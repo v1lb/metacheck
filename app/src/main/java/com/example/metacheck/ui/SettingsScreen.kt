@@ -14,7 +14,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
+import com.example.metacheck.ui.LocalizedText as Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +38,7 @@ import com.example.metacheck.ui.theme.CyberPalette
 @Composable
 fun SettingsScreen(
     onMessage: (String) -> Unit,
+    uiPreferences: com.example.metacheck.ui.preferences.UiPreferences,
     vm: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory),
 ) {
     val settings by vm.settings.collectAsStateWithLifecycle()
@@ -57,16 +58,17 @@ fun SettingsScreen(
         Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
             CyberEyebrow("CONTROL CENTER / LOCAL FIRST")
             Text("Центр управления", style = MaterialTheme.typography.headlineMedium)
-            Text("Приватность, доступ и расширенные возможности", color = CyberPalette.Muted)
+            Text("Приватность, доступ и расширенные возможности", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        GlassPanel(Modifier.fillMaxWidth(), CyberPalette.Purple) {
+        AppearanceSettings(uiPreferences, onMessage)
+        GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
             Column(Modifier.padding(19.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                CyberEyebrow("PLAN / ACCESS", color = CyberPalette.Purple)
+                CyberEyebrow("PLAN / ACCESS", color = MaterialTheme.colorScheme.secondary)
                 Text(if (entitlement.isPro) "METACHECK PRO" else "METACHECK FREE", style = MaterialTheme.typography.titleLarge)
-                Text(proStatusText(entitlement), color = CyberPalette.Muted)
+                Text(proStatusText(entitlement), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(if (entitlement.isPro) "У вас доступен расширенный экспорт и API." else
                     "Базовый анализ и очистка доступны бесплатно. Pro открывает PDF/JSON и до 50 записей в истории.",
-                    style = MaterialTheme.typography.bodyMedium, color = CyberPalette.Muted)
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (!entitlement.isPro) NeonButton("Возможности Pro", proVm::openPaywall, Modifier.fillMaxWidth())
                 if (entitlement.source == ProSource.LICENSE) CyberOutlineButton("Отключить лицензию", proVm::removeLicense)
             }
@@ -83,7 +85,7 @@ fun SettingsScreen(
             }
         }
         SectionLabel("СОБСТВЕННЫЙ API")
-        GlassPanel(Modifier.fillMaxWidth(), CyberPalette.Purple) {
+        GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
             Column(Modifier.padding(19.dp), verticalArrangement = Arrangement.spacedBy(15.dp)) {
                 SwitchRow(
                     title = "Отправлять JSON-отчёт",
@@ -94,7 +96,7 @@ fun SettingsScreen(
                 Row(Modifier.fillMaxWidth().clickable { expandedApi = !expandedApi }.padding(vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text("Настройки соединения", style = MaterialTheme.typography.titleMedium)
-                    Text(if (expandedApi) "−" else "+", color = CyberPalette.Cyan)
+                    Text(if (expandedApi) "−" else "+", color = MaterialTheme.colorScheme.primary)
                 }
                 if (expandedApi) {
                     OutlinedTextField(
@@ -151,21 +153,21 @@ fun SettingsScreen(
                 }
             }
         }
-        GlassPanel(Modifier.fillMaxWidth(), CyberPalette.Green) {
+        GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                CyberEyebrow("SECURITY STATUS", color = CyberPalette.Green)
+                CyberEyebrow("SECURITY STATUS", color = MaterialTheme.colorScheme.tertiary)
                 Text("Хранение только на устройстве", style = MaterialTheme.typography.titleMedium)
                 Text("Сеть используется только при явно включённом внешнем API или запросах к Google Play для покупки Pro.",
-                    style = MaterialTheme.typography.bodySmall, color = CyberPalette.Muted)
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
 
     if (clearConfirm) AlertDialog(
         onDismissRequest = { clearConfirm = false },
-        containerColor = Color(0xFF111C2B),
-        titleContentColor = CyberPalette.White,
-        textContentColor = CyberPalette.White,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurface,
         shape = RoundedCornerShape(26.dp),
         title = { Text("Удалить все отчёты?") },
         text = { Text("Это действие удалит сохранённые отчёты без возможности восстановления.") },
@@ -181,7 +183,7 @@ private fun SwitchRow(title: String, subtitle: String, checked: Boolean, enabled
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(title, style = MaterialTheme.typography.bodyLarge)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = CyberPalette.Muted)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Switch(checked = checked, onCheckedChange = onChange, enabled = enabled)
     }

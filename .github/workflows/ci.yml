@@ -24,8 +24,10 @@ jobs:
           packages: platform-tools
       - name: Install Android platform 36
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
-      - name: Run unit tests, lint and build APK
-        run: gradle --no-daemon testDebugUnitTest lintDebug assembleDebug
+      - name: Verify text contrast
+        run: python3 tools/check_contrast.py
+      - name: Run unit tests, lint, compile instrumentation tests and build APK
+        run: gradle --no-daemon testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest
       - name: Upload unit-test reports when available
         if: always()
         uses: actions/upload-artifact@v4

@@ -5,6 +5,14 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.metacheck.ui.preferences.UiPreferences
+import com.example.metacheck.ui.preferences.UiSelection
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
@@ -20,8 +28,20 @@ class MainActivity : ComponentActivity() {
         // Повторно не анализируем после поворота экрана: состояние уже в ViewModel.
         if (savedInstanceState == null) handleSharedImage(intent)
         setContent {
-            MetaCheckTheme {
-                MainScreen(viewModel)
+            val uiPrefs = remember { UiPreferences(applicationContext) }
+            val selection by uiPrefs.state.collectAsStateWithLifecycle()
+            val config = LocalConfiguration.current
+            val systemLanguage = config.locales[0]?.language ?: "en"
+            val language = UiSelection.effectiveLanguage(selection.language, systemLanguage)
+            val dark = UiSelection.effectiveDark(selection.appearance, isSystemInDarkTheme())
+            CompositionLocalProvider(LocalUiLanguage provides language) {
+                MetaCheckTheme(darkTheme = dark) {
+                    if (!selection.completed) {
+                        OnboardingFlow(uiPrefs)
+                    } else {
+                        MainScreen(viewModel, uiPreferences = uiPrefs)
+                    }
+                }
             }
         }
     }

@@ -37,6 +37,12 @@ class MetadataCatalogTest {
         assertEquals(0, MetadataCatalog.filter(records, MetadataGroup.LOCATION, "samsung").size)
     }
 
+    @Test fun englishSearchMatchesTranslatedTagNames() {
+        val records = MetadataCatalog.from(report)
+        assertEquals(1, MetadataCatalog.filter(records, MetadataGroup.CAMERA, "model").size)
+        assertEquals(1, MetadataCatalog.filter(records, null, "date taken").size)
+    }
+
     @Test fun csvEscapesFormulaAndKeepsUtf8AndQuotes() {
         val csv = String(MetadataCsv.encode(MetadataCatalog.from(report)), Charsets.UTF_8)
         assertTrue(csv.startsWith("\uFEFFcategory"))

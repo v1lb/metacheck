@@ -27,7 +27,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import com.example.metacheck.ui.LocalizedText as Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -85,7 +85,7 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
                 Text(report.file.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             PulseIndicator()
-            Text(" LOCAL", color = CyberPalette.Green, style = MaterialTheme.typography.labelMedium)
+            Text(" LOCAL", color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelMedium)
         }
         Box(Modifier.weight(1f)) {
             when (tab) {
@@ -95,21 +95,21 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
             }
         }
         Row(
-            Modifier.fillMaxWidth().background(CyberPalette.Glass).padding(horizontal = 9.dp, vertical = 9.dp),
+            Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(horizontal = 9.dp, vertical = 9.dp),
             horizontalArrangement = Arrangement.spacedBy(3.dp),
         ) {
             tabs.forEachIndexed { index, item ->
                 val active = item == tab
                 Column(
                     Modifier.weight(1f).clip(RoundedCornerShape(14.dp))
-                        .background(if (active) CyberPalette.Cyan.copy(alpha = .13f) else Color.Transparent)
+                        .background(if (active) MaterialTheme.colorScheme.primary.copy(alpha = .13f) else Color.Transparent)
                         .clickable { selected = index }.padding(vertical = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(item.glyph, style = MaterialTheme.typography.titleLarge,
-                        color = if (active) CyberPalette.Cyan else CyberPalette.Muted)
+                        color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(item.label, style = MaterialTheme.typography.labelMedium,
-                        color = if (active) CyberPalette.White else CyberPalette.Muted)
+                        color = if (active) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -123,9 +123,9 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
     val evidence = report.hasAiEvidence
     val attention = !evidence && (report.file.truncated || report.signals.any { it.severity == Severity.CAUTION })
     val color = when {
-        evidence -> CyberPalette.Danger
-        attention -> CyberPalette.Amber
-        else -> CyberPalette.Cyan
+        evidence -> MaterialTheme.colorScheme.error
+        attention -> if (MaterialTheme.colorScheme.background.red < .15f) Color(0xFFFFC875) else Color(0xFF7F4A00)
+        else -> MaterialTheme.colorScheme.primary
     }
     LazyColumn(modifier = Modifier.testTag("overview_list"), contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(15.dp)) {
         item { PhotoPreview(sourceUri, report.file.name) }
@@ -143,15 +143,15 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
                             else -> "Явных следов ИИ не найдено"
                         },
                         style = MaterialTheme.typography.headlineMedium,
-                        color = CyberPalette.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text("Проверка только метаданных • не анализ пикселей",
-                        color = CyberPalette.Muted, style = MaterialTheme.typography.bodyMedium)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                     ScanningBars(Modifier.fillMaxWidth().height(43.dp))
                     Text(
                         "Результат не подтверждает подлинность снимка. Метаданные могут быть удалены или подделаны.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = CyberPalette.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -159,8 +159,8 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 MetricPanel(report.signals.size.toString(), "СИГНАЛОВ", Modifier.weight(1f))
-                MetricPanel(report.exifSections.size.toString(), "ГРУПП EXIF", Modifier.weight(1f), CyberPalette.Purple)
-                MetricPanel(report.file.format.label, "ФОРМАТ", Modifier.weight(1f), CyberPalette.Green)
+                MetricPanel(report.exifSections.size.toString(), "ГРУПП EXIF", Modifier.weight(1f), MaterialTheme.colorScheme.secondary)
+                MetricPanel(report.file.format.label, "ФОРМАТ", Modifier.weight(1f), MaterialTheme.colorScheme.tertiary)
             }
         }
         item { NeonButton("Посмотреть все метаданные →", onMetadata, Modifier.fillMaxWidth()) }
@@ -182,7 +182,7 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
         items(report.signals) { signal -> SignalPanel(signal) }
         item {
             Text("Оригинальный файл даёт более полные метаданные. В истории MetaCheck хранится отчёт, но не копия фото.",
-                style = MaterialTheme.typography.bodySmall, color = CyberPalette.Muted)
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -228,7 +228,7 @@ private fun PhotoPreview(sourceUri: String?, name: String) {
     GlassPanel(Modifier.fillMaxWidth()) {
         Box(
             Modifier.fillMaxWidth().height(190.dp)
-                .background(Brush.linearGradient(listOf(Color(0xFF192B3A), Color(0xFF101328)))),
+                .background(Brush.linearGradient(listOf(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface))),
             contentAlignment = Alignment.Center,
         ) {
             if (image != null) {
@@ -236,9 +236,9 @@ private fun PhotoPreview(sourceUri: String?, name: String) {
                     contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
             } else {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("◇", color = CyberPalette.Cyan, style = MaterialTheme.typography.headlineLarge)
+                    Text("◇", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.headlineLarge)
                     Text(if (sourceUri == null) "Фотография не хранится в истории" else "Превью недоступно",
-                        color = CyberPalette.Muted, style = MaterialTheme.typography.bodyMedium)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                 }
             }
             CyberEyebrow("IMAGE  /  LOCAL PREVIEW", Modifier.align(Alignment.TopStart).padding(12.dp))
@@ -249,9 +249,9 @@ private fun PhotoPreview(sourceUri: String?, name: String) {
 @Composable
 private fun SignalPanel(signal: Signal) {
     val color = when (signal.severity) {
-        Severity.AI_EVIDENCE -> CyberPalette.Danger
-        Severity.CAUTION -> CyberPalette.Amber
-        Severity.INFO -> CyberPalette.Cyan
+        Severity.AI_EVIDENCE -> MaterialTheme.colorScheme.error
+        Severity.CAUTION -> if (MaterialTheme.colorScheme.background.red < .15f) Color(0xFFFFC875) else Color(0xFF7F4A00)
+        Severity.INFO -> MaterialTheme.colorScheme.primary
     }
     GlassPanel(modifier = Modifier.fillMaxWidth(), accent = color) {
         Column(Modifier.padding(17.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -261,7 +261,7 @@ private fun SignalPanel(signal: Signal) {
                 Severity.INFO -> "INFORMATION"
             }, color = color)
             Text(signal.title, style = MaterialTheme.typography.titleMedium)
-            Text(signal.detail, color = CyberPalette.Muted, style = MaterialTheme.typography.bodyMedium)
+            Text(signal.detail, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -286,6 +286,6 @@ private fun GpsTab(gps: GpsPoint) {
             }, modifier = Modifier.fillMaxWidth())
         }
         item { Text("Для открытия карты потребуется другое приложение. GPS из отчёта не отправляется MetaCheck на сервер.",
-            style = MaterialTheme.typography.bodySmall, color = CyberPalette.Muted) }
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }

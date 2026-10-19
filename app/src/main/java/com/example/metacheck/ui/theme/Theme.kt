@@ -7,6 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -36,7 +38,7 @@ private val Colors = darkColorScheme(
     primaryContainer = Color(0xFF123741),
     onPrimaryContainer = Color(0xFFCAFBFF),
     secondary = CyberPalette.Purple,
-    onSecondary = Color.White,
+    onSecondary = Color(0xFF241137),
     secondaryContainer = Color(0xFF33204C),
     onSecondaryContainer = Color(0xFFF2DDFF),
     tertiary = CyberPalette.Green,
@@ -55,6 +57,29 @@ private val Colors = darkColorScheme(
     onErrorContainer = Color(0xFFFFDCE6),
 )
 
+private val LightColors = lightColorScheme(
+    primary = Color(0xFF00556B),
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFFCAF2F5),
+    onPrimaryContainer = Color(0xFF003D49),
+    secondary = Color(0xFF63339C),
+    onSecondary = Color.White,
+    secondaryContainer = Color(0xFFEAD9FF),
+    onSecondaryContainer = Color(0xFF38135F),
+    tertiary = Color(0xFF00583D),
+    onTertiary = Color.White,
+    background = Color(0xFFF4F8FC),
+    onBackground = Color(0xFF0A2233),
+    surface = Color(0xFFFFFFFF),
+    onSurface = Color(0xFF0A2233),
+    surfaceVariant = Color(0xFFE5EEF6),
+    onSurfaceVariant = Color(0xFF334D60),
+    outline = Color(0xFF758A9B),
+    error = Color(0xFFAD2548),
+    errorContainer = Color(0xFFFFDFE5),
+    onErrorContainer = Color(0xFF69001D),
+)
+
 private val Type = Typography(
     headlineLarge = TextStyle(fontSize = 34.sp, lineHeight = 40.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.8).sp),
     headlineMedium = TextStyle(fontSize = 29.sp, lineHeight = 35.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.5).sp),
@@ -67,15 +92,15 @@ private val Type = Typography(
 )
 
 @Composable
-fun MetaCheckTheme(content: @Composable () -> Unit) {
+fun MetaCheckTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = Colors,
+        colorScheme = if (darkTheme) Colors else LightColors,
         typography = Type,
         shapes = Shapes(
             small = RoundedCornerShape(10.dp),
             medium = RoundedCornerShape(18.dp),
             large = RoundedCornerShape(26.dp),
         ),
-        content = { CompositionLocalProvider(LocalContentColor provides CyberPalette.White) { content() } },
+        content = { CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) { content() } },
     )
 }

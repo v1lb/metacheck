@@ -17,7 +17,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import com.example.metacheck.ui.LocalizedText as Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,8 +51,8 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 CyberEyebrow("NATIVE METADATA EXPLORER  /  LOCAL")
-                Text("Метаданные файла", style = MaterialTheme.typography.headlineMedium, color = CyberPalette.White)
-                Text("${records.size} полей · просмотр прямо на устройстве", color = CyberPalette.Muted)
+                Text("Метаданные файла", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
+                Text("${records.size} полей · просмотр прямо на устройстве", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         item {
@@ -81,9 +81,9 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?) {
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("НАЙДЕНО: ${results.size}", style = MaterialTheme.typography.labelMedium,
-                    color = CyberPalette.Cyan)
+                    color = MaterialTheme.colorScheme.primary)
                 if (onCsv != null) {
-                    TextButton(onClick = onCsv) { Text("Экспорт CSV ↗", color = CyberPalette.Cyan) }
+                    TextButton(onClick = onCsv) { Text("Экспорт CSV ↗", color = MaterialTheme.colorScheme.primary) }
                 }
             }
         }
@@ -92,10 +92,10 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?) {
                 GlassPanel(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(19.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
                         Text("Ничего не найдено", style = MaterialTheme.typography.titleMedium,
-                            color = CyberPalette.White)
+                            color = MaterialTheme.colorScheme.onSurface)
                         Text(if (records.isEmpty()) "Файл не содержит распознанных метаданных."
                             else "Попробуйте другой запрос или выберите категорию «Все».",
-                            color = CyberPalette.Muted)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (query.isNotEmpty() || group != null) {
                             CyberOutlineButton("Сбросить фильтры", { query = ""; groupId = "" })
                         }
@@ -114,7 +114,7 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?) {
         item {
             Text("Показаны доступные поля, извлечённые локальными парсерами MetaCheck. " +
                 "Отсутствие тега не доказывает подлинность файла. GPS может содержать личные данные.",
-                color = CyberPalette.Muted, style = MaterialTheme.typography.bodySmall)
+                color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -126,27 +126,27 @@ private fun MetadataChip(title: String, active: Boolean, onClick: () -> Unit) {
         onClick = onClick,
         label = { Text(title, maxLines = 1) },
         colors = FilterChipDefaults.filterChipColors(
-            containerColor = CyberPalette.Glass,
-            labelColor = CyberPalette.White,
-            selectedContainerColor = CyberPalette.Cyan.copy(alpha = .22f),
-            selectedLabelColor = CyberPalette.White,
+            containerColor = MaterialTheme.colorScheme.surface,
+            labelColor = MaterialTheme.colorScheme.onSurface,
+            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = .22f),
+            selectedLabelColor = MaterialTheme.colorScheme.onSurface,
         ),
-        border = BorderStroke(1.dp, if (active) CyberPalette.Cyan else CyberPalette.Line),
+        border = BorderStroke(1.dp, if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline),
     )
 }
 
 @Composable
 private fun MetadataEntry(record: MetadataRecord) {
-    GlassPanel(Modifier.fillMaxWidth(), accent = if (record.group == MetadataGroup.LOCATION) CyberPalette.Green else CyberPalette.Cyan) {
+    GlassPanel(Modifier.fillMaxWidth(), accent = if (record.group == MetadataGroup.LOCATION) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 13.dp),
             verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Text(record.label, style = MaterialTheme.typography.labelLarge, color = CyberPalette.Muted)
+            Text(record.label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             SelectionContainer {
                 Text(record.value, style = MaterialTheme.typography.bodyLarge,
-                    color = CyberPalette.White, modifier = Modifier.fillMaxWidth())
+                    color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.fillMaxWidth())
             }
             Text(record.section, style = MaterialTheme.typography.labelMedium,
-                color = CyberPalette.Cyan.copy(alpha = .92f))
+                color = MaterialTheme.colorScheme.primary.copy(alpha = .92f))
         }
     }
 }

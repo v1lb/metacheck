@@ -61,7 +61,26 @@ object MetadataCatalog {
         val words = query.trim().lowercase(Locale.ROOT).split(Regex("\\s+")).filter { it.isNotEmpty() }
         return items.filter { item ->
             (group == null || item.group == group) && run {
-                val searchable = "${item.group.title} ${item.section} ${item.label} ${item.value}".lowercase(Locale.ROOT)
+                val internationalCategory = when (item.group) {
+                    MetadataGroup.MAIN -> "general file dates"
+                    MetadataGroup.CAMERA -> "camera lens exposure shutter"
+                    MetadataGroup.LOCATION -> "gps location latitude longitude altitude"
+                    MetadataGroup.EXIF -> "technical exif image software"
+                    MetadataGroup.XMP -> "xmp iptc metadata"
+                    MetadataGroup.PNG -> "png text comments"
+                }
+                val englishField = when (item.label) {
+                    "Имя" -> "name"; "Формат" -> "format"; "Размер, байт" -> "size bytes"
+                    "Производитель" -> "make manufacturer"; "Модель" -> "model"
+                    "Дата съёмки" -> "date taken"; "Дата изменения" -> "date modified"
+                    "Выдержка" -> "shutter speed"; "Диафрагма" -> "aperture"
+                    "Фокусное расстояние" -> "focal length"; "Баланс белого" -> "white balance"
+                    "Широта" -> "latitude"; "Долгота" -> "longitude"
+                    "Программа" -> "software"; "Автор" -> "author"; "Комментарий" -> "comment"
+                    "Описание" -> "description"; "Высота" -> "altitude"; "Ширина" -> "width"
+                    else -> ""
+                }
+                val searchable = "$internationalCategory $englishField ${item.group.title} ${item.section} ${item.label} ${item.value}".lowercase(Locale.ROOT)
                 words.all { searchable.contains(it) }
             }
         }

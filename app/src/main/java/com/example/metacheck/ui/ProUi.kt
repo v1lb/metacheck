@@ -11,7 +11,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import com.example.metacheck.ui.LocalizedText as Text
 import androidx.compose.material3.TextButton
 import com.example.metacheck.ui.theme.CyberPalette
 import androidx.compose.runtime.Composable
@@ -39,19 +39,19 @@ fun PaywallDialog(vm: ProViewModel) {
 
     AlertDialog(
         onDismissRequest = vm::dismissPaywall,
-        containerColor = Color(0xFF111C2B),
-        titleContentColor = CyberPalette.White,
-        textContentColor = CyberPalette.White,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurface,
         shape = RoundedCornerShape(26.dp),
-        title = { Text("MetaCheck Pro", color = CyberPalette.White) },
+        title = { Text("MetaCheck Pro", color = MaterialTheme.colorScheme.onSurface) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                CyberEyebrow("FREE  →  PRO", color = CyberPalette.Cyan)
+                CyberEyebrow("FREE  →  PRO", color = MaterialTheme.colorScheme.primary)
                 ScanningBars(Modifier.fillMaxWidth().height(38.dp))
                 Text("Free: локальный анализ, EXIF, очистка, статистика и CSV-история.")
                 Text("Pro: экспорт PDF/JSON, до 50 отчётов, подключение собственного API.")
                 Text("Разовая покупка через Google Play, без подписки. Цена показывается только если доступен товар pro_lifetime в Play Console.",
-                    style = MaterialTheme.typography.bodySmall, color = CyberPalette.Muted)
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 OutlinedTextField(
                     value = keyInput,
                     onValueChange = { keyInput = it },

@@ -1,3 +1,7 @@
+# MetaCheck 2.3 — Cyber Grid / Neon Intelligence
+
+**Новый первый запуск:** Welcome → язык RU/EN → тема Dark/Light. Переключение сразу, настройки сохраняются. Встроенный Metadata Viewer не требует экспорта. Сведения об изменениях и проверках — [RELEASE_2_3.md](RELEASE_2_3.md).
+
 # MetaCheck · Cyber Grid 2.2
 
 Нативный просмотрщик всех извлечённых EXIF/XMP/GPS полей: категории, поиск и экспорт CSV.
