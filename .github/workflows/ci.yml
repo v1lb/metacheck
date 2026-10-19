@@ -19,6 +19,8 @@ jobs:
       # Подписанный релиз собирается вручную (см. DEPLOY.md), в CI проверяем тесты, линт и debug-сборку.
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
       - name: Install Android platform 36
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - name: Run unit tests, lint and build APK
