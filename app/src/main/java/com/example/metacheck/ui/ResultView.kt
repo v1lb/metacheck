@@ -16,6 +16,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
@@ -38,9 +45,9 @@ import com.example.metacheck.domain.model.Signal
 import java.util.Locale
 
 private enum class ResultTab(val title: String) {
-    AI("ИИ-анализ"),
-    EXIF("EXIF и камера"),
-    FILE("Файл и ПО"),
+    AI("Анализ"),
+    EXIF("Камера"),
+    FILE("Файл"),
     MAP("Карта"),
 }
 
@@ -82,7 +89,12 @@ fun ResultView(report: MetaReport, actions: ResultActions) {
             actions.onClean?.let { AssistChip(onClick = it, label = { Text("Очистить метаданные") }) }
             actions.onApi?.let { AssistChip(onClick = it, label = { Text("Проверить через API") }) }
         }
-        ScrollableTabRow(selectedTabIndex = index, edgePadding = 8.dp) {
+        ScrollableTabRow(
+            selectedTabIndex = index, edgePadding = 12.dp,
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.primary,
+            divider = { HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .35f)) },
+        ) {
             tabs.forEachIndexed { i, tab ->
                 Tab(selected = i == index, onClick = { selected = i }, text = { Text(tab.title) })
             }
@@ -102,6 +114,9 @@ fun ResultView(report: MetaReport, actions: ResultActions) {
 private fun AiTab(report: MetaReport) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = listPadding, verticalArrangement = listSpacing) {
         item {
+            CyberSummary(report)
+        }
+        item {
             if (report.hasAiEvidence) {
                 BannerCard(
                     title = "Найдены следы ИИ-генерации",
@@ -120,6 +135,31 @@ private fun AiTab(report: MetaReport) {
             }
         }
         items(report.signals) { SignalCard(it) }
+    }
+}
+
+@Composable
+private fun CyberSummary(report: MetaReport) {
+    val scheme = MaterialTheme.colorScheme
+    val warning = report.hasAiEvidence
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(1.dp, if (warning) scheme.error.copy(alpha = .5f) else scheme.primary.copy(alpha = .5f)),
+        colors = CardDefaults.cardColors(containerColor = scheme.surface),
+    ) {
+        Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("METACHECK  /  IMAGE INTELLIGENCE", style = MaterialTheme.typography.labelSmall,
+                color = scheme.primary)
+            Text(if (warning) "Обнаружены признаки ИИ" else "Явных следов ИИ нет",
+                style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text("Проверка метаданных • ${report.signals.size} сигналов",
+                style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant)
+            HorizontalDivider(color = scheme.outline.copy(alpha = .3f))
+            Text("Результат относится только к доступным метаданным. " +
+                "Он не подтверждает подлинность изображения и не заменяет анализ пикселей.",
+                style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+        }
     }
 }
 

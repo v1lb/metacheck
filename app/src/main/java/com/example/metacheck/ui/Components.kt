@@ -1,5 +1,6 @@
 package com.example.metacheck.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,11 +8,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.metacheck.domain.model.MetaItem
 import java.util.Locale
@@ -20,10 +23,19 @@ private const val MAX_VALUE_CHARS = 6000
 
 @Composable
 fun SectionCard(title: String, items: List<MetaItem>) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            items.forEach { ItemRow(it) }
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = .48f)),
+    ) {
+        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary)
+            items.forEachIndexed { index, item ->
+                if (index > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .22f))
+                ItemRow(item)
+            }
         }
     }
 }
@@ -32,20 +44,17 @@ fun SectionCard(title: String, items: List<MetaItem>) {
 private fun ItemRow(item: MetaItem) {
     val value = if (item.value.length > MAX_VALUE_CHARS) item.value.take(MAX_VALUE_CHARS) + "…" else item.value
     val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
-    if (value.length > 60 || value.contains('\n')) {
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(item.label, style = MaterialTheme.typography.bodySmall, color = labelColor)
+    if (value.length > 42 || value.contains('\n')) {
+        Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            Text(item.label, style = MaterialTheme.typography.labelMedium, color = labelColor)
             Text(value, style = MaterialTheme.typography.bodyMedium)
         }
     } else {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(
-                item.label,
-                style = MaterialTheme.typography.bodySmall,
-                color = labelColor,
-                modifier = Modifier.weight(0.4f),
-            )
-            Text(value, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(0.6f))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Text(item.label, style = MaterialTheme.typography.labelMedium, color = labelColor,
+                modifier = Modifier.weight(.46f))
+            Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(.54f))
         }
     }
 }
@@ -54,10 +63,12 @@ private fun ItemRow(item: MetaItem) {
 fun BannerCard(title: String, body: String, container: Color, content: Color) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, content.copy(alpha = .25f)),
         colors = CardDefaults.cardColors(containerColor = container, contentColor = content),
     ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(body, style = MaterialTheme.typography.bodyMedium)
         }
     }
