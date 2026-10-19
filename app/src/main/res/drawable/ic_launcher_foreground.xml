@@ -1,27 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Лупа с галочкой, помещается в безопасную зону адаптивной иконки (66 из 108 dp). -->
+<!-- Cyber Grid glyph: shield/hexagon and scan core; safe area for 108dp adaptive icon. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="6"
-        android:strokeLineCap="round"
-        android:pathData="M35,50 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0" />
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="6"
-        android:strokeLineCap="round"
-        android:pathData="M60,60 L74,74" />
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="4"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M43,50 L48,55 L57,45" />
+    <path android:fillColor="#00000000" android:strokeColor="#00F3FF"
+        android:strokeWidth="2.8" android:strokeLineJoin="round"
+        android:pathData="M54,23 L77,36 L77,63 L54,78 L31,63 L31,36 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#9D4EDD"
+        android:strokeWidth="1.6" android:strokeLineJoin="round"
+        android:pathData="M54,30 L71,40 L71,59 L54,70 L37,59 L37,40 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#00F3FF"
+        android:strokeWidth="2.2" android:pathData="M43,51 a11,11 0,1 0,22 0 a11,11 0,1 0,-22 0" />
+    <path android:fillColor="#00F3FF" android:pathData="M52,48 L60,51 L52,54 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#00FFB2"
+        android:strokeWidth="2" android:strokeLineCap="round"
+        android:pathData="M42,64 L47,64 M61,37 L66,37" />
 </vector>

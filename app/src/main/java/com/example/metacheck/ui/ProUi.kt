@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import com.example.metacheck.ui.theme.CyberPalette
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,13 +39,11 @@ fun PaywallDialog(vm: ProViewModel) {
         title = { Text("MetaCheck Pro") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(
-                    "Анализ, копирование и очистка метаданных остаются бесплатными. Pro добавляет:\n" +
-                        "• экспорт отчётов в PDF и JSON\n" +
-                        "• историю до 50 отчётов (бесплатно 10)\n" +
-                        "• отправку отчёта в твой API\n\n" +
-                        "Оплата разовая, без подписки.",
-                )
+                CyberEyebrow("FREE  →  PRO", color = CyberPalette.Purple)
+                Text("Free: локальный анализ, EXIF, очистка, статистика и CSV-история.")
+                Text("Pro: экспорт PDF/JSON, до 50 отчётов, подключение собственного API.")
+                Text("Разовая покупка через Google Play, без подписки. Цена показывается только если доступен товар pro_lifetime в Play Console.",
+                    style = MaterialTheme.typography.bodySmall, color = CyberPalette.Muted)
                 OutlinedTextField(
                     value = keyInput,
                     onValueChange = { keyInput = it },
@@ -59,8 +58,8 @@ fun PaywallDialog(vm: ProViewModel) {
             }
         },
         confirmButton = {
-            Button(onClick = { context.findActivity()?.let(vm::buy) }) {
-                Text(if (price != null) "Купить за $price" else "Купить")
+            Button(onClick = { context.findActivity()?.let(vm::buy) }, enabled = price != null) {
+                Text(if (price != null) "Купить за $price" else "Покупка недоступна")
             }
         },
         dismissButton = { TextButton(onClick = vm::dismissPaywall) { Text("Закрыть") } },

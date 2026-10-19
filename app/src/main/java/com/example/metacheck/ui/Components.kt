@@ -27,8 +27,8 @@ import java.util.Locale
 private const val MAX_VALUE_CHARS = 6000
 
 @Composable
-fun SectionCard(title: String, items: List<MetaItem>) {
-    var expanded by remember(title) { mutableStateOf(false) }
+fun SectionCard(title: String, items: List<MetaItem>, initiallyExpanded: Boolean = false) {
+    var expanded by remember(title) { mutableStateOf(initiallyExpanded) }
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),

@@ -26,6 +26,7 @@ import java.io.File
 
 /** Ручной DI: для проекта такого размера Hilt не нужен. */
 class AppContainer(app: Application) {
+    val contentResolver = app.contentResolver
     private val crypto: Crypto = KeystoreCrypto()
     private val imageRepository: ImageRepository = ImageRepositoryImpl(app.contentResolver)
 

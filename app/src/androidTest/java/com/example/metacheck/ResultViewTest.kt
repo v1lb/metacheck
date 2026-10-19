@@ -1,9 +1,13 @@
 package com.example.metacheck
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertDoesNotExist
+import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToIndex
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.metacheck.domain.model.FileInfo
 import com.example.metacheck.domain.model.GpsPoint
@@ -47,19 +51,22 @@ class ResultViewTest {
     @Test
     fun showsAiVerdictWhenEvidenceFound() {
         show(report(ai = true, gps = false))
-        compose.onNodeWithText("Найдены следы ИИ-генерации").assertIsDisplayed()
+        compose.onNodeWithTag("overview_list").performScrollToIndex(1)
+        compose.onNodeWithText("Обнаружены признаки ИИ").assertExists()
     }
 
     @Test
     fun showsNeutralVerdictWithoutEvidence() {
         show(report(ai = false, gps = false))
-        compose.onNodeWithText("В метаданных следов ИИ не найдено").assertIsDisplayed()
+        compose.onNodeWithTag("overview_list").performScrollToIndex(1)
+        compose.onNodeWithText("Явных следов ИИ не найдено").assertExists()
     }
 
     @Test
     fun exifTabShowsCameraData() {
         show(report(ai = false, gps = false))
-        compose.onNodeWithText("EXIF и камера").performClick()
+        compose.onNodeWithText("Камера").performClick()
+        compose.onNodeWithText("Камера и объектив").performClick()
         compose.onNodeWithText("Pixel 8").assertIsDisplayed()
     }
 
@@ -72,15 +79,16 @@ class ResultViewTest {
     @Test
     fun cleanAndApiButtonsAreHiddenWhenUnavailable() {
         show(report(ai = false, gps = false))
-        compose.onNodeWithText("Копировать всё").assertIsDisplayed()
-        compose.onNodeWithText("Очистить метаданные").assertDoesNotExist()
+        compose.onNodeWithTag("overview_list").performScrollToIndex(4)
+        compose.onNodeWithText("Копировать").assertExists()
+        compose.onNodeWithText("Очистить EXIF").assertDoesNotExist()
     }
 
     @Test
     fun cleanButtonShownWhenProvided() {
         show(report(ai = false, gps = false), ResultActions({}, {}, {}, {}, {}))
-        // Чипы в прокручиваемом ряду могут быть за краем экрана, поэтому проверяем наличие, а не видимость.
-        compose.onNodeWithText("Очистить метаданные").assertExists()
+        compose.onNodeWithTag("overview_list").performScrollToIndex(4)
+        compose.onNodeWithText("Очистить EXIF").assertExists()
         compose.onNodeWithText("Проверить через API").assertExists()
     }
 }

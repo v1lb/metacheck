@@ -1,6 +1,11 @@
 package com.example.metacheck.ui
 
 import android.net.Uri
+import android.content.ContentResolver
+import com.example.metacheck.domain.export.HistoryCsv
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CancellationException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -47,6 +52,7 @@ class MainViewModel(
     private val cleanMetadata: CleanMetadataUseCase,
     private val checkViaApi: CheckViaApiUseCase,
     private val history: HistoryRepository,
+    private val resolver: ContentResolver,
     settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
@@ -76,7 +82,11 @@ class MainViewModel(
     }
 
     fun refreshHistory() {
-        viewModelScope.launch { _history.value = history.list() }
+        viewModelScope.launch {
+            try { _history.value = history.list() }
+            catch (e: CancellationException) { throw e }
+            catch (_: Exception) { showMessage("Не удалось загрузить историю") }
+        }
     }
 
     fun showMessage(text: String) {
@@ -127,6 +137,26 @@ class MainViewModel(
         analyzeJob?.cancel()
         _state.value = UiState.Idle
         refreshHistory()
+    }
+
+    fun exportHistoryCsv(target: Uri) {
+        viewModelScope.launch {
+            _busy.value = true
+            try {
+                withContext(Dispatchers.IO) {
+                    val data = HistoryCsv.encode(history.list())
+                    resolver.openOutputStream(target, "wt")?.use { it.write(data) }
+                        ?: error("Невозможно открыть файл")
+                }
+                showMessage("CSV с историей сохранён")
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                showMessage("Не удалось сохранить CSV")
+            } finally {
+                _busy.value = false
+            }
+        }
     }
 
     fun exportJson(target: Uri) = withDone { done ->
@@ -195,6 +225,10 @@ class MainViewModel(
             _busy.value = true
             try {
                 block(done)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                showMessage("Не удалось завершить операцию")
             } finally {
                 _busy.value = false
             }
@@ -213,7 +247,7 @@ class MainViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val c = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MetaCheckApplication).container
-                MainViewModel(c.analyzeImage, c.exportReport, c.cleanMetadata, c.checkViaApi, c.history, c.settings)
+                MainViewModel(c.analyzeImage, c.exportReport, c.cleanMetadata, c.checkViaApi, c.history, c.contentResolver, c.settings)
             }
         }
     }
