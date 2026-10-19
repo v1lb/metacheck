@@ -15,7 +15,7 @@ fun localize(value: String, language: AppLanguage): String {
     if (value.startsWith("Упоминание «") && value.endsWith("» в тексте"))
         return value.replaceFirst("Упоминание «", "Mention of ‘").replace("» в тексте", "’ in text")
     if (value.startsWith("Проверяемое изображение: ")) return value.replaceFirst("Проверяемое изображение: ", "Image: ")
-    if (value.startsWith("FREE · Очищено сегодня: ")) return value.replace("FREE · Очищено сегодня: ", "FREE · Cleaned today: ").replace(" из 1 · Сброс в 00:00 UTC", " of 1 · Reset 00:00 UTC")
+    if (value.startsWith("FREE · Очищено сегодня: ")) return value.replace("FREE · Очищено сегодня: ", "FREE · Cleaned today: ").replace(" из 75 · Сброс в 00:00 UTC", " of 75 · Reset 00:00 UTC")
     if (value.startsWith("Выбрано: ")) return value.replaceFirst("Выбрано: ", "Selected: ")
     if (value.startsWith("Широта ") && value.contains("Долгота")) return value.replace("Широта", "Latitude").replace("Долгота", "Longitude")
     if (value.startsWith("Дата оригинала: ")) return value.replaceFirst("Дата оригинала: ", "Date taken: ").replace("не изменять", "unchanged")
@@ -42,7 +42,7 @@ private val translations: Map<String, String> = mapOf(
     "Это не означает, что за вами следят. Риск возникает, если передать файл с геометками." to "This does not mean someone is tracking you. The privacy risk arises when you share a file with location data.",
     "Перед отправкой лучше создать копию без GPS — это простой способ защитить своё местоположение." to "Before sharing, make a GPS-free copy to help keep your location private.",
     "Защитить фото · удалить GPS" to "Protect photo · remove GPS",
-    "После нажатия выберите место для новой копии. Оригинал не изменится. Отправляйте именно копию. Free: 1 очистка в сутки." to "After tapping, choose where to save a new copy. The original stays unchanged. Share the copy, not the original. Free: 1 clean per day.",
+    "После нажатия выберите место для новой копии. Оригинал не изменится. Отправляйте именно копию. Free: 75 обработок в сутки." to "After tapping, choose where to save a new copy. The original stays unchanged. Share the copy, not the original. Free: 75 operations per day.",
     "Чтобы убрать геометки, откройте исходную фотографию JPEG/PNG: сохранённый отчёт не содержит самого фото." to "Open the original JPEG/PNG to remove location tags; a saved report contains no photo data.",
     "КООРДИНАТЫ В ИСХОДНОМ ФАЙЛЕ" to "COORDINATES IN ORIGINAL FILE",
     "Точку нельзя показать на карте: GPS-данные неполные или записаны в XMP/PNG." to "Map position is unavailable: GPS tags are incomplete or stored in XMP/PNG.",
@@ -51,9 +51,9 @@ private val translations: Map<String, String> = mapOf(
     "Положение маркера соответствует координатам EXIF. Контуры суши приблизительные; улицы не показаны. Без интернета." to "Marker follows the exact EXIF coordinates. Simplified land outlines, no streets. Fully offline.",
     "Встроенная карта работает без сети. Нажатие «Открыть в картах» передаст координаты выбранному внешнему приложению." to "Offline map never transmits coordinates. Opening an external maps app shares GPS with that app.",
     "EXIF-редактор PRO" to "EXIF editor PRO",
-    "Бесплатно: анализ, GPS Privacy Shield и 1 очистка в сутки. Pro: безлимитная очистка, EXIF-редактор, пакетная обработка, PDF/JSON." to "Free: scans, GPS Privacy Shield and one clean per day. Pro: unlimited cleaning, EXIF editing, batch, PDF/JSON.",
-    "Free: анализ и GPS Privacy Shield, просмотр EXIF, 1 очистка фото в сутки (UTC), 10 отчётов в истории." to "Free: scans, GPS Privacy Shield, EXIF viewer, one cleaned photo per UTC day, 10 saved reports.",
-    "Pro: безлимитная очистка, EXIF-редактор, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API." to "Pro: unlimited cleaning, EXIF editor, batch up to 50 photos, PDF/JSON, 50 reports, API.",
+    "Бесплатно: анализ, GPS Privacy Shield и 75 обработок в сутки. Pro: безлимитная очистка, пакетная обработка, PDF/JSON." to "Free: scans, GPS Privacy Shield and 75 operations per day. Pro: unlimited cleaning, batch, PDF/JSON.",
+    "Free: анализ и GPS Privacy Shield, просмотр EXIF, 75 обработок фото в сутки (UTC), 10 отчётов в истории." to "Free: scans, GPS Privacy Shield, EXIF viewer, 75 edited or cleaned photos per UTC day, 10 saved reports.",
+    "Pro: безлимитная очистка, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API." to "Pro: unlimited cleaning, EXIF editor, batch up to 50 photos, PDF/JSON, 50 reports, API.",
     "Реальное сохранение изменений в файл. Без отправки изображения в сеть." to "Real file modifications. Your image is never uploaded.",
     "← К отчёту" to "← Back to report",
     "Очистка" to "Clean", "EXIF-редактор" to "EXIF editor", "Пакетно PRO" to "Batch PRO",

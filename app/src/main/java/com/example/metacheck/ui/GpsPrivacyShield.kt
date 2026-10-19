@@ -123,7 +123,7 @@ fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean 
                 )
             }
             Text(
-                "После нажатия выберите место для новой копии. Оригинал не изменится. Отправляйте именно копию. Free: 1 очистка в сутки.",
+                "После нажатия выберите место для новой копии. Оригинал не изменится. Отправляйте именно копию. Free: 75 обработок в сутки.",
                 color = softText,
                 style = MaterialTheme.typography.bodySmall,
             )

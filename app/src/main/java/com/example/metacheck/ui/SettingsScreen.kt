@@ -67,7 +67,7 @@ fun SettingsScreen(
                 Text(if (entitlement.isPro) "METACHECK PRO" else "METACHECK FREE", style = MaterialTheme.typography.titleLarge)
                 Text(proStatusText(entitlement), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(if (entitlement.isPro) "У вас доступен расширенный экспорт и API." else
-                    "Бесплатно: анализ, GPS Privacy Shield и 1 очистка в сутки. Pro: безлимитная очистка, EXIF-редактор, пакетная обработка, PDF/JSON.",
+                    "Бесплатно: анализ, GPS Privacy Shield и 75 обработок в сутки. Pro: безлимитная очистка, пакетная обработка, PDF/JSON.",
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (!entitlement.isPro) NeonButton("Возможности Pro", proVm::openPaywall, Modifier.fillMaxWidth())
                 if (entitlement.source == ProSource.LICENSE) CyberOutlineButton("Отключить лицензию", proVm::removeLicense)

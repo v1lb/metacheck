@@ -29,7 +29,7 @@ interface DailyCleanQuota {
     fun recordSuccess(): Boolean
 }
 
-class DailyLimitReachedException : Exception("Бесплатная очистка: 1 фотография за день. Повторите завтра (UTC) или откройте Pro")
+class DailyLimitReachedException : Exception("Бесплатная очистка: 75 фотографий за день. Повторите завтра (UTC) или откройте Pro")
 
 /** Serialize quota check + successful write so concurrent exports cannot bypass Free limits. */
 class MetadataStudioUseCase(
@@ -43,7 +43,7 @@ class MetadataStudioUseCase(
         runCatchingCancellable {
             lock.withLock {
                 val free = !entitlements.entitlement.value.isPro
-                if (free && quota.usedToday() >= 1) {
+                if (free && quota.usedToday() >= 75) {
                     throw DailyLimitReachedException()
                 }
                 val result = action()
@@ -62,30 +62,18 @@ class MetadataStudioUseCase(
         repository.wipeGpsCopy(source, destination)
     }
 
-    suspend fun edit(source: String, destination: String, patch: MetadataPatch): Result<MetadataWriteResult> = runCatchingCancellable {
-        if (!entitlements.entitlement.value.isPro) throw ProRequiredException()
+    suspend fun edit(source: String, destination: String, patch: MetadataPatch): Result<MetadataWriteResult> = limitedWrite {
         val errors = MetadataPatchValidator.validate(patch)
         require(errors.isEmpty()) { errors.joinToString("; ") }
         repository.editCopy(source, destination, patch)
     }
 
-    suspend fun overwrite(source: String, backup: String, patch: MetadataPatch?): Result<MetadataWriteResult> = runCatchingCancellable {
+    suspend fun overwrite(source: String, backup: String, patch: MetadataPatch?): Result<MetadataWriteResult> = limitedWrite {
         if (patch != null) {
-            if (!entitlements.entitlement.value.isPro) throw ProRequiredException()
             val errors = MetadataPatchValidator.validate(patch)
             require(errors.isEmpty()) { errors.joinToString("; ") }
-            repository.overwriteWithBackup(source, backup, patch)
-        } else {
-            lock.withLock {
-                val free = !entitlements.entitlement.value.isPro
-                if (free && quota.usedToday() >= 1) throw DailyLimitReachedException()
-                val result = repository.overwriteWithBackup(source, backup, null)
-                if (free && !quota.recordSuccess()) {
-                    throw IllegalStateException("Оригинал заменён, но лимит не сохранён: проверьте файл и резервную копию")
-                }
-                result
-            }
         }
+        repository.overwriteWithBackup(source, backup, patch)
     }
 
     suspend fun batch(sources: List<String>, tree: String, progress: (BatchProgress) -> Unit): Result<BatchProgress> = runCatchingCancellable {

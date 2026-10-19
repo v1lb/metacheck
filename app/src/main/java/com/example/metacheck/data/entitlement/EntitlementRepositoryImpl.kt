@@ -40,7 +40,11 @@ class EntitlementRepositoryImpl(
     }
 
     override suspend fun refresh() {
-        billing.queryOwned()?.let { prefs.edit().putBoolean(K_PLAY, it).apply() }
+        billing.queryOwned()?.let { owned ->
+            val encrypted = crypto.encrypt(owned.toString().toByteArray(Charsets.UTF_8))
+            prefs.edit().remove("play_owned")
+                .putString(K_PLAY, Base64.encodeToString(encrypted, Base64.NO_WRAP)).commit()
+        }
         state.value = computeNow()
     }
 
@@ -65,7 +69,14 @@ class EntitlementRepositoryImpl(
     }
 
     private fun computeNow(): Entitlement =
-        Entitlement.resolve(prefs.getBoolean(K_PLAY, false), storedLicense())
+        Entitlement.resolve(cachedPlayOwned(), storedLicense())
+
+    private fun cachedPlayOwned(): Boolean {
+        return try {
+            val blob = prefs.getString(K_PLAY, null) ?: return false
+            crypto.decrypt(Base64.decode(blob, Base64.NO_WRAP)).toString(Charsets.UTF_8) == "true"
+        } catch (_: Exception) { false }
+    }
 
     private fun storedLicense(): LicenseInfo? =
         try {
@@ -78,7 +89,7 @@ class EntitlementRepositoryImpl(
         }
 
     private companion object {
-        const val K_PLAY = "play_owned"
+        const val K_PLAY = "play_owned_encrypted_v2"
         const val K_LICENSE = "license_enc"
     }
 }

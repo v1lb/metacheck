@@ -52,6 +52,6 @@ class AppContainer(app: Application) {
 
     val analyzeImage = AnalyzeImageUseCase(imageRepository)
     val exportReport = ExportReportUseCase(ExportRepositoryImpl(app.contentResolver), entitlements)
-    val metadataStudio = MetadataStudioUseCase(MetadataRewriteRepositoryImpl(app), entitlements, PreferencesDailyCleanQuota(app))
+    val metadataStudio = MetadataStudioUseCase(MetadataRewriteRepositoryImpl(app), entitlements, PreferencesDailyCleanQuota(app, crypto))
     val checkViaApi = CheckViaApiUseCase(ApiRepositoryImpl(settings), entitlements)
 }

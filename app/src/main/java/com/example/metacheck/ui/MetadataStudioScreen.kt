@@ -223,7 +223,7 @@ fun MetadataStudioScreen(
                 Text("Управление метаданными", style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface)
                 Text(if (isPro) "PRO · Без ограничений на очистку" else
-                    "FREE · Очищено сегодня: $usedToday из 1 · Сброс в 00:00 UTC",
+                    "FREE · Очищено сегодня: $usedToday из 75 · Сброс в 00:00 UTC",
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                 Text("Реальное сохранение изменений в файл. Без отправки изображения в сеть.",
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -234,8 +234,8 @@ fun MetadataStudioScreen(
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StudioTab("Очистка", mode == StudioMode.STRIP) { mode = StudioMode.STRIP }
-                StudioTab("EXIF-редактор PRO", mode == StudioMode.EDIT) {
-                    if (isPro) mode = StudioMode.EDIT else onUpgrade()
+                StudioTab("EXIF-редактор", mode == StudioMode.EDIT) {
+                    mode = StudioMode.EDIT
                 }
                 StudioTab("Пакетно PRO", mode == StudioMode.BATCH) {
                     if (isPro) mode = StudioMode.BATCH else onUpgrade()

@@ -43,13 +43,13 @@ class MetadataDailyQuotaTest {
         }
     }
 
-    @Test fun freeEditionCanWriteOneFilePerDay() = runBlocking {
+    @Test fun freeEditionAllows75WritesAndBlocks76th() = runBlocking {
         val store = FakeStore(); val quota = Quota()
         val use = MetadataStudioUseCase(store, EntitlementFake(), quota)
-        assertTrue(use.strip("a", "b").isSuccess)
+        repeat(75) { assertTrue(use.strip("a", "b").isSuccess) }
         assertTrue(use.wipeGps("a", "c").exceptionOrNull() is DailyLimitReachedException)
-        assertEquals(1, quota.count)
-        assertEquals(1, store.writes)
+        assertEquals(75, quota.count)
+        assertEquals(75, store.writes)
     }
 
     @Test fun failedWriteDoesNotConsumeQuota() = runBlocking {
@@ -59,12 +59,18 @@ class MetadataDailyQuotaTest {
         assertEquals(0, quota.count)
     }
 
-    @Test fun freeUserCannotEditExif() = runBlocking {
+    @Test fun freeUserCanEditExifAndConsumesQuota() = runBlocking {
+        val store = FakeStore(); val quota = Quota()
+        val use = MetadataStudioUseCase(store, EntitlementFake(), quota)
+        assertTrue(use.edit("a", "b", MetadataPatch(model = "Test")).isSuccess)
+        assertEquals(1, store.writes)
+        assertEquals(1, quota.count)
+    }
+
+    @Test fun freeUserCannotBatch() = runBlocking {
         val store = FakeStore()
         val use = MetadataStudioUseCase(store, EntitlementFake(), Quota())
-        assertTrue(use.edit("a", "b", MetadataPatch(model = "Test"))
-            .exceptionOrNull() is ProRequiredException)
-        assertEquals(0, store.writes)
+        assertTrue(use.batch(listOf("a", "b"), "tree") {}.exceptionOrNull() is ProRequiredException)
     }
 
     @Test fun proUnlimitedWritesAndEdits() = runBlocking {
@@ -76,12 +82,13 @@ class MetadataDailyQuotaTest {
         assertEquals(0, quota.count)
     }
 
-    @Test fun concurrentFreeRequestsCannotBothSucceed() = runBlocking {
+    @Test fun concurrentFreeRequestsRespect75Limit() = runBlocking {
         val store = FakeStore(); val quota = Quota()
         val use = MetadataStudioUseCase(store, EntitlementFake(), quota)
+        repeat(74) { assertTrue(use.strip("a", "b").isSuccess) }
         val first = async { use.strip("a", "b") }
         val second = async { use.wipeGps("a", "c") }
         assertEquals(1, listOf(first.await(), second.await()).count { it.isSuccess })
-        assertEquals(1, store.writes)
+        assertEquals(75, store.writes)
     }
 }
