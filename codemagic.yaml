@@ -1,0 +1,20 @@
+
+workflows:
+  metacheck-debug:
+    name: MetaCheck Android Debug
+    max_build_duration: 60
+
+    scripts:
+      - name: Configure Android SDK
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+
+      - name: Build MetaCheck APK
+        script: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+
+    artifacts:
+      - app/build/outputs/apk/debug/*.apk
+      - app/build/reports/**
+
