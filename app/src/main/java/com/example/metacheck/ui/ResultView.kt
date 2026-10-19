@@ -37,8 +37,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -109,8 +107,8 @@ fun ResultView(report: MetaReport, actions: ResultActions) {
                         selected = i == index, onClick = { selected = i },
                         icon = { Icon(when(tab) {
                             ResultTab.AI -> Icons.Default.Info
-                            ResultTab.EXIF -> Icons.Default.PhotoCamera
-                            ResultTab.FILE -> Icons.Default.Description
+                            ResultTab.EXIF -> Icons.Default.Info
+                            ResultTab.FILE -> Icons.Default.Info
                             ResultTab.MAP -> Icons.Default.Place
                         }, contentDescription = null) },
                         label = { Text(tab.title) }, alwaysShowLabel = true,
