@@ -24,6 +24,7 @@ fun localize(value: String, language: AppLanguage): String {
     if (value.startsWith("Пакетная очистка завершена: ")) return value.replaceFirst("Пакетная очистка завершена: ", "Batch cleaning finished: ").replace("сохранено", "saved").replace("ошибок", "failed")
     if (value.startsWith("Очищенная копия сохранена")) return value.replaceFirst("Очищенная копия сохранена", "Clean copy saved")
     if (value.startsWith("GPS удалён из новой копии")) return value.replaceFirst("GPS удалён из новой копии", "GPS removed from saved copy")
+        .replace("Для отправки используйте новую копию, а не оригинал", "Share the new copy, not the original")
     if (value.startsWith("EXIF записан в новый файл")) return value.replaceFirst("EXIF записан в новый файл", "EXIF saved to a new file")
     if (value.startsWith("Оригинал заменён")) return value.replaceFirst("Оригинал заменён", "Original replaced").replace("Резервная копия сохранена", "Backup saved")
     if (value.startsWith("Программы в истории правок")) return "Edit history software"
@@ -33,14 +34,19 @@ fun localize(value: String, language: AppLanguage): String {
 
 private val translations: Map<String, String> = mapOf(
     "Управление метаданными" to "Metadata management",
-    "УТЕЧКА ГЕОЛОКАЦИИ" to "LOCATION DATA EXPOSED",
-    "GPS PRIVACY SHIELD / RED ALERT" to "GPS PRIVACY SHIELD / RED ALERT",
-    "В EXIF обнаружены GPS-координаты. Фотография может раскрыть место съёмки." to "EXIF GPS coordinates detected. This image may reveal where it was captured.",
-    "В метаданных обнаружены поля геолокации, но полные координаты не удалось прочитать." to "Location metadata found in EXIF; complete coordinates could not be decoded.",
-    "Точная точка на карте недоступна: геотеги неполные или представлены только в XMP/PNG." to "Map position unavailable because GPS tags are incomplete.",
-    "⌖  Уничтожить GPS · сохранить копию" to "⌖  Wipe GPS · save a copy",
-    "Оригинал не изменяется. Android предложит выбрать место сохранения. В бесплатной версии: 1 очистка в сутки." to "Original remains unchanged. Android will ask where to save. Free: one cleaning per day.",
-    "Для очистки требуется исходный файл. Откройте фотографию заново, не только сохранённый отчёт." to "Open the original photo to remove GPS; saved reports contain no image copy.",
+    "GPS PRIVACY SHIELD · GPS В ФАЙЛЕ" to "GPS PRIVACY SHIELD · GPS FOUND",
+    "Место съёмки сохранено в фото" to "This photo contains its capture location",
+    "В фотографии найдены геометки" to "Location metadata found in this photo",
+    "Если отправить оригинал без очистки, получатель может увидеть координаты места съёмки." to "If you share the uncleaned original, the recipient may be able to see where it was taken.",
+    "В метаданных найдены сведения о местоположении, но точные координаты прочитать не удалось." to "Location metadata was found, but full coordinates could not be decoded.",
+    "Это не означает, что за вами следят. Риск возникает, если передать файл с геометками." to "This does not mean someone is tracking you. The privacy risk arises when you share a file with location data.",
+    "Перед отправкой лучше создать копию без GPS — это простой способ защитить своё местоположение." to "Before sharing, make a GPS-free copy to help keep your location private.",
+    "Защитить фото · удалить GPS" to "Protect photo · remove GPS",
+    "После нажатия выберите место для новой копии. Оригинал не изменится. Отправляйте именно копию. Free: 1 очистка в сутки." to "After tapping, choose where to save a new copy. The original stays unchanged. Share the copy, not the original. Free: 1 clean per day.",
+    "Чтобы убрать геометки, откройте исходную фотографию JPEG/PNG: сохранённый отчёт не содержит самого фото." to "Open the original JPEG/PNG to remove location tags; a saved report contains no photo data.",
+    "КООРДИНАТЫ В ИСХОДНОМ ФАЙЛЕ" to "COORDINATES IN ORIGINAL FILE",
+    "Точку нельзя показать на карте: GPS-данные неполные или записаны в XMP/PNG." to "Map position is unavailable: GPS tags are incomplete or stored in XMP/PNG.",
+
     "OFFLINE GEO / ТОЧКА ИЗ EXIF" to "OFFLINE GEO / EXIF POSITION",
     "Положение маркера соответствует координатам EXIF. Контуры суши приблизительные; улицы не показаны. Без интернета." to "Marker follows the exact EXIF coordinates. Simplified land outlines, no streets. Fully offline.",
     "Встроенная карта работает без сети. Нажатие «Открыть в картах» передаст координаты выбранному внешнему приложению." to "Offline map never transmits coordinates. Opening an external maps app shares GPS with that app.",

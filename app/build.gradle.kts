@@ -24,8 +24,8 @@ android {
         applicationId = "dev.metacheck.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 12
-        versionName = "1.1.0-rc2"
+        versionCode = 13
+        versionName = "1.1.1-rc1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

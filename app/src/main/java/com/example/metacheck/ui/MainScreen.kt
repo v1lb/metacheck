@@ -193,7 +193,7 @@ fun MainScreen(
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text("◈", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleLarge)
                             Text(if (showStudio) "Metadata Studio" else if (showSettings) "Настройки" else "MetaCheck", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
-                            if (!showSettings && !showStudio && !inResult) CyberEyebrow("2.5")
+                            if (!showSettings && !showStudio && !inResult) CyberEyebrow("2.5.1")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = .7f)),

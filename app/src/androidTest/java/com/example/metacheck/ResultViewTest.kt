@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +20,7 @@ import com.example.metacheck.domain.model.Signal
 import com.example.metacheck.ui.ResultActions
 import com.example.metacheck.ui.ResultView
 import com.example.metacheck.ui.theme.MetaCheckTheme
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -79,7 +81,27 @@ class ResultViewTest {
     fun gpsAlertIsVisibleWhenExifContainsCoordinates() {
         show(report(ai = false, gps = true))
         compose.onNodeWithTag("overview_list").performScrollToIndex(1)
-        compose.onNodeWithText("УТЕЧКА ГЕОЛОКАЦИИ").assertExists()
+        compose.onNodeWithText("Место съёмки сохранено в фото").assertExists()
+        compose.onNodeWithText(
+            "Это не означает, что за вами следят. Риск возникает, если передать файл с геометками.",
+        ).assertExists()
+    }
+
+    @Test
+    fun gpsCardPromotesSafeCopyOnlyWhenSourceActionExists() {
+        var pressed = false
+        val wipeActions = ResultActions({}, {}, {}, null, null, onWipeGps = { pressed = true })
+        show(report(ai = false, gps = true), wipeActions)
+        compose.onNodeWithTag("overview_list").performScrollToIndex(1)
+        compose.onNodeWithText("Защитить фото · удалить GPS").assertExists()
+        compose.onNodeWithTag("gps_wipe_action").performScrollTo().performClick()
+        assertTrue(pressed)
+    }
+
+    @Test
+    fun noPrivacyAlertWithoutGpsTags() {
+        show(report(ai = false, gps = false))
+        compose.onNodeWithTag("gps_privacy_shield").assertDoesNotExist()
     }
 
     @Test

@@ -36,7 +36,10 @@ class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewM
 
     fun wipeGpsCopy(source: String, destination: Uri) = work {
         studio.wipeGps(source, destination.toString()).fold(
-            onSuccess = { _message.value = successMessage("GPS удалён из новой копии", it.verified, it.downscaled) },
+            onSuccess = {
+                _message.value = successMessage("GPS удалён из новой копии", it.verified, it.downscaled) +
+                    if (it.verified) ". Для отправки используйте новую копию, а не оригинал" else ""
+            },
             onFailure = { _message.value = failMessage(it) },
         )
         usedToday.value = studio.usedToday()
