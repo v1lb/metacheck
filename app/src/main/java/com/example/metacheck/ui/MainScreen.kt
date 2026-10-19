@@ -1,5 +1,8 @@
 package com.example.metacheck.ui
 
+import com.example.metacheck.domain.metadata.GpsPrivacy
+import com.example.metacheck.domain.model.ImageFormat
+
 import android.content.ActivityNotFoundException
 import android.content.ClipboardManager
 import android.content.ContentResolver
@@ -94,14 +97,20 @@ fun MainScreen(
     val message by viewModel.message.collectAsStateWithLifecycle()
     val apiDialog by viewModel.apiDialog.collectAsStateWithLifecycle()
     val proVm: ProViewModel = viewModel(factory = ProViewModel.Factory)
+    val studioVm: MetadataStudioViewModel = viewModel(factory = MetadataStudioViewModel.Factory)
+    val studioMessage by studioVm.message.collectAsStateWithLifecycle()
     val entitlement by proVm.entitlement.collectAsStateWithLifecycle()
     val paywallVisible by proVm.paywallVisible.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val snackbar = remember { SnackbarHostState() }
     var showSettings by rememberSaveable { mutableStateOf(false) }
+    var showStudio by rememberSaveable { mutableStateOf(false) }
     var confirmApi by rememberSaveable { mutableStateOf(false) }
 
+    LaunchedEffect(studioMessage) {
+        studioMessage?.let { snackbar.showSnackbar(it); studioVm.clearMessage() }
+    }
     LaunchedEffect(message) {
         message?.let { snackbar.showSnackbar(it); viewModel.consumeMessage() }
     }
@@ -144,12 +153,33 @@ fun MainScreen(
     val savePdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { it?.let(viewModel::exportPdf) }
     val saveCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { it?.let(viewModel::exportHistoryCsv) }
     val saveMetadataCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { it?.let(viewModel::exportMetadataCsv) }
-    val saveJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { it?.let(viewModel::saveCleaned) }
-    val savePng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { it?.let(viewModel::saveCleaned) }
+    var pendingStripSource by rememberSaveable { mutableStateOf<String?>(null) }
+    var pendingWipeSource by rememberSaveable { mutableStateOf<String?>(null) }
+    val saveJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
+        val original = pendingStripSource
+        pendingStripSource = null
+        if (uri != null && original != null) studioVm.stripCopy(original, uri)
+    }
+    val savePng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
+        val original = pendingStripSource
+        pendingStripSource = null
+        if (uri != null && original != null) studioVm.stripCopy(original, uri)
+    }
+    val saveGpsJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
+        val original = pendingWipeSource
+        pendingWipeSource = null
+        if (uri != null && original != null) studioVm.wipeGpsCopy(original, uri)
+    }
+    val saveGpsPng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
+        val original = pendingWipeSource
+        pendingWipeSource = null
+        if (uri != null && original != null) studioVm.wipeGpsCopy(original, uri)
+    }
     val inResult = state is UiState.Done
 
-    BackHandler(enabled = showSettings || inResult) {
-        if (showSettings) { showSettings = false; viewModel.refreshHistory() }
+    BackHandler(enabled = showStudio || showSettings || inResult) {
+        if (showStudio) showStudio = false
+        else if (showSettings) { showSettings = false; viewModel.refreshHistory() }
         else viewModel.close()
     }
 
@@ -162,19 +192,20 @@ fun MainScreen(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text("◈", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleLarge)
-                            Text(if (showSettings) "Настройки" else "MetaCheck", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
-                            if (!showSettings && !inResult) CyberEyebrow("2.3")
+                            Text(if (showStudio) "Metadata Studio" else if (showSettings) "Настройки" else "MetaCheck", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+                            if (!showSettings && !showStudio && !inResult) CyberEyebrow("2.5")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = .7f)),
                     navigationIcon = {
-                        if (showSettings || inResult) IconButton(onClick = {
-                            if (showSettings) { showSettings = false; viewModel.refreshHistory() }
+                        if (showStudio || showSettings || inResult) IconButton(onClick = {
+                            if (showStudio) showStudio = false
+                            else if (showSettings) { showSettings = false; viewModel.refreshHistory() }
                             else viewModel.close()
                         }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Назад") }
                     },
                     actions = {
-                        if (!showSettings && !inResult) {
+                        if (!showSettings && !showStudio && !inResult) {
                             IconButton(onClick = { showSettings = true }) {
                                 Icon(Icons.Default.Settings, "Настройки", tint = MaterialTheme.colorScheme.primary)
                             }
@@ -185,7 +216,13 @@ fun MainScreen(
         ) { padding ->
             Column(Modifier.padding(padding).fillMaxSize()) {
                 if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
-                if (showSettings) SettingsScreen(onMessage = viewModel::showMessage, uiPreferences = uiPreferences)
+                if (showStudio) MetadataStudioScreen(
+                    initialUri = (state as? UiState.Done)?.source,
+                    isPro = entitlement.isPro,
+                    onUpgrade = proVm::openPaywall,
+                    onBack = { showStudio = false },
+                )
+                else if (showSettings) SettingsScreen(onMessage = viewModel::showMessage, uiPreferences = uiPreferences)
                 else when (val s = state) {
                     UiState.Idle -> Dashboard(
                         history = history, historyEnabled = settings.saveHistory, isPro = entitlement.isPro,
@@ -193,7 +230,7 @@ fun MainScreen(
                         onCamera = ::launchCamera, onClipboard = ::pasteImage,
                         onOpen = viewModel::openFromHistory, onDelete = viewModel::deleteFromHistory,
                         onCsv = { saveCsv.launch("metacheck-history.csv") },
-                        onUpgrade = proVm::openPaywall,
+                        onUpgrade = proVm::openPaywall, onStudio = { showStudio = true },
                     )
                     UiState.Loading -> LoadingScreen()
                     is UiState.Failed -> ErrorScreen(s.message, { pick.launch(arrayOf("image/*")) }, viewModel::close)
@@ -205,6 +242,15 @@ fun MainScreen(
                             sourceUri = s.source,
                             actions = ResultActions(
                                 onCsv = { saveMetadataCsv.launch("$name-metadata.csv") },
+                                onEdit = if (s.source == null) null else { { if (entitlement.isPro) showStudio = true else proVm.openPaywall() } },
+                                onWipeGps = if (s.source == null || !GpsPrivacy.hasLocationMarkers(s.report) ||
+                                    s.report.file.format !in setOf(ImageFormat.JPEG, ImageFormat.PNG)) null else {
+                                    {
+                                        pendingWipeSource = s.source
+                                        if (s.report.file.format == ImageFormat.JPEG) saveGpsJpeg.launch("${name}-gps-safe.jpg")
+                                        else saveGpsPng.launch("${name}-gps-safe.png")
+                                    }
+                                },
                                 onCopy = {
                                     clipboard.setText(AnnotatedString(ReportText.format(s.report)))
                                     viewModel.showMessage("Отчёт скопирован")
@@ -213,6 +259,7 @@ fun MainScreen(
                                 onPdf = { if (entitlement.isPro) savePdf.launch("$name-metacheck.pdf") else proVm.openPaywall() },
                                 onClean = if (s.source == null) null else {
                                     {
+                                        pendingStripSource = s.source
                                         if (format.extension == "jpg") saveJpeg.launch("$name-clean.jpg")
                                         else savePng.launch("$name-clean.png")
                                     }
@@ -279,7 +326,7 @@ private fun Dashboard(
     history: List<HistoryEntry>, historyEnabled: Boolean, isPro: Boolean,
     onPick: () -> Unit, onCamera: () -> Unit, onClipboard: () -> Unit,
     onOpen: (String) -> Unit, onDelete: (String) -> Unit,
-    onCsv: () -> Unit, onUpgrade: () -> Unit,
+    onCsv: () -> Unit, onUpgrade: () -> Unit, onStudio: () -> Unit,
 ) {
     val insight = remember(history) { HistoryInsights.from(history) }
     val dateFormat = remember { SimpleDateFormat("dd.MM · HH:mm", Locale.getDefault()) }
@@ -323,6 +370,16 @@ private fun Dashboard(
                 MetricPanel("EXIF", "КАМЕРА И GPS", Modifier.weight(1f))
                 MetricPanel("XMP", "МЕТАДАННЫЕ", Modifier.weight(1f), MaterialTheme.colorScheme.secondary)
                 MetricPanel("AI", "МЕТКИ ГЕНЕРАЦИИ", Modifier.weight(1f), MaterialTheme.colorScheme.tertiary)
+            }
+        }
+        item {
+            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
+                Column(Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                    CyberEyebrow("METADATA STUDIO / 2.4")
+                    Text("Очистка · EXIF-редактор · пакетная обработка",
+                        color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleMedium)
+                    CyberOutlineButton("Открыть Metadata Studio →", onStudio, Modifier.fillMaxWidth())
+                }
             }
         }
         item { SectionLabel("ВАША АНАЛИТИКА") }

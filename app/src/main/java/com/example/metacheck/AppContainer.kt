@@ -5,7 +5,9 @@ import android.content.Context
 import com.example.metacheck.data.ImageRepositoryImpl
 import com.example.metacheck.data.api.ApiRepositoryImpl
 import com.example.metacheck.data.billing.PlayBillingGateway
-import com.example.metacheck.data.clean.CleanRepositoryImpl
+import com.example.metacheck.data.metadata.MetadataRewriteRepositoryImpl
+import com.example.metacheck.data.metadata.PreferencesDailyCleanQuota
+import com.example.metacheck.domain.metadata.MetadataStudioUseCase
 import com.example.metacheck.data.crypto.Crypto
 import com.example.metacheck.data.crypto.KeystoreCrypto
 import com.example.metacheck.data.entitlement.EntitlementRepositoryImpl
@@ -20,13 +22,14 @@ import com.example.metacheck.domain.repository.ImageRepository
 import com.example.metacheck.domain.repository.SettingsRepository
 import com.example.metacheck.domain.usecase.AnalyzeImageUseCase
 import com.example.metacheck.domain.usecase.CheckViaApiUseCase
-import com.example.metacheck.domain.usecase.CleanMetadataUseCase
 import com.example.metacheck.domain.usecase.ExportReportUseCase
+import com.example.metacheck.ui.preferences.UiPreferences
 import java.io.File
 
 /** Ручной DI: для проекта такого размера Hilt не нужен. */
 class AppContainer(app: Application) {
     val contentResolver = app.contentResolver
+    val uiPreferences = UiPreferences(app)
     private val crypto: Crypto = KeystoreCrypto()
     private val imageRepository: ImageRepository = ImageRepositoryImpl(app.contentResolver)
 
@@ -49,6 +52,6 @@ class AppContainer(app: Application) {
 
     val analyzeImage = AnalyzeImageUseCase(imageRepository)
     val exportReport = ExportReportUseCase(ExportRepositoryImpl(app.contentResolver), entitlements)
-    val cleanMetadata = CleanMetadataUseCase(CleanRepositoryImpl(app.contentResolver))
+    val metadataStudio = MetadataStudioUseCase(MetadataRewriteRepositoryImpl(app), entitlements, PreferencesDailyCleanQuota(app))
     val checkViaApi = CheckViaApiUseCase(ApiRepositoryImpl(settings), entitlements)
 }

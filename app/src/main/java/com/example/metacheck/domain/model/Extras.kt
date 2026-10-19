@@ -23,8 +23,6 @@ data class AppSettings(
 
 data class ApiResult(val statusCode: Int, val body: String)
 
-data class CleanResult(val downscaled: Boolean)
-
 /** Сообщение предназначено для показа пользователю и не содержит секретов. */
 class ApiException(message: String) : Exception(message)
 

@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.metacheck.domain.metadata.GpsPrivacy
 import com.example.metacheck.domain.model.GpsPoint
 import com.example.metacheck.domain.model.MetaItem
 import com.example.metacheck.domain.model.MetaReport
@@ -68,6 +69,8 @@ data class ResultActions(
     val onClean: (() -> Unit)?,
     val onApi: (() -> Unit)?,
     val onCsv: (() -> Unit)? = null,
+    val onEdit: (() -> Unit)? = null,
+    val onWipeGps: (() -> Unit)? = null,
 )
 
 @Composable
@@ -91,7 +94,7 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
             when (tab) {
                 ReportTab.OVERVIEW -> OverviewTab(report, actions, sourceUri, onMetadata = { selected = tabs.indexOf(ReportTab.METADATA) })
                 ReportTab.METADATA -> MetadataViewer(report, actions.onCsv)
-                ReportTab.GPS -> report.gps?.let { GpsTab(it) }
+                ReportTab.GPS -> report.gps?.let { GpsTab(it, actions.onWipeGps) }
             }
         }
         Row(
@@ -129,6 +132,9 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
     }
     LazyColumn(modifier = Modifier.testTag("overview_list"), contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(15.dp)) {
         item { PhotoPreview(sourceUri, report.file.name) }
+        if (GpsPrivacy.hasLocationMarkers(report)) {
+            item { GpsPrivacyAlert(report.gps, actions.onWipeGps, partialTags = report.gps == null) }
+        }
         item {
             GlassPanel(accent = color, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -158,7 +164,7 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                MetricPanel(report.signals.size.toString(), "СИГНАЛОВ", Modifier.weight(1f))
+                MetricPanel(report.actionableSignalCount.toString(), "ПРИЗНАКОВ", Modifier.weight(1f))
                 MetricPanel(report.exifSections.size.toString(), "ГРУПП EXIF", Modifier.weight(1f), MaterialTheme.colorScheme.secondary)
                 MetricPanel(report.file.format.label, "ФОРМАТ", Modifier.weight(1f), MaterialTheme.colorScheme.tertiary)
             }
@@ -173,8 +179,9 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
                     CyberOutlineButton("Экспорт JSON", actions.onJson, Modifier.weight(1f))
-                    actions.onClean?.let { CyberOutlineButton("Очистить EXIF", it, Modifier.weight(1f)) }
+                    actions.onClean?.let { CyberOutlineButton("Удалить все метаданные", it, Modifier.weight(1f)) }
                 }
+                actions.onEdit?.let { CyberOutlineButton("Редактировать EXIF / Metadata Studio →", it, Modifier.fillMaxWidth()) }
                 actions.onApi?.let { CyberOutlineButton("Проверить через API", it, Modifier.fillMaxWidth()) }
             }
         }
@@ -267,11 +274,12 @@ private fun SignalPanel(signal: Signal) {
 }
 
 @Composable
-private fun GpsTab(gps: GpsPoint) {
+private fun GpsTab(gps: GpsPoint, onWipeGps: (() -> Unit)?) {
     val context = LocalContext.current
     val coords = String.format(Locale.US, "%.6f, %.6f", gps.latitude, gps.longitude)
     LazyColumn(contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { SectionLabel("GEOLOCATION / EXIF") }
+        item { GpsPrivacyAlert(gps, onWipeGps) }
         item {
             SectionCard("Координаты", buildList {
                 add(MetaItem("Широта / долгота", coords))
@@ -285,7 +293,7 @@ private fun GpsTab(gps: GpsPoint) {
                 catch (_: Exception) { android.widget.Toast.makeText(context, "Приложение карт не найдено", android.widget.Toast.LENGTH_SHORT).show() }
             }, modifier = Modifier.fillMaxWidth())
         }
-        item { Text("Для открытия карты потребуется другое приложение. GPS из отчёта не отправляется MetaCheck на сервер.",
+        item { Text("Встроенная карта работает без сети. Нажатие «Открыть в картах» передаст координаты выбранному внешнему приложению.",
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }

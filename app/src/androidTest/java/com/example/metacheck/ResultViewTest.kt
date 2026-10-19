@@ -76,18 +76,25 @@ class ResultViewTest {
     }
 
     @Test
+    fun gpsAlertIsVisibleWhenExifContainsCoordinates() {
+        show(report(ai = false, gps = true))
+        compose.onNodeWithTag("overview_list").performScrollToIndex(1)
+        compose.onNodeWithText("УТЕЧКА ГЕОЛОКАЦИИ").assertExists()
+    }
+
+    @Test
     fun cleanAndApiButtonsAreHiddenWhenUnavailable() {
         show(report(ai = false, gps = false))
         compose.onNodeWithTag("overview_list").performScrollToIndex(5)
         compose.onNodeWithText("Копировать").assertExists()
-        compose.onNodeWithText("Очистить EXIF").assertDoesNotExist()
+        compose.onNodeWithText("Удалить все метаданные").assertDoesNotExist()
     }
 
     @Test
     fun cleanButtonShownWhenProvided() {
         show(report(ai = false, gps = false), ResultActions({}, {}, {}, {}, {}))
         compose.onNodeWithTag("overview_list").performScrollToIndex(5)
-        compose.onNodeWithText("Очистить EXIF").assertExists()
+        compose.onNodeWithText("Удалить все метаданные").assertExists()
         compose.onNodeWithText("Проверить через API").assertExists()
     }
 }

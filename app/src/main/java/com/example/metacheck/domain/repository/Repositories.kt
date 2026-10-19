@@ -2,7 +2,6 @@ package com.example.metacheck.domain.repository
 
 import com.example.metacheck.domain.model.ApiResult
 import com.example.metacheck.domain.model.AppSettings
-import com.example.metacheck.domain.model.CleanResult
 import com.example.metacheck.domain.model.HistoryEntry
 import com.example.metacheck.domain.model.ImageFormat
 import com.example.metacheck.domain.model.MetaReport
@@ -19,10 +18,6 @@ interface HistoryRepository {
 interface ExportRepository {
     suspend fun exportJson(report: MetaReport, target: String): Result<Unit>
     suspend fun exportPdf(report: MetaReport, target: String): Result<Unit>
-}
-
-interface CleanRepository {
-    suspend fun clean(source: String, target: String, format: ImageFormat): Result<CleanResult>
 }
 
 interface ApiRepository {

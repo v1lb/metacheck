@@ -1,12 +1,9 @@
 package com.example.metacheck.domain.usecase
 
 import com.example.metacheck.domain.model.ApiResult
-import com.example.metacheck.domain.model.CleanResult
-import com.example.metacheck.domain.model.ImageFormat
 import com.example.metacheck.domain.model.MetaReport
 import com.example.metacheck.domain.model.ProRequiredException
 import com.example.metacheck.domain.repository.ApiRepository
-import com.example.metacheck.domain.repository.CleanRepository
 import com.example.metacheck.domain.repository.EntitlementRepository
 import com.example.metacheck.domain.repository.ExportRepository
 
@@ -22,11 +19,6 @@ class ExportReportUseCase(
     suspend fun pdf(report: MetaReport, target: String): Result<Unit> =
         if (entitlements.entitlement.value.isPro) repository.exportPdf(report, target)
         else Result.failure(ProRequiredException())
-}
-
-class CleanMetadataUseCase(private val repository: CleanRepository) {
-    suspend operator fun invoke(source: String, target: String, format: ImageFormat): Result<CleanResult> =
-        repository.clean(source, target, format)
 }
 
 class CheckViaApiUseCase(

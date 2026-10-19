@@ -31,6 +31,9 @@ object XmpExtractor {
         "dc:rights" to "Права",
         "tiff:Make" to "Производитель (XMP)",
         "tiff:Model" to "Модель (XMP)",
+        "exif:GPSLatitude" to "GPSLatitude (XMP)",
+        "exif:GPSLongitude" to "GPSLongitude (XMP)",
+        "exif:GPSAltitude" to "GPSAltitude (XMP)",
         SignalEngine.KEY_DIGITAL_SOURCE_TYPE to "Тип источника (IPTC)",
     )
 

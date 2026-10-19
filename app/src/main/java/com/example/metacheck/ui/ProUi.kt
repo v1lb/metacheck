@@ -48,8 +48,8 @@ fun PaywallDialog(vm: ProViewModel) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 CyberEyebrow("FREE  →  PRO", color = MaterialTheme.colorScheme.primary)
                 ScanningBars(Modifier.fillMaxWidth().height(38.dp))
-                Text("Free: локальный анализ, EXIF, очистка, статистика и CSV-история.")
-                Text("Pro: экспорт PDF/JSON, до 50 отчётов, подключение собственного API.")
+                Text("Free: анализ и GPS Privacy Shield, просмотр EXIF, 1 очистка фото в сутки (UTC), 10 отчётов в истории.")
+                Text("Pro: безлимитная очистка, EXIF-редактор, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API.")
                 Text("Разовая покупка через Google Play, без подписки. Цена показывается только если доступен товар pro_lifetime в Play Console.",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 OutlinedTextField(

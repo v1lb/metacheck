@@ -41,6 +41,8 @@ data class MetaReport(
     val signals: List<Signal>,
 ) {
     val hasAiEvidence: Boolean get() = signals.any { it.severity == Severity.AI_EVIDENCE }
+    /** Informational notes are not detections and must not inflate the scan metric. */
+    val actionableSignalCount: Int get() = signals.count { it.severity != Severity.INFO }
 }
 
 class UnsupportedFormatException : Exception("Формат файла не поддерживается")

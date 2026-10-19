@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +54,7 @@ import com.example.metacheck.ui.preferences.AppAppearance
 import com.example.metacheck.ui.preferences.AppLanguage
 import com.example.metacheck.ui.preferences.UiPreferences
 import com.example.metacheck.ui.theme.CyberPalette
+import kotlinx.coroutines.launch
 
 /** Full-screen first-run experience; navigation and preferences are independent of image processing. */
 @OptIn(ExperimentalAnimationApi::class)
@@ -62,11 +64,14 @@ fun OnboardingFlow(prefs: UiPreferences) {
     val en = LocalUiLanguage.current == AppLanguage.EN
     var step by rememberSaveable { mutableIntStateOf(0) }
     var failure by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
-    fun save(language: AppLanguage = selected.language,
-             appearance: AppAppearance = selected.appearance,
-             complete: Boolean = false) {
-        failure = !prefs.update(language = language, appearance = appearance, completed = complete)
+    fun save(language: AppLanguage? = null,
+             appearance: AppAppearance? = null,
+             complete: Boolean? = null) {
+        scope.launch {
+            failure = !prefs.update(language = language, appearance = appearance, completed = complete)
+        }
     }
     CyberBackdrop {
         Column(

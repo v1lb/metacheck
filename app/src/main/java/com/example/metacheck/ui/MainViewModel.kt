@@ -25,7 +25,6 @@ import com.example.metacheck.domain.repository.HistoryRepository
 import com.example.metacheck.domain.repository.SettingsRepository
 import com.example.metacheck.domain.usecase.AnalyzeImageUseCase
 import com.example.metacheck.domain.usecase.CheckViaApiUseCase
-import com.example.metacheck.domain.usecase.CleanMetadataUseCase
 import com.example.metacheck.domain.usecase.ExportReportUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +50,6 @@ sealed interface ApiDialog {
 class MainViewModel(
     private val analyzeImage: AnalyzeImageUseCase,
     private val exportReport: ExportReportUseCase,
-    private val cleanMetadata: CleanMetadataUseCase,
     private val checkViaApi: CheckViaApiUseCase,
     private val history: HistoryRepository,
     private val resolver: ContentResolver,
@@ -193,26 +191,6 @@ class MainViewModel(
         )
     }
 
-    fun saveCleaned(target: Uri) = withDone { done ->
-        val source = done.source ?: return@withDone
-        cleanMetadata(source, target.toString(), done.report.file.format).fold(
-            onSuccess = {
-                showMessage(
-                    if (it.downscaled) "Метаданные удалены. Копия уменьшена, чтобы поместиться в память."
-                    else "Метаданные удалены. Копия сохранена, исходный файл не изменён.",
-                )
-            },
-            onFailure = {
-                showMessage(
-                    when (it) {
-                        is TooLargeException -> "Изображение слишком большое для очистки."
-                        is UnsupportedFormatException -> "Этот формат нельзя пересохранить."
-                        else -> "Не удалось очистить метаданные."
-                    },
-                )
-            },
-        )
-    }
 
     fun sendToApi() {
         val done = _state.value as? UiState.Done ?: return
@@ -267,7 +245,7 @@ class MainViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val c = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MetaCheckApplication).container
-                MainViewModel(c.analyzeImage, c.exportReport, c.cleanMetadata, c.checkViaApi, c.history, c.contentResolver, c.settings)
+                MainViewModel(c.analyzeImage, c.exportReport, c.checkViaApi, c.history, c.contentResolver, c.settings)
             }
         }
     }

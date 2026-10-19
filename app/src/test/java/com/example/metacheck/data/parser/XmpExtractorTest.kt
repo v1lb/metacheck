@@ -31,6 +31,14 @@ class XmpExtractorTest {
     }
 
     @Test
+    fun recognizesExplicitXmpGpsFields() {
+        val xmp = """<x:xmpmeta><rdf:Description exif:GPSLatitude="41,54.168N" exif:GPSLongitude="12,29.784E" /></x:xmpmeta>"""
+        val parsed = XmpExtractor.parse(xmp)
+        assertEquals("41,54.168N", parsed.fields["exif:GPSLatitude"])
+        assertEquals("12,29.784E", parsed.fields["exif:GPSLongitude"])
+    }
+
+    @Test
     fun extractsPacketFromBinaryNoise() {
         val noise = ByteArray(100) { 0x7F }
         val bytes = noise + packet.toByteArray() + noise

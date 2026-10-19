@@ -24,8 +24,8 @@ android {
         applicationId = "dev.metacheck.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 9
-        versionName = "0.9.0"
+        versionCode = 12
+        versionName = "1.1.0-rc2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -100,6 +100,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
     implementation("androidx.exifinterface:exifinterface:1.3.7")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.android.billingclient:billing:8.0.0")

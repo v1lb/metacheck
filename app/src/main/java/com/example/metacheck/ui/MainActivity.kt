@@ -11,7 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.metacheck.ui.preferences.UiPreferences
+import com.example.metacheck.MetaCheckApplication
 import com.example.metacheck.ui.preferences.UiSelection
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
         // Повторно не анализируем после поворота экрана: состояние уже в ViewModel.
         if (savedInstanceState == null) handleSharedImage(intent)
         setContent {
-            val uiPrefs = remember { UiPreferences(applicationContext) }
+            val uiPrefs = remember { (application as MetaCheckApplication).container.uiPreferences }
             val selection by uiPrefs.state.collectAsStateWithLifecycle()
             val config = LocalConfiguration.current
             val systemLanguage = config.locales[0]?.language ?: "en"

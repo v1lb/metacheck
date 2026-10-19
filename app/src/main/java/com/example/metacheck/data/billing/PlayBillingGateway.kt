@@ -17,6 +17,7 @@ import com.example.metacheck.domain.repository.BillingGateway
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 
 /**
@@ -44,7 +45,7 @@ class PlayBillingGateway(context: Context) : BillingGateway {
 
     override suspend fun queryOwned(): Boolean? = withContext(Dispatchers.Main.immediate) {
         if (!ensureConnected()) return@withContext null
-        suspendCancellableCoroutine { cont ->
+        withTimeoutOrNull(BILLING_TIMEOUT_MS) { suspendCancellableCoroutine<Boolean?> { cont ->
             val params = QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build()
             client.queryPurchasesAsync(params) { result, purchases ->
                 if (!cont.isActive) return@queryPurchasesAsync
@@ -56,7 +57,7 @@ class PlayBillingGateway(context: Context) : BillingGateway {
                     cont.resume(owned.isNotEmpty())
                 }
             }
-        }
+        } }
     }
 
     override suspend fun priceText(): String? = withContext(Dispatchers.Main.immediate) {
@@ -72,7 +73,7 @@ class PlayBillingGateway(context: Context) : BillingGateway {
                 ),
             )
             .build()
-        suspendCancellableCoroutine { cont ->
+        withTimeoutOrNull(BILLING_TIMEOUT_MS) { suspendCancellableCoroutine<String?> { cont ->
             client.queryProductDetailsAsync(params) { result, queryResult ->
                 if (!cont.isActive) return@queryProductDetailsAsync
                 val found = if (result.responseCode == BillingClient.BillingResponseCode.OK) {
@@ -83,7 +84,7 @@ class PlayBillingGateway(context: Context) : BillingGateway {
                 details = found
                 cont.resume(found?.oneTimePurchaseOfferDetails?.formattedPrice)
             }
-        }
+        } }
     }
 
     override fun launchPurchase(activity: Activity): Boolean {
@@ -112,7 +113,7 @@ class PlayBillingGateway(context: Context) : BillingGateway {
         if (client.isReady) {
             true
         } else {
-            suspendCancellableCoroutine { cont ->
+            withTimeoutOrNull(BILLING_TIMEOUT_MS) { suspendCancellableCoroutine<Boolean> { cont ->
                 client.startConnection(
                     object : BillingClientStateListener {
                         override fun onBillingSetupFinished(result: BillingResult) {
@@ -124,10 +125,11 @@ class PlayBillingGateway(context: Context) : BillingGateway {
                         }
                     },
                 )
-            }
+            } } ?: false
         }
 
     companion object {
+        private const val BILLING_TIMEOUT_MS = 15_000L
         /** Должен совпадать с идентификатором товара в Play Console. */
         const val PRODUCT_ID = "pro_lifetime"
     }

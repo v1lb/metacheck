@@ -15,12 +15,80 @@ fun localize(value: String, language: AppLanguage): String {
     if (value.startsWith("Упоминание «") && value.endsWith("» в тексте"))
         return value.replaceFirst("Упоминание «", "Mention of ‘").replace("» в тексте", "’ in text")
     if (value.startsWith("Проверяемое изображение: ")) return value.replaceFirst("Проверяемое изображение: ", "Image: ")
+    if (value.startsWith("FREE · Очищено сегодня: ")) return value.replace("FREE · Очищено сегодня: ", "FREE · Cleaned today: ").replace(" из 1 · Сброс в 00:00 UTC", " of 1 · Reset 00:00 UTC")
+    if (value.startsWith("Выбрано: ")) return value.replaceFirst("Выбрано: ", "Selected: ")
+    if (value.startsWith("Широта ") && value.contains("Долгота")) return value.replace("Широта", "Latitude").replace("Долгота", "Longitude")
+    if (value.startsWith("Дата оригинала: ")) return value.replaceFirst("Дата оригинала: ", "Date taken: ").replace("не изменять", "unchanged")
+    if (value.startsWith("Дата оцифровки: ")) return value.replaceFirst("Дата оцифровки: ", "Date digitized: ").replace("не изменять", "unchanged")
+    if (value.startsWith("Операция не выполнена: ")) return value.replaceFirst("Операция не выполнена: ", "Operation failed: ")
+    if (value.startsWith("Пакетная очистка завершена: ")) return value.replaceFirst("Пакетная очистка завершена: ", "Batch cleaning finished: ").replace("сохранено", "saved").replace("ошибок", "failed")
+    if (value.startsWith("Очищенная копия сохранена")) return value.replaceFirst("Очищенная копия сохранена", "Clean copy saved")
+    if (value.startsWith("GPS удалён из новой копии")) return value.replaceFirst("GPS удалён из новой копии", "GPS removed from saved copy")
+    if (value.startsWith("EXIF записан в новый файл")) return value.replaceFirst("EXIF записан в новый файл", "EXIF saved to a new file")
+    if (value.startsWith("Оригинал заменён")) return value.replaceFirst("Оригинал заменён", "Original replaced").replace("Резервная копия сохранена", "Backup saved")
     if (value.startsWith("Программы в истории правок")) return "Edit history software"
     return value
 }
 
 
 private val translations: Map<String, String> = mapOf(
+    "Управление метаданными" to "Metadata management",
+    "УТЕЧКА ГЕОЛОКАЦИИ" to "LOCATION DATA EXPOSED",
+    "GPS PRIVACY SHIELD / RED ALERT" to "GPS PRIVACY SHIELD / RED ALERT",
+    "В EXIF обнаружены GPS-координаты. Фотография может раскрыть место съёмки." to "EXIF GPS coordinates detected. This image may reveal where it was captured.",
+    "В метаданных обнаружены поля геолокации, но полные координаты не удалось прочитать." to "Location metadata found in EXIF; complete coordinates could not be decoded.",
+    "Точная точка на карте недоступна: геотеги неполные или представлены только в XMP/PNG." to "Map position unavailable because GPS tags are incomplete.",
+    "⌖  Уничтожить GPS · сохранить копию" to "⌖  Wipe GPS · save a copy",
+    "Оригинал не изменяется. Android предложит выбрать место сохранения. В бесплатной версии: 1 очистка в сутки." to "Original remains unchanged. Android will ask where to save. Free: one cleaning per day.",
+    "Для очистки требуется исходный файл. Откройте фотографию заново, не только сохранённый отчёт." to "Open the original photo to remove GPS; saved reports contain no image copy.",
+    "OFFLINE GEO / ТОЧКА ИЗ EXIF" to "OFFLINE GEO / EXIF POSITION",
+    "Положение маркера соответствует координатам EXIF. Контуры суши приблизительные; улицы не показаны. Без интернета." to "Marker follows the exact EXIF coordinates. Simplified land outlines, no streets. Fully offline.",
+    "Встроенная карта работает без сети. Нажатие «Открыть в картах» передаст координаты выбранному внешнему приложению." to "Offline map never transmits coordinates. Opening an external maps app shares GPS with that app.",
+    "EXIF-редактор PRO" to "EXIF editor PRO",
+    "Бесплатно: анализ, GPS Privacy Shield и 1 очистка в сутки. Pro: безлимитная очистка, EXIF-редактор, пакетная обработка, PDF/JSON." to "Free: scans, GPS Privacy Shield and one clean per day. Pro: unlimited cleaning, EXIF editing, batch, PDF/JSON.",
+    "Free: анализ и GPS Privacy Shield, просмотр EXIF, 1 очистка фото в сутки (UTC), 10 отчётов в истории." to "Free: scans, GPS Privacy Shield, EXIF viewer, one cleaned photo per UTC day, 10 saved reports.",
+    "Pro: безлимитная очистка, EXIF-редактор, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API." to "Pro: unlimited cleaning, EXIF editor, batch up to 50 photos, PDF/JSON, 50 reports, API.",
+    "Реальное сохранение изменений в файл. Без отправки изображения в сеть." to "Real file modifications. Your image is never uploaded.",
+    "← К отчёту" to "← Back to report",
+    "Очистка" to "Clean", "EXIF-редактор" to "EXIF editor", "Пакетно PRO" to "Batch PRO",
+    "01 / ИСХОДНОЕ ИЗОБРАЖЕНИЕ" to "01 / SOURCE IMAGE",
+    "Файл не выбран" to "No file selected", "Изображение выбрано" to "Image selected",
+    "02 / ПОЛНАЯ ОЧИСТКА" to "02 / REMOVE METADATA",
+    "Удалить метаданные" to "Remove metadata",
+    "Удалить все метаданные" to "Remove all metadata",
+    "Файл будет декодирован и сохранён заново без переносимых EXIF, XMP, IPTC и GPS. JPEG повторно сжимается; HEIC/GIF/WebP сохраняются как PNG, а анимация может потеряться. Подписи C2PA становятся недействительными." to "The image is re-encoded without carried EXIF, XMP, IPTC or GPS. JPEG is recompressed; HEIC/GIF/WebP export as PNG and animation can be lost. Existing C2PA signatures are invalidated.",
+    "Сохранить очищенный дубликат" to "Save clean copy",
+    "Перезаписать оригинал с резервной копией" to "Replace original with backup",
+    "Для перезаписи доступны только JPEG/PNG и только документы с правом записи. Сначала вы выберете место для полноценной резервной копии." to "Replace only writable JPEG/PNG documents. You will choose a location for a verified backup first.",
+    "02 / РЕДАКТОР EXIF" to "02 / EXIF EDITOR",
+    "Координаты и GPS" to "Coordinates and GPS",
+    "Удалить GPS целиком" to "Remove all GPS",
+    "Широта (−90…90)" to "Latitude (−90…90)",
+    "Долгота (−180…180)" to "Longitude (−180…180)",
+    "Выбрать точку на мировой сетке" to "Pick on world coordinate grid",
+    "Модель камеры" to "Camera model", "Диафрагма (например, 1.8)" to "Aperture (e.g. 1.8)",
+    "Выдержка в секундах (например, 0.02)" to "Shutter speed in seconds (e.g. 0.02)",
+    "Оставить без изменений" to "Leave unchanged",
+    "Пустые поля остаются без изменений. Редактор работает с JPEG; противоречащие EXIF блоки XMP/IPTC в JPEG удаляются. Изменения не применяются к исходному файлу до сохранения. Любая правка может сделать C2PA-подписи недействительными." to "Blank fields remain unchanged. The editor supports JPEG. Conflicting standalone XMP/IPTC blocks are removed. The original stays untouched until saved. Changes may invalidate C2PA signatures.",
+    "Сохранить изменённую копию JPEG" to "Save edited JPEG copy",
+    "Перезаписать JPEG с резервной копией" to "Replace JPEG with backup",
+    "Массовая очистка" to "Batch cleaning",
+    "До 50 файлов за один запуск. Новые копии будут сохранены в выбранную папку. Оригиналы останутся неизменными." to "Up to 50 files per operation. New copies go to the selected folder; originals remain unchanged.",
+    "Выбрать фотографии" to "Choose photos",
+    "Выбрать папку и запустить" to "Choose folder and start",
+    "ОШИБКИ ПО ФАЙЛАМ" to "FILE ERRORS",
+    "Заменить оригинальный файл?" to "Replace original file?",
+    "Действие нельзя гарантированно выполнить атомарно у всех файловых провайдеров. Вы сначала сохраните отдельную резервную копию; только после проверки копии будет произведена замена. При сбое приложение попытается восстановить оригинал." to "File providers do not guarantee atomic replacement. First save an independent backup; the app verifies it before replacing the original and attempts a rollback if anything fails.",
+    "Создать резервную копию" to "Create backup",
+    "Мировая сетка GPS" to "World GPS grid",
+    "Коснитесь сетки для выбора координат. Это схематическая карта широты/долготы без улиц." to "Tap the grid to pick coordinates. This is a latitude/longitude grid without street map tiles.",
+    "Использовать точку" to "Use this point",
+    "Редактировать EXIF / Metadata Studio →" to "Edit EXIF / Metadata Studio →",
+    "Очистка · EXIF-редактор · пакетная обработка" to "Cleaning · EXIF editor · batch operations",
+    "Открыть Metadata Studio →" to "Open Metadata Studio →",
+    "Free: локальный анализ, EXIF-редактор JPEG, очистка одного фото и CSV-история." to "Free: on-device analysis, JPEG EXIF editor, one-photo cleaning and history CSV.",
+    "Pro: пакетная очистка до 50 фото, PDF/JSON, 50 отчётов и собственный API." to "Pro: batch clean up to 50 photos, PDF/JSON, 50 reports and custom API.",
+    "Анализ, EXIF-редактор JPEG и очистка одного фото бесплатны. Pro добавляет пакетную очистку, PDF/JSON и историю до 50 записей." to "Analysis, JPEG EXIF editing and single-photo cleaning are free. Pro adds batch cleaning, PDF/JSON and 50 history entries.",
     "Настройки" to "Settings", "Назад" to "Back", "Подтвердить отправку" to "Confirm transfer",
     "Отправить" to "Send", "Отмена" to "Cancel", "Внешний API" to "External API",
     "Ожидание ответа сервера…" to "Waiting for server response…", "Ответ пуст" to "Empty response",

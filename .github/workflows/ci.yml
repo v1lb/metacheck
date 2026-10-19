@@ -26,6 +26,8 @@ jobs:
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - name: Verify text contrast
         run: python3 tools/check_contrast.py
+      - name: Check Play release preflight
+        run: python3 tools/release_gate.py
       - name: Run unit tests, lint, compile instrumentation tests and build APK
         run: gradle --no-daemon testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest
       - name: Upload unit-test reports when available

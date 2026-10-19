@@ -1,3 +1,11 @@
+# MetaCheck 2.4 — Metadata Studio
+
+Новый модуль редактирования EXIF, полной очистки JPEG/PNG путём перекодирования, выбора координат и пакетной очистки до 50 изображений для Pro. Доступны копия и осторожная перезапись оригинала с внешней резервной копией и проверкой SHA-256.
+
+**Реальные ограничения:** редактирование тегов — JPEG EXIF; универсальный XMP/IPTC-редактор не заявляется. Полная очистка перекодирует пиксели и может изменить качество, цвет и анимацию. Свежий Android APK ещё должен пройти GitHub Actions. Документация: [`RELEASE_2_4.md`](RELEASE_2_4.md).
+
+---
+
 # MetaCheck 2.3 — Cyber Grid / Neon Intelligence
 
 **Новый первый запуск:** Welcome → язык RU/EN → тема Dark/Light. Переключение сразу, настройки сохраняются. Встроенный Metadata Viewer не требует экспорта. Сведения об изменениях и проверках — [RELEASE_2_3.md](RELEASE_2_3.md).
@@ -92,3 +100,10 @@ com.example.metacheck
 **Технические ограничения:** проверка на ИИ относится только к доступным метаданным и не даёт процента подлинности. Для полноценной Android-сборки используйте GitHub Actions (workflow `CI`) или Android Studio с Android SDK 36 и Gradle 8.11.1. Файл `gradle-wrapper.jar` в этом архиве отсутствует; GitHub Actions устанавливает Gradle отдельно. Для real-money Pro необходимо настроить товар `pro_lifetime` в Google Play Console. Для выпуска подписанного релиза — собственный keystore и настройки из `DEPLOY.md`.
 
 Подробнее: [ARCHITECTURE_2_1.md](ARCHITECTURE_2_1.md).
+
+
+## Google Play release gate
+
+Run `python3 tools/release_gate.py` for static prerequisites, then execute the `Android emulator tests` workflow in GitHub Actions to run (rather than merely compile) the instrumentation suite. See `PLAY_RELEASE_CHECKLIST.md`. Neither step alone makes the app production-ready.
+
+See `RELEASE_CANDIDATE_2_4_1.md` for the latest code hardening and remaining release blockers, and `PRODUCT_STRATEGY.md` for the roadmap.
