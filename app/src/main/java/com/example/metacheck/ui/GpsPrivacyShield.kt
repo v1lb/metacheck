@@ -228,9 +228,9 @@ fun CyberGeoMap(gps: GpsPoint) {
             drawCircle(Color.White, radius = 5f, center = middle)
             drawCircle(dangerGlow, radius = 3f, center = middle)
             drawLine(Color.White.copy(alpha = .65f), Offset(middle.x - 15f, middle.y),
-                Offset(middle.x + 15f, middle.y), width = 1f)
+                Offset(middle.x + 15f, middle.y), strokeWidth = 1f)
             drawLine(Color.White.copy(alpha = .65f), Offset(middle.x, middle.y - 15f),
-                Offset(middle.x, middle.y + 15f), width = 1f)
+                Offset(middle.x, middle.y + 15f), strokeWidth = 1f)
         }
         Text("Положение маркера соответствует координатам EXIF. Контуры суши приблизительные; улицы не показаны. Без интернета.",
             color = Color(0xFFCDD9E7), style = MaterialTheme.typography.bodySmall)
