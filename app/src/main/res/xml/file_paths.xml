@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Только cache/camera: туда системная камера кладёт снимок. Остальные папки не открываем. -->
+<paths>
+    <cache-path name="camera" path="camera/" />
+</paths>
