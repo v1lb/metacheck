@@ -16,6 +16,30 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -76,89 +100,121 @@ fun ResultView(report: MetaReport, actions: ResultActions) {
     var selected by rememberSaveable { mutableStateOf(0) }
     val index = selected.coerceIn(0, tabs.lastIndex)
 
-    Column(Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 12.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            AssistChip(onClick = actions.onCopy, label = { Text("Копировать всё") })
-            AssistChip(onClick = actions.onJson, label = { Text("JSON") })
-            AssistChip(onClick = actions.onPdf, label = { Text("PDF") })
-            actions.onClean?.let { AssistChip(onClick = it, label = { Text("Очистить метаданные") }) }
-            actions.onApi?.let { AssistChip(onClick = it, label = { Text("Проверить через API") }) }
-        }
-        ScrollableTabRow(
-            selectedTabIndex = index, edgePadding = 12.dp,
-            containerColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.primary,
-            divider = { HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .35f)) },
-        ) {
-            tabs.forEachIndexed { i, tab ->
-                Tab(selected = i == index, onClick = { selected = i }, text = { Text(tab.title) })
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+                tabs.forEachIndexed { i, tab ->
+                    NavigationBarItem(
+                        selected = i == index, onClick = { selected = i },
+                        icon = { Icon(when(tab) {
+                            ResultTab.AI -> Icons.Default.Info
+                            ResultTab.EXIF -> Icons.Default.PhotoCamera
+                            ResultTab.FILE -> Icons.Default.Description
+                            ResultTab.MAP -> Icons.Default.Place
+                        }, contentDescription = null) },
+                        label = { Text(tab.title) }, alwaysShowLabel = true,
+                    )
+                }
             }
-        }
-        SelectionContainer {
-            when (tabs[index]) {
-                ResultTab.AI -> AiTab(report)
-                ResultTab.EXIF -> ExifTab(report)
-                ResultTab.FILE -> FileTab(report)
-                ResultTab.MAP -> report.gps?.let { MapTab(it) }
+        },
+    ) { inner ->
+        Column(Modifier.fillMaxSize().padding(inner)) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("ОТЧЁТ  /  METACHECK", style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary)
+                    Text(report.file.name, style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                Text("●  LOCAL", style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary)
+            }
+            SelectionContainer {
+                when (tabs[index]) {
+                    ResultTab.AI -> AiTab(report, actions)
+                    ResultTab.EXIF -> ExifTab(report)
+                    ResultTab.FILE -> FileTab(report)
+                    ResultTab.MAP -> report.gps?.let { MapTab(it) }
+                }
             }
         }
     }
+
 }
 
 @Composable
-private fun AiTab(report: MetaReport) {
+private fun AiTab(report: MetaReport, actions: ResultActions) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = listPadding, verticalArrangement = listSpacing) {
+        item { CyberSummary(report) }
         item {
-            CyberSummary(report)
-        }
-        item {
-            if (report.hasAiEvidence) {
-                BannerCard(
-                    title = "Найдены следы ИИ-генерации",
-                    body = "В метаданных файла есть явные признаки генерации. Подробности ниже.",
-                    container = MaterialTheme.colorScheme.errorContainer,
-                    content = MaterialTheme.colorScheme.onErrorContainer,
-                )
-            } else {
-                BannerCard(
-                    title = "В метаданных следов ИИ не найдено",
-                    body = "Это не доказывает подлинность: метаданные легко удалить. " +
-                        "Анализ самих пикселей нейросетью появится на следующих этапах.",
-                    container = MaterialTheme.colorScheme.secondaryContainer,
-                    content = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                SummaryMetric("${report.signals.size}", "СИГНАЛОВ", Modifier.weight(1f))
+                SummaryMetric("${report.exifSections.size}", "EXIF ГРУПП", Modifier.weight(1f))
+                SummaryMetric(report.file.format.label, "ФОРМАТ", Modifier.weight(1f))
             }
         }
+        item {
+            Text("ДЕЙСТВИЯ С ОТЧЁТОМ", color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelMedium)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = actions.onCopy, modifier = Modifier.weight(1f)) { Text("Копировать") }
+                OutlinedButton(onClick = actions.onPdf, modifier = Modifier.weight(1f)) { Text("PDF") }
+                OutlinedButton(onClick = actions.onJson, modifier = Modifier.weight(1f)) { Text("JSON") }
+            }
+            actions.onClean?.let { OutlinedButton(onClick = it, modifier = Modifier.fillMaxWidth()) {
+                Text("Очистить метаданные") } }
+            actions.onApi?.let { OutlinedButton(onClick = it, modifier = Modifier.fillMaxWidth()) {
+                Text("Проверить через API") } }
+        }
+        item { Text("ОБНАРУЖЕННЫЕ ПРИЗНАКИ", color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.labelMedium) }
         items(report.signals) { SignalCard(it) }
+        item {
+            Text("Метаданные можно удалить или изменить. Отсутствие следов ИИ не подтверждает подлинность снимка.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+
+}
+
+@Composable
+private fun SummaryMetric(value: String, label: String, modifier: Modifier = Modifier) {
+    Card(modifier = modifier, shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary, maxLines = 1)
+            Text(label, style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 
 @Composable
 private fun CyberSummary(report: MetaReport) {
-    val scheme = MaterialTheme.colorScheme
     val warning = report.hasAiEvidence
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        border = BorderStroke(1.dp, if (warning) scheme.error.copy(alpha = .5f) else scheme.primary.copy(alpha = .5f)),
-        colors = CardDefaults.cardColors(containerColor = scheme.surface),
-    ) {
-        Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("METACHECK  /  IMAGE INTELLIGENCE", style = MaterialTheme.typography.labelSmall,
-                color = scheme.primary)
-            Text(if (warning) "Обнаружены признаки ИИ" else "Явных следов ИИ нет",
-                style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Text("Проверка метаданных • ${report.signals.size} сигналов",
-                style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant)
-            HorizontalDivider(color = scheme.outline.copy(alpha = .3f))
-            Text("Результат относится только к доступным метаданным. " +
-                "Он не подтверждает подлинность изображения и не заменяет анализ пикселей.",
-                style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+    val accent = if (warning) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp),
+        border = BorderStroke(1.dp, accent.copy(alpha = .65f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text("✦  IMAGE FORENSICS", style = MaterialTheme.typography.labelMedium, color = accent)
+            Box(Modifier.size(64.dp).clip(RoundedCornerShape(20.dp))
+                .background(accent.copy(alpha = .13f)), contentAlignment = Alignment.Center) {
+                Text(if (warning) "!" else "✓", style = MaterialTheme.typography.headlineLarge,
+                    color = accent, fontWeight = FontWeight.Bold)
+            }
+            Text(if (warning) "Найдены признаки\nИИ-генерации" else "Явных следов\nИИ не найдено",
+                style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text("Проверка доступных метаданных", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            HorizontalDivider(color = accent.copy(alpha = .25f))
+            Text(if (warning) "В файле обнаружены признаки, требующие дополнительной проверки."
+                else "Это не означает, что изображение подлинное: анализ пикселей не выполнялся.",
+                style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

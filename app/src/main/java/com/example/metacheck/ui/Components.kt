@@ -1,6 +1,11 @@
 package com.example.metacheck.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +28,7 @@ private const val MAX_VALUE_CHARS = 6000
 
 @Composable
 fun SectionCard(title: String, items: List<MetaItem>) {
+    var expanded by remember(title) { mutableStateOf(false) }
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
@@ -30,11 +36,22 @@ fun SectionCard(title: String, items: List<MetaItem>) {
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = .48f)),
     ) {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary)
-            items.forEachIndexed { index, item ->
-                if (index > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .22f))
-                ItemRow(item)
+            Row(Modifier.fillMaxWidth().clickable { expanded = !expanded },
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(title, style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f))
+                Text(if (expanded) "−" else "+", color = MaterialTheme.colorScheme.primary)
+            }
+            if (!expanded) {
+                Text("${items.size} полей  ·  Нажмите, чтобы раскрыть",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else {
+                items.forEachIndexed { index, item ->
+                    if (index > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .22f))
+                    ItemRow(item)
+                }
             }
         }
     }

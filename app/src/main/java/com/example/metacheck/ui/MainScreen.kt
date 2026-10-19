@@ -28,6 +28,12 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -193,24 +199,49 @@ fun MainScreen(viewModel: MainViewModel = viewModel(factory = MainViewModel.Fact
                 SettingsScreen(onMessage = viewModel::showMessage)
             } else {
                 if (!inResult) {
-                    Button(
-                        onClick = { pick.launch(arrayOf("image/*")) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                    ) { Text("Выбрать из галереи") }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    Column(
+                        Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(18.dp),
                     ) {
-                        OutlinedButton(onClick = { launchCamera() }, modifier = Modifier.weight(1f)) {
-                            Text("Сделать фото")
+                        Text("IMAGE INTELLIGENCE  /  01", color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelMedium)
+                        Text("Проверьте\nизображение", style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold)
+                        Text("Исследуйте происхождение файла и скрытые метаданные.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        androidx.compose.material3.Card(
+                            shape = RoundedCornerShape(28.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                                Text("✦  НОВАЯ ПРОВЕРКА", color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.labelLarge)
+                                Text("Загрузите оригинал фото", style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold)
+                                Text("Оригинальный файл сохраняет больше данных, чем скриншот или копия из мессенджера.",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Button(onClick = { pick.launch(arrayOf("image/*")) },
+                                    modifier = Modifier.fillMaxWidth()) { Text("＋  Выбрать изображение") }
+                                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    OutlinedButton(onClick = { launchCamera() }, modifier = Modifier.weight(1f)) {
+                                        Text("Камера")
+                                    }
+                                    OutlinedButton(onClick = { pasteFromClipboard() }, modifier = Modifier.weight(1f)) {
+                                        Text("Буфер")
+                                    }
+                                }
+                            }
                         }
-                        OutlinedButton(onClick = { pasteFromClipboard() }, modifier = Modifier.weight(1f)) {
-                            Text("Из буфера")
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            DashboardMetric("EXIF", "Камера и GPS", Modifier.weight(1f))
+                            DashboardMetric("AI TRACE", "Следы генерации", Modifier.weight(1f))
                         }
+                        Text("ПРИВАТНОСТЬ ПО УМОЛЧАНИЮ", color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelMedium)
+                        Text("Анализ выполняется на телефоне. Без вашего разрешения изображение не отправляется в сеть.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyMedium)
                     }
                 }
                 if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
@@ -390,3 +421,18 @@ private fun suggestedName(fileName: String): String =
         .trim()
         .ifEmpty { "image" }
         .take(60)
+
+@Composable
+private fun DashboardMetric(title: String, subtitle: String, modifier: Modifier = Modifier) {
+    androidx.compose.material3.Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(title, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
