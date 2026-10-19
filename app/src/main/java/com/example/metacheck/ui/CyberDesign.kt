@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -48,7 +50,7 @@ fun CyberBackdrop(modifier: Modifier = Modifier, content: @Composable () -> Unit
             drawRect(Brush.verticalGradient(listOf(Color(0xFF0D1420), CyberPalette.Base, CyberPalette.Black)))
             drawCircle(
                 brush = Brush.radialGradient(
-                    listOf(CyberPalette.Purple.copy(alpha = .22f), Color.Transparent),
+                    listOf(CyberPalette.PurpleGlow.copy(alpha = .22f), Color.Transparent),
                     center = Offset(size.width * .87f, size.height * .10f),
                     radius = size.width * .78f,
                 ),
@@ -77,7 +79,7 @@ fun CyberBackdrop(modifier: Modifier = Modifier, content: @Composable () -> Unit
                 y += pitch
             }
         }
-        content()
+        CompositionLocalProvider(LocalContentColor provides CyberPalette.White) { content() }
     }
 }
 
@@ -92,7 +94,7 @@ fun GlassPanel(
         modifier = modifier.clip(shape)
             .background(Brush.linearGradient(listOf(CyberPalette.GlassLight, CyberPalette.Glass)))
             .border(1.dp, Brush.linearGradient(listOf(accent.copy(alpha = .46f), Color.White.copy(alpha = .06f), CyberPalette.Line)), shape)
-    ) { content() }
+    ) { CompositionLocalProvider(LocalContentColor provides CyberPalette.White) { content() } }
 }
 
 @Composable
@@ -162,7 +164,7 @@ fun ScanningBars(modifier: Modifier = Modifier) {
         val fractions = listOf(.32f,.53f,.44f,.71f,.38f,.62f,.83f,.46f,.69f,.36f,.89f,.57f,.72f,.42f,.98f,.53f,.81f,.38f,.65f,.93f,.46f,.72f,.34f,.6f,.84f,.48f,.55f)
         fractions.forEachIndexed { index, fraction ->
             drawRoundRect(
-                brush = Brush.verticalGradient(listOf(CyberPalette.Cyan.copy(alpha = .88f), CyberPalette.Purple.copy(alpha = .55f))),
+                brush = Brush.verticalGradient(listOf(CyberPalette.Cyan.copy(alpha = .88f), CyberPalette.PurpleGlow.copy(alpha = .55f))),
                 topLeft = Offset(index * gap + gap * .18f, size.height * (1 - fraction)),
                 size = Size(max(1f, gap * .46f), size.height * fraction),
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(4f, 4f),

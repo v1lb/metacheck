@@ -142,6 +142,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel(factory = MainViewModel.Fact
     val saveJson = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { it?.let(viewModel::exportJson) }
     val savePdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { it?.let(viewModel::exportPdf) }
     val saveCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { it?.let(viewModel::exportHistoryCsv) }
+    val saveMetadataCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { it?.let(viewModel::exportMetadataCsv) }
     val saveJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { it?.let(viewModel::saveCleaned) }
     val savePng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { it?.let(viewModel::saveCleaned) }
     val inResult = state is UiState.Done
@@ -160,8 +161,8 @@ fun MainScreen(viewModel: MainViewModel = viewModel(factory = MainViewModel.Fact
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text("◈", color = CyberPalette.Cyan, style = MaterialTheme.typography.titleLarge)
-                            Text(if (showSettings) "Настройки" else "MetaCheck", style = MaterialTheme.typography.titleLarge)
-                            if (!showSettings && !inResult) CyberEyebrow("2.1")
+                            Text(if (showSettings) "Настройки" else "MetaCheck", style = MaterialTheme.typography.titleLarge, color = CyberPalette.White)
+                            if (!showSettings && !inResult) CyberEyebrow("2.2")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = CyberPalette.Black.copy(alpha = .7f)),
@@ -202,6 +203,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel(factory = MainViewModel.Fact
                             report = s.report,
                             sourceUri = s.source,
                             actions = ResultActions(
+                                onCsv = { saveMetadataCsv.launch("$name-metadata.csv") },
                                 onCopy = {
                                     clipboard.setText(AnnotatedString(ReportText.format(s.report)))
                                     viewModel.showMessage("Отчёт скопирован")
@@ -239,6 +241,10 @@ fun MainScreen(viewModel: MainViewModel = viewModel(factory = MainViewModel.Fact
         }
         AlertDialog(
             onDismissRequest = { confirmApi = false },
+            containerColor = Color(0xFF111C2B),
+            titleContentColor = CyberPalette.White,
+            textContentColor = CyberPalette.White,
+            shape = RoundedCornerShape(26.dp),
             title = { Text("Подтвердить отправку") },
             text = { Text("JSON-отчёт будет отправлен на $host. Исходная фотография не отправляется. GPS: " +
                 if (settings.apiSendGps) "включён в отчёт." else "исключён из отчёта.") },
@@ -249,6 +255,10 @@ fun MainScreen(viewModel: MainViewModel = viewModel(factory = MainViewModel.Fact
     apiDialog?.let { dialog ->
         AlertDialog(
             onDismissRequest = viewModel::dismissApiDialog,
+            containerColor = Color(0xFF111C2B),
+            titleContentColor = CyberPalette.White,
+            textContentColor = CyberPalette.White,
+            shape = RoundedCornerShape(26.dp),
             title = { Text("Внешний API") },
             text = {
                 when (dialog) {
@@ -286,7 +296,7 @@ private fun Dashboard(
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
                     PulseIndicator(); CyberEyebrow("SECURE IMAGE INTELLIGENCE")
                 }
-                Text("Цифровая\nэкспертиза фото", style = MaterialTheme.typography.headlineLarge)
+                Text("Цифровая\nэкспертиза фото", style = MaterialTheme.typography.headlineLarge, color = CyberPalette.White)
                 Text("Проверьте происхождение файла, метаданные камеры и технические признаки ИИ.",
                     color = CyberPalette.Muted, style = MaterialTheme.typography.bodyMedium)
             }
@@ -299,7 +309,7 @@ private fun Dashboard(
                         CyberEyebrow("NEW SCAN / 001")
                         Text("⌁", color = CyberPalette.Purple, style = MaterialTheme.typography.headlineMedium)
                     }
-                    Text("Исследовать изображение", style = MaterialTheme.typography.titleLarge)
+                    Text("Исследовать изображение", style = MaterialTheme.typography.titleLarge, color = CyberPalette.White)
                     Text("Выбирайте исходный JPEG, PNG или HEIC: в скриншоте часть данных уже потеряна.",
                         color = CyberPalette.Muted, style = MaterialTheme.typography.bodyMedium)
                     ScanningBars(Modifier.fillMaxWidth().height(52.dp))
@@ -320,20 +330,40 @@ private fun Dashboard(
         }
         item { SectionLabel("ВАША АНАЛИТИКА") }
         item {
+            GlassPanel(Modifier.fillMaxWidth(), CyberPalette.Green) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Лимит сохранённой истории", color = CyberPalette.White,
+                            style = MaterialTheme.typography.titleMedium)
+                        Text("${history.size} / ${if (isPro) 50 else 10}", color = CyberPalette.Green)
+                    }
+                    LinearProgressIndicator(
+                        progress = { (history.size.toFloat() / if (isPro) 50f else 10f).coerceIn(0f, 1f) },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = CyberPalette.Green,
+                        trackColor = CyberPalette.Line,
+                    )
+                    Text(if (isPro) "Pro: до 50 локальных отчётов" else "Free: до 10 отчётов · Pro: до 50",
+                        color = CyberPalette.Muted, style = MaterialTheme.typography.bodySmall)
+                    if (!isPro) CyberOutlineButton("Увеличить лимит с Pro", onUpgrade, Modifier.fillMaxWidth())
+                }
+            }
+        }
+        item {
             GlassPanel(Modifier.fillMaxWidth(), CyberPalette.Purple) {
                 Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
                         Column(Modifier.weight(1f)) {
                             CyberEyebrow("ВСЕГО ОТЧЁТОВ")
-                            Text("${insight.total}", style = MaterialTheme.typography.headlineMedium)
+                            Text("${insight.total}", style = MaterialTheme.typography.headlineMedium, color = CyberPalette.White)
                         }
                         Column(Modifier.weight(1f)) {
                             CyberEyebrow("С ПРИЗНАКАМИ ИИ", color = CyberPalette.Purple)
-                            Text("${insight.aiEvidenceCount}", style = MaterialTheme.typography.headlineMedium)
+                            Text("${insight.aiEvidenceCount}", style = MaterialTheme.typography.headlineMedium, color = CyberPalette.White)
                         }
                         Column(Modifier.weight(1f)) {
                             CyberEyebrow("С GPS", color = CyberPalette.Green)
-                            Text("${insight.gpsCount}", style = MaterialTheme.typography.headlineMedium)
+                            Text("${insight.gpsCount}", style = MaterialTheme.typography.headlineMedium, color = CyberPalette.White)
                         }
                     }
                     CyberEyebrow("АКТИВНОСТЬ ЗА 7 ДНЕЙ")
@@ -353,7 +383,7 @@ private fun Dashboard(
         if (history.isEmpty()) item {
             GlassPanel(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                    Text("Здесь появятся отчёты", style = MaterialTheme.typography.titleMedium)
+                    Text("Здесь появятся отчёты", style = MaterialTheme.typography.titleMedium, color = CyberPalette.White)
                     Text(if (historyEnabled) "История пока пуста. Начните первую проверку." else "Сохранение истории отключено в настройках.",
                         color = CyberPalette.Muted)
                 }
@@ -382,7 +412,7 @@ private fun Dashboard(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("◈", style = MaterialTheme.typography.headlineMedium, color = CyberPalette.Green)
                     Column(Modifier.weight(1f)) {
-                        Text(if (isPro) "PRO ACTIVE" else "METACHECK PRO", style = MaterialTheme.typography.titleMedium)
+                        Text(if (isPro) "PRO ACTIVE" else "METACHECK PRO", style = MaterialTheme.typography.titleMedium, color = CyberPalette.White)
                         Text(if (isPro) "Экспорт PDF/JSON и расширенная история доступны" else "PDF, JSON, 50 отчётов и собственный API",
                             color = CyberPalette.Muted, style = MaterialTheme.typography.bodySmall)
                     }
@@ -455,6 +485,10 @@ private fun OnboardingDialog(onFinish: () -> Unit) {
     )
     AlertDialog(
         onDismissRequest = onFinish,
+        containerColor = Color(0xFF111C2B),
+        titleContentColor = CyberPalette.White,
+        textContentColor = CyberPalette.White,
+        shape = RoundedCornerShape(26.dp),
         title = { Text(pages[step].first) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(13.dp)) {

@@ -58,7 +58,7 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 private enum class ReportTab(val label: String, val glyph: String) {
-    OVERVIEW("Анализ", "◉"), EXIF("Камера", "◎"), FILE("Файл", "▤"), GPS("Карта", "⌖")
+    OVERVIEW("Анализ", "◉"), METADATA("Метаданные", "▤"), GPS("Карта", "⌖")
 }
 
 data class ResultActions(
@@ -67,12 +67,13 @@ data class ResultActions(
     val onPdf: () -> Unit,
     val onClean: (() -> Unit)?,
     val onApi: (() -> Unit)?,
+    val onCsv: (() -> Unit)? = null,
 )
 
 @Composable
 fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = null) {
     val tabs = remember(report.gps) {
-        if (report.gps == null) listOf(ReportTab.OVERVIEW, ReportTab.EXIF, ReportTab.FILE)
+        if (report.gps == null) listOf(ReportTab.OVERVIEW, ReportTab.METADATA)
         else ReportTab.entries.toList()
     }
     var selected by rememberSaveable(report.file.name) { mutableIntStateOf(0) }
@@ -86,11 +87,10 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
             PulseIndicator()
             Text(" LOCAL", color = CyberPalette.Green, style = MaterialTheme.typography.labelMedium)
         }
-        SelectionContainer(modifier = Modifier.weight(1f)) {
+        Box(Modifier.weight(1f)) {
             when (tab) {
-                ReportTab.OVERVIEW -> OverviewTab(report, actions, sourceUri)
-                ReportTab.EXIF -> ExifTab(report)
-                ReportTab.FILE -> FileTab(report)
+                ReportTab.OVERVIEW -> OverviewTab(report, actions, sourceUri, onMetadata = { selected = tabs.indexOf(ReportTab.METADATA) })
+                ReportTab.METADATA -> MetadataViewer(report, actions.onCsv)
                 ReportTab.GPS -> report.gps?.let { GpsTab(it) }
             }
         }
@@ -119,7 +119,7 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
 private val contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 10.dp, bottom = 26.dp)
 
 @Composable
-private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: String?) {
+private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: String?, onMetadata: () -> Unit) {
     val evidence = report.hasAiEvidence
     val attention = !evidence && (report.file.truncated || report.signals.any { it.severity == Severity.CAUTION })
     val color = when {
@@ -143,6 +143,7 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
                             else -> "Явных следов ИИ не найдено"
                         },
                         style = MaterialTheme.typography.headlineMedium,
+                        color = CyberPalette.White,
                     )
                     Text("Проверка только метаданных • не анализ пикселей",
                         color = CyberPalette.Muted, style = MaterialTheme.typography.bodyMedium)
@@ -150,6 +151,7 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
                     Text(
                         "Результат не подтверждает подлинность снимка. Метаданные могут быть удалены или подделаны.",
                         style = MaterialTheme.typography.bodyMedium,
+                        color = CyberPalette.White,
                     )
                 }
             }
@@ -161,6 +163,7 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
                 MetricPanel(report.file.format.label, "ФОРМАТ", Modifier.weight(1f), CyberPalette.Green)
             }
         }
+        item { NeonButton("Посмотреть все метаданные →", onMetadata, Modifier.fillMaxWidth()) }
         item { SectionLabel("ДЕЙСТВИЯ С ОТЧЁТОМ") }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
@@ -260,35 +263,6 @@ private fun SignalPanel(signal: Signal) {
             Text(signal.title, style = MaterialTheme.typography.titleMedium)
             Text(signal.detail, color = CyberPalette.Muted, style = MaterialTheme.typography.bodyMedium)
         }
-    }
-}
-
-@Composable
-private fun ExifTab(report: MetaReport) {
-    LazyColumn(contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        item { SectionLabel("EXIF / CAMERA INTELLIGENCE") }
-        if (report.exifSections.isEmpty()) item {
-            GlassPanel(Modifier.fillMaxWidth()) {
-                Text("EXIF не найден. Это не означает, что изображение сгенерировано ИИ.", Modifier.padding(18.dp))
-            }
-        }
-        items(report.exifSections) { section -> SectionCard(section.title, section.items) }
-    }
-}
-
-@Composable
-private fun FileTab(report: MetaReport) {
-    val file = report.file
-    val details = listOf(
-        MetaItem("Имя", file.name), MetaItem("Формат", file.format.label),
-        MetaItem("Тип MIME", file.mimeType), MetaItem("Размер", formatSize(file.sizeBytes)),
-        MetaItem("Прочитано", formatSize(file.scannedBytes.toLong()) + if (file.truncated) " (частично)" else ""),
-    )
-    LazyColumn(contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        item { SectionLabel("FILE / TECHNICAL DETAILS") }
-        item { SectionCard("Свойства файла", details, initiallyExpanded = true) }
-        if (report.xmpItems.isNotEmpty()) item { SectionCard("XMP / IPTC", report.xmpItems) }
-        if (report.pngTextItems.isNotEmpty()) item { SectionCard("Текстовые блоки PNG", report.pngTextItems) }
     }
 }
 

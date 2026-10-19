@@ -6,6 +6,7 @@ import android.content.ContextWrapper
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,10 +39,15 @@ fun PaywallDialog(vm: ProViewModel) {
 
     AlertDialog(
         onDismissRequest = vm::dismissPaywall,
-        title = { Text("MetaCheck Pro") },
+        containerColor = Color(0xFF111C2B),
+        titleContentColor = CyberPalette.White,
+        textContentColor = CyberPalette.White,
+        shape = RoundedCornerShape(26.dp),
+        title = { Text("MetaCheck Pro", color = CyberPalette.White) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                CyberEyebrow("FREE  →  PRO", color = CyberPalette.Purple)
+                CyberEyebrow("FREE  →  PRO", color = CyberPalette.Cyan)
+                ScanningBars(Modifier.fillMaxWidth().height(38.dp))
                 Text("Free: локальный анализ, EXIF, очистка, статистика и CSV-история.")
                 Text("Pro: экспорт PDF/JSON, до 50 отчётов, подключение собственного API.")
                 Text("Разовая покупка через Google Play, без подписки. Цена показывается только если доступен товар pro_lifetime в Play Console.",

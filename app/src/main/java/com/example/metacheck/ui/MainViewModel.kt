@@ -3,6 +3,8 @@ package com.example.metacheck.ui
 import android.net.Uri
 import android.content.ContentResolver
 import com.example.metacheck.domain.export.HistoryCsv
+import com.example.metacheck.domain.export.MetadataCsv
+import com.example.metacheck.domain.metadata.MetadataCatalog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CancellationException
@@ -101,22 +103,30 @@ class MainViewModel(
         analyzeJob?.cancel()
         _state.value = UiState.Loading
         analyzeJob = viewModelScope.launch {
-            analyzeImage(uri.toString()).fold(
-                onSuccess = { report ->
-                    _state.value = UiState.Done(report, uri.toString())
-                    if (settingsState.value.saveHistory) {
-                        history.save(report)
-                        refreshHistory()
-                    }
-                },
-                onFailure = { _state.value = UiState.Failed(it.toUserMessage()) },
-            )
+            try {
+                analyzeImage(uri.toString()).fold(
+                    onSuccess = { report ->
+                        _state.value = UiState.Done(report, uri.toString())
+                        if (settingsState.value.saveHistory) {
+                            try {
+                                history.save(report)
+                                refreshHistory()
+                            } catch (e: CancellationException) { throw e }
+                            catch (_: Exception) { showMessage("Проверка завершена, но историю сохранить не удалось") }
+                        }
+                    },
+                    onFailure = { _state.value = UiState.Failed(it.toUserMessage()) },
+                )
+            } catch (e: CancellationException) { throw e }
+            catch (_: Exception) { _state.value = UiState.Failed("Ошибка чтения файла. Попробуйте другой источник.") }
         }
     }
 
     fun openFromHistory(id: String) {
         viewModelScope.launch {
-            val report = history.load(id)
+            val report = try { history.load(id) }
+                catch (e: CancellationException) { throw e }
+                catch (_: Exception) { null }
             if (report == null) {
                 showMessage("Не удалось открыть отчёт")
                 refreshHistory()
@@ -128,8 +138,9 @@ class MainViewModel(
 
     fun deleteFromHistory(id: String) {
         viewModelScope.launch {
-            history.delete(id)
-            refreshHistory()
+            try { history.delete(id); refreshHistory() }
+            catch (e: CancellationException) { throw e }
+            catch (_: Exception) { showMessage("Не удалось удалить отчёт") }
         }
     }
 
@@ -157,6 +168,15 @@ class MainViewModel(
                 _busy.value = false
             }
         }
+    }
+
+    fun exportMetadataCsv(target: Uri) = withDone { done ->
+        withContext(Dispatchers.IO) {
+            val data = MetadataCsv.encode(MetadataCatalog.from(done.report))
+            resolver.openOutputStream(target, "wt")?.use { it.write(data) }
+                ?: error("Не удалось открыть файл")
+        }
+        showMessage("CSV с метаданными сохранён")
     }
 
     fun exportJson(target: Uri) = withDone { done ->

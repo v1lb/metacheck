@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.metacheck.domain.model.FileInfo
@@ -63,10 +64,10 @@ class ResultViewTest {
     }
 
     @Test
-    fun exifTabShowsCameraData() {
+    fun searchableMetadataTabShowsCameraData() {
         show(report(ai = false, gps = false))
-        compose.onNodeWithText("Камера").performClick()
-        compose.onNodeWithText("Камера и объектив").performClick()
+        compose.onNodeWithText("Метаданные").performClick()
+        compose.onNodeWithTag("metadata_search").performTextInput("Модель")
         compose.onNodeWithText("Pixel 8").assertIsDisplayed()
     }
 
@@ -79,7 +80,7 @@ class ResultViewTest {
     @Test
     fun cleanAndApiButtonsAreHiddenWhenUnavailable() {
         show(report(ai = false, gps = false))
-        compose.onNodeWithTag("overview_list").performScrollToIndex(4)
+        compose.onNodeWithTag("overview_list").performScrollToIndex(5)
         compose.onNodeWithText("Копировать").assertExists()
         compose.onNodeWithText("Очистить EXIF").assertDoesNotExist()
     }
@@ -87,7 +88,7 @@ class ResultViewTest {
     @Test
     fun cleanButtonShownWhenProvided() {
         show(report(ai = false, gps = false), ResultActions({}, {}, {}, {}, {}))
-        compose.onNodeWithTag("overview_list").performScrollToIndex(4)
+        compose.onNodeWithTag("overview_list").performScrollToIndex(5)
         compose.onNodeWithText("Очистить EXIF").assertExists()
         compose.onNodeWithText("Проверить через API").assertExists()
     }

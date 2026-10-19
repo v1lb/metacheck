@@ -1,6 +1,8 @@
 package com.example.metacheck.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
@@ -15,15 +17,16 @@ import androidx.compose.ui.unit.sp
 object CyberPalette {
     val Black = Color(0xFF05070A)
     val Base = Color(0xFF0A0C10)
-    val Glass = Color(0xD9141B28)
-    val GlassLight = Color(0xB71C2838)
+    val Glass = Color(0xF016202D)
+    val GlassLight = Color(0xEA1C2B3F)
     val Cyan = Color(0xFF00F3FF)
-    val Purple = Color(0xFF9D4EDD)
+    val PurpleGlow = Color(0xFF9D4EDD)
+    val Purple = Color(0xFFE0BBFF)
     val Green = Color(0xFF00FFB2)
     val Amber = Color(0xFFFFC875)
-    val Danger = Color(0xFFFF6B91)
-    val White = Color(0xFFF0F7FF)
-    val Muted = Color(0xFFA8B9CE)
+    val Danger = Color(0xFFFF96B4)
+    val White = Color(0xFFFFFFFF)
+    val Muted = Color(0xFFC5D4E8)
     val Line = Color(0xFF293E52)
 }
 
@@ -73,6 +76,6 @@ fun MetaCheckTheme(content: @Composable () -> Unit) {
             medium = RoundedCornerShape(18.dp),
             large = RoundedCornerShape(26.dp),
         ),
-        content = content,
+        content = { CompositionLocalProvider(LocalContentColor provides CyberPalette.White) { content() } },
     )
 }

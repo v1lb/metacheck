@@ -77,6 +77,18 @@ object ExifReader {
             Tag(ExifInterface.TAG_OFFSET_TIME, "Часовой пояс изменения"),
             Tag(ExifInterface.TAG_SUBSEC_TIME_ORIGINAL, "Доли секунды"),
         ),
+        "Геолокация EXIF" to listOf(
+            Tag(ExifInterface.TAG_GPS_LATITUDE_REF, "Полушарие широты"),
+            Tag(ExifInterface.TAG_GPS_LONGITUDE_REF, "Полушарие долготы"),
+            Tag(ExifInterface.TAG_GPS_ALTITUDE, "Высота GPS (RAW)"),
+            Tag(ExifInterface.TAG_GPS_DATESTAMP, "Дата GPS"),
+            Tag(ExifInterface.TAG_GPS_TIMESTAMP, "Время GPS"),
+            Tag(ExifInterface.TAG_GPS_IMG_DIRECTION, "Направление камеры"),
+            Tag(ExifInterface.TAG_GPS_SPEED, "Скорость GPS"),
+            Tag(ExifInterface.TAG_GPS_SPEED_REF, "Единица скорости"),
+            Tag(ExifInterface.TAG_GPS_SATELLITES, "Спутники"),
+            Tag(ExifInterface.TAG_GPS_PROCESSING_METHOD, "Метод геопозиционирования"),
+        ),
         "Программа и авторство" to listOf(
             Tag(ExifInterface.TAG_SOFTWARE, "Программа"),
             Tag(ExifInterface.TAG_ARTIST, "Автор"),

@@ -24,6 +24,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -161,6 +163,10 @@ fun SettingsScreen(
 
     if (clearConfirm) AlertDialog(
         onDismissRequest = { clearConfirm = false },
+        containerColor = Color(0xFF111C2B),
+        titleContentColor = CyberPalette.White,
+        textContentColor = CyberPalette.White,
+        shape = RoundedCornerShape(26.dp),
         title = { Text("Удалить все отчёты?") },
         text = { Text("Это действие удалит сохранённые отчёты без возможности восстановления.") },
         confirmButton = { TextButton(onClick = {
