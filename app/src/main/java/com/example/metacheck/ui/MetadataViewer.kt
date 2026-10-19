@@ -55,6 +55,17 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?) {
                 Text("${records.size} полей · просмотр прямо на устройстве", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
+        if (report.gps != null) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("ГЕОМЕТКА · БЕСПЛАТНО", color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleMedium)
+                    CyberGeoMap(report.gps)
+                    Text("GPS-координаты фотографии. Карта локальная, без отправки координат в интернет.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
         item {
             OutlinedTextField(
                 value = query,
