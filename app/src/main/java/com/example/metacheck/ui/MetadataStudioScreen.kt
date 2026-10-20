@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.ContentResolver
 import android.net.Uri
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
@@ -144,6 +145,27 @@ fun MetadataStudioScreen(
         }
     }
 
+    // GPS preview is independent of Pro and does not modify the image.
+    val photoGps by produceState<Pair<Double, Double>?>(initialValue = null, key1 = source) {
+        value = withContext(Dispatchers.IO) {
+            if (source.isBlank()) null else runCatching {
+                context.contentResolver.openInputStream(Uri.parse(source))?.use { stream ->
+                    ExifInterface(stream).latLong?.let { it[0] to it[1] }
+                }
+            }.getOrNull()
+        }
+    }
+    var showGpsGrid by remember { mutableStateOf(false) }
+    LaunchedEffect(source, photoGps) {
+        if (photoGps != null) {
+            latitude = String.format(Locale.US, "%.6f", photoGps!!.first)
+            longitude = String.format(Locale.US, "%.6f", photoGps!!.second)
+        } else if (source.isBlank()) {
+            latitude = ""
+            longitude = ""
+        }
+    }
+
     val chooseImage = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) { source = uri.toString(); actionError = null }
     }
@@ -266,6 +288,37 @@ fun MetadataStudioScreen(
                 }
             }
         }
+        // METACHECK_FREE_GPS_PANEL_V1: visible for both Free and Pro users.
+        if (mode != StudioMode.BATCH && source.isNotBlank()) {
+            item {
+                GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.primary) {
+                    Column(Modifier.padding(17.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CyberEyebrow("GPS / ГЕОЛОКАЦИЯ · FREE")
+                        Text("Геометка фотографии", style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurface)
+                        val gps = photoGps
+                        if (gps == null) {
+                            Text("Геометка не найдена в EXIF этой фотографии",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        } else {
+                            Text(String.format(Locale.US, "Широта: %.6f  ·  Долгота: %.6f", gps.first, gps.second),
+                                color = MaterialTheme.colorScheme.onSurface)
+                            CyberOutlineButton("Показать точку на кибер-сетке", {
+                                showGpsGrid = true
+                            }, Modifier.fillMaxWidth())
+                            CyberOutlineButton("Открыть на Google Maps", {
+                                val url = Uri.parse("https://www.google.com/maps/search/?api=1&query=${gps.first}%2C${gps.second}")
+                                runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, url)) }
+                                    .onFailure { actionError = "Не удалось открыть карту: ${it.message}" }
+                            }, Modifier.fillMaxWidth())
+                        }
+                        Text("GPS и просмотр геометки бесплатны. Схематическая кибер-сетка работает без интернета.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+        }
         if (mode == StudioMode.STRIP) {
             item {
                 GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
@@ -384,6 +437,14 @@ fun MetadataStudioScreen(
                 }) { Text("Создать резервную копию", color = MaterialTheme.colorScheme.primary) }
             },
             dismissButton = { TextButton(onClick = { overwriteConfirm = false }) { Text("Отмена") } },
+        )
+    }
+    if (showGpsGrid && photoGps != null) {
+        WorldGridDialog(
+            latitude = photoGps!!.first,
+            longitude = photoGps!!.second,
+            onDismiss = { showGpsGrid = false },
+            onSelect = { _, _ -> showGpsGrid = false },
         )
     }
     if (worldPicker) {
