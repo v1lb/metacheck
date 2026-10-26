@@ -1,5 +1,18 @@
 package com.example.metacheck.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.Button
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.exifinterface.media.ExifInterface
+import com.example.metacheck.domain.model.GpsPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.Locale
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -36,7 +49,39 @@ import com.example.metacheck.ui.theme.CyberPalette
 
 /** Accessible, searchable native viewer for every EXIF/XMP/PNG field actually extracted. */
 @Composable
-fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?) {
+fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? = null) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var selectedGps by remember(report.file.name) { mutableStateOf(report.gps) }
+    var saveStatus by remember(report.file.name) { mutableStateOf("") }
+    val saveGpsFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { destination ->
+        if (destination != null && sourceUri != null && selectedGps != null) {
+            val point = selectedGps!!
+            scope.launch {
+                saveStatus = "Сохранение…"
+                saveStatus = withContext(Dispatchers.IO) {
+                    runCatching {
+                        val temp = File.createTempFile("metacheck-gps-", ".jpg", context.cacheDir)
+                        try {
+                            context.contentResolver.openInputStream(Uri.parse(sourceUri)).use { input ->
+                                requireNotNull(input) { "Не удалось открыть исходный файл" }
+                                temp.outputStream().use { output -> input.copyTo(output) }
+                            }
+                            val exif = ExifInterface(temp.absolutePath)
+                            exif.setLatLong(point.latitude, point.longitude)
+                            exif.saveAttributes()
+                            context.contentResolver.openOutputStream(destination, "w").use { output ->
+                                requireNotNull(output) { "Не удалось открыть файл назначения" }
+                                temp.inputStream().use { input -> input.copyTo(output) }
+                            }
+                            "GPS сохранён в новую копию JPEG"
+                        } finally { temp.delete() }
+                    }.getOrElse { "Ошибка сохранения: ${it.message}" }
+                }
+            }
+        }
+    }
+
     val records = remember(report) { MetadataCatalog.from(report) }
     var query by rememberSaveable(report.file.name) { mutableStateOf("") }
     var groupId by rememberSaveable(report.file.name) { mutableStateOf("") }
@@ -87,23 +132,26 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?) {
                 }
             }
         }
-        item(key = "interactive_gps_map") {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
+        item(key = "gps_editor") {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 SectionLabel("GPS / ИНТЕРАКТИВНАЯ КАРТА")
-
-                val gps = report.gps
-                if (gps != null) {
-                    CyberGeoMap(gps = gps)
-                } else {
-                    GlassPanel(Modifier.fillMaxWidth()) {
-                        Text(
-                            "GPS-координаты в фотографии не найдены.",
-                            modifier = Modifier.padding(16.dp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                val point = selectedGps
+                if (point != null) {
+                    CyberGeoMap(gps = point, onSelect = { lat, lon ->
+                        selectedGps = GpsPoint(lat, lon, point.altitudeMeters)
+                        saveStatus = "Точка выбрана. Сохраните копию фотографии."
+                    })
+                    Button(
+                        enabled = sourceUri != null && report.file.format.name == "JPEG",
+                        onClick = { saveGpsFile.launch("gps-${report.file.name.substringBeforeLast('.')}.jpg") }
+                    ) { Text("Сохранить GPS в JPEG") }
+                    if (report.file.format.name != "JPEG") {
+                        Text("Запись GPS пока поддерживается только для JPEG.")
                     }
+                    if (sourceUri == null) Text("Исходный файл недоступен: откройте оригинал фотографии.")
+                    if (saveStatus.isNotBlank()) Text(saveStatus)
+                } else {
+                    Text("В фотографии нет GPS-координат.")
                 }
             }
         }

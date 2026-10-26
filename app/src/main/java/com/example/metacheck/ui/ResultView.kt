@@ -93,7 +93,7 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
         Box(Modifier.weight(1f)) {
             when (tab) {
                 ReportTab.OVERVIEW -> OverviewTab(report, actions, sourceUri, onMetadata = { selected = tabs.indexOf(ReportTab.METADATA) })
-                ReportTab.METADATA -> MetadataViewer(report, actions.onCsv)
+                ReportTab.METADATA -> MetadataViewer(report, actions.onCsv, sourceUri)
                 ReportTab.GPS -> {
                     val point = report.gps
                     if (point != null) GpsTab(point, actions.onWipeGps)
