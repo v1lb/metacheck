@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Строгая сетевая политика. Сейчас в приложении нет разрешения INTERNET, поэтому конфиг
+    работает как страховка: когда сеть появится (API-клиент, этап 3), HTTP останется запрещён.
+
+    Про TLS 1.3: network_security_config версию протокола не выбирает. Минимальную версию
+    задаём в HTTP-клиенте (OkHttp ConnectionSpec.RESTRICTED_TLS), это будет в этапе 3.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Только системные центры сертификации, пользовательские не доверяем. -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!--
+    Шаблон SSL-pinning для конкретного API. Пины считаются по реальному серверу, поэтому
+    включать нужно только вместе с боевым хостом и ОБЯЗАТЕЛЬНО с запасным пином,
+    иначе после смены сертификата приложение перестанет ходить в сеть:
+
+    <domain-config>
+        <domain includeSubdomains="true">api.example.org</domain>
+        <pin-set expiration="2027-12-31">
+            <pin digest="SHA-256">ОСНОВНОЙ_ПИН_BASE64=</pin>
+            <pin digest="SHA-256">ЗАПАСНОЙ_ПИН_BASE64=</pin>
+        </pin-set>
+    </domain-config>
+    -->
+</network-security-config>
