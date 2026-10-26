@@ -106,7 +106,7 @@ fun CyberGeoMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = null) {
         if (onSelect != null) {
             Button(onClick = { onSelect(chosen.latitude, chosen.longitude) }) { Text("Применить новые координаты") }
         } else {
-            Text("Выбор точки доступен для просмотра. Сохранение GPS в файл пока не подключено.", color = pink)
+            Text("Выберите точку на карте, затем нажмите «Сохранить GPS в JPEG» в разделе метаданных.", color = pink)
         }
         Text("© OpenStreetMap contributors · тайлы требуют интернет; ранее загруженные доступны из кэша", color = Color.LightGray)
     }
