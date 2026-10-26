@@ -54,9 +54,9 @@ fun CyberGeoMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = null) {
             setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null)
             // Dark cyan-tinted cartography without modifying server tiles.
             val matrix = ColorMatrix(floatArrayOf(
-                -0.42f, -0.25f, -0.15f, 0f, 65f,
-                -0.20f, -0.28f, -0.16f, 0f, 87f,
-                -0.12f, -0.18f, -0.32f, 0f, 113f,
+                -0.72f, -0.05f, -0.03f, 0f, 205f,
+                -0.04f, -0.70f, -0.04f, 0f, 205f,
+                -0.03f, -0.05f, -0.68f, 0f, 215f,
                 0f, 0f, 0f, 1f, 0f
             ))
             overlayManager.tilesOverlay.setColorFilter(ColorMatrixColorFilter(matrix))
