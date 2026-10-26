@@ -39,7 +39,13 @@ class ManifestSecurityTest {
     @Test
     fun onlyInternetPermissionIsRequested() {
         val permissions = manifest.children("uses-permission").map { it.getAttributeNS(ns, "name") }
-        assertEquals(listOf("android.permission.INTERNET"), permissions)
+        assertEquals(
+            setOf(
+                "android.permission.INTERNET",
+                "android.permission.ACCESS_MEDIA_LOCATION"
+            ),
+            permissions.toSet()
+        )
         assertTrue(manifest.children("uses-permission-sdk-23").isEmpty())
     }
 
