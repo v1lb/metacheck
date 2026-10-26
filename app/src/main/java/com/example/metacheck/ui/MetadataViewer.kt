@@ -87,6 +87,26 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?) {
                 }
             }
         }
+        item(key = "interactive_gps_map") {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                SectionLabel("GPS / ИНТЕРАКТИВНАЯ КАРТА")
+
+                val gps = report.gps
+                if (gps != null) {
+                    CyberGeoMap(gps = gps)
+                } else {
+                    GlassPanel(Modifier.fillMaxWidth()) {
+                        Text(
+                            "GPS-координаты в фотографии не найдены.",
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
         if (results.isEmpty()) {
             item {
                 GlassPanel(Modifier.fillMaxWidth()) {
