@@ -173,12 +173,12 @@ fun MainScreen(
     val saveJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
         val original = pendingStripSource
         pendingStripSource = null
-        if (uri != null && original != null) studioVm.stripCopy(original, uri)
+        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri) }
     }
     val savePng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
         val original = pendingStripSource
         pendingStripSource = null
-        if (uri != null && original != null) studioVm.stripCopy(original, uri)
+        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri) }
     }
     val saveGpsJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
         val original = pendingWipeSource

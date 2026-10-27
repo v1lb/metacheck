@@ -160,10 +160,10 @@ fun MetadataStudioScreen(
         }
     }
     val saveCleanJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
-        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri)
+        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { source = uri.toString(); actionError = null }
     }
     val saveCleanPng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
-        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri)
+        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { source = uri.toString(); actionError = null }
     }
     val saveEdited = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
         val patch = pendingPatch

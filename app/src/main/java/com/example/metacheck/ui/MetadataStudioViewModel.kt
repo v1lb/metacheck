@@ -26,9 +26,16 @@ class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewM
     val usedToday = MutableStateFlow(studio.usedToday())
 
     fun clearMessage() { _message.value = null }
-    fun stripCopy(source: String, destination: Uri) = work {
+    fun stripCopy(
+        source: String,
+        destination: Uri,
+        onSavedCopy: (() -> Unit)? = null
+    ) = work {
         studio.strip(source, destination.toString()).fold(
-            onSuccess = { _message.value = successMessage("Очищенная копия сохранена", it.verified, it.downscaled) },
+            onSuccess = {
+                _message.value = successMessage("Очищенная копия сохранена", it.verified, it.downscaled)
+                if (it.verified) onSavedCopy?.invoke()
+            },
             onFailure = { _message.value = failMessage(it) },
         )
         usedToday.value = studio.usedToday()
