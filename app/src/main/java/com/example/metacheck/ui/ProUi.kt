@@ -11,6 +11,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import com.example.metacheck.data.license.LicenseKey
 import com.example.metacheck.ui.LocalizedText as Text
 import androidx.compose.material3.TextButton
 import com.example.metacheck.ui.theme.CyberPalette
@@ -50,17 +51,21 @@ fun PaywallDialog(vm: ProViewModel) {
                 ScanningBars(Modifier.fillMaxWidth().height(38.dp))
                 Text("Free: анализ и GPS Privacy Shield, просмотр EXIF, 75 обработок фото в сутки (UTC), 10 отчётов в истории.")
                 Text("Pro: безлимитная очистка, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API.")
-                Text("Разовая покупка через Google Play, без подписки. Цена показывается только если доступен товар pro_lifetime в Play Console.",
+                Text("Разовая покупка через Google Play, без подписки.",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                OutlinedTextField(
-                    value = keyInput,
-                    onValueChange = { keyInput = it },
-                    label = { Text("Ключ Pro, если он у тебя есть") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                TextButton(onClick = { vm.redeem(keyInput) }, enabled = keyInput.isNotBlank()) {
-                    Text("Применить ключ")
+                // Поле ключа показываем только если в сборку вшит открытый ключ проверки (LicenseKey).
+                // Иначе любой ввод заканчивался бы ошибкой «Ключи Pro в этой сборке не включены».
+                if (LicenseKey.PUBLIC_KEY_BASE64.isNotBlank()) {
+                    OutlinedTextField(
+                        value = keyInput,
+                        onValueChange = { keyInput = it },
+                        label = { Text("Ключ Pro, если он у тебя есть") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    TextButton(onClick = { vm.redeem(keyInput) }, enabled = keyInput.isNotBlank()) {
+                        Text("Применить ключ")
+                    }
                 }
                 info?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
             }
