@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -32,9 +33,36 @@ import java.util.Locale
 private val cyan = Color(0xFF00F3FF)
 private val pink = Color(0xFFFF0055)
 
-/** Real slippy map; tiles are fetched over HTTPS and cached on device. */
+/**
+ * Карта OpenStreetMap включается только по нажатию кнопки: пока пользователь не согласился,
+ * приложение не делает сетевых запросов и не раскрывает серверам OSM район точки.
+ * Согласие действует для текущей точки и сбрасывается при выборе другого фото.
+ */
 @Composable
 fun CyberGeoMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = null) {
+    var enabled by rememberSaveable(gps.latitude, gps.longitude) { mutableStateOf(false) }
+    if (enabled) {
+        LiveOsmMap(gps, onSelect)
+    } else {
+        Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+            Text("КАРТА ВЫКЛЮЧЕНА · В СЕТЬ НИЧЕГО НЕ ОТПРАВЛЯЕТСЯ", color = cyan)
+            Text("%.6f, %.6f".format(Locale.US, gps.latitude, gps.longitude), color = cyan)
+            Text(
+                "Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов OpenStreetMap. " +
+                    "Серверы увидят ваш IP-адрес и примерный район точки. Само фото и его метаданные не отправляются.",
+                color = Color.LightGray,
+            )
+            Button(onClick = { enabled = true }) { Text("Показать карту (запрос к OpenStreetMap)") }
+            if (onSelect != null) {
+                Text("Чтобы выбрать новые координаты на карте, сначала включите карту.", color = pink)
+            }
+        }
+    }
+}
+
+/** Real slippy map; tiles are fetched over HTTPS and cached on device. */
+@Composable
+private fun LiveOsmMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = null) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var chosen by remember(gps.latitude, gps.longitude) { mutableStateOf(GeoPoint(gps.latitude, gps.longitude)) }
@@ -86,6 +114,7 @@ fun CyberGeoMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = null) {
         Text("%.6f, %.6f".format(Locale.US, chosen.latitude, chosen.longitude), color = cyan)
         Text(status, color = Color.LightGray)
         OutlinedTextField(value = address, onValueChange = { address = it }, label = { Text("Город, улица или адрес") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+        Text("Поиск адреса отправляет введённый текст системному геокодеру телефона (на многих устройствах это сервис Google).", color = Color.LightGray)
         Button(onClick = {
             scope.launch {
                 status = "Поиск адреса…"
