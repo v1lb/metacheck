@@ -20,12 +20,12 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        // ЗАМЕНИ на свой домен. Google Play не принимает пакеты, начинающиеся с com.example.
+        // Постоянный идентификатор приложения в Google Play: после первой загрузки его нельзя изменить.
         applicationId = "dev.metacheck.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 13
-        versionName = "1.1.1-rc1"
+        versionCode = 20600
+        versionName = "2.6.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
