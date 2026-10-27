@@ -1,0 +1,49 @@
+name: Release AAB for Google Play
+
+# Ручной запуск: Actions -> "Release AAB for Google Play" -> Run workflow.
+# Нужны секреты репозитория: METACHECK_KEYSTORE_B64, METACHECK_STORE_PASSWORD,
+# METACHECK_KEY_ALIAS, METACHECK_KEY_PASSWORD (см. инструкцию в чате / DEPLOY.md).
+on:
+  workflow_dispatch:
+
+jobs:
+  aab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.11.1
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install Android platform 36
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Decode upload keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.METACHECK_KEYSTORE_B64 }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then
+            echo "Нет секрета METACHECK_KEYSTORE_B64: AAB без своего ключа Google Play не примет."
+            exit 1
+          fi
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+      - name: Build signed AAB
+        env:
+          METACHECK_STORE_FILE: ${{ runner.temp }}/upload.jks
+          METACHECK_STORE_PASSWORD: ${{ secrets.METACHECK_STORE_PASSWORD }}
+          METACHECK_KEY_ALIAS: ${{ secrets.METACHECK_KEY_ALIAS }}
+          METACHECK_KEY_PASSWORD: ${{ secrets.METACHECK_KEY_PASSWORD }}
+        run: gradle --no-daemon bundleRelease -x lintVitalRelease
+      - name: Upload AAB and R8 mapping
+        uses: actions/upload-artifact@v4
+        with:
+          name: MetaCheck-play-release
+          path: |
+            app/build/outputs/bundle/release/*.aab
+            app/build/outputs/mapping/release/mapping.txt
+          if-no-files-found: error
