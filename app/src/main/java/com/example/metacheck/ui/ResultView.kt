@@ -53,6 +53,7 @@ import com.example.metacheck.domain.model.MetaItem
 import com.example.metacheck.domain.model.MetaReport
 import com.example.metacheck.domain.model.Severity
 import com.example.metacheck.domain.model.Signal
+import com.example.metacheck.ui.i18n.localize
 import com.example.metacheck.ui.theme.CyberPalette
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -283,6 +284,7 @@ private fun SignalPanel(signal: Signal) {
 @Composable
 private fun GpsTab(gps: GpsPoint, onWipeGps: (() -> Unit)?) {
     val context = LocalContext.current
+    val uiLanguage = LocalUiLanguage.current
     val coords = String.format(Locale.US, "%.6f, %.6f", gps.latitude, gps.longitude)
     LazyColumn(contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { SectionLabel("GEOLOCATION / EXIF") }
@@ -302,11 +304,11 @@ private fun GpsTab(gps: GpsPoint, onWipeGps: (() -> Unit)?) {
                 try { context.startActivity(Intent(Intent.ACTION_VIEW, geo)) }
                 catch (_: Exception) {
                     try { context.startActivity(Intent(Intent.ACTION_VIEW, web)) }
-                    catch (_: Exception) { android.widget.Toast.makeText(context, "Не найдено приложение для открытия карты", android.widget.Toast.LENGTH_SHORT).show() }
+                    catch (_: Exception) { android.widget.Toast.makeText(context, localize("Не найдено приложение для открытия карты", uiLanguage), android.widget.Toast.LENGTH_SHORT).show() }
                 }
             }, modifier = Modifier.fillMaxWidth())
         }
-        item { Text("Встроенная карта работает без сети. Нажатие «Открыть в картах» передаст координаты выбранному внешнему приложению.",
+        item { Text("Карта OpenStreetMap загружается только по вашей кнопке. Нажатие «Открыть в картах» передаст координаты выбранному внешнему приложению.",
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }

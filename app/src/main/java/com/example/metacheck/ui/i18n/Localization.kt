@@ -20,16 +20,41 @@ fun localize(value: String, language: AppLanguage): String {
     if (value.startsWith("Широта ") && value.contains("Долгота")) return value.replace("Широта", "Latitude").replace("Долгота", "Longitude")
     if (value.startsWith("Дата оригинала: ")) return value.replaceFirst("Дата оригинала: ", "Date taken: ").replace("не изменять", "unchanged")
     if (value.startsWith("Дата оцифровки: ")) return value.replaceFirst("Дата оцифровки: ", "Date digitized: ").replace("не изменять", "unchanged")
-    if (value.startsWith("Операция не выполнена: ")) return value.replaceFirst("Операция не выполнена: ", "Operation failed: ")
+    if (value.startsWith("Операция не выполнена: ")) return value.replaceFirst("Операция не выполнена: ", "Operation failed: ").let(::fragments)
     if (value.startsWith("Пакетная очистка завершена: ")) return value.replaceFirst("Пакетная очистка завершена: ", "Batch cleaning finished: ").replace("сохранено", "saved").replace("ошибок", "failed")
-    if (value.startsWith("Очищенная копия сохранена")) return value.replaceFirst("Очищенная копия сохранена", "Clean copy saved")
+    if (value.startsWith("Очищенная копия сохранена")) return value.replaceFirst("Очищенная копия сохранена", "Clean copy saved").let(::fragments)
     if (value.startsWith("GPS удалён из новой копии")) return value.replaceFirst("GPS удалён из новой копии", "GPS removed from saved copy")
-        .replace("Для отправки используйте новую копию, а не оригинал", "Share the new copy, not the original")
-    if (value.startsWith("EXIF записан в новый файл")) return value.replaceFirst("EXIF записан в новый файл", "EXIF saved to a new file")
-    if (value.startsWith("Оригинал заменён")) return value.replaceFirst("Оригинал заменён", "Original replaced").replace("Резервная копия сохранена", "Backup saved")
+        .replace("Для отправки используйте новую копию, а не оригинал", "Share the new copy, not the original").let(::fragments)
+    if (value.startsWith("EXIF записан в новый файл")) return value.replaceFirst("EXIF записан в новый файл", "EXIF saved to a new file").let(::fragments)
+    if (value.startsWith("Оригинал заменён")) return value.replaceFirst("Оригинал заменён", "Original replaced").replace("Резервная копия сохранена", "Backup saved").let(::fragments)
     if (value.startsWith("Программы в истории правок")) return "Edit history software"
-    return value
+    Regex("^(\\d+(?:[.,]\\d+)?) (Б|КБ|МБ)$").matchEntire(value)?.let {
+        val unit = when (it.groupValues[2]) { "Б" -> "B"; "КБ" -> "KB"; else -> "MB" }
+        return it.groupValues[1] + " " + unit
+    }
+    Regex("^(\\d+(?:[.,]\\d+)?) м$").matchEntire(value)?.let { return it.groupValues[1] + " m" }
+    Regex("^(\\d+)/(\\d+) · Успешно: (\\d+) · Ошибок: (\\d+)$").matchEntire(value)?.let {
+        return it.groupValues[1] + "/" + it.groupValues[2] + " · Succeeded: " + it.groupValues[3] + " · Failed: " + it.groupValues[4]
+    }
+    Regex("^JSON-отчёт будет отправлен на (.+)\\. Исходная фотография не отправляется\\. GPS: (включён в отчёт|исключён из отчёта)\\.$").matchEntire(value)?.let {
+        val host = if (it.groupValues[1] == "указанный сервер") "the specified server" else it.groupValues[1]
+        val gps = if (it.groupValues[2].startsWith("включён")) "included in the report" else "excluded from the report"
+        return "The JSON report will be sent to " + host + ". The original photo is not sent. GPS: " + gps + "."
+    }
+    Regex("^Pro активен по ключу(?: до (.+))?$").matchEntire(value)?.let {
+        val until = it.groupValues[1]
+        return if (until.isEmpty()) "Pro active via key" else "Pro active via key until " + until
+    }
+    if (value.startsWith("Ошибка сохранения: ")) return value.replaceFirst("Ошибка сохранения: ", "Save error: ")
+    return fragments(value)
 }
+
+/** Sentence fragments appended to composed status messages. */
+private fun fragments(value: String): String = value
+    .replace(". Запись проверена", ". Write verified")
+    .replace(". Не удалось перепроверить запись: откройте файл вручную", ". Could not verify the write: open the file manually")
+    .replace(". Разрешение уменьшено для безопасной обработки", ". Resolution was reduced for safe processing")
+    .replace("ошибка доступа или формата", "access or format error")
 
 
 private val translations: Map<String, String> = mapOf(
@@ -47,9 +72,6 @@ private val translations: Map<String, String> = mapOf(
     "КООРДИНАТЫ В ИСХОДНОМ ФАЙЛЕ" to "COORDINATES IN ORIGINAL FILE",
     "Точку нельзя показать на карте: GPS-данные неполные или записаны в XMP/PNG." to "Map position is unavailable: GPS tags are incomplete or stored in XMP/PNG.",
 
-    "OFFLINE GEO / ТОЧКА ИЗ EXIF" to "OFFLINE GEO / EXIF POSITION",
-    "Положение маркера соответствует координатам EXIF. Контуры суши приблизительные; улицы не показаны. Без интернета." to "Marker follows the exact EXIF coordinates. Simplified land outlines, no streets. Fully offline.",
-    "Встроенная карта работает без сети. Нажатие «Открыть в картах» передаст координаты выбранному внешнему приложению." to "Offline map never transmits coordinates. Opening an external maps app shares GPS with that app.",
     "EXIF-редактор PRO" to "EXIF editor PRO",
     "Бесплатно: анализ, GPS Privacy Shield и 75 обработок в сутки. Pro: безлимитная очистка, пакетная обработка, PDF/JSON." to "Free: scans, GPS Privacy Shield and 75 operations per day. Pro: unlimited cleaning, batch, PDF/JSON.",
     "Free: анализ и GPS Privacy Shield, просмотр EXIF, 75 обработок фото в сутки (UTC), 10 отчётов в истории." to "Free: scans, GPS Privacy Shield, EXIF viewer, 75 edited or cleaned photos per UTC day, 10 saved reports.",
@@ -164,13 +186,11 @@ private val translations: Map<String, String> = mapOf(
     "SHA-256 публичного ключа (base64)" to "Public key SHA-256 (base64)",
     "Необязательный pin сертификата сервера." to "Optional server certificate pin.",
     "Хранение только на устройстве" to "On-device storage only",
-    "Сеть используется только при явно включённом внешнем API или запросах к Google Play для покупки Pro." to "Network is used only for custom API you enable or Google Play purchase requests.",
     "Удалить все отчёты?" to "Delete all reports?",
     "Это действие удалит сохранённые отчёты без возможности восстановления." to "This permanently deletes saved reports.",
     "Запрошена очистка истории" to "History deletion requested",
     "Free: локальный анализ, EXIF, очистка, статистика и CSV-история." to "Free: local analysis, EXIF, cleaning, analytics and history CSV.",
     "Pro: экспорт PDF/JSON, до 50 отчётов, подключение собственного API." to "Pro: PDF/JSON exports, 50 reports, custom API.",
-    "Разовая покупка через Google Play, без подписки. Цена показывается только если доступен товар pro_lifetime в Play Console." to "One-time purchase via Google Play, no subscription. Price appears when pro_lifetime is available.",
     "Ключ Pro, если он у тебя есть" to "Pro license key (optional)",
     "Применить ключ" to "Redeem key", "Покупка недоступна" to "Purchase unavailable",
     "Бесплатная версия" to "Free plan", "Pro активен (покупка в Google Play)" to "Pro active (Google Play)",
@@ -222,4 +242,68 @@ private val translations: Map<String, String> = mapOf(
     "Описание" to "Description", "Комментарий" to "Comment", "Серийный номер объектива" to "Lens serial number",
     "Владелец камеры" to "Camera owner",
     "Дата съёмки" to "Date taken", "Дата изменения" to "Modified",
+    "КАРТА ВЫКЛЮЧЕНА · В СЕТЬ НИЧЕГО НЕ ОТПРАВЛЯЕТСЯ" to "MAP OFF · NOTHING IS SENT OVER THE NETWORK",
+    "Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов OpenStreetMap. Серверы увидят ваш IP-адрес и примерный район точки. Само фото и его метаданные не отправляются." to "To show the point on the map, the app will download map tiles from OpenStreetMap servers. The servers will see your IP address and the approximate area of the point. The photo and its metadata are not sent.",
+    "Показать карту (запрос к OpenStreetMap)" to "Show map (request to OpenStreetMap)",
+    "Чтобы выбрать новые координаты на карте, сначала включите карту." to "To pick new coordinates on the map, turn the map on first.",
+    "Нажмите на карту, чтобы выбрать точку" to "Tap the map to pick a point",
+    "Город, улица или адрес" to "City, street or address",
+    "Поиск адреса отправляет введённый текст системному геокодеру телефона (на многих устройствах это сервис Google)." to "Address search sends the text you type to your phone's system geocoder (on many devices this is a Google service).",
+    "Поиск адреса…" to "Searching address…",
+    "Адрес найден" to "Address found",
+    "Адрес не найден или геокодер недоступен" to "Address not found or geocoder unavailable",
+    "Найти на карте" to "Find on map",
+    "Применить новые координаты" to "Apply new coordinates",
+    "Выберите точку на карте, затем нажмите «Сохранить GPS в JPEG» в разделе метаданных." to "Pick a point on the map, then tap “Save GPS to JPEG” in the metadata section.",
+    "© OpenStreetMap contributors · тайлы требуют интернет; ранее загруженные доступны из кэша" to "© OpenStreetMap contributors · tiles need internet; previously loaded tiles are available from cache",
+    "На устройстве нет приложения камеры" to "No camera app on this device",
+    "Не удалось запустить камеру" to "Could not start the camera",
+    "В буфере нет ссылки на изображение" to "No image link in the clipboard",
+    "Не удалось прочитать буфер" to "Could not read the clipboard",
+    "Отчёт скопирован" to "Report copied",
+    "указанный сервер" to "the specified server",
+    "Не удалось загрузить историю" to "Could not load history",
+    "Проверка завершена, но историю сохранить не удалось" to "Check finished, but history could not be saved",
+    "Ошибка чтения файла. Попробуйте другой источник." to "Could not read the file. Try another source.",
+    "Не удалось открыть отчёт" to "Could not open the report",
+    "Не удалось удалить отчёт" to "Could not delete the report",
+    "Невозможно открыть файл" to "Cannot open the file",
+    "CSV с историей сохранён" to "History CSV saved",
+    "Не удалось сохранить CSV" to "Could not save CSV",
+    "Не удалось открыть файл" to "Could not open the file",
+    "CSV с метаданными сохранён" to "Metadata CSV saved",
+    "JSON-отчёт сохранён" to "JSON report saved",
+    "PDF-отчёт сохранён" to "PDF report saved",
+    "Не удалось выполнить запрос." to "Request failed.",
+    "Отправка в API доступна в Pro." to "Sending to an API is available in Pro.",
+    "Не удалось завершить операцию" to "Could not complete the operation",
+    "Это не изображение в поддерживаемом формате (JPEG, PNG, WebP, GIF, HEIC, AVIF)." to "This is not an image in a supported format (JPEG, PNG, WebP, GIF, HEIC, AVIF).",
+    "Не удалось прочитать файл. Попробуй другой." to "Could not read the file. Try another one.",
+    "Допускается до 50 фото за один запуск" to "Up to 50 photos per run",
+    "Проверьте числа: GPS, ISO, диафрагму и выдержку" to "Check the numbers: GPS, ISO, aperture and shutter speed",
+    "PRO · Без ограничений на очистку" to "PRO · Unlimited cleaning",
+    "Дата оригинала" to "Date taken",
+    "Камера и авторство" to "Camera and authorship",
+    "Сначала выберите файлы" to "Choose files first",
+    "Сохранение…" to "Saving…",
+    "Не удалось открыть исходный файл" to "Could not open the source file",
+    "Не удалось открыть файл назначения" to "Could not open the destination file",
+    "GPS сохранён в новую копию JPEG" to "GPS saved to a new JPEG copy",
+    "GPS / ИНТЕРАКТИВНАЯ КАРТА" to "GPS / INTERACTIVE MAP",
+    "Точка выбрана. Сохраните копию фотографии." to "Point selected. Save a copy of the photo.",
+    "Сохранить GPS в JPEG" to "Save GPS to JPEG",
+    "Запись GPS пока поддерживается только для JPEG." to "Writing GPS is currently supported for JPEG only.",
+    "Исходный файл недоступен: откройте оригинал фотографии." to "The source file is unavailable: open the original photo.",
+    "В фотографии нет GPS-координат." to "The photo has no GPS coordinates.",
+    "Показаны доступные поля, извлечённые локальными парсерами MetaCheck. Отсутствие тега не доказывает подлинность файла. GPS может содержать личные данные." to "Showing available fields extracted by MetaCheck's local parsers. A missing tag does not prove the file is authentic. GPS can contain personal data.",
+    "Не удалось открыть покупку. Проверь Google Play и интернет." to "Could not start the purchase. Check Google Play and your connection.",
+    "Ключ принят" to "Key accepted",
+    "Некорректный ключ" to "Invalid key",
+    "Разовая покупка через Google Play, без подписки." to "One-time purchase through Google Play, no subscription.",
+    "В этом файле нет читаемых GPS-координат. Если вы уверены, что они были, выберите оригинал фото через «Выбрать файл» и разрешите доступ к геометкам." to "This file has no readable GPS coordinates. If you are sure there were some, choose the original photo with “Choose file” and allow access to photo location.",
+    "ПРИЗНАКОВ" to "INDICATORS",
+    "Не найдено приложение для открытия карты" to "No app found to open the map",
+    "неизвестно" to "unknown",
+    "Сеть используется только по вашему действию: карта OpenStreetMap, поиск адреса, внешний API (если включён) и Google Play для покупки Pro." to "The network is used only when you act: OpenStreetMap map, address search, your own API (if enabled) and Google Play for the Pro purchase.",
+    "Карта OpenStreetMap загружается только по вашей кнопке. Нажатие «Открыть в картах» передаст координаты выбранному внешнему приложению." to "The OpenStreetMap map loads only when you press its button. Tapping “Open in maps” shares the coordinates with the external app you choose.",
 )

@@ -157,7 +157,7 @@ fun SettingsScreen(
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 CyberEyebrow("SECURITY STATUS", color = MaterialTheme.colorScheme.tertiary)
                 Text("Хранение только на устройстве", style = MaterialTheme.typography.titleMedium)
-                Text("Сеть используется только при явно включённом внешнем API или запросах к Google Play для покупки Pro.",
+                Text("Сеть используется только по вашему действию: карта OpenStreetMap, поиск адреса, внешний API (если включён) и Google Play для покупки Pro.",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }

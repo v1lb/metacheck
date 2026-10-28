@@ -49,6 +49,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import com.example.metacheck.ui.LocalizedText as Text
+import com.example.metacheck.ui.i18n.localize
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -108,15 +109,16 @@ fun MainScreen(
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val snackbar = remember { SnackbarHostState() }
+    val uiLanguage = LocalUiLanguage.current
     var showSettings by rememberSaveable { mutableStateOf(false) }
     var showStudio by rememberSaveable { mutableStateOf(false) }
     var confirmApi by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(studioMessage) {
-        studioMessage?.let { snackbar.showSnackbar(it); studioVm.clearMessage() }
+        studioMessage?.let { snackbar.showSnackbar(localize(it, uiLanguage)); studioVm.clearMessage() }
     }
     LaunchedEffect(message) {
-        message?.let { snackbar.showSnackbar(it); viewModel.consumeMessage() }
+        message?.let { snackbar.showSnackbar(localize(it, uiLanguage)); viewModel.consumeMessage() }
     }
 
     // OpenDocument preserves more of the source file's original metadata than a transcoding photo picker.
