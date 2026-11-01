@@ -130,7 +130,11 @@ class PlayBillingGateway(context: Context) : BillingGateway {
 
     companion object {
         private const val BILLING_TIMEOUT_MS = 15_000L
-        /** Должен совпадать с идентификатором товара в Play Console. */
+        /**
+         * Должен совпадать с идентификатором товара в Play Console.
+         * [ТРЕБУЕТСЯ ВЫ] Создайте разовый товар `pro_lifetime` в Play Console (Монетизация → Товары в приложении)
+         * и задайте цену. Пока товара нет, покупка в приложении недоступна.
+         */
         const val PRODUCT_ID = "pro_lifetime"
     }
 }

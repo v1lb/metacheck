@@ -23,3 +23,8 @@
 -dontwarn org.conscrypt.**
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
+
+# osmdroid (карта OpenStreetMap): подбирает тайловые источники и обработчики по именам классов.
+# Без этих правил R8 может обрезать нужные классы, и в release-сборке карта останется пустой.
+-keep class org.osmdroid.** { *; }
+-dontwarn org.osmdroid.**

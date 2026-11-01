@@ -35,6 +35,11 @@ check('Policy document exists', (ROOT / 'PRIVACY_POLICY.md').is_file())
 check('Release checklist exists', (ROOT / 'PLAY_RELEASE_CHECKLIST.md').is_file())
 check('CI runs tests and lint', all(token in CI.read_text(encoding='utf-8') for token in ['testDebugUnitTest','lintDebug','assembleDebug','assembleDebugAndroidTest']))
 check('Emulator workflow present', (ROOT / '.github/workflows/android-instrumentation.yml').is_file())
+policy_text = (ROOT / 'PRIVACY_POLICY.md').read_text(encoding='utf-8') if (ROOT / 'PRIVACY_POLICY.md').is_file() else ''
+check('Privacy policy has no unresolved placeholders', not re.search(r'\[(дата|имя|email|name|date)[^\]]*\]', policy_text, re.I))
+check('Legal documents folder exists', all((ROOT / 'legal' / n).is_file() for n in ['PRIVACY_POLICY_RU.md', 'PRIVACY_POLICY_EN.md', 'TERMS_RU.md', 'TERMS_EN.md']))
+check('AAB cannot be built without own signing key', 'bundleRelease' in cfg and 'GradleException' in cfg)
+check('Third-party licenses listed', (ROOT / 'THIRD_PARTY_LICENSES.md').is_file())
 for label, ok in checks:
     print(('PASS' if ok else 'FAIL') + '  ' + label)
 if not all(ok for _, ok in checks):

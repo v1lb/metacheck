@@ -1,7 +1,7 @@
 # Сборка и публикация MetaCheck в Google Play
 
 ## 0. Перед первой сборкой
-1. **Смени `applicationId`** в `app/build.gradle.kts` (сейчас заглушка `dev.metacheck.app`).
+1. **Подтверди `applicationId`** в `app/build.gradle.kts` (сейчас `dev.metacheck.app`). [ТРЕБУЕТСЯ ВЫ: решение окончательное.]
    Google Play не принимает идентификаторы, начинающиеся с `com.example`. После первой загрузки
    в Play Console идентификатор изменить нельзя. `namespace` (пакет в коде) трогать не нужно.
 2. Нужна свежая Android Studio: проект использует AGP 8.9.1, Gradle 8.11.1 и compileSdk/targetSdk 36.

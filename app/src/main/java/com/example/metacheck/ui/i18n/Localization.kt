@@ -5,6 +5,7 @@ import com.example.metacheck.ui.preferences.AppLanguage
 fun localize(value: String, language: AppLanguage): String {
     if (language != AppLanguage.EN) return value
     translations[value]?.let { return it }
+    legalTranslations[value]?.let { return it }
     val found = Regex("^(\\d+) полей · просмотр прямо на устройстве$").matchEntire(value)
     if (found != null) return "${found.groupValues[1]} fields · on-device viewer"
     val found2 = Regex("^(\\d+) полей  ·  Нажмите, чтобы раскрыть$").matchEntire(value)

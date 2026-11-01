@@ -57,7 +57,8 @@ android {
             // ВАЖНО: release-APK без подписи Android НЕ устанавливает («Приложение не установлено»).
             // Есть свой ключ (keystore.properties / переменные окружения) -> подписываем им (для Google Play).
             // Нет ключа -> подписываем стандартным debug-ключом, чтобы APK можно было поставить на телефон.
-            // Для публикации в Google Play обязательно собирайте с СВОИМ ключом (см. DEPLOY.md).
+            // [ТРЕБУЕТСЯ ВЫ] Для Google Play нужен собственный ключ загрузки (см. RELEASE_TODO.md).
+            // AAB без своего ключа не собирается: см. защиту в конце файла.
             signingConfig = if (signingValue("storeFile", "METACHECK_STORE_FILE") != null) {
                 signingConfigs.getByName("release")
             } else {
@@ -125,4 +126,17 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     // Настоящий org.json для JVM-тестов (в android.jar только заглушки).
     testImplementation("org.json:json:20240303")
+}
+
+// Защита от случайной публикации: AAB для Google Play нельзя собрать с debug-ключом.
+// [ТРЕБУЕТСЯ ВЫ] Создайте ключ загрузки и секреты CI (METACHECK_*), см. RELEASE_TODO.md.
+// Для установки на свой телефон используйте assembleRelease, ему собственный ключ не нужен.
+gradle.taskGraph.whenReady {
+    val needsRealKey = allTasks.any { it.name == "bundleRelease" }
+    if (needsRealKey && signingValue("storeFile", "METACHECK_STORE_FILE") == null) {
+        throw GradleException(
+            "bundleRelease требует собственный ключ загрузки (keystore.properties или METACHECK_STORE_FILE). " +
+                "Debug-ключ для Google Play не подходит. См. RELEASE_TODO.md.",
+        )
+    }
 }
