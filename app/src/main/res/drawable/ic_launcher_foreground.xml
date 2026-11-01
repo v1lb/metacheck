@@ -1,20 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cyber Grid glyph: shield/hexagon and scan core; safe area for 108dp adaptive icon. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#00000000" android:strokeColor="#00F3FF"
-        android:strokeWidth="2.8" android:strokeLineJoin="round"
-        android:pathData="M54,23 L77,36 L77,63 L54,78 L31,63 L31,36 Z" />
-    <path android:fillColor="#00000000" android:strokeColor="#9D4EDD"
-        android:strokeWidth="1.6" android:strokeLineJoin="round"
-        android:pathData="M54,30 L71,40 L71,59 L54,70 L37,59 L37,40 Z" />
-    <path android:fillColor="#00000000" android:strokeColor="#00F3FF"
-        android:strokeWidth="2.2" android:pathData="M43,51 a11,11 0,1 0,22 0 a11,11 0,1 0,-22 0" />
-    <path android:fillColor="#00F3FF" android:pathData="M52,48 L60,51 L52,54 Z" />
-    <path android:fillColor="#00000000" android:strokeColor="#00FFB2"
-        android:strokeWidth="2" android:strokeLineCap="round"
-        android:pathData="M42,64 L47,64 M61,37 L66,37" />
+
+    <!-- Адаптивная иконка: маска телефона обрезает края, поэтому рисунок уменьшен до безопасной зоны. -->
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.8"
+        android:scaleY="0.8">
+        <!-- Щит с фиолетово-бирюзовым градиентом -->
+        <path
+            android:pathData="M54,24 C64,24 74,27 80,30 C80,52 74,74 54,84 C34,74 28,52 28,30 C34,27 44,24 54,24 Z"
+            android:strokeWidth="4.5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round">
+            <aapt:attr name="android:strokeColor">
+                <gradient
+                    android:startX="28"
+                    android:startY="24"
+                    android:endX="80"
+                    android:endY="84"
+                    android:type="linear">
+                    <item android:color="#9D4EDD" android:offset="0.0" />
+                    <item android:color="#00F3FF" android:offset="1.0" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Зелёная галочка безопасности -->
+        <path
+            android:pathData="M43,53 L51,61 L67,43"
+            android:strokeColor="#00FF66"
+            android:strokeWidth="5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+
+        <!-- Крупные пиксели "стирания данных" -->
+        <path android:fillColor="#00F3FF" android:pathData="M83,40 h4 v4 h-4 z" />
+        <path android:fillColor="#00F3FF" android:pathData="M89,46 h4.5 v4.5 h-4.5 z" />
+        <path android:fillColor="#9D4EDD" android:pathData="M84,54 h4 v4 h-4 z" />
+        <path android:fillColor="#00FF66" android:pathData="M90,60 h3.5 v3.5 h-3.5 z" />
+    </group>
 </vector>
