@@ -9,6 +9,7 @@ import com.example.metacheck.domain.model.LicenseInfo
 import com.example.metacheck.domain.repository.BillingGateway
 import com.example.metacheck.domain.repository.EntitlementRepository
 import com.example.metacheck.domain.runCatchingCancellable
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -43,15 +44,28 @@ class EntitlementRepositoryImpl(
     private val scope = CoroutineScope(
         SupervisorJob() + io + CoroutineExceptionHandler { _, e -> onError(e) },
     )
-    private val state = MutableStateFlow(computeNow())
+    // Начальное значение Free, настоящее (Keystore + ECDSA) считается в фоне, а не в главном потоке:
+    // репозиторий создаётся лениво при первом обращении из UI.
+    private val state = MutableStateFlow(Entitlement())
     override val entitlement: StateFlow<Entitlement> = state.asStateFlow()
+    private val initialLoad = CompletableDeferred<Unit>()
 
     init {
         billing.onPurchasesChanged = { scope.launch { refresh() } }
+        scope.launch {
+            try { state.value = computeNow() } finally { initialLoad.complete(Unit) }
+        }
+    }
+
+    override suspend fun current(): Entitlement {
+        initialLoad.await()
+        return state.value
     }
 
     override suspend fun refresh() {
         withContext(io) {
+            // Иначе первичная загрузка из кэша может перезаписать более свежий ответ Play.
+            initialLoad.await()
             val owned = runCatchingCancellable { billing.queryOwned() }
                 .onFailure(onError)
                 .getOrNull()
@@ -90,7 +104,7 @@ class EntitlementRepositoryImpl(
 
     override fun removeLicense() {
         prefs.edit().remove(K_LICENSE).apply()
-        state.value = computeNow()
+        scope.launch { state.value = computeNow() }
     }
 
     private fun persistPlayOwned(owned: Boolean) {

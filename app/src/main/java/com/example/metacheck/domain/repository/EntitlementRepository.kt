@@ -13,6 +13,12 @@ interface EntitlementRepository {
      * Никогда не бросает исключений (кроме CancellationException): вызывается на каждом запуске.
      */
     suspend fun refresh()
+
+    /**
+     * Актуальное состояние Pro для проверок доступа. В отличие от [entitlement].value, дожидается
+     * первичной загрузки кэша (она идёт в фоне, чтобы не трогать Keystore в главном потоке).
+     */
+    suspend fun current(): Entitlement = entitlement.value
     suspend fun priceText(): String?
     fun launchPurchase(activity: Activity): Boolean
     suspend fun redeem(token: String): Result<LicenseInfo>
