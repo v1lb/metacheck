@@ -402,6 +402,8 @@
     <string name="dash_history_disabled">Сохранение истории отключено в настройках.</string>
     <string name="dash_history_ai_badge">AI TRACE</string>
     <string name="dash_history_delete">Удалить %1$s</string>
+    <string name="dash_delete_title">Удалить этот отчёт?</string>
+    <string name="dash_delete_text">Отчёт будет удалён из истории. Само фото это не затронет.</string>
     <string name="dash_pro_active">PRO ACTIVE</string>
     <string name="dash_pro_title">METACHECK PRO</string>
     <string name="dash_pro_active_text">Экспорт PDF/JSON и расширенная история доступны</string>

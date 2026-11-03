@@ -216,12 +216,12 @@ fun MainScreen(
     val saveJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
         val original = pendingStripSource
         pendingStripSource = null
-        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri) }
+        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
     }
     val savePng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
         val original = pendingStripSource
         pendingStripSource = null
-        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri) }
+        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
     }
     val saveGpsJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
         val original = pendingWipeSource
@@ -418,6 +418,21 @@ private fun Dashboard(
 ) {
     val insight = remember(history) { HistoryInsights.from(history) }
     // Те же числа, что в AppContainer: раньше здесь были отдельно записанные 10 и 50.
+    // Удаление отчёта необратимо: раньше хватало одного касания по значку корзины.
+    var pendingDelete by rememberSaveable { mutableStateOf<String?>(null) }
+    pendingDelete?.let { id ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurface,
+            shape = RoundedCornerShape(26.dp),
+            title = { Text(stringResource(R.string.dash_delete_title)) },
+            text = { Text(stringResource(R.string.dash_delete_text)) },
+            confirmButton = { TextButton(onClick = { pendingDelete = null; onDelete(id) }) { Text(stringResource(R.string.common_delete)) } },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.common_cancel)) } },
+        )
+    }
     val historyLimit = if (isPro) com.example.metacheck.data.history.FileHistoryRepository.STORAGE_LIMIT
         else com.example.metacheck.AppContainer.FREE_HISTORY_LIMIT
     val texts = rememberMetaTexts()
@@ -550,7 +565,7 @@ private fun Dashboard(
                             if (entry.hasAiEvidence) "  •  " + stringResource(R.string.dash_history_ai_badge) else "",
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
-                    IconButton(onClick = { onDelete(entry.id) }) {
+                    IconButton(onClick = { pendingDelete = entry.id }) {
                         Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.dash_history_delete, entry.fileName), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }

@@ -126,7 +126,8 @@ class MainViewModel(
         _message.value = null
     }
 
-    fun onImagePicked(uri: Uri) {
+    /** [saveToHistory] = false для повторного анализа очищенной копии: иначе на одно фото две записи. */
+    fun onImagePicked(uri: Uri, saveToHistory: Boolean = true) {
         analyzeJob?.cancel()
         _state.value = UiState.Loading
         analyzeJob = viewModelScope.launch {
@@ -134,7 +135,7 @@ class MainViewModel(
                 analyzeImage(uri.toString()).fold(
                     onSuccess = { report ->
                         _state.value = UiState.Done(report, uri.toString())
-                        if (settingsState.value.saveHistory) {
+                        if (saveToHistory && settingsState.value.saveHistory) {
                             try {
                                 // save возвращает Result: без getOrThrow ошибка сохранения молча терялась.
                                 history.save(report).getOrThrow()
