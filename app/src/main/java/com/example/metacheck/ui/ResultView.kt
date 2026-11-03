@@ -1,5 +1,7 @@
 package com.example.metacheck.ui
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.Crossfade
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -98,7 +100,9 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
             PulseIndicator()
             Text(" " + stringResource(R.string.result_badge_local), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelMedium)
         }
-        Box(Modifier.weight(1f)) {
+        // Вкладки сменяются растворением, а не мгновенно.
+        Crossfade(targetState = tab, modifier = Modifier.weight(1f), animationSpec = tween(220), label = "report-tab") { tab ->
+        Box(Modifier.fillMaxSize()) {
             when (tab) {
                 ReportTab.OVERVIEW -> OverviewTab(report, actions, sourceUri, onMetadata = { selected = tabs.indexOf(ReportTab.METADATA) })
                 ReportTab.METADATA -> MetadataViewer(report, actions.onCsv, sourceUri)
@@ -111,6 +115,7 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
                     }
                 }
             }
+        }
         }
         Row(
             Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(horizontal = 9.dp, vertical = 9.dp),
