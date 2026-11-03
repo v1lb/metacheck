@@ -237,7 +237,7 @@ private fun PhotoPreview(sourceUri: String?, name: String) {
                     if (rotated !== bitmap) bitmap.recycle()
                     rotated.asImageBitmap()
                 }
-            } catch (_: Exception) { null }
+            } catch (_: Exception) { null } catch (_: OutOfMemoryError) { null } // превью необязательно: без него, но без крэша
         }
     }
     GlassPanel(Modifier.fillMaxWidth()) {

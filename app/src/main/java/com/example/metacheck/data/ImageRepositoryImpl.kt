@@ -20,6 +20,7 @@ import com.example.metacheck.domain.model.FileInfo
 import com.example.metacheck.domain.model.ImageFormat
 import com.example.metacheck.domain.model.MetaItem
 import com.example.metacheck.domain.model.MetaReport
+import com.example.metacheck.domain.model.TooLargeException
 import com.example.metacheck.domain.model.UnsupportedFormatException
 import com.example.metacheck.domain.repository.ImageRepository
 import kotlinx.coroutines.CancellationException
@@ -40,6 +41,9 @@ class ImageRepositoryImpl(
             throw e
         } catch (e: Exception) {
             Result.failure(e)
+        } catch (e: OutOfMemoryError) {
+            // Error, а не Exception: раньше он проходил мимо catch и ронял приложение.
+            Result.failure(TooLargeException())
         }
     }
 
@@ -50,7 +54,8 @@ class ImageRepositoryImpl(
         val (name, size) = queryNameAndSize(uri)
         val mime = resolver.getType(uri) ?: "неизвестно"
 
-        val (bytes, truncated) = resolver.openInputStream(uri)?.use { readBounded(it, MAX_SCAN_BYTES) }
+        // Размер известен заранее: буфер выделяется сразу, без удвоений и лишней копии.
+        val (bytes, truncated) = resolver.openInputStream(uri)?.use { readBounded(it, MAX_SCAN_BYTES, size) }
             ?: throw IOException("Не удалось открыть файл")
 
         val format = ImageFormatDetector.detect(bytes)

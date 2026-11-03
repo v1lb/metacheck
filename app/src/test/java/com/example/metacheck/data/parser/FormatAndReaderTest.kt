@@ -66,3 +66,47 @@ class FormatAndReaderTest {
         assertEquals(-1, hay.indexOfSeq(ByteArray(0)))
     }
 }
+
+/** Аудит, п. 12: известный размер -> буфер без удвоений и лишних копий; неверный размер не ломает чтение. */
+class BoundedReaderSizeHintTest {
+    private fun data(n: Int) = ByteArray(n) { (it % 251).toByte() }
+
+    @Test fun exactSizeHint() {
+        val src = data(10_000)
+        val (out, truncated) = readBounded(java.io.ByteArrayInputStream(src), 1_000_000, 10_000L)
+        org.junit.Assert.assertArrayEquals(src, out)
+        org.junit.Assert.assertFalse(truncated)
+    }
+
+    @Test fun hintTooSmall_stillReadsEverything() {
+        val src = data(300_000)
+        val (out, truncated) = readBounded(java.io.ByteArrayInputStream(src), 1_000_000, 10L)
+        org.junit.Assert.assertArrayEquals(src, out)
+        org.junit.Assert.assertFalse(truncated)
+    }
+
+    @Test fun hintTooLarge_trimsResult() {
+        val src = data(500)
+        val (out, _) = readBounded(java.io.ByteArrayInputStream(src), 1_000_000, 900_000L)
+        org.junit.Assert.assertArrayEquals(src, out)
+    }
+
+    @Test fun limitRespectedWithHint() {
+        val (out, truncated) = readBounded(java.io.ByteArrayInputStream(data(5_000)), 1_000, 5_000L)
+        org.junit.Assert.assertEquals(1_000, out.size)
+        org.junit.Assert.assertTrue(truncated)
+    }
+
+    @Test fun unknownSize_growsPastInitialBuffer() {
+        val src = data(200_000)
+        val (out, truncated) = readBounded(java.io.ByteArrayInputStream(src), 1_000_000)
+        org.junit.Assert.assertArrayEquals(src, out)
+        org.junit.Assert.assertFalse(truncated)
+    }
+
+    @Test fun zeroLimit() {
+        val (out, truncated) = readBounded(java.io.ByteArrayInputStream(data(10)), 0, 10L)
+        org.junit.Assert.assertEquals(0, out.size)
+        org.junit.Assert.assertTrue(truncated)
+    }
+}
