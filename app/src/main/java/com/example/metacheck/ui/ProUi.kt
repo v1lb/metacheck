@@ -1,5 +1,7 @@
 package com.example.metacheck.ui
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -52,7 +54,8 @@ fun PaywallDialog(vm: ProViewModel) {
         shape = RoundedCornerShape(26.dp),
         title = { Text(stringResource(R.string.pro_title), color = MaterialTheme.colorScheme.onSurface) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Прокрутка: на маленьком экране с открытой клавиатурой (поле ключа) текст и кнопки обрезались.
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 CyberEyebrow(stringResource(R.string.pro_eyebrow), color = MaterialTheme.colorScheme.primary)
                 ScanningBars(Modifier.fillMaxWidth().height(38.dp))
                 Text(stringResource(R.string.pro_free_features, DailyCleanQuota.FREE_DAILY_LIMIT))
@@ -81,15 +84,16 @@ fun PaywallDialog(vm: ProViewModel) {
             }
         },
         confirmButton = {
+            val shownPrice = price
             Button(
                 onClick = { context.findActivity()?.let(vm::buy) },
                 // Второй платёж поверх ожидающего Play всё равно отклонит.
-                enabled = price != null && !entitlement.purchasePending,
+                enabled = shownPrice != null && !entitlement.purchasePending,
             ) {
                 Text(
                     when {
                         entitlement.purchasePending -> stringResource(R.string.pro_buy_pending)
-                        price != null -> stringResource(R.string.pro_buy_for, price!!)
+                        shownPrice != null -> stringResource(R.string.pro_buy_for, shownPrice)
                         else -> stringResource(R.string.pro_buy_unavailable)
                     },
                 )

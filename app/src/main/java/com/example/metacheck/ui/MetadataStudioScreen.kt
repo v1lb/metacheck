@@ -75,6 +75,8 @@ import java.util.Locale
 
 private enum class StudioMode { STRIP, EDIT, BATCH }
 
+private const val UNKNOWN_MIME = "application/octet-stream"
+
 /** Standalone native workspace for safe SAF operations. Never requests storage permission. */
 @Composable
 fun MetadataStudioScreen(
@@ -110,6 +112,9 @@ fun MetadataStudioScreen(
     var shutter by rememberSaveable { mutableStateOf("") }
 
     val selectedMime by produceState<String?>(initialValue = null, key1 = source) {
+        // produceState не сбрасывает значение при смене ключа: без этого после выбора другого файла
+        // какое-то время действовал формат предыдущего.
+        value = null
         value = withContext(Dispatchers.IO) {
             if (source.isEmpty()) null else runCatching {
                 val uri = Uri.parse(source)
@@ -128,10 +133,34 @@ fun MetadataStudioScreen(
                         else -> context.contentResolver.getType(uri)?.lowercase(Locale.ROOT)
                     }
                 }
-            }.getOrNull()
+            }.getOrNull() ?: UNKNOWN_MIME // проверка завершена, но формат не распознан: операция сама сообщит причину
         }
     }
     val sourceIsJpeg = selectedMime == "image/jpeg"
+    // Формат ещё не определён (чтение идёт в фоне). Раньше быстрое нажатие сохраняло JPEG под именем .png.
+    val mimeReady = source.isNotBlank() && selectedMime != null
+    /** Имя файла для показа вместо хвоста URI вида «document/primary%3ADCIM...». */
+    val sourceName by produceState<String?>(initialValue = null, key1 = source) {
+        value = null
+        value = withContext(Dispatchers.IO) {
+            if (source.isBlank()) null else runCatching {
+                context.contentResolver.query(Uri.parse(source), arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)
+                    ?.use { if (it.moveToFirst()) it.getString(0) else null }
+            }.getOrNull()
+        }
+    }
+    /**
+     * Проверка до системного диалога сохранения: иначе диалог успевал создать пустой файл,
+     * а операция затем отказывала («только JPEG»), и пустой файл оставался у пользователя.
+     */
+    fun formatError(jpegOnly: Boolean, overwrite: Boolean): UiText? = when {
+        !mimeReady -> UiText.Res(R.string.studio_wait_format)
+        jpegOnly && !sourceIsJpeg ->
+            UiText.Res(if (overwrite) R.string.failure_overwrite_edit_jpeg_only else R.string.failure_edit_jpeg_only)
+        overwrite && selectedMime != "image/jpeg" && selectedMime != "image/png" ->
+            UiText.Res(R.string.failure_overwrite_strip_jpeg_png_only)
+        else -> null
+    }
     val exifPreview by produceState<String>(initialValue = "", key1 = source) {
         value = withContext(Dispatchers.IO) {
             if (source.isBlank()) return@withContext ""
@@ -277,7 +306,8 @@ fun MetadataStudioScreen(
                         Text(stringResource(if (source.isBlank()) R.string.studio_source_none else R.string.studio_source_selected),
                             color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleMedium)
                         if (source.isNotBlank()) Text(
-                            source.substringAfterLast('/').take(100), color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            (sourceName ?: Uri.decode(source.substringAfterLast('/')).substringAfterLast('/')).take(100),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 2, overflow = TextOverflow.Ellipsis,
                         )
                         if (exifPreview.isNotBlank()) Text(exifPreview,
@@ -298,12 +328,17 @@ fun MetadataStudioScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         NeonButton(stringResource(R.string.studio_strip_save_copy), onClick = {
                             if (source.isNotBlank() && !busy) {
-                                if (sourceIsJpeg) saveCleanJpeg.launch("metacheck-clean-${System.currentTimeMillis()}.jpg")
+                                val error = formatError(jpegOnly = false, overwrite = false)
+                                if (error != null) actionError = error
+                                else if (sourceIsJpeg) saveCleanJpeg.launch("metacheck-clean-${System.currentTimeMillis()}.jpg")
                                 else saveCleanPng.launch("metacheck-clean-${System.currentTimeMillis()}.png")
                             }
                         }, modifier = Modifier.fillMaxWidth())
                         CyberOutlineButton(stringResource(R.string.studio_strip_overwrite), {
-                            if (source.isNotBlank() && !busy) vm.requestOverwrite(source, OverwriteOp.Strip)
+                            if (source.isNotBlank() && !busy) {
+                                val error = formatError(jpegOnly = false, overwrite = true)
+                                if (error != null) actionError = error else vm.requestOverwrite(source, OverwriteOp.Strip)
+                            }
                         }, Modifier.fillMaxWidth())
                         Text(stringResource(R.string.studio_strip_overwrite_note),
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
@@ -344,12 +379,16 @@ fun MetadataStudioScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                         NeonButton(stringResource(R.string.studio_edit_save_copy), onClick = {
                             if (source.isNotBlank() && !busy) {
-                                patchOrError()?.let { vm.requestEditCopy(source, it); saveEdited.launch("metacheck-edited-${System.currentTimeMillis()}.jpg") }
+                                val error = formatError(jpegOnly = true, overwrite = false)
+                                if (error != null) actionError = error
+                                else patchOrError()?.let { vm.requestEditCopy(source, it); saveEdited.launch("metacheck-edited-${System.currentTimeMillis()}.jpg") }
                             }
                         }, modifier = Modifier.fillMaxWidth())
                         CyberOutlineButton(stringResource(R.string.studio_edit_overwrite), {
                             if (source.isNotBlank() && !busy) {
-                                patchOrError()?.let { vm.requestOverwrite(source, OverwriteOp.Edit(it)) }
+                                val error = formatError(jpegOnly = true, overwrite = true)
+                                if (error != null) actionError = error
+                                else patchOrError()?.let { vm.requestOverwrite(source, OverwriteOp.Edit(it)) }
                             }
                         }, Modifier.fillMaxWidth())
                     }
@@ -493,6 +532,12 @@ private fun WorldGridDialog(
     var lon by remember { mutableStateOf(longitude.coerceIn(-180.0, 180.0)) }
     val primary = MaterialTheme.colorScheme.primary
     val outline = MaterialTheme.colorScheme.outline
+    val context = LocalContext.current
+    // Контуры материков (Natural Earth, общественное достояние) из assets: без них сетка была пустой,
+    // и выбрать точку «на глаз» было невозможно. Файл лежал в APK, но больше нигде не использовался.
+    val coastlines by produceState(initialValue = emptyList<FloatArray>()) {
+        value = withContext(Dispatchers.IO) { runCatching { WorldOutline.load(context) }.getOrDefault(emptyList()) }
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface,
@@ -516,6 +561,17 @@ private fun WorldGridDialog(
                         val y = size.height * i / 6f
                         drawLine(outline.copy(alpha = .6f), Offset(0f, y), Offset(size.width, y), 1f)
                     }
+                    for (ring in coastlines) {
+                        val path = androidx.compose.ui.graphics.Path()
+                        var i = 0
+                        while (i + 1 < ring.size) {
+                            val px = ((ring[i] + 180f) / 360f) * size.width
+                            val py = ((90f - ring[i + 1]) / 180f) * size.height
+                            if (i == 0) path.moveTo(px, py) else path.lineTo(px, py)
+                            i += 2
+                        }
+                        drawPath(path, primary.copy(alpha = .55f), style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.2f))
+                    }
                     val x = ((lon + 180) / 360 * size.width).toFloat()
                     val y = ((90 - lat) / 180 * size.height).toFloat()
                     drawCircle(primary.copy(alpha = .23f), radius = 25f, center = Offset(x, y))
@@ -529,4 +585,27 @@ private fun WorldGridDialog(
         confirmButton = { TextButton(onClick = { onSelect(lat, lon) }) { Text(stringResource(R.string.studio_grid_use), color = primary) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel), color = MaterialTheme.colorScheme.onSurface) } },
     )
+}
+
+/** Упрощённые контуры суши: строка файла — кольцо точек «долгота,широта;…». */
+private object WorldOutline {
+    @Volatile private var cache: List<FloatArray>? = null
+
+    fun load(context: android.content.Context): List<FloatArray> {
+        cache?.let { return it }
+        val rings = context.assets.open("naturalearth_world_outline.txt").bufferedReader().useLines { lines ->
+            lines.mapNotNull { line ->
+                val points = line.split(';').mapNotNull { pair ->
+                    val comma = pair.indexOf(',')
+                    if (comma <= 0) null else {
+                        val x = pair.substring(0, comma).trim().toFloatOrNull()
+                        val y = pair.substring(comma + 1).trim().toFloatOrNull()
+                        if (x == null || y == null) null else floatArrayOf(x, y)
+                    }
+                }
+                if (points.size < 2) null else FloatArray(points.size * 2) { points[it / 2][it % 2] }
+            }.toList()
+        }
+        return rings.also { cache = it }
+    }
 }

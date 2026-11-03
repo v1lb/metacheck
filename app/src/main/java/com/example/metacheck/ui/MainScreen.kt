@@ -109,6 +109,7 @@ fun MainScreen(
     val proVm: ProViewModel = viewModel(factory = ProViewModel.Factory)
     val studioVm: MetadataStudioViewModel = viewModel(factory = MetadataStudioViewModel.Factory)
     val studioMessage by studioVm.message.collectAsStateWithLifecycle()
+    val studioBusy by studioVm.busy.collectAsStateWithLifecycle()
     val entitlement by proVm.entitlement.collectAsStateWithLifecycle()
     val paywallVisible by proVm.paywallVisible.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -208,8 +209,10 @@ fun MainScreen(
         if (uri != null && original != null) studioVm.wipeGpsCopy(original, uri)
     }
     val inResult = state is UiState.Done
+    // «Назад» с экрана ошибки и во время анализа раньше закрывало приложение: возвращаемся на главный.
+    val inFlow = inResult || state is UiState.Failed || state is UiState.Loading
 
-    BackHandler(enabled = showStudio || showSettings || inResult) {
+    BackHandler(enabled = showStudio || showSettings || inFlow) {
         if (showStudio) showStudio = false
         else if (showSettings) { showSettings = false; viewModel.refreshHistory() }
         else viewModel.close()
@@ -242,14 +245,14 @@ fun MainScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = .7f)),
                     navigationIcon = {
-                        if (showStudio || showSettings || inResult) IconButton(onClick = {
+                        if (showStudio || showSettings || inFlow) IconButton(onClick = {
                             if (showStudio) showStudio = false
                             else if (showSettings) { showSettings = false; viewModel.refreshHistory() }
                             else viewModel.close()
                         }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.common_back)) }
                     },
                     actions = {
-                        if (!showSettings && !showStudio && !inResult) {
+                        if (!showSettings && !showStudio && !inFlow) {
                             IconButton(onClick = { showSettings = true }) {
                                 Icon(Icons.Default.Settings, stringResource(R.string.main_title_settings), tint = MaterialTheme.colorScheme.primary)
                             }
@@ -289,7 +292,8 @@ fun MainScreen(
                                 onEdit = if (s.source == null) null else { { if (entitlement.isPro) showStudio = true else proVm.openPaywall() } },
                                 onWipeGps = if (s.source == null || !GpsPrivacy.hasLocationMarkers(s.report) ||
                                     s.report.file.format !in setOf(ImageFormat.JPEG, ImageFormat.PNG)) null else {
-                                    {
+                                    wipe@{
+                                        if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@wipe }
                                         pendingWipeSource = s.source
                                         if (s.report.file.format == ImageFormat.JPEG) saveGpsJpeg.launch("${name}-gps-safe.jpg")
                                         else saveGpsPng.launch("${name}-gps-safe.png")
@@ -306,7 +310,8 @@ fun MainScreen(
                                 onJson = { if (entitlement.isPro) saveJson.launch("$name-metacheck.json") else proVm.openPaywall() },
                                 onPdf = { if (entitlement.isPro) savePdf.launch("$name-metacheck.pdf") else proVm.openPaywall() },
                                 onClean = if (s.source == null) null else {
-                                    {
+                                    clean@{
+                                        if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@clean }
                                         pendingStripSource = s.source
                                         if (format.extension == "jpg") saveJpeg.launch("$name-clean.jpg")
                                         else savePng.launch("$name-clean.png")
@@ -381,6 +386,9 @@ private fun Dashboard(
     onCsv: () -> Unit, onUpgrade: () -> Unit, onStudio: () -> Unit,
 ) {
     val insight = remember(history) { HistoryInsights.from(history) }
+    // Те же числа, что в AppContainer: раньше здесь были отдельно записанные 10 и 50.
+    val historyLimit = if (isPro) com.example.metacheck.data.history.FileHistoryRepository.STORAGE_LIMIT
+        else com.example.metacheck.AppContainer.FREE_HISTORY_LIMIT
     val texts = rememberMetaTexts()
     // Формат даты по языку интерфейса (день/месяц и 12/24 часа в привычном для него порядке).
     val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
@@ -446,10 +454,10 @@ private fun Dashboard(
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text(stringResource(R.string.dash_history_limit), color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.titleMedium)
-                        Text("${history.size} / ${if (isPro) 50 else 10}", color = MaterialTheme.colorScheme.tertiary)
+                        Text("${history.size} / $historyLimit", color = MaterialTheme.colorScheme.tertiary)
                     }
                     LinearProgressIndicator(
-                        progress = { (history.size.toFloat() / if (isPro) 50f else 10f).coerceIn(0f, 1f) },
+                        progress = { (history.size.toFloat() / historyLimit).coerceIn(0f, 1f) },
                         modifier = Modifier.fillMaxWidth(),
                         color = MaterialTheme.colorScheme.tertiary,
                         trackColor = MaterialTheme.colorScheme.outline,
@@ -590,4 +598,5 @@ private fun ErrorScreen(message: UiText, onRetry: () -> Unit, onBack: () -> Unit
 
 private fun suggestedName(fileName: String): String =
     fileName.substringBeforeLast('.').filter { it.isLetterOrDigit() || it == '-' || it == '_' || it == ' ' }
+        .trim().take(60).ifBlank { "image" } // иначе файл назывался бы «-clean.jpg»
         .trim().ifEmpty { "image" }.take(60)
