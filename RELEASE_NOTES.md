@@ -4,6 +4,7 @@
 Версия 2.6.0
 • Карта OpenStreetMap включается только вашей кнопкой, до этого запросов в сеть нет
 • Исправлено чтение GPS из фото
+• Метки ИИ из Content Credentials (ChatGPT, Gemini, Firefly) и ~70 генераторов
 • Новый значок приложения
 • Полный перевод на английский; язык можно выбрать и в настройках Android 13+
 • Раздел «О приложении»: политика, условия, лицензии
@@ -12,6 +13,7 @@
 Version 2.6.0
 • The OpenStreetMap map loads only when you press its button, no network requests before that
 • Fixed reading GPS from photos
+• AI labels from Content Credentials (ChatGPT, Gemini, Firefly) and ~70 generators
 • New app icon
 • Complete English translation; on Android 13+ the language can also be set in system settings
 • New "About" section: privacy policy, terms, licenses

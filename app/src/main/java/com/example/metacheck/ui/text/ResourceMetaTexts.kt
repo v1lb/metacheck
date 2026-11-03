@@ -11,6 +11,7 @@ import com.example.metacheck.R
 import com.example.metacheck.data.parser.ExifReader
 import com.example.metacheck.data.parser.XmpExtractor
 import com.example.metacheck.domain.analysis.SignalEngine
+import com.example.metacheck.domain.analysis.SignalEngine.C2PA_UNREADABLE
 import com.example.metacheck.domain.metadata.MetadataGroup
 import com.example.metacheck.domain.model.ImageFormat
 import com.example.metacheck.domain.model.MetaItem
@@ -89,7 +90,17 @@ class ResourceMetaTexts(private val context: Context) : MetaTexts {
             SignalKind.AI_TOOL_FIELD -> s(R.string.signal_ai_tool_title, a.arg(0))
             SignalKind.AI_MENTION_TEXT -> s(R.string.signal_ai_mention_title, a.arg(0))
             SignalKind.IPTC_AI_SOURCE -> s(R.string.signal_iptc_title)
+            SignalKind.IPTC_AI_EDITED -> s(R.string.signal_iptc_edited_title)
             SignalKind.C2PA_PRESENT -> s(R.string.signal_c2pa_title)
+            SignalKind.C2PA_AI_CREATED -> a.arg(0).let {
+                if (it.isBlank()) s(R.string.signal_c2pa_ai_title) else s(R.string.signal_c2pa_ai_title_generator, it)
+            }
+            SignalKind.C2PA_AI_EDITED -> a.arg(0).let {
+                if (it.isBlank()) s(R.string.signal_c2pa_ai_edited_title) else s(R.string.signal_c2pa_ai_edited_title_generator, it)
+            }
+            SignalKind.GENERATION_PARAMS -> s(R.string.signal_generation_params_title)
+            SignalKind.MESSENGER_COPY -> s(R.string.signal_messenger_title, a.arg(0))
+            SignalKind.SCREENSHOT -> s(R.string.signal_screenshot_title)
             SignalKind.HAS_GPS -> s(R.string.signal_gps_title)
             SignalKind.NO_METADATA -> s(R.string.signal_no_metadata_title)
             SignalKind.PARTIAL_SCAN -> s(R.string.signal_partial_title)
@@ -107,7 +118,18 @@ class ResourceMetaTexts(private val context: Context) : MetaTexts {
             SignalKind.AI_TOOL_FIELD -> s(R.string.signal_ai_tool_detail, a.arg(1), a.arg(2))
             SignalKind.AI_MENTION_TEXT -> s(R.string.signal_ai_mention_detail, a.arg(1), a.arg(2))
             SignalKind.IPTC_AI_SOURCE -> s(R.string.signal_iptc_detail, a.arg(0))
-            SignalKind.C2PA_PRESENT -> s(R.string.signal_c2pa_detail)
+            SignalKind.IPTC_AI_EDITED -> s(R.string.signal_iptc_edited_detail, a.arg(0))
+            // Отчёты из прежних версий: у C2PA_PRESENT аргументов не было.
+            SignalKind.C2PA_PRESENT -> when {
+                a.getOrNull(1) == C2PA_UNREADABLE -> s(R.string.signal_c2pa_unreadable_detail)
+                a.arg(0).isBlank() -> s(R.string.signal_c2pa_detail)
+                else -> s(R.string.signal_c2pa_detail_generator, a.arg(0))
+            }
+            SignalKind.C2PA_AI_CREATED -> s(R.string.signal_c2pa_ai_detail)
+            SignalKind.C2PA_AI_EDITED -> s(R.string.signal_c2pa_ai_edited_detail)
+            SignalKind.GENERATION_PARAMS -> s(R.string.signal_generation_params_detail, a.arg(0))
+            SignalKind.MESSENGER_COPY -> s(R.string.signal_messenger_detail, a.arg(0))
+            SignalKind.SCREENSHOT -> s(R.string.signal_screenshot_detail)
             SignalKind.HAS_GPS -> s(R.string.signal_gps_detail)
             SignalKind.NO_METADATA -> s(R.string.signal_no_metadata_detail)
             SignalKind.PARTIAL_SCAN -> s(R.string.signal_partial_detail)

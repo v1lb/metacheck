@@ -7,7 +7,7 @@ import android.os.Build
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import com.example.metacheck.data.parser.C2paDetector
+import com.example.metacheck.data.parser.C2paReader
 import com.example.metacheck.data.parser.ExifReader
 import com.example.metacheck.data.parser.ExifResult
 import com.example.metacheck.data.parser.ImageFormatDetector
@@ -69,7 +69,8 @@ class ImageRepositoryImpl(
         val xmp = XmpExtractor.extractPacket(bytes, png)?.let(XmpExtractor::parse)
         // Android 10+ вырезает GPS из обычных потоков MediaStore. Читаем EXIF из «оригинального» URI.
         val exif = readExifWithLocation(uri)
-        val hasC2pa = C2paDetector.looksPresent(bytes)
+        // Ошибка разбора C2PA не должна ломать анализ: тогда просто нет сведений из манифеста.
+        val c2pa = try { C2paReader.read(bytes, format) } catch (_: Exception) { null }
 
         val xmpTools = listOfNotNull(
             xmp?.fields?.get(XmpExtractor.KEY_CREATOR_TOOL)?.let { MetaItem("XMP CreatorTool", it) },
@@ -89,9 +90,10 @@ class ImageRepositoryImpl(
                 freeTextFields = exif.freeTextFields,
                 xmpFields = xmp?.fields.orEmpty(),
                 pngText = png,
-                hasC2pa = hasC2pa,
+                c2pa = c2pa,
+                fileName = name,
                 hasGps = exif.gps != null,
-                hasAnyMetadata = exif.hasData || xmpItems.isNotEmpty() || pngItems.isNotEmpty(),
+                hasAnyMetadata = exif.hasData || xmpItems.isNotEmpty() || pngItems.isNotEmpty() || c2pa != null,
                 truncated = truncated,
             ),
         )
