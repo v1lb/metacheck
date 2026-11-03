@@ -1,14 +1,30 @@
 name: Release AAB for Google Play
 
-# Ручной запуск: Actions -> "Release AAB for Google Play" -> Run workflow.
+# Запуск:
+#  - автоматически при пуше тега вида v2.6.1 (git tag v2.6.1 && git push origin v2.6.1);
+#  - вручную: Actions -> "Release AAB for Google Play" -> Run workflow.
 # Нужны секреты репозитория: METACHECK_KEYSTORE_B64, METACHECK_STORE_PASSWORD,
-# METACHECK_KEY_ALIAS, METACHECK_KEY_PASSWORD (см. инструкцию в чате / DEPLOY.md).
+# METACHECK_KEY_ALIAS, METACHECK_KEY_PASSWORD (см. DEPLOY.md).
+#
+# Порядок важен: сначала тесты и lint, и только потом подпись и сборка AAB.
+# Раньше сборка шла с `-x lintVitalRelease`, то есть без проверки, которую AGP специально
+# делает перед релизом (ошибки манифеста, непереведённые строки, WrongConstant и т. п.).
 on:
+  push:
+    tags: ['v*']
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   aab:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -23,27 +39,62 @@ jobs:
           packages: platform-tools
       - name: Install Android platform 36
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Check tag matches versionName
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          name=$(grep -oP 'versionName\s*=\s*"\K[^"]+' app/build.gradle.kts)
+          echo "Тег: $tag, versionName: $name"
+          if [ "$tag" != "$name" ]; then
+            echo "::error::Тег v$tag не совпадает с versionName $name в app/build.gradle.kts"
+            exit 1
+          fi
+
+      - name: Static release preflight
+        run: python3 tools/release_gate.py
+
+      - name: Unit tests and release lint
+        run: gradle --no-daemon testReleaseUnitTest lintRelease
+
       - name: Decode upload keystore
         env:
           KEYSTORE_B64: ${{ secrets.METACHECK_KEYSTORE_B64 }}
         run: |
           if [ -z "$KEYSTORE_B64" ]; then
-            echo "Нет секрета METACHECK_KEYSTORE_B64: AAB без своего ключа Google Play не примет."
+            echo "::error::Нет секрета METACHECK_KEYSTORE_B64: AAB без своего ключа Google Play не примет."
             exit 1
           fi
           echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+
+      # lintVitalRelease выполняется внутри bundleRelease автоматически, ничего не пропускаем.
       - name: Build signed AAB
         env:
           METACHECK_STORE_FILE: ${{ runner.temp }}/upload.jks
           METACHECK_STORE_PASSWORD: ${{ secrets.METACHECK_STORE_PASSWORD }}
           METACHECK_KEY_ALIAS: ${{ secrets.METACHECK_KEY_ALIAS }}
           METACHECK_KEY_PASSWORD: ${{ secrets.METACHECK_KEY_PASSWORD }}
-        run: gradle --no-daemon bundleRelease -x lintVitalRelease
+        run: gradle --no-daemon bundleRelease
+
+      - name: Remove keystore from runner
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload.jks"
+
       - name: Upload AAB and R8 mapping
         uses: actions/upload-artifact@v4
         with:
-          name: MetaCheck-play-release
+          name: MetaCheck-play-release-${{ github.ref_name }}
           path: |
             app/build/outputs/bundle/release/*.aab
             app/build/outputs/mapping/release/mapping.txt
           if-no-files-found: error
+
+      - name: Upload test and lint reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MetaCheck-release-reports-${{ github.ref_name }}
+          path: |
+            app/build/reports/tests/**
+            app/build/reports/lint-results-*.html
+          if-no-files-found: ignore
