@@ -8,7 +8,7 @@ import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
- * Проверки локализации без Android: читаем res/values*/strings.xml и исходники.
+ * Проверки локализации без Android: читаем res/values/strings.xml и res/values-ru/strings.xml и исходники.
  * Строки генерируются tools/i18n/gen.py, но тест ловит и ручные правки XML, и забытые ключи в коде.
  */
 class StringResourcesTest {
