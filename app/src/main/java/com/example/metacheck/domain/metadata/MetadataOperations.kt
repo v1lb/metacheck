@@ -1,5 +1,7 @@
 package com.example.metacheck.domain.metadata
 
+import com.example.metacheck.domain.FailureCode
+import com.example.metacheck.domain.ensure
 import com.example.metacheck.domain.model.ProRequiredException
 import com.example.metacheck.domain.runCatchingCancellable
 import com.example.metacheck.domain.repository.EntitlementRepository
@@ -43,7 +45,7 @@ interface DailyCleanQuota {
     }
 }
 
-class DailyLimitReachedException : Exception("Бесплатная очистка: 75 фотографий за день. Повторите завтра (UTC) или откройте Pro")
+class DailyLimitReachedException : Exception("Free daily limit reached")
 
 /** Serialize quota check + successful write so concurrent exports cannot bypass Free limits. */
 class MetadataStudioUseCase(
@@ -79,23 +81,22 @@ class MetadataStudioUseCase(
     }
 
     suspend fun edit(source: String, destination: String, patch: MetadataPatch): Result<MetadataWriteResult> = limitedWrite {
-        val errors = MetadataPatchValidator.validate(patch)
-        require(errors.isEmpty()) { errors.joinToString("; ") }
+        val issues = MetadataPatchValidator.validate(patch)
+        if (issues.isNotEmpty()) throw InvalidPatchException(issues)
         repository.editCopy(source, destination, patch)
     }
 
     suspend fun overwrite(source: String, backup: String, patch: MetadataPatch?): Result<MetadataWriteResult> = limitedWrite {
         if (patch != null) {
-            val errors = MetadataPatchValidator.validate(patch)
-            require(errors.isEmpty()) { errors.joinToString("; ") }
+            val issues = MetadataPatchValidator.validate(patch)
+            if (issues.isNotEmpty()) throw InvalidPatchException(issues)
         }
         repository.overwriteWithBackup(source, backup, patch)
     }
 
     suspend fun batch(sources: List<String>, tree: String, progress: (BatchProgress) -> Unit): Result<BatchProgress> = runCatchingCancellable {
         if (!entitlements.current().isPro) throw ProRequiredException()
-        require(sources.isNotEmpty()) { "Не выбраны изображения" }
-        require(sources.size <= 50) { "За одну операцию допускается до 50 файлов" }
+        ensure(sources.size in 1..50, FailureCode.BATCH_SIZE)
         repository.stripBatch(sources, tree, progress)
     }
 }

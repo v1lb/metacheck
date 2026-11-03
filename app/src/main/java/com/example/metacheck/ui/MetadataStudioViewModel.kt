@@ -9,6 +9,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.metacheck.MetaCheckApplication
+import com.example.metacheck.R
+import com.example.metacheck.ui.text.ErrorTexts
+import com.example.metacheck.ui.text.UiText
 import com.example.metacheck.data.UriAccess
 import com.example.metacheck.domain.metadata.BatchProgress
 import com.example.metacheck.domain.metadata.MetadataPatch
@@ -45,7 +48,7 @@ class MetadataStudioViewModel(
 
     private val _busy = MutableStateFlow(false)
     val busy = _busy.asStateFlow()
-    private val _message = MutableStateFlow<String?>(null)
+    private val _message = MutableStateFlow<UiText?>(null)
     val message = _message.asStateFlow()
     private val _batch = MutableStateFlow(BatchProgress())
     val batch = _batch.asStateFlow()
@@ -66,7 +69,7 @@ class MetadataStudioViewModel(
     ) = work {
         studio.strip(source, destination.toString()).fold(
             onSuccess = {
-                _message.value = successMessage("Очищенная копия сохранена", it.verified, it.downscaled)
+                _message.value = successMessage(R.string.studio_msg_clean_saved, it.verified, it.downscaled)
                 if (it.verified) onSavedCopy?.invoke()
             },
             onFailure = { _message.value = failMessage(it) },
@@ -77,8 +80,10 @@ class MetadataStudioViewModel(
     fun wipeGpsCopy(source: String, destination: Uri) = work {
         studio.wipeGps(source, destination.toString()).fold(
             onSuccess = {
-                _message.value = successMessage("GPS удалён из новой копии", it.verified, it.downscaled) +
-                    if (it.verified) ". Для отправки используйте новую копию, а не оригинал" else ""
+                _message.value = successMessage(
+                    R.string.studio_msg_gps_removed, it.verified, it.downscaled,
+                    extra = if (it.verified) UiText.Res(R.string.studio_msg_share_copy) else null,
+                )
             },
             onFailure = { _message.value = failMessage(it) },
         )
@@ -116,14 +121,14 @@ class MetadataStudioViewModel(
 
     private fun editCopy(source: String, destination: Uri, patch: MetadataPatch) = work {
         studio.edit(source, destination.toString(), patch).fold(
-            onSuccess = { _message.value = successMessage("EXIF записан в новый файл", it.verified, false) },
+            onSuccess = { _message.value = successMessage(R.string.studio_msg_exif_saved, it.verified, false) },
             onFailure = { _message.value = failMessage(it) },
         )
     }
 
     private fun overwrite(source: String, backup: Uri, patch: MetadataPatch?) = work {
         studio.overwrite(source, backup.toString(), patch).fold(
-            onSuccess = { _message.value = successMessage("Оригинал заменён. Резервная копия сохранена", it.verified, it.downscaled) },
+            onSuccess = { _message.value = successMessage(R.string.studio_msg_original_replaced, it.verified, it.downscaled) },
             onFailure = { _message.value = failMessage(it) },
         )
         usedToday.value = studio.usedToday()
@@ -133,7 +138,7 @@ class MetadataStudioViewModel(
         _batch.value = BatchProgress(total = sources.size, running = true)
         studio.batch(sources, targetTree.toString()) { _batch.value = it }.fold(
             onSuccess = {
-                _message.value = "Пакетная очистка завершена: сохранено ${it.succeeded}, ошибок ${it.failed}."
+                _message.value = UiText.Res(R.string.studio_msg_batch_done, it.succeeded, it.failed)
                 _batch.value = it
             },
             onFailure = {
@@ -154,24 +159,29 @@ class MetadataStudioViewModel(
         }
     }
 
-    private fun successMessage(title: String, verified: Boolean, downscaled: Boolean): String =
-        title + (if (!verified) ". Не удалось перепроверить запись: откройте файл вручную" else ". Запись проверена") +
-            if (downscaled) ". Разрешение уменьшено для безопасной обработки" else ""
+    /** Сообщение собирается из предложений-ресурсов: так оно переводится целиком, без склейки строк. */
+    private fun successMessage(
+        @androidx.annotation.StringRes title: Int,
+        verified: Boolean,
+        downscaled: Boolean,
+        extra: UiText? = null,
+    ): UiText = UiText.Joined(
+        listOfNotNull(
+            UiText.Res(title),
+            UiText.Res(if (verified) R.string.studio_msg_verified else R.string.studio_msg_not_verified),
+            if (downscaled) UiText.Res(R.string.studio_msg_downscaled) else null,
+            extra,
+        ),
+        separator = " ",
+    )
 
-    private fun failMessage(error: Throwable): String =
-        if (error.isAccessLost()) LOST_ACCESS
-        else "Операция не выполнена: " + (error.message ?: "ошибка доступа или формата").take(250)
-
-    private fun Throwable.isAccessLost(): Boolean =
-        generateSequence(this) { it.cause }.take(8).any { it is SecurityException }
+    private fun failMessage(error: Throwable): UiText = ErrorTexts.operationFailed(error)
 
     companion object {
         /** Пустой файл, созданный диалогом, остаётся у пользователя: удалять его без операции не будем. */
-        private const val INTERRUPTED =
-            "Операция прервана: приложение было перезапущено системой. Повторите действие; созданный пустой файл можно удалить"
+        private val INTERRUPTED = UiText.Res(R.string.studio_msg_interrupted)
 
-        const val LOST_ACCESS =
-            "Нет доступа к файлу: Android отозвал разрешение после перезапуска приложения. Выберите файл снова"
+        val LOST_ACCESS = UiText.Res(R.string.error_access_lost)
 
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

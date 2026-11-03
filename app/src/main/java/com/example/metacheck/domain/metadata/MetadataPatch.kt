@@ -35,45 +35,64 @@ data class MetadataPatch(
     }
 }
 
+/** Поле патча, к которому относится проблема. */
+enum class PatchField { MAKE, MODEL, AUTHOR, COPYRIGHT, DESCRIPTION, DATE_TAKEN, DATE_DIGITIZED }
+
+/** Проблема в патче. Текст для пользователя подбирает интерфейс по коду (и полю, если оно есть). */
+data class PatchIssue(val code: Code, val field: PatchField? = null) {
+    enum class Code {
+        GPS_REMOVE_AND_SET, GPS_INCOMPLETE, LATITUDE_RANGE, LONGITUDE_RANGE,
+        ISO_RANGE, APERTURE_RANGE, EXPOSURE_RANGE,
+        /** Недопустимые символы или длина больше 512; [field] указывает поле. */
+        TEXT_INVALID,
+        /** Формат даты ГГГГ:ММ:ДД ЧЧ:ММ:СС; [field] указывает поле. */
+        DATE_FORMAT,
+        NO_CHANGES,
+    }
+}
+
+/** Патч не прошёл проверку. */
+class InvalidPatchException(val issues: List<PatchIssue>) : IllegalArgumentException(issues.joinToString { it.code.name })
+
 object MetadataPatchValidator {
     private val exifDateTime = DateTimeFormatter.ofPattern("uuuu:MM:dd HH:mm:ss", Locale.ROOT).withResolverStyle(ResolverStyle.STRICT)
 
-    fun validate(patch: MetadataPatch): List<String> = buildList {
+    fun validate(patch: MetadataPatch): List<PatchIssue> = buildList {
         if (patch.removeGps && (patch.latitude != null || patch.longitude != null)) {
-            add("Нельзя одновременно удалить и заменить координаты")
+            add(PatchIssue(PatchIssue.Code.GPS_REMOVE_AND_SET))
         }
         if ((patch.latitude == null) != (patch.longitude == null)) {
-            add("Широта и долгота должны быть заданы вместе")
+            add(PatchIssue(PatchIssue.Code.GPS_INCOMPLETE))
         }
         if (patch.latitude != null && (!patch.latitude.isFinite() || patch.latitude !in -90.0..90.0)) {
-            add("Широта должна быть от −90 до 90")
+            add(PatchIssue(PatchIssue.Code.LATITUDE_RANGE))
         }
         if (patch.longitude != null && (!patch.longitude.isFinite() || patch.longitude !in -180.0..180.0)) {
-            add("Долгота должна быть от −180 до 180")
+            add(PatchIssue(PatchIssue.Code.LONGITUDE_RANGE))
         }
-        if (patch.iso != null && patch.iso !in 1..204800) add("ISO должно быть от 1 до 204800")
+        if (patch.iso != null && patch.iso !in 1..204800) add(PatchIssue(PatchIssue.Code.ISO_RANGE))
         if (patch.aperture != null && (!patch.aperture.isFinite() || patch.aperture !in 0.5..128.0)) {
-            add("Диафрагма должна быть от f/0.5 до f/128")
+            add(PatchIssue(PatchIssue.Code.APERTURE_RANGE))
         }
         if (patch.exposureSeconds != null && (!patch.exposureSeconds.isFinite() || patch.exposureSeconds !in 0.000001..3600.0)) {
-            add("Выдержка должна быть от 1/1000000 до 3600 секунд")
+            add(PatchIssue(PatchIssue.Code.EXPOSURE_RANGE))
         }
-        for ((key, value) in listOf("Производитель" to patch.make, "Модель" to patch.model,
-            "Автор" to patch.author, "Copyright" to patch.copyright, "Описание" to patch.description)) {
+        for ((field, value) in listOf(PatchField.MAKE to patch.make, PatchField.MODEL to patch.model,
+            PatchField.AUTHOR to patch.author, PatchField.COPYRIGHT to patch.copyright, PatchField.DESCRIPTION to patch.description)) {
             if (value != null && (value.length > 512 || value.any { it == '\u0000' || (it.code < 32 && it != '\n' && it != '\t') })) {
-                add("$key: недопустимые символы или длина более 512")
+                add(PatchIssue(PatchIssue.Code.TEXT_INVALID, field))
             }
         }
-        for ((key, value) in listOf("Дата съёмки" to patch.dateTaken, "Дата оцифровки" to patch.dateDigitized)) {
+        for ((field, value) in listOf(PatchField.DATE_TAKEN to patch.dateTaken, PatchField.DATE_DIGITIZED to patch.dateDigitized)) {
             if (value != null) {
                 try {
                     require(value.length == 19)
                     LocalDateTime.parse(value, exifDateTime)
-                } catch (_: DateTimeParseException) { add("$key: формат ГГГГ:ММ:ДД ЧЧ:ММ:СС") }
-                catch (_: IllegalArgumentException) { add("$key: формат ГГГГ:ММ:ДД ЧЧ:ММ:СС") }
+                } catch (_: DateTimeParseException) { add(PatchIssue(PatchIssue.Code.DATE_FORMAT, field)) }
+                catch (_: IllegalArgumentException) { add(PatchIssue(PatchIssue.Code.DATE_FORMAT, field)) }
             }
         }
-        if (!patch.hasChanges) add("Выберите хотя бы одно изменение")
+        if (!patch.hasChanges) add(PatchIssue(PatchIssue.Code.NO_CHANGES))
     }
 }
 
@@ -90,6 +109,9 @@ data class BatchProgress(
     val current: String = "",
     val succeeded: Int = 0,
     val failed: Int = 0,
-    val errors: List<String> = emptyList(),
+    val errors: List<BatchFileError> = emptyList(),
     val running: Boolean = false,
 )
+
+/** Ошибка одного файла пакета. Текст ошибки локализует интерфейс по [error]. */
+data class BatchFileError(val file: String, val error: Throwable)

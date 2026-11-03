@@ -36,7 +36,13 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
-import com.example.metacheck.ui.LocalizedText as Text
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.example.metacheck.R
+import com.example.metacheck.domain.metadata.DailyCleanQuota
+import com.example.metacheck.ui.text.ErrorTexts
+import com.example.metacheck.ui.text.UiText
+import com.example.metacheck.ui.text.asString
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -88,7 +94,7 @@ fun MetadataStudioScreen(
     var batchSources by rememberSaveable { mutableStateOf(emptyList<String>()) }
     var worldPicker by remember { mutableStateOf(false) }
     val pending by vm.pending.collectAsStateWithLifecycle()
-    var actionError by remember { mutableStateOf<String?>(null) }
+    var actionError by remember { mutableStateOf<UiText?>(null) }
     var gpsRemove by rememberSaveable { mutableStateOf(false) }
     var latitude by rememberSaveable { mutableStateOf("") }
     var longitude by rememberSaveable { mutableStateOf("") }
@@ -164,7 +170,7 @@ fun MetadataStudioScreen(
     val chooseMultiple = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { list ->
         if (list.isNotEmpty()) {
             if (!isPro) onUpgrade()
-            else if (list.size > 50) actionError = "Допускается до 50 фото за один запуск"
+            else if (list.size > 50) actionError = UiText.Res(R.string.failure_batch_size)
             else { batchSources = list.map(Uri::toString); actionError = null }
         }
     }
@@ -199,7 +205,7 @@ fun MetadataStudioScreen(
             (iso.isNotBlank() && iso.toIntOrNull() == null) ||
             (aperture.isNotBlank() && numberOrNull(aperture) == null) ||
             (shutter.isNotBlank() && numberOrNull(shutter) == null)) {
-            actionError = "Проверьте числа: GPS, ISO, диафрагму и выдержку"
+            actionError = UiText.Res(R.string.studio_check_numbers)
             return null
         }
         val result = MetadataPatch(
@@ -218,7 +224,7 @@ fun MetadataStudioScreen(
             exposureSeconds = numberOrNull(shutter),
         )
         val validation = MetadataPatchValidator.validate(result)
-        if (validation.isNotEmpty()) { actionError = validation.joinToString(". "); return null }
+        if (validation.isNotEmpty()) { actionError = ErrorTexts.patchIssues(validation); return null }
         actionError = null
         return result
     }
@@ -234,25 +240,25 @@ fun MetadataStudioScreen(
     ) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                CyberEyebrow("METADATA STUDIO  /  ON-DEVICE")
-                Text("Управление метаданными", style = MaterialTheme.typography.headlineMedium,
+                CyberEyebrow(stringResource(R.string.studio_eyebrow))
+                Text(stringResource(R.string.studio_title), style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface)
-                Text(if (isPro) "PRO · Без ограничений на очистку" else
-                    "FREE · Очищено сегодня: $usedToday из 75 · Сброс в 00:00 UTC",
+                Text(if (isPro) stringResource(R.string.studio_quota_pro) else
+                    stringResource(R.string.studio_quota_free, usedToday, DailyCleanQuota.FREE_DAILY_LIMIT),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
-                Text("Реальное сохранение изменений в файл. Без отправки изображения в сеть.",
+                Text(stringResource(R.string.studio_subtitle),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                CyberOutlineButton("← К отчёту", onBack, Modifier.fillMaxWidth())
+                CyberOutlineButton(stringResource(R.string.studio_back_to_report), onBack, Modifier.fillMaxWidth())
             }
         }
         item {
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                StudioTab("Очистка", mode == StudioMode.STRIP) { mode = StudioMode.STRIP }
-                StudioTab("EXIF-редактор", mode == StudioMode.EDIT) {
+                StudioTab(stringResource(R.string.studio_tab_strip), mode == StudioMode.STRIP) { mode = StudioMode.STRIP }
+                StudioTab(stringResource(R.string.studio_tab_edit), mode == StudioMode.EDIT) {
                     mode = StudioMode.EDIT
                 }
-                StudioTab("Пакетно PRO", mode == StudioMode.BATCH) {
+                StudioTab(stringResource(R.string.studio_tab_batch), mode == StudioMode.BATCH) {
                     if (isPro) mode = StudioMode.BATCH else onUpgrade()
                 }
             }
@@ -260,15 +266,15 @@ fun MetadataStudioScreen(
         if (busy) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
         if (actionError != null) item {
             GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.error) {
-                Text(actionError.orEmpty(), Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onSurface)
+                Text(actionError?.asString().orEmpty(), Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onSurface)
             }
         }
         if (mode != StudioMode.BATCH) {
             item {
                 GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.primary) {
                     Column(Modifier.padding(17.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        CyberEyebrow("01 / ИСХОДНОЕ ИЗОБРАЖЕНИЕ")
-                        Text(if (source.isBlank()) "Файл не выбран" else "Изображение выбрано",
+                        CyberEyebrow(stringResource(R.string.studio_source_eyebrow))
+                        Text(stringResource(if (source.isBlank()) R.string.studio_source_none else R.string.studio_source_selected),
                             color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleMedium)
                         if (source.isNotBlank()) Text(
                             source.substringAfterLast('/').take(100), color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -276,7 +282,7 @@ fun MetadataStudioScreen(
                         )
                         if (exifPreview.isNotBlank()) Text(exifPreview,
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                        CyberOutlineButton("Выбрать другой файл", { chooseImage.launch(arrayOf("image/*")) }, Modifier.fillMaxWidth())
+                        CyberOutlineButton(stringResource(R.string.error_choose_other), { chooseImage.launch(arrayOf("image/*")) }, Modifier.fillMaxWidth())
                     }
                 }
             }
@@ -285,21 +291,21 @@ fun MetadataStudioScreen(
             item {
                 GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
                     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        CyberEyebrow("02 / ПОЛНАЯ ОЧИСТКА")
-                        Text("Удалить метаданные", color = MaterialTheme.colorScheme.onSurface,
+                        CyberEyebrow(stringResource(R.string.studio_strip_eyebrow))
+                        Text(stringResource(R.string.studio_strip_title), color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.titleLarge)
-                        Text("Файл будет декодирован и сохранён заново без переносимых EXIF, XMP, IPTC и GPS. JPEG повторно сжимается; HEIC/GIF/WebP сохраняются как PNG, а анимация может потеряться. Подписи C2PA становятся недействительными.",
+                        Text(stringResource(R.string.studio_strip_text),
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        NeonButton("Сохранить очищенный дубликат", onClick = {
+                        NeonButton(stringResource(R.string.studio_strip_save_copy), onClick = {
                             if (source.isNotBlank() && !busy) {
                                 if (sourceIsJpeg) saveCleanJpeg.launch("metacheck-clean-${System.currentTimeMillis()}.jpg")
                                 else saveCleanPng.launch("metacheck-clean-${System.currentTimeMillis()}.png")
                             }
                         }, modifier = Modifier.fillMaxWidth())
-                        CyberOutlineButton("Перезаписать оригинал с резервной копией", {
+                        CyberOutlineButton(stringResource(R.string.studio_strip_overwrite), {
                             if (source.isNotBlank() && !busy) vm.requestOverwrite(source, OverwriteOp.Strip)
                         }, Modifier.fillMaxWidth())
-                        Text("Для перезаписи доступны только JPEG/PNG и только документы с правом записи. Сначала вы выберете место для полноценной резервной копии.",
+                        Text(stringResource(R.string.studio_strip_overwrite_note),
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
                 }
@@ -308,40 +314,40 @@ fun MetadataStudioScreen(
             item {
                 GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
                     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(13.dp)) {
-                        CyberEyebrow("02 / РЕДАКТОР EXIF")
-                        Text("Координаты и GPS", style = MaterialTheme.typography.titleLarge,
+                        CyberEyebrow(stringResource(R.string.studio_edit_eyebrow))
+                        Text(stringResource(R.string.studio_edit_gps_title), style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface)
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            Text("Удалить GPS целиком", Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
+                            Text(stringResource(R.string.studio_edit_remove_gps), Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
                             Switch(checked = gpsRemove, onCheckedChange = { gpsRemove = it })
                         }
                         if (!gpsRemove) {
-                            StudioField("Широта (−90…90)", latitude) { latitude = it }
-                            StudioField("Долгота (−180…180)", longitude) { longitude = it }
-                            CyberOutlineButton("Выбрать точку на мировой сетке", { worldPicker = true }, Modifier.fillMaxWidth())
+                            StudioField(stringResource(R.string.studio_field_latitude), latitude, KeyboardType.Decimal) { latitude = it }
+                            StudioField(stringResource(R.string.studio_field_longitude), longitude, KeyboardType.Decimal) { longitude = it }
+                            CyberOutlineButton(stringResource(R.string.studio_pick_on_grid), { worldPicker = true }, Modifier.fillMaxWidth())
                         }
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-                        Text("Дата съёмки", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-                        StudioDatePicker("Дата оригинала", dateTaken) { dateTaken = it }
-                        StudioDatePicker("Дата оцифровки", dateDigitized) { dateDigitized = it }
+                        Text(stringResource(R.string.studio_edit_dates_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                        StudioDatePicker(stringResource(R.string.studio_field_date_taken), dateTaken) { dateTaken = it }
+                        StudioDatePicker(stringResource(R.string.studio_field_date_digitized), dateDigitized) { dateDigitized = it }
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-                        Text("Камера и авторство", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-                        StudioField("Производитель", manufacturer) { manufacturer = it }
-                        StudioField("Модель камеры", model) { model = it }
-                        StudioField("Автор", author) { author = it }
-                        StudioField("Copyright", copyright) { copyright = it }
-                        StudioField("Описание", description, maxLines = 3) { description = it }
-                        StudioField("ISO", iso) { iso = it }
-                        StudioField("Диафрагма (например, 1.8)", aperture) { aperture = it }
-                        StudioField("Выдержка в секундах (например, 0.02)", shutter) { shutter = it }
-                        Text("Пустые поля остаются без изменений. Редактор работает с JPEG; противоречащие EXIF блоки XMP/IPTC в JPEG удаляются. Изменения не применяются к исходному файлу до сохранения. Любая правка может сделать C2PA-подписи недействительными.",
+                        Text(stringResource(R.string.studio_edit_camera_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                        StudioField(stringResource(R.string.patch_field_make), manufacturer) { manufacturer = it }
+                        StudioField(stringResource(R.string.studio_field_camera_model), model) { model = it }
+                        StudioField(stringResource(R.string.patch_field_author), author) { author = it }
+                        StudioField(stringResource(R.string.patch_field_copyright), copyright) { copyright = it }
+                        StudioField(stringResource(R.string.patch_field_description), description, maxLines = 3) { description = it }
+                        StudioField(stringResource(R.string.studio_field_iso), iso, KeyboardType.Number) { iso = it }
+                        StudioField(stringResource(R.string.studio_field_aperture), aperture, KeyboardType.Decimal) { aperture = it }
+                        StudioField(stringResource(R.string.studio_field_shutter), shutter, KeyboardType.Decimal) { shutter = it }
+                        Text(stringResource(R.string.studio_edit_note),
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                        NeonButton("Сохранить изменённую копию JPEG", onClick = {
+                        NeonButton(stringResource(R.string.studio_edit_save_copy), onClick = {
                             if (source.isNotBlank() && !busy) {
                                 patchOrError()?.let { vm.requestEditCopy(source, it); saveEdited.launch("metacheck-edited-${System.currentTimeMillis()}.jpg") }
                             }
                         }, modifier = Modifier.fillMaxWidth())
-                        CyberOutlineButton("Перезаписать JPEG с резервной копией", {
+                        CyberOutlineButton(stringResource(R.string.studio_edit_overwrite), {
                             if (source.isNotBlank() && !busy) {
                                 patchOrError()?.let { vm.requestOverwrite(source, OverwriteOp.Edit(it)) }
                             }
@@ -353,22 +359,22 @@ fun MetadataStudioScreen(
             item {
                 GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
                     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        CyberEyebrow("BATCH STRIP / PRO")
-                        Text("Массовая очистка", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
-                        Text("До 50 файлов за один запуск. Новые копии будут сохранены в выбранную папку. Оригиналы останутся неизменными.",
+                        CyberEyebrow(stringResource(R.string.studio_batch_eyebrow))
+                        Text(stringResource(R.string.studio_batch_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(R.string.studio_batch_text),
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("Выбрано: ${batchSources.size}", color = MaterialTheme.colorScheme.onSurface)
-                        CyberOutlineButton("Выбрать фотографии", { chooseMultiple.launch(arrayOf("image/*")) }, Modifier.fillMaxWidth())
-                        NeonButton("Выбрать папку и запустить", {
+                        Text(stringResource(R.string.studio_batch_selected, batchSources.size), color = MaterialTheme.colorScheme.onSurface)
+                        CyberOutlineButton(stringResource(R.string.studio_batch_choose_photos), { chooseMultiple.launch(arrayOf("image/*")) }, Modifier.fillMaxWidth())
+                        NeonButton(stringResource(R.string.studio_batch_choose_folder_start), {
                             if (!busy && batchSources.isNotEmpty()) chooseTree.launch(null)
-                            else actionError = "Сначала выберите файлы"
+                            else actionError = UiText.Res(R.string.studio_batch_choose_files_first)
                         }, Modifier.fillMaxWidth())
                         if (batch.total > 0) {
                             LinearProgressIndicator(
                                 progress = { batch.completed.toFloat() / batch.total },
                                 modifier = Modifier.fillMaxWidth(),
                             )
-                            Text("${batch.completed}/${batch.total} · Успешно: ${batch.succeeded} · Ошибок: ${batch.failed}",
+                            Text(stringResource(R.string.studio_batch_progress, batch.completed, batch.total, batch.succeeded, batch.failed),
                                 color = MaterialTheme.colorScheme.onSurface)
                             if (batch.current.isNotBlank()) Text(batch.current, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
@@ -376,8 +382,11 @@ fun MetadataStudioScreen(
                 }
             }
             if (batch.errors.isNotEmpty()) {
-                item { SectionLabel("ОШИБКИ ПО ФАЙЛАМ") }
-                items(batch.errors) { error -> Text(error, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                item { SectionLabel(stringResource(R.string.studio_batch_errors)) }
+                items(batch.errors) { error ->
+                    Text(stringResource(R.string.studio_batch_file_error, error.file, ErrorTexts.reason(error.error).asString()),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
     }
@@ -387,9 +396,9 @@ fun MetadataStudioScreen(
         AlertDialog(
             onDismissRequest = { vm.cancelPending() },
             containerColor = MaterialTheme.colorScheme.surface,
-            title = { Text("Заменить оригинальный файл?", color = MaterialTheme.colorScheme.onSurface) },
+            title = { Text(stringResource(R.string.studio_overwrite_title), color = MaterialTheme.colorScheme.onSurface) },
             text = { Text(
-                "Действие нельзя гарантированно выполнить атомарно у всех файловых провайдеров. Вы сначала сохраните отдельную резервную копию; только после проверки копии будет произведена замена. При сбое приложение попытается восстановить оригинал.",
+                stringResource(R.string.studio_overwrite_text),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             ) },
             confirmButton = {
@@ -398,9 +407,9 @@ fun MetadataStudioScreen(
                         if (sourceIsJpeg) backupJpeg.launch("metacheck-original-backup-${System.currentTimeMillis()}.jpg")
                         else backupPng.launch("metacheck-original-backup-${System.currentTimeMillis()}.png")
                     }
-                }) { Text("Создать резервную копию", color = MaterialTheme.colorScheme.primary) }
+                }) { Text(stringResource(R.string.studio_overwrite_confirm), color = MaterialTheme.colorScheme.primary) }
             },
-            dismissButton = { TextButton(onClick = { vm.cancelPending() }) { Text("Отмена") } },
+            dismissButton = { TextButton(onClick = { vm.cancelPending() }) { Text(stringResource(R.string.common_cancel)) } },
         )
     }
     if (worldPicker) {
@@ -428,21 +437,23 @@ private fun StudioTab(label: String, selected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun StudioField(label: String, value: String, maxLines: Int = 1, onChange: (String) -> Unit) {
+private fun StudioField(
+    label: String,
+    value: String,
+    keyboard: KeyboardType = KeyboardType.Text,
+    maxLines: Int = 1,
+    onChange: (String) -> Unit,
+) {
     OutlinedTextField(
         value = value,
         onValueChange = { onChange(it.take(512)) },
         label = { Text(label) },
-        placeholder = { Text("Оставить без изменений") },
+        placeholder = { Text(stringResource(R.string.studio_field_keep)) },
         singleLine = maxLines == 1,
         maxLines = maxLines,
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = when {
-            label == "ISO" -> KeyboardType.Number
-            label.startsWith("Широта") || label.startsWith("Долгота") ||
-                label.startsWith("Диафрагма") || label.startsWith("Выдержка") -> KeyboardType.Decimal
-            else -> KeyboardType.Text
-        }),
+        // Тип клавиатуры передаётся явно: раньше он угадывался по русской подписи поля.
+        keyboardOptions = KeyboardOptions(keyboardType = keyboard),
         shape = RoundedCornerShape(14.dp),
     )
 }
@@ -456,14 +467,16 @@ private fun StudioDatePicker(label: String, value: String, onChange: (String) ->
         DatePickerDialog(context, { _, year, month, day ->
             TimePickerDialog(context, { _, hour, minute ->
                 onChange(String.format(Locale.ROOT, "%04d:%02d:%02d %02d:%02d:00", year, month + 1, day, hour, minute))
-            }, cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), true).show()
+            }, cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE),
+                android.text.format.DateFormat.is24HourFormat(context)).show()
         }, cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH),
             cal.get(java.util.Calendar.DAY_OF_MONTH)).show()
     }, modifier = Modifier.weight(1f)) {
-        Text("$label: ${value.ifBlank { "не изменять" }}", color = MaterialTheme.colorScheme.onSurface)
+        Text(stringResource(R.string.studio_date_value, label, value.ifBlank { stringResource(R.string.studio_date_unchanged) }),
+            color = MaterialTheme.colorScheme.onSurface)
     }
     if (value.isNotBlank()) TextButton(onClick = { onChange("") }) {
-        Text("Сброс", color = MaterialTheme.colorScheme.primary)
+        Text(stringResource(R.string.viewer_search_clear), color = MaterialTheme.colorScheme.primary)
     }
     }
 }
@@ -483,10 +496,10 @@ private fun WorldGridDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface,
-        title = { Text("Мировая сетка GPS", color = MaterialTheme.colorScheme.onSurface) },
+        title = { Text(stringResource(R.string.studio_grid_title), color = MaterialTheme.colorScheme.onSurface) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Коснитесь сетки для выбора координат. Это схематическая карта широты/долготы без улиц.",
+                Text(stringResource(R.string.studio_grid_text),
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Canvas(Modifier.fillMaxWidth().height(220.dp).pointerInput(Unit) {
                     detectTapGestures { point ->
@@ -508,11 +521,12 @@ private fun WorldGridDialog(
                     drawCircle(primary.copy(alpha = .23f), radius = 25f, center = Offset(x, y))
                     drawCircle(primary, radius = 9f, center = Offset(x, y))
                 }
-                Text(String.format(Locale.US, "Широта %.6f · Долгота %.6f", lat, lon),
+                Text(stringResource(R.string.studio_grid_point,
+                    String.format(Locale.US, "%.6f", lat), String.format(Locale.US, "%.6f", lon)),
                     color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
             }
         },
-        confirmButton = { TextButton(onClick = { onSelect(lat, lon) }) { Text("Использовать точку", color = primary) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Отмена", color = MaterialTheme.colorScheme.onSurface) } },
+        confirmButton = { TextButton(onClick = { onSelect(lat, lon) }) { Text(stringResource(R.string.studio_grid_use), color = primary) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel), color = MaterialTheme.colorScheme.onSurface) } },
     )
 }

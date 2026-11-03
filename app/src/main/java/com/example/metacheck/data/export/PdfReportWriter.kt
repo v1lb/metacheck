@@ -6,16 +6,17 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import com.example.metacheck.domain.export.ReportText
 import com.example.metacheck.domain.model.MetaReport
+import com.example.metacheck.domain.text.MetaTexts
 import java.io.OutputStream
 
-/** Простой постраничный PDF из текстового представления отчёта (формат A4). */
+/** Простой постраничный PDF из текстового представления отчёта (формат A4) на языке пользователя. */
 object PdfReportWriter {
     private const val PAGE_W = 595
     private const val PAGE_H = 842
     private const val MARGIN = 40f
     private const val MAX_PAGES = 40
 
-    fun write(report: MetaReport, out: OutputStream) {
+    fun write(report: MetaReport, out: OutputStream, texts: MetaTexts) {
         val normal = Paint().apply { textSize = 10.5f; isAntiAlias = true; color = Color.BLACK }
         val bold = Paint(normal).apply { typeface = Typeface.DEFAULT_BOLD; textSize = 13f }
         val width = PAGE_W - 2 * MARGIN
@@ -35,7 +36,7 @@ object PdfReportWriter {
                 return true
             }
 
-            loop@ for (block in ReportText.blocks(report)) {
+            loop@ for (block in ReportText.blocks(report, texts)) {
                 val heading = block.kind == ReportText.Kind.HEADING
                 val paint = if (heading) bold else normal
                 val lineHeight = paint.fontSpacing

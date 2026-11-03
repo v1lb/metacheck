@@ -12,7 +12,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import com.example.metacheck.data.license.LicenseKey
-import com.example.metacheck.ui.LocalizedText as Text
+import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
+import com.example.metacheck.R
+import com.example.metacheck.domain.metadata.DailyCleanQuota
+import com.example.metacheck.ui.text.asString
 import androidx.compose.material3.TextButton
 import com.example.metacheck.ui.theme.CyberPalette
 import androidx.compose.runtime.Composable
@@ -45,34 +50,34 @@ fun PaywallDialog(vm: ProViewModel) {
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         textContentColor = MaterialTheme.colorScheme.onSurface,
         shape = RoundedCornerShape(26.dp),
-        title = { Text("MetaCheck Pro", color = MaterialTheme.colorScheme.onSurface) },
+        title = { Text(stringResource(R.string.pro_title), color = MaterialTheme.colorScheme.onSurface) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                CyberEyebrow("FREE  →  PRO", color = MaterialTheme.colorScheme.primary)
+                CyberEyebrow(stringResource(R.string.pro_eyebrow), color = MaterialTheme.colorScheme.primary)
                 ScanningBars(Modifier.fillMaxWidth().height(38.dp))
-                Text("Free: анализ и GPS Privacy Shield, просмотр EXIF, 75 обработок фото в сутки (UTC), 10 отчётов в истории.")
-                Text("Pro: безлимитная очистка, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API.")
-                Text("Разовая покупка через Google Play, без подписки.",
+                Text(stringResource(R.string.pro_free_features, DailyCleanQuota.FREE_DAILY_LIMIT))
+                Text(stringResource(R.string.pro_pro_features))
+                Text(stringResource(R.string.pro_one_time),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 // Поле ключа показываем только если в сборку вшит открытый ключ проверки (LicenseKey).
-                // Иначе любой ввод заканчивался бы ошибкой «Ключи Pro в этой сборке не включены».
+                // Иначе любой ввод заканчивался бы ошибкой «ключи Pro в этой сборке не включены».
                 if (LicenseKey.PUBLIC_KEY_BASE64.isNotBlank()) {
                     OutlinedTextField(
                         value = keyInput,
                         onValueChange = { keyInput = it },
-                        label = { Text("Ключ Pro, если он у тебя есть") },
+                        label = { Text(stringResource(R.string.pro_key_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                     )
                     TextButton(onClick = { vm.redeem(keyInput) }, enabled = keyInput.isNotBlank()) {
-                        Text("Применить ключ")
+                        Text(stringResource(R.string.pro_key_apply))
                     }
                 }
                 if (entitlement.purchasePending) {
-                    Text("Платёж ожидает подтверждения. Pro включится автоматически после оплаты.",
+                    Text(stringResource(R.string.pro_payment_pending),
                         color = MaterialTheme.colorScheme.primary)
                 }
-                info?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                info?.let { Text(it.asString(), style = MaterialTheme.typography.bodySmall) }
             }
         },
         confirmButton = {
@@ -83,24 +88,28 @@ fun PaywallDialog(vm: ProViewModel) {
             ) {
                 Text(
                     when {
-                        entitlement.purchasePending -> "Ожидает оплаты"
-                        price != null -> "Купить за $price"
-                        else -> "Покупка недоступна"
+                        entitlement.purchasePending -> stringResource(R.string.pro_buy_pending)
+                        price != null -> stringResource(R.string.pro_buy_for, price!!)
+                        else -> stringResource(R.string.pro_buy_unavailable)
                     },
                 )
             }
         },
-        dismissButton = { TextButton(onClick = vm::dismissPaywall) { Text("Закрыть") } },
+        dismissButton = { TextButton(onClick = vm::dismissPaywall) { Text(stringResource(R.string.common_close)) } },
     )
 }
 
-/** Строка о состоянии Pro для экрана настроек. */
+/** Строка о состоянии Pro для экрана настроек. Дата в формате языка интерфейса, а не системы. */
+@Composable
 fun proStatusText(e: Entitlement): String = when (e.source) {
-    ProSource.NONE -> if (e.purchasePending) "Бесплатная версия · платёж Pro ожидает подтверждения" else "Бесплатная версия"
-    ProSource.PLAY -> "Pro активен (покупка в Google Play)"
+    ProSource.NONE -> stringResource(if (e.purchasePending) R.string.pro_status_free_pending else R.string.pro_status_free)
+    ProSource.PLAY -> stringResource(R.string.pro_status_play)
     ProSource.LICENSE -> {
-        val until = e.licenseExpiresAt?.let { " до " + DateFormat.getDateInstance().format(Date(it * 1000)) } ?: ""
-        "Pro активен по ключу$until"
+        val locale = LocalConfiguration.current.locales[0]
+        val expires = e.licenseExpiresAt
+        if (expires == null) stringResource(R.string.pro_status_license)
+        else stringResource(R.string.pro_status_license_until,
+            DateFormat.getDateInstance(DateFormat.MEDIUM, locale).format(Date(expires * 1000)))
     }
 }
 

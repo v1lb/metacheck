@@ -1,5 +1,6 @@
 package com.example.metacheck.data.license
 
+import com.example.metacheck.domain.model.LicenseError
 import com.example.metacheck.domain.model.LicenseException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -33,7 +34,7 @@ class LicenseVerifierTest {
     private val kp = newKeyPair()
     private fun verifier(now: Long = 1_000L, key: KeyPair = kp) = LicenseVerifier(publicKeyOf(key)) { now }
 
-    private fun message(r: Result<*>) = (r.exceptionOrNull() as? LicenseException)?.message
+    private fun code(r: Result<*>) = (r.exceptionOrNull() as? LicenseException)?.code
 
     @Test
     fun acceptsValidLifetimeKey() {
@@ -52,7 +53,7 @@ class LicenseVerifierTest {
     @Test
     fun rejectsExpiredKey() {
         val r = verifier(now = 3_000).verify(issue(kp, """{"id":"a","exp":2000}"""))
-        assertEquals("Срок действия ключа истёк", message(r))
+        assertEquals(LicenseError.EXPIRED, code(r))
     }
 
     @Test
@@ -60,14 +61,14 @@ class LicenseVerifierTest {
         val good = issue(kp, """{"id":"a","exp":2000}""")
         val parts = good.split('.')
         val forged = "MC1." + b64u("""{"id":"a"}""".toByteArray()) + "." + parts[2] // подпись от другого текста
-        assertEquals("Подпись ключа неверна", message(verifier().verify(forged)))
+        assertEquals(LicenseError.BAD_SIGNATURE, code(verifier().verify(forged)))
     }
 
     @Test
     fun rejectsKeyFromAnotherIssuer() {
         val other = newKeyPair()
         val r = verifier().verify(issue(other, """{"id":"a"}"""))
-        assertEquals("Подпись ключа неверна", message(r))
+        assertEquals(LicenseError.BAD_SIGNATURE, code(r))
     }
 
     @Test
@@ -91,7 +92,7 @@ class LicenseVerifierTest {
     @Test
     fun disabledWithoutPublicKey() {
         val r = LicenseVerifier("").verify(issue(kp, """{"id":"a"}"""))
-        assertEquals("Ключи Pro в этой сборке не включены", message(r))
+        assertEquals(LicenseError.NOT_ENABLED, code(r))
     }
 
     @Test

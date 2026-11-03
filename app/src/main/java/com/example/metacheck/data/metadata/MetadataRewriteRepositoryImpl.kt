@@ -11,6 +11,11 @@ import android.os.Build
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import androidx.exifinterface.media.ExifInterface
+import com.example.metacheck.domain.AppFailure
+import com.example.metacheck.domain.FailureCode
+import com.example.metacheck.domain.HiddenPart
+import com.example.metacheck.domain.ensure
+import com.example.metacheck.domain.metadata.BatchFileError
 import com.example.metacheck.domain.metadata.BatchProgress
 import com.example.metacheck.domain.metadata.MetadataPatch
 import com.example.metacheck.domain.metadata.MetadataRewriteRepository
@@ -38,16 +43,16 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
 
     override suspend fun stripCopy(source: String, destination: String): MetadataWriteResult = withContext(Dispatchers.IO) {
         val src = checkedUri(source); val dst = checkedUri(destination)
-        require(src != dst) { "Оригинал нельзя использовать как новый файл" }
+        ensure(src != dst, FailureCode.SAME_AS_SOURCE)
         val stage = createTemp("strip", ".img")
         try {
             val prepared = renderClean(src, stage)
-            require(verifyNoMetadata(stage, prepared.mime)) { "Проверка очистки метаданных не пройдена" }
+            ensure(verifyNoMetadata(stage, prepared.mime), FailureCode.CLEAN_CHECK_FAILED)
             writeDocument(dst, stage, allowNewFileFallback = true)
             // A copied image is NOT a successful privacy operation until the
             // bytes persisted by the document provider are read back intact.
             if (!verifySameFile(stage, dst)) {
-                throw IOException("Не удалось подтвердить сохранённый файл. Проверьте и удалите неполную копию")
+                throw AppFailure(FailureCode.SAVED_FILE_UNVERIFIED)
             }
             prepared.asResult(stage.length(), verified = true)
         } finally { stage.delete() }
@@ -58,43 +63,41 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
      */
     override suspend fun wipeGpsCopy(source: String, destination: String): MetadataWriteResult = withContext(Dispatchers.IO) {
         val src = checkedUri(source); val dst = checkedUri(destination)
-        require(src != dst) { "Выберите новый файл для очищенной копии" }
+        ensure(src != dst, FailureCode.SAME_AS_SOURCE)
         val stage = createTemp("gps_wipe", ".img")
         try {
             val prepared = when (readMime(src)) {
                 "image/jpeg" -> {
                     prepareEdited(src, stage, MetadataPatch(removeGps = true))
                     val exif = ExifInterface(stage.absolutePath)
-                    require(exif.latLong == null && GPS_TAGS.all { exif.getAttribute(it) == null }) {
-                        "Проверка GPS-тегов не пройдена"
-                    }
+                    ensure(exif.latLong == null && GPS_TAGS.all { exif.getAttribute(it) == null }, FailureCode.GPS_NOT_REMOVED)
                     // Координаты прячутся не только в EXIF: Motion Photo, MPF-кадры, XMP, миниатюра.
                     val hidden = JpegSegments.inspect(stage)
-                    require(!hidden.hasHiddenPayload) { "Проверка скрытых данных не пройдена: ${hidden.describe()}" }
+                    ensure(!hidden.hasHiddenPayload, FailureCode.HIDDEN_DATA_FOUND, *hidden.parts())
                     Prepared("image/jpeg", false)
                 }
                 "image/png" -> {
                     val result = renderClean(src, stage)
-                    require(verifyNoMetadata(stage, result.mime)) { "Проверка очистки PNG не пройдена" }
+                    ensure(verifyNoMetadata(stage, result.mime), FailureCode.CLEAN_CHECK_FAILED)
                     result
                 }
-                else -> throw IOException("Удаление GPS поддерживает JPEG и PNG")
+                else -> throw AppFailure(FailureCode.WIPE_GPS_JPEG_PNG_ONLY)
             }
             writeDocument(dst, stage, allowNewFileFallback = true)
-            if (!verifySameFile(stage, dst)) throw IOException("Не удалось проверить сохранённый очищенный файл")
+            if (!verifySameFile(stage, dst)) throw AppFailure(FailureCode.SAVED_FILE_UNVERIFIED)
             prepared.asResult(stage.length(), true)
         } finally { stage.delete() }
     }
 
     override suspend fun editCopy(source: String, destination: String, patch: MetadataPatch): MetadataWriteResult = withContext(Dispatchers.IO) {
         val src = checkedUri(source); val dst = checkedUri(destination)
-        require(src != dst) { "Оригинал нельзя использовать как новый файл" }
+        ensure(src != dst, FailureCode.SAME_AS_SOURCE)
         val stage = createTemp("edit", ".jpg")
         try {
             prepareEdited(src, stage, patch)
             writeDocument(dst, stage, allowNewFileFallback = true)
             if (!verifySameFile(stage, dst)) {
-                throw IOException("Не удалось подтвердить изменения EXIF в сохранённом файле")
+                throw AppFailure(FailureCode.EDIT_UNVERIFIED)
             }
             MetadataWriteResult(stage.length(), false, "JPEG", verified = true)
         } finally { stage.delete() }
@@ -106,45 +109,41 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         patch: MetadataPatch?,
     ): MetadataWriteResult = withContext(Dispatchers.IO) {
         val original = checkedUri(source); val backup = checkedUri(backupDestination)
-        require(original != backup) { "Выберите другой файл для резервной копии" }
+        ensure(original != backup, FailureCode.SAME_AS_BACKUP)
         val originalTemp = createTemp("original", ".bak")
         val prepared = createTemp("replacement", ".img")
         try {
             val originalMime = readMime(original)
             if (patch == null) {
-                require(originalMime == "image/jpeg" || originalMime == "image/png") {
-                    "Перезапись при очистке поддерживает только JPEG и PNG: другие форматы сохраняйте как новую копию"
-                }
-            } else require(originalMime == "image/jpeg") { "Редактирование EXIF с перезаписью поддерживается для JPEG" }
+                ensure(originalMime == "image/jpeg" || originalMime == "image/png", FailureCode.OVERWRITE_STRIP_JPEG_PNG_ONLY)
+            } else ensure(originalMime == "image/jpeg", FailureCode.OVERWRITE_EDIT_JPEG_ONLY)
             copyUriToFile(original, originalTemp)
             // External backup must be complete and independently readable before touching the original.
             writeDocument(backup, originalTemp, allowNewFileFallback = true)
-            if (!verifySameFile(originalTemp, backup)) throw IOException("Невозможно проверить резервную копию. Оригинал не изменён")
+            if (!verifySameFile(originalTemp, backup)) throw AppFailure(FailureCode.BACKUP_UNVERIFIED)
             val result = if (patch == null) renderClean(original, prepared) else {
                 prepareEdited(original, prepared, patch)
                 Prepared("image/jpeg", false)
             }
             if (patch == null && !verifyNoMetadata(prepared, result.mime)) {
-                throw IOException("Результат очистки не прошёл проверку")
+                throw AppFailure(FailureCode.CLEAN_CHECK_FAILED)
             }
             var mutationAttempted = false
             try {
                 mutationAttempted = true
                 writeDocument(original, prepared)
-                if (!verifySameFile(prepared, original)) throw IOException("Невозможно проверить заменённый файл")
+                if (!verifySameFile(prepared, original)) throw AppFailure(FailureCode.REPLACED_FILE_UNVERIFIED)
             } catch (e: Exception) {
                 if (mutationAttempted) {
                     try {
                         writeDocument(original, originalTemp)
-                        if (!verifySameFile(originalTemp, original)) throw IOException("Проверка восстановления не пройдена")
+                        if (!verifySameFile(originalTemp, original)) throw AppFailure(FailureCode.RESTORE_UNVERIFIED)
                     } catch (restoreError: Exception) {
-                        throw IOException(
-                            "Ошибка замены; автоматическое восстановление не удалось. Резервная копия сохранена в выбранном вами месте. " +
-                                "Не удаляйте её. Причина: ${restoreError.message}", e,
-                        )
+                        // Причина для пользователя — ошибка восстановления; исходная ошибка замены приложена.
+                        throw AppFailure(FailureCode.REPLACE_FAILED_RESTORE_FAILED, cause = restoreError).also { it.addSuppressed(e) }
                     }
                 }
-                throw IOException("Замена отменена; оригинал восстановлен из резервной копии: ${e.message}", e)
+                throw AppFailure(FailureCode.REPLACE_CANCELLED_RESTORED, cause = e)
             }
             result.asResult(prepared.length(), true)
         } finally { originalTemp.delete(); prepared.delete() }
@@ -153,7 +152,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
     override suspend fun stripBatch(
         sources: List<String>, destinationTree: String, progress: (BatchProgress) -> Unit,
     ): BatchProgress = withContext(Dispatchers.IO) {
-        require(sources.size in 1..50) { "За один запуск: от 1 до 50 фотографий" }
+        ensure(sources.size in 1..50, FailureCode.BATCH_SIZE)
         val tree = checkedUri(destinationTree)
         val root = DocumentsContract.buildDocumentUriUsingTree(tree, DocumentsContract.getTreeDocumentId(tree))
         var report = BatchProgress(total = sources.size, running = true)
@@ -167,23 +166,22 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             var target: Uri? = null
             try {
                 val prepared = renderClean(checkedUri(raw), stage)
-                if (!verifyNoMetadata(stage, prepared.mime)) throw IOException("Проверка очистки не пройдена")
+                if (!verifyNoMetadata(stage, prepared.mime)) throw AppFailure(FailureCode.CLEAN_CHECK_FAILED)
                 val ext = if (prepared.mime == "image/jpeg") "jpg" else "png"
                 val name = uniqueName(label, ext, index)
                 target = DocumentsContract.createDocument(resolver, root, prepared.mime, name)
-                    ?: throw IOException("Нельзя создать файл в выбранной папке")
+                    ?: throw AppFailure(FailureCode.CANNOT_CREATE_IN_FOLDER)
                 writeDocument(target, stage, allowNewFileFallback = true)
-                if (!verifySameFile(stage, target)) throw IOException("Не удалось проверить сохранённый файл")
+                if (!verifySameFile(stage, target)) throw AppFailure(FailureCode.SAVED_FILE_UNVERIFIED)
                 report = report.copy(succeeded = report.succeeded + 1)
             } catch (e: CancellationException) {
                 target?.let { runCatching { DocumentsContract.deleteDocument(resolver, it) } }
                 throw e
             } catch (e: Exception) {
                 target?.let { runCatching { DocumentsContract.deleteDocument(resolver, it) } }
-                val reason = (e.message ?: e.javaClass.simpleName).take(130)
                 report = report.copy(
                     failed = report.failed + 1,
-                    errors = (report.errors + "${label.take(80)}: $reason").takeLast(50),
+                    errors = (report.errors + BatchFileError(label.take(80), e)).takeLast(50),
                 )
             } finally {
                 stage.delete()
@@ -195,7 +193,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
     }
 
     private fun checkedUri(value: String): Uri = Uri.parse(value).also {
-        require(it.scheme == ContentResolver.SCHEME_CONTENT) { "Используйте документ из Android-файлов" }
+        ensure(it.scheme == ContentResolver.SCHEME_CONTENT, FailureCode.INVALID_URI)
     }
 
     private fun createTemp(prefix: String, suffix: String): File =
@@ -210,13 +208,13 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             if (count >= 8 && header.take(8) == listOf(137, 80, 78, 71, 13, 10, 26, 10).map { it.toByte() }) return "image/png"
         }
         // Never trust a filename or provider MIME type for in-place replacements.
-        throw IOException("Исходный формат не подтверждён сигнатурой (тип провайдера: ${contentType ?: "не указан"})")
+        throw AppFailure(FailureCode.FORMAT_UNCONFIRMED, listOf(contentType.orEmpty()))
     }
 
     private fun copyUriToFile(uri: Uri, target: File) {
         resolver.openInputStream(uri)?.use { stream ->
             FileOutputStream(target).use { sink -> copyLimited(stream, sink) }
-        } ?: throw IOException("Не удалось прочитать исходный файл")
+        } ?: throw AppFailure(FailureCode.CANNOT_READ_SOURCE)
     }
 
     private fun copyLimited(source: InputStream, target: java.io.OutputStream) {
@@ -227,16 +225,14 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             if (n < 0) return
             if (n == 0) continue
             total += n
-            if (total > MAX_SOURCE_BYTES) throw IOException("Размер изображения превышает 80 МБ")
+            if (total > MAX_SOURCE_BYTES) throw AppFailure(FailureCode.SOURCE_TOO_LARGE)
             target.write(buffer, 0, n)
         }
     }
 
     private fun prepareEdited(source: Uri, output: File, patch: MetadataPatch) {
         val sourceMime = readMime(source)
-        require(sourceMime == "image/jpeg") {
-            "Редактор EXIF работает с JPEG; PNG/HEIC/AVIF пока можно полностью очистить как новую копию"
-        }
+        ensure(sourceMime == "image/jpeg", FailureCode.EDIT_JPEG_ONLY)
         val original = createTemp("editable_original", ".jpg")
         try {
             copyUriToFile(source, original)
@@ -261,11 +257,11 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             patch.exposureSeconds?.let { exif.setAttribute(ExifInterface.TAG_EXPOSURE_TIME, it.toString()) }
             exif.saveAttributes()
             val check = ExifInterface(output.absolutePath)
-            if (patch.removeGps && check.latLong != null) throw IOException("EXIF GPS не удалён")
+            if (patch.removeGps && check.latLong != null) throw AppFailure(FailureCode.GPS_NOT_REMOVED)
             if (patch.latitude != null && patch.longitude != null) {
-                val pair = check.latLong ?: throw IOException("EXIF GPS не записан")
+                val pair = check.latLong ?: throw AppFailure(FailureCode.GPS_NOT_WRITTEN)
                 if (kotlin.math.abs(pair[0] - patch.latitude) > .0001 || kotlin.math.abs(pair[1] - patch.longitude) > .0001) {
-                    throw IOException("GPS отличается от заданных координат")
+                    throw AppFailure(FailureCode.GPS_MISMATCH)
                 }
             }
             for ((tag, desired) in listOf(
@@ -278,13 +274,13 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
                 ExifInterface.TAG_IMAGE_DESCRIPTION to patch.description,
             )) {
                 if (desired != null && check.getAttribute(tag) != desired) {
-                    throw IOException("EXIF проверка поля $tag не пройдена")
+                    throw AppFailure(FailureCode.EXIF_FIELD_UNVERIFIED, listOf(tag))
                 }
             }
-            if (output.length() == 0L) throw IOException("Пустой результат редактирования")
+            if (output.length() == 0L) throw AppFailure(FailureCode.EMPTY_RESULT)
             if (patch.removeGps) {
                 val hidden = JpegSegments.inspect(output)
-                if (hidden.hasHiddenPayload) throw IOException("Проверка скрытых данных не пройдена: ${hidden.describe()}")
+                if (hidden.hasHiddenPayload) throw AppFailure(FailureCode.HIDDEN_DATA_FOUND, hidden.parts().toList())
             }
         } finally { original.delete() }
     }
@@ -304,7 +300,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             val mime = if (sourceMime == "image/jpeg") "image/jpeg" else "image/png"
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             BitmapFactory.decodeFile(raw.absolutePath, bounds)
-            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) throw IOException("Неподдерживаемый формат изображения")
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) throw AppFailure(FailureCode.UNSUPPORTED_IMAGE)
             val orientation = runCatching {
                 ExifInterface(raw.absolutePath).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
             }.getOrDefault(ExifInterface.ORIENTATION_NORMAL)
@@ -316,7 +312,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             val decoded = BitmapFactory.decodeFile(
                 raw.absolutePath,
                 BitmapFactory.Options().apply { inSampleSize = sample; inMutable = true },
-            ) ?: throw IOException("Не удалось прочитать пиксели. Попробуйте другое изображение")
+            ) ?: throw AppFailure(FailureCode.DECODE_FAILED)
             // Android 14+: Ultra HDR фото декодируются с gain map, и Bitmap.compress пишет обратно
             // MPF + второй кадр. Очищенная копия должна быть обычным JPEG без вторичных изображений.
             val bitmap = withoutGainmap(decoded)
@@ -325,17 +321,17 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
                 oriented = applyExifOrientation(bitmap, orientation)
                 FileOutputStream(output).use { stream ->
                     val format = if (mime == "image/jpeg") Bitmap.CompressFormat.JPEG else Bitmap.CompressFormat.PNG
-                    if (!oriented.compress(format, 95, stream)) throw IOException("Кодирование изображения не удалось")
+                    if (!oriented.compress(format, 95, stream)) throw AppFailure(FailureCode.ENCODE_FAILED)
                     stream.fd.sync()
                 }
-                if (output.length() == 0L) throw IOException("Создан пустой файл")
+                if (output.length() == 0L) throw AppFailure(FailureCode.EMPTY_RESULT)
             } finally {
                 if (oriented !== bitmap) oriented.recycle()
                 bitmap.recycle()
             }
             return Prepared(mime, sample > 1)
         } catch (outOfMemory: OutOfMemoryError) {
-            throw IOException("Недостаточно памяти для обработки изображения", outOfMemory)
+            throw AppFailure(FailureCode.OUT_OF_MEMORY, cause = outOfMemory)
         } finally { raw.delete() }
     }
 
@@ -350,13 +346,11 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         return copy
     }
 
-    private fun JpegSegments.Findings.describe(): String = listOfNotNull(
-        "XMP".takeIf { xmp }, "IPTC".takeIf { iptc }, "COM".takeIf { comment }, "MPF".takeIf { mpf },
-        "данные после EOI".takeIf { trailer }, "миниатюра EXIF".takeIf { exifThumbnail },
-    ).joinToString(", ")
-
-    private fun needsTransform(orientation: Int): Boolean =
-        orientation != ExifInterface.ORIENTATION_NORMAL && orientation != ExifInterface.ORIENTATION_UNDEFINED
+    /** Найденные скрытые части как имена [HiddenPart]: интерфейс переводит их в слова. */
+    private fun JpegSegments.Findings.parts(): Array<String> = listOfNotNull(
+        HiddenPart.XMP.takeIf { xmp }, HiddenPart.IPTC.takeIf { iptc }, HiddenPart.COMMENT.takeIf { comment },
+        HiddenPart.MPF.takeIf { mpf }, HiddenPart.TRAILER.takeIf { trailer }, HiddenPart.EXIF_THUMBNAIL.takeIf { exifThumbnail },
+    ).map { it.name }.toTypedArray()
 
     private fun applyExifOrientation(bitmap: Bitmap, orientation: Int): Bitmap {
         val matrix = Matrix()
@@ -420,8 +414,8 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             }
             return
         }
-        if (!allowNewFileFallback) throw IOException("Провайдер не поддерживает безопасную перезапись (rwt)")
-        val stream = resolver.openOutputStream(uri, "wt") ?: throw IOException("Невозможно открыть новый файл для записи")
+        if (!allowNewFileFallback) throw AppFailure(FailureCode.NO_SAFE_OVERWRITE)
+        val stream = resolver.openOutputStream(uri, "wt") ?: throw AppFailure(FailureCode.CANNOT_OPEN_OUTPUT)
         stream.use { destination -> FileInputStream(staged).use { it.copyTo(destination, 64 * 1024) } }
     }
 
@@ -436,7 +430,10 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
     } ?: "image"
 
     private fun uniqueName(raw: String, ext: String, index: Int): String {
-        val base = raw.substringBeforeLast('.', raw).replace(Regex("[^a-zA-Zа-яА-ЯёЁ0-9_-]"), "_").take(55).ifBlank { "photo" }
+        // Буквы и цифры любого алфавита сохраняются, остальное заменяется на "_".
+        val base = raw.substringBeforeLast('.', raw)
+            .map { if (it.isLetterOrDigit() || it == '_' || it == '-') it else '_' }
+            .joinToString("").take(55).ifBlank { "photo" }
         return "${base}_clean_${System.currentTimeMillis()}_${index + 1}.$ext"
     }
 

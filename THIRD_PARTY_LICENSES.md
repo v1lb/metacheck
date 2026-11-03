@@ -1,6 +1,6 @@
 # Сторонние компоненты и лицензии / Third-party licenses
 
-Версии указаны по `app/build.gradle.kts`. Полный список включая транзитивные зависимости: `gradle :app:dependencies`.
+Версии указаны по `gradle/libs.versions.toml` (тот же список показывает приложение: «О приложении» → «Лицензии открытого кода»). Полный список включая транзитивные зависимости: `gradle :app:dependencies`.
 
 | Компонент | Версия | Лицензия |
 |---|---|---|
@@ -8,6 +8,7 @@
 | AndroidX Core KTX | 1.17.0 | Apache License 2.0 |
 | AndroidX Lifecycle (runtime, viewmodel, compose) | 2.9.2 | Apache License 2.0 |
 | AndroidX Activity Compose | 1.10.1 | Apache License 2.0 |
+| AndroidX AppCompat (язык приложения) | 1.7.1 | Apache License 2.0 |
 | AndroidX ExifInterface | 1.4.1 | Apache License 2.0 |
 | AndroidX DataStore Preferences | 1.1.7 | Apache License 2.0 |
 | Jetpack Compose (BOM) | 2025.08.00 | Apache License 2.0 |
@@ -20,4 +21,4 @@
 ## Данные карты
 Картографические данные © участники OpenStreetMap (OpenStreetMap contributors), лицензия Open Database License 1.0.
 Подробности: https://www.openstreetmap.org/copyright
-Фрагменты карты загружаются с серверов OpenStreetMap Foundation по запросу пользователя.
+Фрагменты карты загружаются по запросу пользователя с MapTiler (© MapTiler), если в сборке задан ключ, иначе с серверов OpenStreetMap Foundation.

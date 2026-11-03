@@ -15,17 +15,20 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import com.example.metacheck.ui.LocalizedText as Text
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.pluralStringResource
+import com.example.metacheck.R
+import com.example.metacheck.ui.text.rememberMetaTexts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.metacheck.domain.model.MetaItem
-import java.util.Locale
 
 private const val MAX_VALUE_CHARS = 6000
 
+/** Подписи и значения полей локализуются здесь, по ключам ([MetaItem.key]); значения без ключа — как есть. */
 @Composable
 fun SectionCard(title: String, items: List<MetaItem>, initiallyExpanded: Boolean = false) {
     var expanded by remember(title) { mutableStateOf(initiallyExpanded) }
@@ -44,7 +47,7 @@ fun SectionCard(title: String, items: List<MetaItem>, initiallyExpanded: Boolean
                 Text(if (expanded) "−" else "+", color = MaterialTheme.colorScheme.primary)
             }
             if (!expanded) {
-                Text("${items.size} полей  ·  Нажмите, чтобы раскрыть",
+                Text(pluralStringResource(R.plurals.section_fields_collapsed, items.size, items.size),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
@@ -59,16 +62,19 @@ fun SectionCard(title: String, items: List<MetaItem>, initiallyExpanded: Boolean
 
 @Composable
 private fun ItemRow(item: MetaItem) {
-    val value = if (item.value.length > MAX_VALUE_CHARS) item.value.take(MAX_VALUE_CHARS) + "…" else item.value
+    val texts = rememberMetaTexts()
+    val label = texts.itemLabel(item)
+    val full = texts.itemValue(item)
+    val value = if (full.length > MAX_VALUE_CHARS) full.take(MAX_VALUE_CHARS) + "…" else full
     val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
     if (value.length > 42 || value.contains('\n')) {
         Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Text(item.label, style = MaterialTheme.typography.labelMedium, color = labelColor)
+            Text(label, style = MaterialTheme.typography.labelMedium, color = labelColor)
             Text(value, style = MaterialTheme.typography.bodyMedium)
         }
     } else {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            Text(item.label, style = MaterialTheme.typography.labelMedium, color = labelColor,
+            Text(label, style = MaterialTheme.typography.labelMedium, color = labelColor,
                 modifier = Modifier.weight(.46f))
             Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(.54f))
@@ -89,11 +95,4 @@ fun BannerCard(title: String, body: String, container: Color, content: Color) {
             Text(body, style = MaterialTheme.typography.bodyMedium)
         }
     }
-}
-
-fun formatSize(bytes: Long): String = when {
-    bytes < 0 -> "неизвестно"
-    bytes < 1024 -> "$bytes Б"
-    bytes < 1024 * 1024 -> "${bytes / 1024} КБ"
-    else -> String.format(Locale.US, "%.1f МБ", bytes / (1024.0 * 1024.0))
 }

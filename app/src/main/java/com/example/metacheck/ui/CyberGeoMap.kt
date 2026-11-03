@@ -10,7 +10,11 @@ import android.view.MotionEvent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import com.example.metacheck.ui.LocalizedText as Text
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
+import com.example.metacheck.R
+import com.example.metacheck.ui.text.UiText
+import com.example.metacheck.ui.text.asString
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -46,27 +50,15 @@ fun CyberGeoMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = null) {
         LiveOsmMap(gps, onSelect)
     } else {
         Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-            Text("КАРТА ВЫКЛЮЧЕНА · В СЕТЬ НИЧЕГО НЕ ОТПРАВЛЯЕТСЯ", color = cyan)
+            Text(stringResource(R.string.map_off), color = cyan)
             Text("%.6f, %.6f".format(Locale.US, gps.latitude, gps.longitude), color = cyan)
             // Пользователь должен знать, чей сервер увидит район точки: текст зависит от провайдера.
-            Text(
-                if (provider == MapTiles.Provider.MAPTILER) {
-                    "Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов MapTiler. " +
-                        "Серверы увидят ваш IP-адрес и примерный район точки. Само фото и его метаданные не отправляются."
-                } else {
-                    "Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов OpenStreetMap. " +
-                        "Серверы увидят ваш IP-адрес и примерный район точки. Само фото и его метаданные не отправляются."
-                },
-                color = Color.LightGray,
-            )
+            Text(stringResource(R.string.map_consent, provider.serviceName), color = Color.LightGray)
             Button(onClick = { enabled = true }) {
-                Text(
-                    if (provider == MapTiles.Provider.MAPTILER) "Показать карту (запрос к MapTiler)"
-                    else "Показать карту (запрос к OpenStreetMap)",
-                )
+                Text(stringResource(R.string.map_show, provider.serviceName))
             }
             if (onSelect != null) {
-                Text("Чтобы выбрать новые координаты на карте, сначала включите карту.", color = pink)
+                Text(stringResource(R.string.map_enable_first), color = pink)
             }
         }
     }
@@ -79,7 +71,9 @@ private fun LiveOsmMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = nu
     val scope = rememberCoroutineScope()
     var chosen by remember(gps.latitude, gps.longitude) { mutableStateOf(GeoPoint(gps.latitude, gps.longitude)) }
     var address by remember { mutableStateOf("") }
-    var status by remember { mutableStateOf("Нажмите на карту, чтобы выбрать точку") }
+    var status by remember { mutableStateOf<UiText>(UiText.Res(R.string.map_tap_to_pick)) }
+    // Геокодер ищет на языке интерфейса: Locale.getDefault() на Android 8–12 не знает о выборе в приложении.
+    val uiLocale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
     val map = remember(context) {
         // User-Agent с контактом, лимит кэша 50 МБ, не больше 2 загрузок одновременно (Tile Usage Policy).
         MapTiles.configure(context)
@@ -107,7 +101,8 @@ private fun LiveOsmMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = nu
     DisposableEffect(map) {
         map.overlays.add(MapEventsOverlay(object : MapEventsReceiver {
             override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-                chosen = p; status = "Выбрано: %.6f, %.6f".format(Locale.US, p.latitude, p.longitude)
+                chosen = p
+                status = UiText.Res(R.string.map_picked, "%.6f, %.6f".format(Locale.US, p.latitude, p.longitude))
                 return true
             }
             override fun longPressHelper(p: GeoPoint): Boolean = singleTapConfirmedHelper(p)
@@ -118,41 +113,34 @@ private fun LiveOsmMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = nu
     }
     LaunchedEffect(chosen) { marker.position = chosen; map.invalidate() }
     Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-        Text("LIVE OPENSTREETMAP · GPS PICKER", color = cyan)
+        Text(stringResource(R.string.map_live_eyebrow), color = cyan)
         AndroidView(factory = { map }, modifier = Modifier.fillMaxWidth().height(290.dp), update = { it.invalidate() })
         Text("%.6f, %.6f".format(Locale.US, chosen.latitude, chosen.longitude), color = cyan)
-        Text(status, color = Color.LightGray)
-        OutlinedTextField(value = address, onValueChange = { address = it }, label = { Text("Город, улица или адрес") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-        Text("Поиск адреса отправляет введённый текст системному геокодеру телефона (на многих устройствах это сервис Google).", color = Color.LightGray)
+        Text(status.asString(), color = Color.LightGray)
+        OutlinedTextField(value = address, onValueChange = { address = it }, label = { Text(stringResource(R.string.map_address_label)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+        Text(stringResource(R.string.map_geocoder_note), color = Color.LightGray)
         Button(onClick = {
             scope.launch {
-                status = "Поиск адреса…"
+                status = UiText.Res(R.string.map_searching)
                 val found = withContext(Dispatchers.IO) {
                     runCatching {
                         @Suppress("DEPRECATION")
-                        Geocoder(context, Locale.getDefault()).getFromLocationName(address, 1)?.firstOrNull()
+                        Geocoder(context, uiLocale).getFromLocationName(address, 1)?.firstOrNull()
                     }.getOrNull()
                 }
                 if (found != null) {
                     chosen = GeoPoint(found.latitude, found.longitude)
                     map.controller.animateTo(chosen)
                     map.controller.setZoom(16.0)
-                    status = "Адрес найден"
-                } else status = "Адрес не найден или геокодер недоступен"
+                    status = UiText.Res(R.string.map_address_found)
+                } else status = UiText.Res(R.string.map_address_not_found)
             }
-        }, enabled = address.isNotBlank()) { Text("Найти на карте") }
+        }, enabled = address.isNotBlank()) { Text(stringResource(R.string.map_find)) }
         if (onSelect != null) {
-            Button(onClick = { onSelect(chosen.latitude, chosen.longitude) }) { Text("Применить новые координаты") }
+            Button(onClick = { onSelect(chosen.latitude, chosen.longitude) }) { Text(stringResource(R.string.map_apply)) }
         } else {
-            Text("Выберите точку на карте, затем нажмите «Сохранить GPS в JPEG» в разделе метаданных.", color = pink)
+            Text(stringResource(R.string.map_then_save), color = pink)
         }
-        Text(
-            if (MapTiles.provider(context) == MapTiles.Provider.MAPTILER) {
-                "© MapTiler © OpenStreetMap contributors · тайлы требуют интернет; ранее загруженные доступны из кэша"
-            } else {
-                "© OpenStreetMap contributors · тайлы требуют интернет; ранее загруженные доступны из кэша"
-            },
-            color = Color.LightGray,
-        )
+        Text(stringResource(R.string.map_attribution_note, MapTiles.provider(context).attribution), color = Color.LightGray)
     }
 }

@@ -21,7 +21,11 @@ import org.osmdroid.util.MapTileIndex
  * Кэш ограничен 50 МБ (по умолчанию osmdroid держит до 600 МБ).
  */
 internal object MapTiles {
-    enum class Provider { MAPTILER, OSM }
+    /** [serviceName] и [attribution] не переводятся: это названия сервисов и обязательная подпись. */
+    enum class Provider(val serviceName: String, val attribution: String) {
+        MAPTILER("MapTiler", "© MapTiler © OpenStreetMap contributors"),
+        OSM("OpenStreetMap", "© OpenStreetMap contributors"),
+    }
 
     private const val CACHE_MAX_BYTES = 50L * 1024 * 1024
     private const val CACHE_TRIM_BYTES = 40L * 1024 * 1024

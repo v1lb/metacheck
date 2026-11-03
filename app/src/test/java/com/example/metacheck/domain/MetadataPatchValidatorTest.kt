@@ -2,6 +2,8 @@ package com.example.metacheck.domain
 
 import com.example.metacheck.domain.metadata.MetadataPatch
 import com.example.metacheck.domain.metadata.MetadataPatchValidator
+import com.example.metacheck.domain.metadata.PatchField
+import com.example.metacheck.domain.metadata.PatchIssue
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -13,7 +15,7 @@ class MetadataPatchValidatorTest {
     }
     @Test fun rejectsOnlyOneGpsCoordinate() {
         val errors = MetadataPatchValidator.validate(MetadataPatch(latitude = 41.9))
-        assertTrue(errors.any { it.contains("вместе") })
+        assertTrue(errors.toString(), errors.any { it.code == PatchIssue.Code.GPS_INCOMPLETE })
     }
     @Test fun rejectsGpsOutOfRangeAndNonFinite() {
         assertTrue(MetadataPatchValidator.validate(MetadataPatch(latitude = 91.0, longitude = 0.0)).isNotEmpty())
@@ -26,12 +28,14 @@ class MetadataPatchValidatorTest {
         assertTrue(MetadataPatchValidator.validate(MetadataPatch(removeGps = true)).isEmpty())
     }
     @Test fun rejectsMalformedDate() {
-        assertTrue(MetadataPatchValidator.validate(MetadataPatch(dateTaken = "2026:02:31 12:12:12")).isNotEmpty())
+        assertEquals(listOf(PatchIssue(PatchIssue.Code.DATE_FORMAT, PatchField.DATE_TAKEN)),
+            MetadataPatchValidator.validate(MetadataPatch(dateTaken = "2026:02:31 12:12:12")))
         assertTrue(MetadataPatchValidator.validate(MetadataPatch(dateTaken = "19.10.2026")).isNotEmpty())
     }
     @Test fun rejectsEmptyPatchAndControlCharacters() {
-        assertTrue(MetadataPatchValidator.validate(MetadataPatch()).isNotEmpty())
-        assertTrue(MetadataPatchValidator.validate(MetadataPatch(author = "a\u0000b")).isNotEmpty())
+        assertEquals(listOf(PatchIssue(PatchIssue.Code.NO_CHANGES, null)), MetadataPatchValidator.validate(MetadataPatch()))
+        assertEquals(listOf(PatchIssue(PatchIssue.Code.TEXT_INVALID, PatchField.AUTHOR)),
+            MetadataPatchValidator.validate(MetadataPatch(author = "a\u0000b")))
     }
     @Test fun checksExposureLimits() {
         assertTrue(MetadataPatchValidator.validate(MetadataPatch(exposureSeconds = 0.0)).isNotEmpty())

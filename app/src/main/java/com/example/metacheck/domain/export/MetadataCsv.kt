@@ -7,7 +7,7 @@ object MetadataCsv {
         val text = buildString {
             append("category,section,tag,value\r\n")
             for (record in records) {
-                append(listOf(record.group.title, record.section, record.label, record.value)
+                append(listOf(record.groupTitle, record.section, record.label, record.value)
                     .joinToString(",", transform = ::escape))
                 append("\r\n")
             }

@@ -52,6 +52,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.metacheck.ui.preferences.AppAppearance
 import com.example.metacheck.ui.preferences.AppLanguage
+import com.example.metacheck.ui.preferences.AppLocales
+import androidx.compose.ui.res.stringResource
+import com.example.metacheck.R
+import java.util.Locale
 import com.example.metacheck.ui.preferences.UiPreferences
 import com.example.metacheck.ui.theme.CyberPalette
 import kotlinx.coroutines.launch
@@ -61,17 +65,21 @@ import kotlinx.coroutines.launch
 @Composable
 fun OnboardingFlow(prefs: UiPreferences) {
     val selected by prefs.state.collectAsStateWithLifecycle()
-    val en = LocalUiLanguage.current == AppLanguage.EN
+    // Смена языка пересоздаёт Activity (шаг сохраняется в rememberSaveable), поэтому достаточно чтения при композиции.
+    val language = AppLocales.current()
     var step by rememberSaveable { mutableIntStateOf(0) }
     var failure by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    fun save(language: AppLanguage? = null,
-             appearance: AppAppearance? = null,
-             complete: Boolean? = null) {
+    fun save(appearance: AppAppearance? = null, complete: Boolean? = null) {
         scope.launch {
-            failure = !prefs.update(language = language, appearance = appearance, completed = complete)
+            failure = !prefs.update(appearance = appearance, completed = complete)
         }
+    }
+
+    fun skip() {
+        AppLocales.apply(AppLanguage.SYSTEM)
+        save(appearance = AppAppearance.SYSTEM, complete = true)
     }
     CyberBackdrop {
         Column(
@@ -84,7 +92,7 @@ fun OnboardingFlow(prefs: UiPreferences) {
                 horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("◈  MetaCheck", color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleLarge)
-                Text("0${step + 1} / 03", color = MaterialTheme.colorScheme.primary,
+                Text(stringResource(R.string.onboarding_step, step + 1, STEPS), color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge)
             }
             AnimatedContent(
@@ -101,83 +109,84 @@ fun OnboardingFlow(prefs: UiPreferences) {
                         0 -> {
                             Spacer(Modifier.height(24.dp))
                             NeonMark()
-                            Text("METACHECK / IMAGE INTELLIGENCE", color = MaterialTheme.colorScheme.primary,
+                            Text(stringResource(R.string.onboarding_eyebrow_intro), color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.labelMedium)
-                            Text(if (en) "See beyond\nthe image" else "Увидеть больше,\nчем изображение",
+                            Text(stringResource(R.string.onboarding_intro_title),
                                 color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.headlineLarge,
                                 textAlign = TextAlign.Center)
-                            Text(if (en) "Privacy-first image metadata analysis. Your photos stay on this device."
-                                else "Проверка метаданных и технических признаков изображения. Фото остаются на вашем устройстве.",
+                            Text(stringResource(R.string.onboarding_intro_text),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
                             GlassPanel(Modifier.fillMaxWidth()) {
                                 Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                                    CyberEyebrow("EXIF  /  XMP  /  AI SIGNALS")
+                                    CyberEyebrow(stringResource(R.string.onboarding_intro_eyebrow_panel))
                                     ScanningBars(Modifier.fillMaxWidth().height(66.dp))
-                                    Text(if (en) "Metadata analysis is not a pixel-level AI detector and cannot certify authenticity."
-                                        else "Анализ метаданных не является нейросетевой проверкой пикселей и не доказывает подлинность.",
+                                    Text(stringResource(R.string.onboarding_intro_disclaimer),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         style = MaterialTheme.typography.bodyMedium)
                                 }
                             }
-                            NeonButton(if (en) "Continue →" else "Продолжить →", { step = 1 }, Modifier.fillMaxWidth())
+                            NeonButton(stringResource(R.string.onboarding_continue), { step = 1 }, Modifier.fillMaxWidth())
                         }
                         1 -> {
                             Spacer(Modifier.height(14.dp))
-                            CyberEyebrow("02 / LANGUAGE")
-                            Text(if (en) "Choose your language" else "Выберите язык",
+                            CyberEyebrow(stringResource(R.string.onboarding_eyebrow_language))
+                            Text(stringResource(R.string.onboarding_language_title),
                                 color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.headlineMedium)
-                            Text(if (en) "The interface updates immediately. You can change the language later in Settings."
-                                else "Интерфейс переключается сразу. Язык можно поменять позже в настройках.",
+                            Text(stringResource(R.string.onboarding_language_text),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
-                            SelectTile("Русский", "RU / Русский", selected.language == AppLanguage.RU) {
-                                save(language = AppLanguage.RU)
+                            AppLanguage.entries.forEach { option ->
+                                SelectTile(stringResource(AppLocales.nameRes(option)), languageDetail(option),
+                                    option == language) { AppLocales.apply(option) }
                             }
-                            SelectTile("English", "EN / English", selected.language == AppLanguage.EN) {
-                                save(language = AppLanguage.EN)
-                            }
-                            NeonButton(if (en) "Continue →" else "Продолжить →", { step = 2 }, Modifier.fillMaxWidth())
-                            CyberOutlineButton(if (en) "Skip · use device language and theme" else "Пропустить · системные язык и тема",
-                                { save(language = AppLanguage.SYSTEM, appearance = AppAppearance.SYSTEM, complete = true) }, Modifier.fillMaxWidth())
+                            NeonButton(stringResource(R.string.onboarding_continue), { step = 2 }, Modifier.fillMaxWidth())
+                            CyberOutlineButton(stringResource(R.string.onboarding_skip), ::skip, Modifier.fillMaxWidth())
                         }
                         else -> {
                             Spacer(Modifier.height(14.dp))
-                            CyberEyebrow("03 / PERSONALIZE")
-                            Text(if (en) "Choose a theme" else "Выберите тему",
+                            CyberEyebrow(stringResource(R.string.onboarding_eyebrow_theme))
+                            Text(stringResource(R.string.onboarding_theme_title),
                                 color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.headlineMedium)
-                            Text(if (en) "Tap a preview to apply it instantly. Both themes keep text readable."
-                                else "Нажмите на миниатюру: тема применится сразу. Обе темы рассчитаны на читаемость.",
+                            Text(stringResource(R.string.onboarding_theme_text),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
                             ThemePreviewCard(dark = true, selected = selected.appearance == AppAppearance.DARK,
-                                title = if (en) "Cyber Grid Dark" else "Тёмная · Cyber Grid",
-                                subtitle = if (en) "Neon Intelligence" else "Неоновая аналитика") {
+                                title = stringResource(R.string.appearance_theme_dark),
+                                subtitle = stringResource(R.string.appearance_theme_dark_sub)) {
                                 save(appearance = AppAppearance.DARK)
                             }
                             ThemePreviewCard(dark = false, selected = selected.appearance == AppAppearance.LIGHT,
-                                title = if (en) "Clean Cyber Light" else "Светлая · Clean Cyber",
-                                subtitle = if (en) "High-contrast daylight" else "Высокий контраст днём") {
+                                title = stringResource(R.string.appearance_theme_light),
+                                subtitle = stringResource(R.string.appearance_theme_light_sub)) {
                                 save(appearance = AppAppearance.LIGHT)
                             }
-                            NeonButton(if (en) "Finish setup ✓" else "Завершить ✓",
+                            NeonButton(stringResource(R.string.onboarding_finish),
                                 { save(complete = true) }, Modifier.fillMaxWidth())
-                            CyberOutlineButton(if (en) "Skip · use device language and theme" else "Пропустить · системные язык и тема",
-                                { save(language = AppLanguage.SYSTEM, appearance = AppAppearance.SYSTEM, complete = true) }, Modifier.fillMaxWidth())
+                            CyberOutlineButton(stringResource(R.string.onboarding_skip), ::skip, Modifier.fillMaxWidth())
                         }
                     }
                 }
             }
             if (failure) {
-                Text(if (en) "Could not save preferences. Check available storage and try again."
-                    else "Не удалось сохранить настройки. Проверьте свободное место и повторите.",
+                Text(stringResource(R.string.onboarding_save_failed),
                     color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
+}
+
+private const val STEPS = 3
+
+/** Подпись под названием языка: для «Как в системе» показываем, какой язык у устройства сейчас. */
+@Composable
+private fun languageDetail(option: AppLanguage): String = when (option) {
+    AppLanguage.SYSTEM -> stringResource(R.string.onboarding_language_system_detail,
+        AppLocales.nativeName(AppLocales.systemLocale()))
+    else -> option.tag.orEmpty().uppercase(Locale.ROOT)
 }
 
 @Composable

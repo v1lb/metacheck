@@ -19,7 +19,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import com.example.metacheck.ui.LocalizedText as Text
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.example.metacheck.R
+import com.example.metacheck.domain.metadata.DailyCleanQuota
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -70,7 +73,7 @@ fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean 
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
             PulseIndicator(dangerGlow)
             Text(
-                "GPS PRIVACY SHIELD · GPS В ФАЙЛЕ",
+                stringResource(R.string.gps_shield_eyebrow),
                 color = Color(0xFFFFCCD9),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
@@ -78,17 +81,13 @@ fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean 
         }
 
         Text(
-            if (gps != null) "Место съёмки сохранено в фото"
-            else "В фотографии найдены геометки",
+            stringResource(if (gps != null) R.string.gps_shield_title_point else R.string.gps_shield_title_tags),
             color = Color.White,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.ExtraBold,
         )
         Text(
-            if (gps != null)
-                "Если отправить оригинал без очистки, получатель может увидеть координаты места съёмки."
-            else
-                "В метаданных найдены сведения о местоположении, но точные координаты прочитать не удалось.",
+            stringResource(if (gps != null) R.string.gps_shield_text_point else R.string.gps_shield_text_tags),
             color = Color.White,
             style = MaterialTheme.typography.bodyLarge,
         )
@@ -101,7 +100,7 @@ fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean 
                 .padding(horizontal = 13.dp, vertical = 11.dp),
         ) {
             Text(
-                "Это не означает, что за вами следят. Риск возникает, если передать файл с геометками.",
+                stringResource(R.string.gps_shield_not_tracking),
                 color = softText,
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -109,7 +108,7 @@ fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean 
 
         if (onWipe != null) {
             Text(
-                "Перед отправкой лучше создать копию без GPS — это простой способ защитить своё местоположение.",
+                stringResource(R.string.gps_shield_advice),
                 color = Color(0xFFB9F8FF),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
@@ -121,19 +120,19 @@ fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean 
                     .padding(5.dp),
             ) {
                 NeonButton(
-                    "Защитить фото · удалить GPS",
+                    stringResource(R.string.gps_shield_action),
                     onWipe,
                     Modifier.fillMaxWidth().testTag("gps_wipe_action"),
                 )
             }
             Text(
-                "После нажатия выберите место для новой копии. Оригинал не изменится. Отправляйте именно копию. Free: 75 обработок в сутки.",
+                stringResource(R.string.gps_shield_action_note, DailyCleanQuota.FREE_DAILY_LIMIT),
                 color = softText,
                 style = MaterialTheme.typography.bodySmall,
             )
         } else {
             Text(
-                "Чтобы убрать геометки, откройте исходную фотографию JPEG/PNG: сохранённый отчёт не содержит самого фото.",
+                stringResource(R.string.gps_shield_open_original),
                 color = softText,
                 style = MaterialTheme.typography.bodySmall,
             )
@@ -141,7 +140,7 @@ fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean 
 
         if (gps != null) {
             Text(
-                "КООРДИНАТЫ В ИСХОДНОМ ФАЙЛЕ",
+                stringResource(R.string.gps_shield_coordinates),
                 color = Color(0xFFFFCCD9),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
@@ -155,7 +154,7 @@ fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean 
             CyberGeoMap(gps)
         } else if (partialTags) {
             Text(
-                "Точку нельзя показать на карте: GPS-данные неполные или записаны в XMP/PNG.",
+                stringResource(R.string.gps_shield_partial),
                 color = softText,
                 style = MaterialTheme.typography.bodySmall,
             )

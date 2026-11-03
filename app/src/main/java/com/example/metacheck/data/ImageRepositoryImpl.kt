@@ -20,14 +20,17 @@ import com.example.metacheck.domain.model.FileInfo
 import com.example.metacheck.domain.model.ImageFormat
 import com.example.metacheck.domain.model.MetaItem
 import com.example.metacheck.domain.model.MetaReport
+import com.example.metacheck.domain.AppFailure
+import com.example.metacheck.domain.FailureCode
+import com.example.metacheck.domain.ensure
 import com.example.metacheck.domain.model.TooLargeException
+import com.example.metacheck.domain.model.ValueFormat
 import com.example.metacheck.domain.model.UnsupportedFormatException
 import com.example.metacheck.domain.repository.ImageRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class ImageRepositoryImpl(
     private val resolver: ContentResolver,
@@ -49,14 +52,15 @@ class ImageRepositoryImpl(
 
     private fun analyzeBlocking(uri: Uri): MetaReport {
         // Только content://. file:// позволил бы подсунуть путь к приватным файлам приложения.
-        require(uri.scheme == ContentResolver.SCHEME_CONTENT) { "Недопустимый источник файла" }
+        ensure(uri.scheme == ContentResolver.SCHEME_CONTENT, FailureCode.INVALID_URI)
 
         val (name, size) = queryNameAndSize(uri)
-        val mime = resolver.getType(uri) ?: "неизвестно"
+        // Пустые имя и MIME интерфейс показывает как «без имени» / «неизвестно» на языке пользователя.
+        val mime = resolver.getType(uri).orEmpty()
 
         // Размер известен заранее: буфер выделяется сразу, без удвоений и лишней копии.
         val (bytes, truncated) = resolver.openInputStream(uri)?.use { readBounded(it, MAX_SCAN_BYTES, size) }
-            ?: throw IOException("Не удалось открыть файл")
+            ?: throw AppFailure(FailureCode.CANNOT_READ_SOURCE)
 
         val format = ImageFormatDetector.detect(bytes)
         if (format == ImageFormat.UNKNOWN) throw UnsupportedFormatException()
@@ -74,7 +78,10 @@ class ImageRepositoryImpl(
         val xmpItems = xmp?.items.orEmpty()
         val pngItems = png
             .filter { it.keyword != "XML:com.adobe.xmp" }
-            .map { MetaItem(it.keyword, it.text) }
+            .map {
+                if (it.text == PngTextParser.BAD_DATA) MetaItem(it.keyword, "", format = ValueFormat.BAD_DATA)
+                else MetaItem(it.keyword, it.text)
+            }
 
         val signals = SignalEngine.evaluate(
             SignalInput(
@@ -141,7 +148,7 @@ class ImageRepositoryImpl(
     }
 
     private fun queryNameAndSize(uri: Uri): Pair<String, Long> {
-        var name = "без имени"
+        var name = ""
         var size = -1L
         resolver.query(uri, null, null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
