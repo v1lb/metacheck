@@ -226,6 +226,9 @@ class SignalEngineTest {
         assertEquals("Facebook", SignalEngine.copySource("FB_IMG_1730000000000.jpg"))
         assertEquals("Facebook / Instagram", SignalEngine.copySource("465123456_1234567890123456_789_n.jpg"))
         assertEquals("screenshot", SignalEngine.copySource("Screenshot_20261101-123000.png"))
+        // Windows и некоторые прошивки с русским интерфейсом («Снимок экрана», «Скриншот»).
+        assertEquals("screenshot", SignalEngine.copySource("\u0421\u043d\u0438\u043c\u043e\u043a \u044d\u043a\u0440\u0430\u043d\u0430 2026-11-03 180000.png"))
+        assertEquals("screenshot", SignalEngine.copySource("\u0421\u043a\u0440\u0438\u043d\u0448\u043e\u0442_20261103.jpg"))
         assertEquals(null, SignalEngine.copySource("IMG_20261101_123000.jpg"))
         assertEquals(null, SignalEngine.copySource("DSC01234.JPG"))
 

@@ -226,7 +226,7 @@ object SignalEngine {
         Regex("^\\d+_\\d+_\\d+_[no]\\.(jpe?g|webp)$", RegexOption.IGNORE_CASE) to "Facebook / Instagram",
         Regex("^viber_image_\\d{4}", RegexOption.IGNORE_CASE) to "Viber",
         Regex("^signal-\\d{4}-\\d{2}-\\d{2}", RegexOption.IGNORE_CASE) to "Signal",
-        Regex("^(Screenshot|Screen ?Shot|Screen_Recording|Capture d.écran|Schermata|Bildschirmfoto)", RegexOption.IGNORE_CASE) to SCREENSHOT,
+        Regex("^(Screenshot|Screen ?Shot|Screen_Recording|Capture d.écran|Schermata|Bildschirmfoto|\u0421\u043d\u0438\u043c\u043e\u043a \u044d\u043a\u0440\u0430\u043d\u0430|\u0421\u043a\u0440\u0438\u043d\u0448\u043e\u0442)", RegexOption.IGNORE_CASE) to SCREENSHOT,
     )
 
     internal fun copySource(fileName: String): String? =
