@@ -1,52 +1,85 @@
 package com.example.metacheck.data.metadata
 
 import android.content.Context
-import android.util.Base64
+import android.content.SharedPreferences
 import com.example.metacheck.data.crypto.Crypto
 import com.example.metacheck.domain.metadata.DailyCleanQuota
+import com.example.metacheck.domain.metadata.DailyCleanQuota.Companion.FREE_DAILY_LIMIT
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.util.Base64
 
-/** AES-256-GCM authenticated quota record, backed by Android Keystore.
- * Device-side protection is not a substitute for server-authoritative quotas.
+/**
+ * Счётчик бесплатных обработок за UTC-сутки. Запись зашифрована AES-GCM (ключ в Android Keystore),
+ * чтобы её нельзя было просто отредактировать в shared_prefs на рутованном телефоне.
+ *
+ * Политика ошибок: FAIL-OPEN.
+ * Раньше любая ошибка расшифровки превращалась в «75 из 75 на сегодня», запись больше никогда не
+ * перезаписывалась, и после сбоя Keystore бесплатный тариф блокировался навсегда. Защиты это не давало:
+ * «Очистить данные» обнуляет счётчик в любом случае.
+ *  - Повреждённая или нечитаемая запись удаляется, счёт начинается с нуля.
+ *  - Если записать на диск не удалось, счёт ведётся в памяти до конца сессии.
+ *  - Дата в записи из «будущего» (часы переводили назад) не блокирует: другой день = новый счёт.
  */
 class PreferencesDailyCleanQuota(
-    context: Context,
+    private val prefs: SharedPreferences,
     private val crypto: Crypto,
     private val clock: Clock = Clock.systemUTC(),
+    private val onError: (Throwable) -> Unit = {},
 ) : DailyCleanQuota {
-    private val prefs = context.applicationContext.getSharedPreferences("quota_secure_v2", Context.MODE_PRIVATE)
+
+    constructor(context: Context, crypto: Crypto) : this(
+        context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE),
+        crypto,
+    )
+
     private data class Record(val day: Long, val count: Int)
+
+    /** Запасной счётчик, если Keystore или диск недоступны. */
+    private var memory: Record? = null
+
     private fun utcDay(): Long = LocalDate.now(clock.withZone(ZoneOffset.UTC)).toEpochDay()
 
-    private fun record(): Record? {
-        val encoded = prefs.getString("encrypted_record", null) ?: return null
+    private fun stored(): Record? {
+        val encoded = prefs.getString(KEY, null) ?: return null
         return try {
-            val plain = crypto.decrypt(Base64.decode(encoded, Base64.NO_WRAP)).toString(Charsets.UTF_8)
+            val plain = crypto.decrypt(Base64.getDecoder().decode(encoded)).toString(Charsets.UTF_8)
             val parts = plain.split(':')
-            if (parts.size != 2) null else Record(parts[0].toLong(), parts[1].toInt().coerceIn(0, 75))
-        } catch (_: Exception) {
-            // Fail closed on corrupted or incompatible ciphertext.
-            Record(utcDay(), 75)
+            require(parts.size == 2) { "Bad quota record" }
+            Record(parts[0].toLong(), parts[1].toInt().coerceIn(0, FREE_DAILY_LIMIT))
+        } catch (e: Exception) {
+            onError(e)
+            prefs.edit().remove(KEY).apply()
+            null
         }
     }
 
-    private fun effectiveDay(previous: Record?): Long = maxOf(utcDay(), previous?.day ?: utcDay())
+    private fun countFor(day: Long, record: Record?): Int = if (record?.day == day) record.count else 0
 
-    @Synchronized override fun usedToday(): Int {
-        val previous = record() ?: return 0
-        val day = effectiveDay(previous)
-        return if (previous.day == day) previous.count else 0
+    @Synchronized
+    override fun usedToday(): Int {
+        val today = utcDay()
+        return maxOf(countFor(today, stored()), countFor(today, memory))
     }
 
-    @Synchronized override fun recordSuccess(): Boolean = try {
-        val previous = record()
-        val day = effectiveDay(previous)
-        val current = if (previous?.day == day) previous.count else 0
-        if (current >= 75) false else {
-            val blob = crypto.encrypt("$day:${current + 1}".toByteArray(Charsets.UTF_8))
-            prefs.edit().putString("encrypted_record", Base64.encodeToString(blob, Base64.NO_WRAP)).commit()
+    @Synchronized
+    override fun recordSuccess(): Boolean {
+        val today = utcDay()
+        val next = Record(today, (usedToday() + 1).coerceAtMost(FREE_DAILY_LIMIT))
+        memory = next
+        return try {
+            val blob = crypto.encrypt("${next.day}:${next.count}".toByteArray(Charsets.UTF_8))
+            prefs.edit().putString(KEY, Base64.getEncoder().encodeToString(blob)).apply()
+            true
+        } catch (e: Exception) {
+            onError(e)
+            false
         }
-    } catch (_: Exception) { false }
+    }
+
+    private companion object {
+        const val PREFS_NAME = "quota_secure_v2"
+        const val KEY = "encrypted_record"
+    }
 }
