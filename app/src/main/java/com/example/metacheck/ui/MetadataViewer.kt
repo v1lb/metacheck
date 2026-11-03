@@ -55,13 +55,16 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
     val studioVm: MetadataStudioViewModel = viewModel(factory = MetadataStudioViewModel.Factory)
     val studioBusy by studioVm.busy.collectAsStateWithLifecycle()
     // rememberSaveable: выбранная на карте точка переживает поворот экрана и выгрузку процесса.
-    var selectedLat by rememberSaveable(report.file.name) { mutableStateOf(report.gps?.latitude) }
-    var selectedLon by rememberSaveable(report.file.name) { mutableStateOf(report.gps?.longitude) }
+    // Ключ — не только имя файла: два разных фото «IMG_0001.jpg» делили бы точку на карте,
+    // и «Сохранить GPS» записал бы координаты чужого фото.
+    val reportKey = remember(report) { reportStateKey(report) }
+    var selectedLat by rememberSaveable(reportKey) { mutableStateOf(report.gps?.latitude) }
+    var selectedLon by rememberSaveable(reportKey) { mutableStateOf(report.gps?.longitude) }
     val lat = selectedLat
     val lon = selectedLon
     val selectedGps = if (lat != null && lon != null) GpsPoint(lat, lon, report.gps?.altitudeMeters) else null
     // Флаг, а не текст: текст берётся из ресурсов при показе и следует за языком интерфейса.
-    var pointChanged by rememberSaveable(report.file.name) { mutableStateOf(false) }
+    var pointChanged by rememberSaveable(reportKey) { mutableStateOf(false) }
     val saveGpsFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { destination ->
         // Параметры операции берутся из ViewModel, результат приходит сообщением внизу экрана.
         studioVm.onEditCopyDestination(destination)
@@ -70,8 +73,8 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
 
     val texts = rememberMetaTexts()
     val records = remember(report, texts) { MetadataCatalog.from(report, texts) }
-    var query by rememberSaveable(report.file.name) { mutableStateOf("") }
-    var groupId by rememberSaveable(report.file.name) { mutableStateOf("") }
+    var query by rememberSaveable(reportKey) { mutableStateOf("") }
+    var groupId by rememberSaveable(reportKey) { mutableStateOf("") }
     val group = MetadataGroup.entries.firstOrNull { it.name == groupId }
     val results = remember(records, query, group) { MetadataCatalog.filter(records, group, query) }
     val availableGroups = remember(records) { MetadataGroup.entries.filter { group -> records.any { it.group == group } } }
