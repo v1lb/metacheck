@@ -35,7 +35,11 @@ import kotlin.coroutines.resume
  *  - enableAutoServiceReconnection(): библиотека сама переподключается после разрыва связи с Play;
  *  - результат покупки разбирается полностью: PENDING, ITEM_ALREADY_OWNED, отмена, ошибка.
  */
-class PlayBillingGateway(context: Context) : BillingGateway {
+class PlayBillingGateway(
+    context: Context,
+    /** Подпись покупок (аудит, п. 26): ключ из Play Console, см. [PlayPublicKey]. */
+    private val signature: PurchaseSignature = PurchaseSignature(PlayPublicKey.BASE64),
+) : BillingGateway {
 
     override var onPurchaseUpdate: ((PurchaseEvent) -> Unit)? = null
 
@@ -52,9 +56,12 @@ class PlayBillingGateway(context: Context) : BillingGateway {
     private fun onPurchasesUpdated(result: BillingResult, purchases: List<Purchase>?) {
         val event = when (result.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
-                val ours = purchases.orEmpty().filter { it.products.contains(PRODUCT_ID) }
+                val all = purchases.orEmpty().filter { it.products.contains(PRODUCT_ID) }
+                val ours = all.filter(::isGenuine)
                 ours.forEach { acknowledgeIfNeeded(it) }
                 when {
+                    // Есть «покупка», но подпись не сходится: подделка, Pro не включаем.
+                    ours.isEmpty() && all.isNotEmpty() -> PurchaseEvent.FAILED
                     ours.any { it.purchaseState == Purchase.PurchaseState.PURCHASED } -> PurchaseEvent.COMPLETED
                     ours.any { it.purchaseState == Purchase.PurchaseState.PENDING } -> PurchaseEvent.PENDING
                     else -> PurchaseEvent.UPDATED
@@ -77,7 +84,8 @@ class PlayBillingGateway(context: Context) : BillingGateway {
                     if (result.responseCode != BillingClient.BillingResponseCode.OK) {
                         cont.resume(null)
                     } else {
-                        val ours = purchases.filter { it.products.contains(PRODUCT_ID) }
+                        // Покупки с неверной подписью не считаются: ни Pro, ни подтверждения.
+                        val ours = purchases.filter { it.products.contains(PRODUCT_ID) && isGenuine(it) }
                         // Повторное подтверждение при каждой проверке: без него через 3 дня Google вернёт деньги.
                         ours.forEach { acknowledgeIfNeeded(it) }
                         cont.resume(
@@ -130,6 +138,9 @@ class PlayBillingGateway(context: Context) : BillingGateway {
             .build()
         return client.launchBillingFlow(activity, flow).responseCode == BillingClient.BillingResponseCode.OK
     }
+
+    private fun isGenuine(purchase: Purchase): Boolean =
+        signature.isValid(purchase.originalJson, purchase.signature)
 
     /** Без подтверждения в течение 3 дней Google автоматически вернёт деньги. PENDING подтверждать нельзя. */
     private fun acknowledgeIfNeeded(purchase: Purchase) {
