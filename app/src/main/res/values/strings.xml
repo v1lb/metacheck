@@ -592,7 +592,7 @@
     <string name="gps_shield_coordinates">Coordinates in the original file</string>
     <string name="gps_shield_partial">The point cannot be shown on the map: the GPS data is incomplete or stored in XMP/PNG.</string>
     <string name="map_off">Map is off · nothing is sent</string>
-    <string name="map_consent">To show the point on a map, the app will download map tiles from %1$s servers. The servers will see your IP address and the approximate area of the point. The photo and its metadata are not sent.</string>
+    <string name="map_consent">To show the point on a map, the app will download map tiles from %1$s servers. The servers will see your IP address and where the point is, to within a few hundred metres. The photo and its metadata are not sent.</string>
     <string name="map_show">Show map (request to %1$s)</string>
     <string name="map_enable_first">To pick new coordinates on the map, turn the map on first.</string>
     <string name="map_live_eyebrow">Map · pick a point</string>
