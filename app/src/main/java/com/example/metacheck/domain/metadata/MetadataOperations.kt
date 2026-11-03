@@ -23,10 +23,21 @@ interface MetadataRewriteRepository {
     ): BatchProgress
 }
 
-/** Persistent UTC-day quota for successful single-file privacy writes. */
+/**
+ * Persistent UTC-day quota for successful single-file privacy writes.
+ * Это UX-ограничение бесплатного тарифа, а не защита: «Очистить данные» всё равно его обнуляет.
+ * Поэтому при любой ошибке хранилища квота работает в пользу пользователя (fail-open),
+ * а не блокирует бесплатный тариф навсегда.
+ */
 interface DailyCleanQuota {
     fun usedToday(): Int
+
+    /** false: счётчик не удалось сохранить на диск. Операцию пользователя это не отменяет. */
     fun recordSuccess(): Boolean
+
+    companion object {
+        const val FREE_DAILY_LIMIT = 75
+    }
 }
 
 class DailyLimitReachedException : Exception("Бесплатная очистка: 75 фотографий за день. Повторите завтра (UTC) или откройте Pro")
@@ -43,13 +54,13 @@ class MetadataStudioUseCase(
         runCatchingCancellable {
             lock.withLock {
                 val free = !entitlements.entitlement.value.isPro
-                if (free && quota.usedToday() >= 75) {
+                if (free && quota.usedToday() >= DailyCleanQuota.FREE_DAILY_LIMIT) {
                     throw DailyLimitReachedException()
                 }
                 val result = action()
-                if (free && !quota.recordSuccess()) {
-                    throw IllegalStateException("Файл создан, но не удалось сохранить счётчик лимита. Проверьте результат в выбранной папке")
-                }
+                // Файл уже записан и проверен. Сбой счётчика не повод сообщать пользователю об ошибке:
+                // раньше при сломанном Keystore каждая успешная очистка выглядела как неудачная.
+                if (free) quota.recordSuccess()
                 result
             }
         }

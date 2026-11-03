@@ -82,6 +82,17 @@ class MetadataDailyQuotaTest {
         assertEquals(0, quota.count)
     }
 
+    @Test fun counterFailureDoesNotFailSuccessfulWrite() = runBlocking {
+        val store = FakeStore()
+        val brokenCounter = object : DailyCleanQuota {
+            override fun usedToday() = 0
+            override fun recordSuccess() = false
+        }
+        val use = MetadataStudioUseCase(store, EntitlementFake(), brokenCounter)
+        assertTrue(use.strip("a", "b").isSuccess)
+        assertEquals(1, store.writes)
+    }
+
     @Test fun concurrentFreeRequestsRespect75Limit() = runBlocking {
         val store = FakeStore(); val quota = Quota()
         val use = MetadataStudioUseCase(store, EntitlementFake(), quota)
