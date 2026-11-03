@@ -1,6 +1,6 @@
 # Google Play text (English)
 
-**Title (max 30):** MetaCheck: Photo Metadata
+**Title (max 30):** MetaCheck: EXIF & GPS Remover
 
 **Short description (max 80):**
 See what your photos reveal: GPS, camera, author. Remove it in one tap.
@@ -32,7 +32,7 @@ PDF and JSON export, history of 50 reports, sending a report to your own API.
 
 App privacy:
 • Analysis runs on your device. Images are never uploaded.
-• The map (MapTiler, OpenStreetMap data) turns on only when you press its button; until then no map requests are made. Once on, the map provider sees your IP address and the approximate area of the point.
+• The map (MapTiler, OpenStreetMap data) turns on only when you press its button; until then no map requests are made. Once on, the map provider sees your IP address and where the point is on the map.
 • No accounts, ads or analytics.
 • Sending a JSON report to your own server is off by default and works only on your command.
 
