@@ -1,7 +1,7 @@
 # GPS Privacy Shield (GpsPrivacyShield.kt) и карта (CyberGeoMap.kt). (key, en, ru)
 
 S = [
-    ("gps_shield_eyebrow", "GPS PRIVACY SHIELD · GPS IN FILE", "GPS PRIVACY SHIELD · GPS В ФАЙЛЕ"),
+    ("gps_shield_eyebrow", "GPS in the file", "GPS в файле"),
     ("gps_shield_title_point", "The capture location is saved in the photo", "Место съёмки сохранено в фото"),
     ("gps_shield_title_tags", "Location tags found in the photo", "В фотографии найдены геометки"),
     ("gps_shield_text_point",
@@ -23,20 +23,20 @@ S = [
     ("gps_shield_open_original",
      "To remove location tags, open the original JPEG/PNG photo: a saved report does not contain the photo itself.",
      "Чтобы убрать геометки, откройте исходную фотографию JPEG/PNG: сохранённый отчёт не содержит самого фото."),
-    ("gps_shield_coordinates", "COORDINATES IN THE ORIGINAL FILE", "КООРДИНАТЫ В ИСХОДНОМ ФАЙЛЕ"),
+    ("gps_shield_coordinates", "Coordinates in the original file", "Координаты в исходном файле"),
     ("gps_shield_partial",
      "The point cannot be shown on the map: the GPS data is incomplete or stored in XMP/PNG.",
      "Точку нельзя показать на карте: GPS-данные неполные или записаны в XMP/PNG."),
 
     # --- Карта ---
-    ("map_off", "MAP OFF · NOTHING IS SENT OVER THE NETWORK", "КАРТА ВЫКЛЮЧЕНА · В СЕТЬ НИЧЕГО НЕ ОТПРАВЛЯЕТСЯ"),
+    ("map_off", "Map is off · nothing is sent", "Карта выключена · ничего не отправляется"),
     ("map_consent",
      "To show the point on a map, the app will download map tiles from %1$s servers. The servers will see your IP address and the approximate area of the point. The photo and its metadata are not sent.",
      "Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов %1$s. Серверы увидят ваш IP-адрес и примерный район точки. Само фото и его метаданные не отправляются."),
     ("map_show", "Show map (request to %1$s)", "Показать карту (запрос к %1$s)"),
     ("map_enable_first", "To pick new coordinates on the map, turn the map on first.",
      "Чтобы выбрать новые координаты на карте, сначала включите карту."),
-    ("map_live_eyebrow", "LIVE MAP · GPS PICKER", "LIVE MAP · GPS PICKER"),
+    ("map_live_eyebrow", "Map · pick a point", "Карта · выбор точки"),
     ("map_tap_to_pick", "Tap the map to pick a point", "Нажмите на карту, чтобы выбрать точку"),
     ("map_picked", "Selected: %1$s", "Выбрано: %1$s"),
     ("map_address_label", "City, street or address", "Город, улица или адрес"),

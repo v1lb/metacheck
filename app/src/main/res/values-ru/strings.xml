@@ -270,36 +270,36 @@
     <string name="result_tab_analysis">Анализ</string>
     <string name="result_tab_metadata">Метаданные</string>
     <string name="result_tab_map">Карта</string>
-    <string name="result_eyebrow_report">FORENSIC REPORT  /  ON-DEVICE</string>
-    <string name="result_badge_local">LOCAL</string>
+    <string name="result_eyebrow_report">Отчёт · на этом устройстве</string>
+    <string name="result_badge_local">На устройстве</string>
     <string name="result_no_gps">В этом файле нет читаемых GPS-координат. Если вы уверены, что они были, выберите оригинал фото кнопкой «Выбрать фотографию» и разрешите доступ к геометкам.</string>
-    <string name="result_eyebrow_engine">AI METADATA SIGNAL ENGINE</string>
+    <string name="result_eyebrow_engine">Метки ИИ в метаданных</string>
     <string name="result_verdict_ai">Обнаружены признаки ИИ</string>
     <string name="result_verdict_attention">Нужна дополнительная проверка</string>
     <string name="result_verdict_clean">Явных следов ИИ не найдено</string>
     <string name="result_metadata_only">Проверка только метаданных • не анализ пикселей</string>
     <string name="result_disclaimer">Результат не подтверждает подлинность снимка. Метаданные могут быть удалены или подделаны.</string>
-    <string name="result_metric_signals">ПРИЗНАКОВ</string>
-    <string name="result_metric_exif_groups">ГРУПП EXIF</string>
-    <string name="result_metric_format">ФОРМАТ</string>
+    <string name="result_metric_signals">Признаки</string>
+    <string name="result_metric_exif_groups">Группы EXIF</string>
+    <string name="result_metric_format">Формат</string>
     <string name="result_view_all_metadata">Посмотреть все метаданные →</string>
-    <string name="result_section_actions">ДЕЙСТВИЯ С ОТЧЁТОМ</string>
+    <string name="result_section_actions">Действия</string>
     <string name="result_action_copy">Копировать</string>
     <string name="result_action_pdf">Сохранить PDF</string>
     <string name="result_action_json">Экспорт JSON</string>
     <string name="result_action_clean">Удалить все метаданные</string>
     <string name="result_action_edit">Редактировать EXIF / Metadata Studio →</string>
     <string name="result_action_api">Проверить через API</string>
-    <string name="result_section_signals">РЕЗУЛЬТАТЫ СКАНИРОВАНИЯ</string>
+    <string name="result_section_signals">Что найдено</string>
     <string name="result_footer_original">Оригинальный файл даёт более полные метаданные. В истории MetaCheck хранится отчёт, но не копия фото.</string>
     <string name="result_preview_description">Проверяемое изображение: %1$s</string>
     <string name="result_preview_not_stored">Фотография не хранится в истории</string>
     <string name="result_preview_unavailable">Превью недоступно</string>
-    <string name="result_eyebrow_preview">IMAGE  /  LOCAL PREVIEW</string>
-    <string name="signal_eyebrow_ai">AI INDICATOR</string>
-    <string name="signal_eyebrow_caution">CAUTION</string>
-    <string name="signal_eyebrow_info">INFORMATION</string>
-    <string name="result_eyebrow_geolocation">GEOLOCATION / EXIF</string>
+    <string name="result_eyebrow_preview">Превью</string>
+    <string name="signal_eyebrow_ai">Признак ИИ</string>
+    <string name="signal_eyebrow_caution">Внимание</string>
+    <string name="signal_eyebrow_info">Заметка</string>
+    <string name="result_eyebrow_geolocation">Местоположение</string>
     <string name="result_lat_lon">Широта / долгота</string>
     <string name="result_altitude">Высота</string>
     <string name="result_open_in_maps">Открыть в картах</string>
@@ -307,7 +307,7 @@
     <string name="result_map_privacy_note">Карта загружается только по вашей кнопке. «Открыть в картах» передаст координаты выбранному внешнему приложению.</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">NATIVE METADATA EXPLORER  /  LOCAL</string>
+    <string name="viewer_eyebrow">Все метаданные</string>
     <string name="viewer_title">Метаданные файла</string>
     <plurals name="viewer_field_count">
         <item quantity="one">%1$d поле · просмотр прямо на устройстве</item>
@@ -321,7 +321,7 @@
     <string name="viewer_group_all">Все</string>
     <string name="viewer_found">НАЙДЕНО: %1$d</string>
     <string name="viewer_export_csv">Экспорт CSV ↗</string>
-    <string name="viewer_gps_section">GPS / ИНТЕРАКТИВНАЯ КАРТА</string>
+    <string name="viewer_gps_section">GPS и карта</string>
     <string name="viewer_save_gps">Сохранить GPS в JPEG</string>
     <string name="viewer_saving">Сохранение…</string>
     <string name="viewer_gps_jpeg_only">Запись GPS пока поддерживается только для JPEG.</string>
@@ -371,55 +371,50 @@
     <string name="main_api_dialog_title">Внешний API</string>
     <string name="main_api_waiting">Ожидание ответа сервера…</string>
     <string name="main_api_empty_response">Ответ пуст</string>
-    <string name="dash_eyebrow_secure">SECURE IMAGE INTELLIGENCE</string>
-    <string name="dash_title">Цифровая\nэкспертиза фото</string>
-    <string name="dash_subtitle">Проверьте происхождение файла, метаданные камеры и технические признаки ИИ.</string>
-    <string name="dash_eyebrow_new_scan">NEW SCAN / 001</string>
-    <string name="dash_scan_title">Исследовать изображение</string>
+    <string name="dash_eyebrow_secure">Проверка приватности фото</string>
+    <string name="dash_title">Что выдаёт ваше фото?</string>
+    <string name="dash_subtitle">Место съёмки, камера, автор и метки ИИ внутри файла. Проверьте и удалите их до отправки.</string>
     <string name="dash_scan_hint">Выбирайте исходный JPEG, PNG или HEIC: в скриншоте часть данных уже потеряна.</string>
-    <string name="dash_choose_photo">Выбрать фотографию</string>
+    <string name="dash_choose_photo">Проверить фото</string>
     <string name="dash_camera">Камера</string>
     <string name="dash_clipboard">Буфер</string>
-    <string name="dash_metric_exif">КАМЕРА И GPS</string>
-    <string name="dash_metric_xmp">МЕТАДАННЫЕ</string>
-    <string name="dash_metric_ai">МЕТКИ ГЕНЕРАЦИИ</string>
-    <string name="dash_eyebrow_studio">METADATA STUDIO</string>
+    <string name="dash_eyebrow_studio">Студия метаданных</string>
     <string name="dash_studio_features">Очистка · EXIF-редактор · пакетная обработка</string>
-    <string name="dash_open_studio">Открыть Metadata Studio →</string>
-    <string name="dash_section_analytics">ВАША АНАЛИТИКА</string>
+    <string name="dash_open_studio">Открыть студию</string>
+    <string name="dash_section_analytics">Статистика</string>
     <string name="dash_history_limit">Лимит сохранённой истории</string>
     <string name="dash_history_limit_pro">Pro: до 50 локальных отчётов</string>
     <string name="dash_history_limit_free">Free: до 10 отчётов · Pro: до 50</string>
     <string name="dash_upgrade_limit">Увеличить лимит с Pro</string>
-    <string name="dash_stat_total">ВСЕГО ОТЧЁТОВ</string>
-    <string name="dash_stat_ai">С ПРИЗНАКАМИ ИИ</string>
+    <string name="dash_stat_total">Отчётов</string>
+    <string name="dash_stat_ai">С признаками ИИ</string>
     <string name="dash_stat_gps">С GPS</string>
-    <string name="dash_stat_activity">АКТИВНОСТЬ ЗА 7 ДНЕЙ</string>
+    <string name="dash_stat_activity">За 7 дней</string>
     <string name="dash_stat_note">Статистика только по сохранённой истории, без облака и оценок подлинности.</string>
-    <string name="dash_history_title">ИСТОРИЯ ПРОВЕРОК</string>
-    <string name="dash_history_csv">CSV ↗</string>
+    <string name="dash_history_title">История</string>
+    <string name="dash_history_csv">Экспорт CSV</string>
     <string name="dash_history_empty_title">Здесь появятся отчёты</string>
     <string name="dash_history_empty">История пока пуста. Начните первую проверку.</string>
     <string name="dash_history_disabled">Сохранение истории отключено в настройках.</string>
-    <string name="dash_history_ai_badge">AI TRACE</string>
+    <string name="dash_history_ai_badge">признаки ИИ</string>
     <string name="dash_history_delete">Удалить %1$s</string>
     <string name="dash_delete_title">Удалить этот отчёт?</string>
     <string name="dash_delete_text">Отчёт будет удалён из истории. Само фото это не затронет.</string>
-    <string name="dash_pro_active">PRO ACTIVE</string>
-    <string name="dash_pro_title">METACHECK PRO</string>
+    <string name="dash_pro_active">Pro активен</string>
+    <string name="dash_pro_title">MetaCheck Pro</string>
     <string name="dash_pro_active_text">Экспорт PDF/JSON и расширенная история доступны</string>
     <string name="dash_pro_text">PDF, JSON, 50 отчётов и собственный API</string>
     <string name="dash_privacy_footer">Приватность по умолчанию: изображения не отправляются MetaCheck в сеть. Для API требуется отдельное согласие.</string>
-    <string name="loading_eyebrow">ANALYZING / ON DEVICE</string>
+    <string name="loading_eyebrow">Анализ на этом устройстве</string>
     <string name="loading_title">Сканирование метаданных</string>
     <string name="loading_text">Проверяем структуру файла, EXIF, XMP и признаки генерации.</string>
-    <string name="error_eyebrow">SCAN ERROR</string>
+    <string name="error_eyebrow">Ошибка</string>
     <string name="error_title">Не удалось проверить файл</string>
     <string name="error_choose_other">Выбрать другой файл</string>
     <string name="error_home">На главную</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">METADATA STUDIO  /  ON-DEVICE</string>
+    <string name="studio_eyebrow">На этом устройстве</string>
     <string name="studio_title">Управление метаданными</string>
     <string name="studio_quota_pro">PRO · Без ограничений на очистку</string>
     <string name="studio_quota_free">FREE · Очищено сегодня: %1$d из %2$d · Сброс в 00:00 UTC</string>
@@ -429,17 +424,17 @@
     <string name="studio_tab_edit">EXIF-редактор</string>
     <string name="studio_tab_batch">Пакетно PRO</string>
     <string name="studio_check_numbers">Проверьте числа: GPS, ISO, диафрагму и выдержку</string>
-    <string name="studio_source_eyebrow">01 / ИСХОДНОЕ ИЗОБРАЖЕНИЕ</string>
+    <string name="studio_source_eyebrow">1 · Исходное фото</string>
     <string name="studio_source_none">Файл не выбран</string>
     <string name="studio_source_selected">Изображение выбрано</string>
     <string name="studio_wait_format">Проверяется формат файла, повторите через секунду</string>
-    <string name="studio_strip_eyebrow">02 / ПОЛНАЯ ОЧИСТКА</string>
+    <string name="studio_strip_eyebrow">2 · Полная очистка</string>
     <string name="studio_strip_title">Удалить метаданные</string>
     <string name="studio_strip_text">Файл будет декодирован и сохранён заново без переносимых EXIF, XMP, IPTC и GPS. JPEG повторно сжимается; HEIC/GIF/WebP сохраняются как PNG, а анимация может потеряться. Подписи C2PA становятся недействительными.</string>
     <string name="studio_strip_save_copy">Сохранить очищенный дубликат</string>
     <string name="studio_strip_overwrite">Перезаписать оригинал с резервной копией</string>
     <string name="studio_strip_overwrite_note">Для перезаписи доступны только JPEG/PNG и только документы с правом записи. Сначала вы выберете место для полноценной резервной копии.</string>
-    <string name="studio_edit_eyebrow">02 / РЕДАКТОР EXIF</string>
+    <string name="studio_edit_eyebrow">2 · Редактор EXIF</string>
     <string name="studio_edit_gps_title">Координаты и GPS</string>
     <string name="studio_edit_remove_gps">Удалить GPS целиком</string>
     <string name="studio_field_latitude">Широта (−90…90)</string>
@@ -459,7 +454,7 @@
     <string name="studio_edit_note">Пустые поля остаются без изменений. Редактор работает с JPEG; противоречащие EXIF блоки XMP/IPTC в JPEG удаляются. Изменения не применяются к исходному файлу до сохранения. Любая правка может сделать C2PA-подписи недействительными.</string>
     <string name="studio_edit_save_copy">Сохранить изменённую копию JPEG</string>
     <string name="studio_edit_overwrite">Перезаписать JPEG с резервной копией</string>
-    <string name="studio_batch_eyebrow">BATCH STRIP / PRO</string>
+    <string name="studio_batch_eyebrow">Пакетная очистка · Pro</string>
     <string name="studio_batch_title">Массовая очистка</string>
     <string name="studio_batch_text">До 50 файлов за один запуск. Новые копии будут сохранены в выбранную папку. Оригиналы останутся неизменными.</string>
     <string name="studio_batch_selected">Выбрано: %1$d</string>
@@ -467,7 +462,7 @@
     <string name="studio_batch_choose_folder_start">Выбрать папку и запустить</string>
     <string name="studio_batch_choose_files_first">Сначала выберите файлы</string>
     <string name="studio_batch_progress">%1$d/%2$d · Успешно: %3$d · Ошибок: %4$d</string>
-    <string name="studio_batch_errors">ОШИБКИ ПО ФАЙЛАМ</string>
+    <string name="studio_batch_errors">Ошибки по файлам</string>
     <string name="studio_batch_file_error">%1$s: %2$s</string>
     <string name="studio_overwrite_title">Заменить оригинальный файл?</string>
     <string name="studio_overwrite_text">Действие нельзя гарантированно выполнить атомарно у всех файловых провайдеров. Вы сначала сохраните отдельную резервную копию; только после проверки копии будет произведена замена. При сбое приложение попытается восстановить оригинал.</string>
@@ -488,16 +483,16 @@
     <string name="studio_msg_interrupted">Операция прервана: приложение было перезапущено системой. Повторите действие; созданный пустой файл можно удалить</string>
 
     <!-- master_14_settings.py -->
-    <string name="settings_eyebrow">CONTROL CENTER / LOCAL FIRST</string>
+    <string name="settings_eyebrow">Всё хранится на этом устройстве</string>
     <string name="settings_title">Центр управления</string>
     <string name="settings_subtitle">Приватность, доступ и расширенные возможности</string>
-    <string name="settings_plan_eyebrow">PLAN / ACCESS</string>
-    <string name="settings_plan_free">METACHECK FREE</string>
+    <string name="settings_plan_eyebrow">Тариф</string>
+    <string name="settings_plan_free">MetaCheck Free</string>
     <string name="settings_plan_pro_text">У вас доступен расширенный экспорт и API.</string>
     <string name="settings_plan_free_text">Бесплатно: анализ, GPS Privacy Shield и обработка до %1$d фото в сутки. Pro: безлимитная очистка, пакетная обработка, PDF/JSON.</string>
     <string name="settings_pro_features">Возможности Pro</string>
     <string name="settings_remove_license">Отключить лицензию</string>
-    <string name="settings_section_history">ЛОКАЛЬНАЯ ИСТОРИЯ</string>
+    <string name="settings_section_history">История</string>
     <string name="settings_save_history">Сохранять отчёты</string>
     <string name="settings_save_history_text">Шифрование через Android Keystore. Фотографии не копируются. Free: 10, Pro: 50.</string>
     <string name="settings_clear_history">Удалить историю с телефона</string>
@@ -505,7 +500,7 @@
     <string name="settings_clear_text">Это действие удалит сохранённые отчёты без возможности восстановления.</string>
     <string name="settings_msg_history_cleared">История удалена</string>
     <string name="settings_msg_history_clear_failed">Не удалось удалить историю. Повторите попытку.</string>
-    <string name="settings_section_api">СОБСТВЕННЫЙ API</string>
+    <string name="settings_section_api">Собственный API</string>
     <string name="settings_api_enabled">Отправлять JSON-отчёт</string>
     <string name="settings_api_enabled_text">Только с подтверждением и только в Pro. Исходное изображение не передаётся.</string>
     <string name="settings_api_connection">Настройки соединения</string>
@@ -524,10 +519,10 @@
     <string name="settings_api_tls13_text">Работает с совместимыми серверами на Android 10+.</string>
     <string name="settings_api_pin">SHA-256 публичного ключа (base64)</string>
     <string name="settings_api_pin_note">Необязательный pin сертификата сервера.</string>
-    <string name="settings_security_eyebrow">SECURITY STATUS</string>
+    <string name="settings_security_eyebrow">Безопасность</string>
     <string name="settings_security_title">Хранение только на устройстве</string>
     <string name="settings_security_text">Сеть используется только по вашему действию: карта, поиск адреса и внешний API (если включён). Google Play проверяет покупку Pro.</string>
-    <string name="appearance_section">ЯЗЫК И ОФОРМЛЕНИЕ</string>
+    <string name="appearance_section">Язык и оформление</string>
     <string name="appearance_language">Язык приложения</string>
     <string name="appearance_language_system">Как в системе</string>
     <string name="appearance_language_current">Сейчас: %1$s</string>
@@ -543,17 +538,17 @@
     <string name="appearance_save_failed">Не удалось сохранить настройку</string>
 
     <!-- master_15_onboarding.py -->
-    <string name="onboarding_eyebrow_intro">METACHECK / IMAGE INTELLIGENCE</string>
+    <string name="onboarding_eyebrow_intro">Приватность фото</string>
     <string name="onboarding_intro_title">Увидеть больше,\nчем изображение</string>
     <string name="onboarding_intro_text">Проверка метаданных и технических признаков изображения. Фото остаются на вашем устройстве.</string>
-    <string name="onboarding_intro_eyebrow_panel">EXIF  /  XMP  /  AI SIGNALS</string>
+    <string name="onboarding_intro_eyebrow_panel">EXIF · XMP · метки ИИ</string>
     <string name="onboarding_intro_disclaimer">Анализ метаданных не является нейросетевой проверкой пикселей и не доказывает подлинность.</string>
     <string name="onboarding_continue">Продолжить →</string>
-    <string name="onboarding_eyebrow_language">02 / LANGUAGE</string>
+    <string name="onboarding_eyebrow_language">Шаг 2 · Язык</string>
     <string name="onboarding_language_title">Выберите язык</string>
     <string name="onboarding_language_text">Интерфейс переключается сразу. Язык можно поменять позже в настройках.</string>
     <string name="onboarding_language_system_detail">Язык устройства: %1$s</string>
-    <string name="onboarding_eyebrow_theme">03 / PERSONALIZE</string>
+    <string name="onboarding_eyebrow_theme">Шаг 3 · Тема</string>
     <string name="onboarding_theme_title">Выберите тему</string>
     <string name="onboarding_theme_text">Нажмите на миниатюру: тема применится сразу. Обе темы рассчитаны на читаемость.</string>
     <string name="onboarding_finish">Завершить ✓</string>
@@ -584,7 +579,7 @@
     <string name="pro_msg_key_accepted">Ключ принят</string>
 
     <!-- master_17_gps_map.py -->
-    <string name="gps_shield_eyebrow">GPS PRIVACY SHIELD · GPS В ФАЙЛЕ</string>
+    <string name="gps_shield_eyebrow">GPS в файле</string>
     <string name="gps_shield_title_point">Место съёмки сохранено в фото</string>
     <string name="gps_shield_title_tags">В фотографии найдены геометки</string>
     <string name="gps_shield_text_point">Если отправить оригинал без очистки, получатель может увидеть координаты места съёмки.</string>
@@ -594,13 +589,13 @@
     <string name="gps_shield_action">Защитить фото · удалить GPS</string>
     <string name="gps_shield_action_note">После нажатия выберите место для новой копии. Оригинал не изменится. Отправляйте именно копию. Free: до %1$d фото в сутки.</string>
     <string name="gps_shield_open_original">Чтобы убрать геометки, откройте исходную фотографию JPEG/PNG: сохранённый отчёт не содержит самого фото.</string>
-    <string name="gps_shield_coordinates">КООРДИНАТЫ В ИСХОДНОМ ФАЙЛЕ</string>
+    <string name="gps_shield_coordinates">Координаты в исходном файле</string>
     <string name="gps_shield_partial">Точку нельзя показать на карте: GPS-данные неполные или записаны в XMP/PNG.</string>
-    <string name="map_off">КАРТА ВЫКЛЮЧЕНА · В СЕТЬ НИЧЕГО НЕ ОТПРАВЛЯЕТСЯ</string>
+    <string name="map_off">Карта выключена · ничего не отправляется</string>
     <string name="map_consent">Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов %1$s. Серверы увидят ваш IP-адрес и примерный район точки. Само фото и его метаданные не отправляются.</string>
     <string name="map_show">Показать карту (запрос к %1$s)</string>
     <string name="map_enable_first">Чтобы выбрать новые координаты на карте, сначала включите карту.</string>
-    <string name="map_live_eyebrow">LIVE MAP · GPS PICKER</string>
+    <string name="map_live_eyebrow">Карта · выбор точки</string>
     <string name="map_tap_to_pick">Нажмите на карту, чтобы выбрать точку</string>
     <string name="map_picked">Выбрано: %1$s</string>
     <string name="map_address_label">Город, улица или адрес</string>
@@ -614,7 +609,7 @@
     <string name="map_attribution_note">%1$s · тайлы требуют интернет; ранее загруженные доступны из кэша</string>
 
     <!-- master_18_about.py -->
-    <string name="about_eyebrow">ABOUT</string>
+    <string name="about_eyebrow">О приложении</string>
     <string name="about_title">О приложении</string>
     <string name="about_version">MetaCheck %1$s</string>
     <string name="about_privacy">Политика конфиденциальности</string>
@@ -629,7 +624,7 @@
     <string name="licenses_map_tiles">Фрагменты карты загружаются с MapTiler (© MapTiler), если он настроен, иначе с серверов OpenStreetMap Foundation.</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">PRIVACY EXPOSURE</string>
+    <string name="privacy_eyebrow">Приватность</string>
     <string name="privacy_title">Что раскрывает это фото</string>
     <string name="privacy_hint">Это увидит любой, кому вы отправите оригинал файла.</string>
     <string name="privacy_none_text">В метаданных нет координат, имён и серийных номеров устройства.</string>

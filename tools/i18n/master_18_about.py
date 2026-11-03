@@ -2,7 +2,7 @@
 # Адреса документов тоже ресурсы: каждая локаль открывает политику на своём языке.
 
 S = [
-    ("about_eyebrow", "ABOUT", "ABOUT"),
+    ("about_eyebrow", "About", "О приложении"),
     ("about_title", "About the app", "О приложении"),
     ("about_version", "MetaCheck %1$s", "MetaCheck %1$s"),
     ("about_privacy", "Privacy Policy", "Политика конфиденциальности"),

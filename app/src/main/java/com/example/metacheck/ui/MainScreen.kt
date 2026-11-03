@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -47,6 +48,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -261,7 +272,7 @@ fun MainScreen(
                 TopAppBar(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("◈", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleLarge)
+                            Icon(Icons.Filled.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Text(
                                 if (showStudio) stringResource(R.string.studio_name)
                                 else if (showSettings) stringResource(R.string.main_title_settings)
@@ -470,108 +481,45 @@ private fun Dashboard(
     val dateFormat = remember(locale) {
         SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(locale, "ddMMjjmm"), locale)
     }
+    // Порядок: главное действие и объяснение, затем история, студия, статистика и Pro.
+    // Раньше новый пользователь видел пять блоков подряд до списка своих проверок.
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(17.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                    PulseIndicator(); CyberEyebrow(stringResource(R.string.dash_eyebrow_secure))
-                }
-                Text(stringResource(R.string.dash_title), style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onSurface)
-                Text(stringResource(R.string.dash_subtitle),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
-            }
-        }
-        item {
             GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.primary) {
-                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween) {
-                        CyberEyebrow(stringResource(R.string.dash_eyebrow_new_scan))
-                        Text("⌁", color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.headlineMedium)
+                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Icon(Icons.Filled.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp))
+                        CyberEyebrow(stringResource(R.string.dash_eyebrow_secure))
                     }
-                    Text(stringResource(R.string.dash_scan_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+                    Text(stringResource(R.string.dash_title), style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSurface)
+                    Text(stringResource(R.string.dash_subtitle),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyLarge)
+                    NeonButton(stringResource(R.string.dash_choose_photo), onPick, Modifier.fillMaxWidth().height(56.dp),
+                        icon = Icons.Filled.AddPhotoAlternate)
+                    Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                        CyberOutlineButton(stringResource(R.string.dash_camera), onCamera, Modifier.weight(1f), icon = Icons.Filled.PhotoCamera)
+                        CyberOutlineButton(stringResource(R.string.dash_clipboard), onClipboard, Modifier.weight(1f), icon = Icons.Filled.ContentPaste)
+                    }
                     Text(stringResource(R.string.dash_scan_hint),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
-                    ScanningBars(Modifier.fillMaxWidth().height(52.dp))
-                    NeonButton("＋  " + stringResource(R.string.dash_choose_photo), onPick, Modifier.fillMaxWidth())
-                    Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                        CyberOutlineButton("◎  " + stringResource(R.string.dash_camera), onCamera, Modifier.weight(1f))
-                        CyberOutlineButton("▣  " + stringResource(R.string.dash_clipboard), onClipboard, Modifier.weight(1f))
-                    }
-                }
-            }
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                MetricPanel("EXIF", stringResource(R.string.dash_metric_exif), Modifier.weight(1f))
-                MetricPanel("XMP", stringResource(R.string.dash_metric_xmp), Modifier.weight(1f), MaterialTheme.colorScheme.secondary)
-                MetricPanel("AI", stringResource(R.string.dash_metric_ai), Modifier.weight(1f), MaterialTheme.colorScheme.tertiary)
-            }
-        }
-        item {
-            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
-                Column(Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                    CyberEyebrow(stringResource(R.string.dash_eyebrow_studio))
-                    Text(stringResource(R.string.dash_studio_features),
-                        color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleMedium)
-                    CyberOutlineButton(stringResource(R.string.dash_open_studio), onStudio, Modifier.fillMaxWidth())
-                }
-            }
-        }
-        item { SectionLabel(stringResource(R.string.dash_section_analytics)) }
-        item {
-            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(stringResource(R.string.dash_history_limit), color = MaterialTheme.colorScheme.onSurface,
-                            style = MaterialTheme.typography.titleMedium)
-                        Text("${history.size} / $historyLimit", color = MaterialTheme.colorScheme.tertiary)
-                    }
-                    LinearProgressIndicator(
-                        progress = { (history.size.toFloat() / historyLimit).coerceIn(0f, 1f) },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.tertiary,
-                        trackColor = MaterialTheme.colorScheme.outline,
-                    )
-                    Text(stringResource(if (isPro) R.string.dash_history_limit_pro else R.string.dash_history_limit_free),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                    if (!isPro) CyberOutlineButton(stringResource(R.string.dash_upgrade_limit), onUpgrade, Modifier.fillMaxWidth())
-                }
-            }
-        }
-        item {
-            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
-                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                        Column(Modifier.weight(1f)) {
-                            CyberEyebrow(stringResource(R.string.dash_stat_total))
-                            Text("${insight.total}", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
-                        }
-                        Column(Modifier.weight(1f)) {
-                            CyberEyebrow(stringResource(R.string.dash_stat_ai), color = MaterialTheme.colorScheme.secondary)
-                            Text("${insight.aiEvidenceCount}", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
-                        }
-                        Column(Modifier.weight(1f)) {
-                            CyberEyebrow(stringResource(R.string.dash_stat_gps), color = MaterialTheme.colorScheme.tertiary)
-                            Text("${insight.gpsCount}", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
-                        }
-                    }
-                    CyberEyebrow(stringResource(R.string.dash_stat_activity))
-                    ActivityChart(insight.lastSevenDays, Modifier.fillMaxWidth().height(78.dp))
-                    Text(stringResource(R.string.dash_stat_note),
                         color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
         item {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+            Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                CyberEyebrow(stringResource(R.string.dash_history_title))
-                Text(stringResource(R.string.dash_history_csv), modifier = Modifier.clickable { onCsv() }.padding(8.dp), color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.dash_history_title), style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface)
+                if (history.isNotEmpty()) TextButton(onClick = onCsv) {
+                    Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Text(stringResource(R.string.dash_history_csv), modifier = Modifier.padding(start = 6.dp))
+                }
             }
         }
         if (history.isEmpty()) item {
@@ -587,6 +535,9 @@ private fun Dashboard(
             GlassPanel(Modifier.fillMaxWidth(), if (entry.hasAiEvidence) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary) {
                 Row(Modifier.fillMaxWidth().clickable { onOpen(entry.id) }.padding(start = 15.dp, top = 10.dp, bottom = 10.dp, end = 5.dp),
                     verticalAlignment = Alignment.CenterVertically) {
+                    Icon(if (entry.hasGps) Icons.Filled.LocationOn else Icons.Filled.Image, contentDescription = null,
+                        tint = if (entry.hasGps) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(end = 12.dp))
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(entry.fileName.ifBlank { stringResource(R.string.common_unnamed) }, maxLines = 1, overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleMedium)
@@ -601,17 +552,72 @@ private fun Dashboard(
             }
         }
         item {
+            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
+                Row(Modifier.fillMaxWidth().clickable(onClick = onStudio).padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Icon(Icons.Filled.Tune, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Text(stringResource(R.string.dash_eyebrow_studio), style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(R.string.dash_studio_features),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    }
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.dash_open_studio),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+        if (history.isNotEmpty()) item {
             GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
-                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("◈", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.tertiary)
+                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(stringResource(R.string.dash_section_analytics), style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface)
+                    Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                        Column(Modifier.weight(1f)) {
+                            CyberEyebrow(stringResource(R.string.dash_stat_total))
+                            Text("${insight.total}", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                        Column(Modifier.weight(1f)) {
+                            CyberEyebrow(stringResource(R.string.dash_stat_ai), color = MaterialTheme.colorScheme.secondary)
+                            Text("${insight.aiEvidenceCount}", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                        Column(Modifier.weight(1f)) {
+                            CyberEyebrow(stringResource(R.string.dash_stat_gps), color = MaterialTheme.colorScheme.tertiary)
+                            Text("${insight.gpsCount}", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                    }
+                    CyberEyebrow(stringResource(R.string.dash_stat_activity))
+                    ActivityChart(insight.lastSevenDays, Modifier.fillMaxWidth().height(64.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(stringResource(R.string.dash_history_limit), color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodySmall)
+                        Text("${history.size} / $historyLimit", color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodySmall)
+                    }
+                    LinearProgressIndicator(
+                        progress = { (history.size.toFloat() / historyLimit).coerceIn(0f, 1f) },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.tertiary,
+                        trackColor = MaterialTheme.colorScheme.outline,
+                    )
+                    Text(stringResource(if (isPro) R.string.dash_history_limit_pro else R.string.dash_history_limit_free),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.dash_stat_note),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+        item {
+            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
+                Row(Modifier.fillMaxWidth().then(if (isPro) Modifier else Modifier.clickable(onClick = onUpgrade)).padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Icon(Icons.Filled.WorkspacePremium, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(if (isPro) R.string.dash_pro_active else R.string.dash_pro_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         Text(stringResource(if (isPro) R.string.dash_pro_active_text else R.string.dash_pro_text),
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
-                    if (!isPro) Text("↗", modifier = Modifier.clickable { onUpgrade() }.padding(8.dp),
-                        color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleLarge)
+                    if (!isPro) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.dash_upgrade_limit),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }

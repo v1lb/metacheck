@@ -57,7 +57,6 @@ fun PaywallDialog(vm: ProViewModel) {
             // Прокрутка: на маленьком экране с открытой клавиатурой (поле ключа) текст и кнопки обрезались.
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 CyberEyebrow(stringResource(R.string.pro_eyebrow), color = MaterialTheme.colorScheme.primary)
-                ScanningBars(Modifier.fillMaxWidth().height(38.dp))
                 Text(stringResource(R.string.pro_free_features, DailyCleanQuota.FREE_DAILY_LIMIT))
                 Text(stringResource(R.string.pro_pro_features))
                 Text(stringResource(R.string.pro_one_time),

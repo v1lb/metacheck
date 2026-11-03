@@ -1,6 +1,6 @@
 # Индекс приватности и «Очистить и отправить».
 S = [
-    ("privacy_eyebrow", "PRIVACY EXPOSURE", "PRIVACY EXPOSURE"),
+    ("privacy_eyebrow", "Privacy", "Приватность"),
     ("privacy_title", "What this photo reveals", "Что раскрывает это фото"),
     ("privacy_hint", "Anyone you send the original file to can see this.",
      "Это увидит любой, кому вы отправите оригинал файла."),
