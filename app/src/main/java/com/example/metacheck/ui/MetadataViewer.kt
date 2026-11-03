@@ -1,18 +1,12 @@
 package com.example.metacheck.ui
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Button
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.exifinterface.media.ExifInterface
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.metacheck.domain.metadata.MetadataPatch
 import com.example.metacheck.domain.model.GpsPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.util.Locale
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -50,36 +44,22 @@ import com.example.metacheck.ui.theme.CyberPalette
 /** Accessible, searchable native viewer for every EXIF/XMP/PNG field actually extracted. */
 @Composable
 fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? = null) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var selectedGps by remember(report.file.name) { mutableStateOf(report.gps) }
-    var saveStatus by remember(report.file.name) { mutableStateOf("") }
+    // Запись GPS идёт через тот же путь, что и редактор EXIF в студии (аудит, п. 15):
+    // дневной лимит Free, проверка JPEG по сигнатуре, проверка координат, запись через staging-файл
+    // с обрезкой ("rwt") и сверкой SHA-256 сохранённого файла. Раньше здесь был отдельный код в обход всего этого.
+    val studioVm: MetadataStudioViewModel = viewModel(factory = MetadataStudioViewModel.Factory)
+    val studioBusy by studioVm.busy.collectAsStateWithLifecycle()
+    // rememberSaveable: выбранная на карте точка переживает поворот экрана и выгрузку процесса.
+    var selectedLat by rememberSaveable(report.file.name) { mutableStateOf(report.gps?.latitude) }
+    var selectedLon by rememberSaveable(report.file.name) { mutableStateOf(report.gps?.longitude) }
+    val lat = selectedLat
+    val lon = selectedLon
+    val selectedGps = if (lat != null && lon != null) GpsPoint(lat, lon, report.gps?.altitudeMeters) else null
+    var saveStatus by rememberSaveable(report.file.name) { mutableStateOf("") }
     val saveGpsFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { destination ->
-        if (destination != null && sourceUri != null && selectedGps != null) {
-            val point = selectedGps!!
-            scope.launch {
-                saveStatus = "Сохранение…"
-                saveStatus = withContext(Dispatchers.IO) {
-                    runCatching {
-                        val temp = File.createTempFile("metacheck-gps-", ".jpg", context.cacheDir)
-                        try {
-                            context.contentResolver.openInputStream(Uri.parse(sourceUri)).use { input ->
-                                requireNotNull(input) { "Не удалось открыть исходный файл" }
-                                temp.outputStream().use { output -> input.copyTo(output) }
-                            }
-                            val exif = ExifInterface(temp.absolutePath)
-                            exif.setLatLong(point.latitude, point.longitude)
-                            exif.saveAttributes()
-                            context.contentResolver.openOutputStream(destination, "w").use { output ->
-                                requireNotNull(output) { "Не удалось открыть файл назначения" }
-                                temp.inputStream().use { input -> input.copyTo(output) }
-                            }
-                            "GPS сохранён в новую копию JPEG"
-                        } finally { temp.delete() }
-                    }.getOrElse { "Ошибка сохранения: ${it.message}" }
-                }
-            }
-        }
+        // Параметры операции берутся из ViewModel, результат приходит сообщением внизу экрана.
+        studioVm.onEditCopyDestination(destination)
+        if (destination != null) saveStatus = ""
     }
 
     val records = remember(report) { MetadataCatalog.from(report) }
@@ -137,14 +117,20 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
                 SectionLabel("GPS / ИНТЕРАКТИВНАЯ КАРТА")
                 val point = selectedGps
                 if (point != null) {
-                    CyberGeoMap(gps = point, onSelect = { lat, lon ->
-                        selectedGps = GpsPoint(lat, lon, point.altitudeMeters)
+                    CyberGeoMap(gps = point, onSelect = { newLat, newLon ->
+                        selectedLat = newLat
+                        selectedLon = newLon
                         saveStatus = "Точка выбрана. Сохраните копию фотографии."
                     })
                     Button(
-                        enabled = sourceUri != null && report.file.format.name == "JPEG",
-                        onClick = { saveGpsFile.launch("gps-${report.file.name.substringBeforeLast('.')}.jpg") }
-                    ) { Text("Сохранить GPS в JPEG") }
+                        enabled = sourceUri != null && report.file.format.name == "JPEG" && !studioBusy,
+                        onClick = {
+                            if (sourceUri != null) {
+                                studioVm.requestEditCopy(sourceUri, MetadataPatch(latitude = point.latitude, longitude = point.longitude))
+                                saveGpsFile.launch("gps-${report.file.name.substringBeforeLast('.')}.jpg")
+                            }
+                        },
+                    ) { Text(if (studioBusy) "Сохранение…" else "Сохранить GPS в JPEG") }
                     if (report.file.format.name != "JPEG") {
                         Text("Запись GPS пока поддерживается только для JPEG.")
                     }
