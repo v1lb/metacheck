@@ -75,6 +75,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metacheck.domain.analytics.HistoryInsights
@@ -120,6 +122,13 @@ fun MainScreen(
     LaunchedEffect(message) {
         message?.let { snackbar.showSnackbar(localize(it, uiLanguage)); viewModel.consumeMessage() }
     }
+    val proMessage by proVm.message.collectAsStateWithLifecycle()
+    LaunchedEffect(proMessage) {
+        proMessage?.let { snackbar.showSnackbar(localize(it, uiLanguage)); proVm.consumeMessage() }
+    }
+    // Google требует сверять покупки при возврате в приложение: отложенные платежи, возвраты,
+    // покупки на другом устройстве. Срабатывает и при первом показе экрана.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { proVm.refresh() }
 
     // OpenDocument preserves more of the source file's original metadata than a transcoding photo picker.
     // rememberSaveable: системный диалог разрешения может пересоздать Activity, выбранное фото не должно теряться.

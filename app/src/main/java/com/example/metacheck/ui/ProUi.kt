@@ -35,6 +35,7 @@ import java.util.Date
 fun PaywallDialog(vm: ProViewModel) {
     val price by vm.price.collectAsStateWithLifecycle()
     val info by vm.info.collectAsStateWithLifecycle()
+    val entitlement by vm.entitlement.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var keyInput by remember { mutableStateOf("") }
 
@@ -67,12 +68,26 @@ fun PaywallDialog(vm: ProViewModel) {
                         Text("Применить ключ")
                     }
                 }
+                if (entitlement.purchasePending) {
+                    Text("Платёж ожидает подтверждения. Pro включится автоматически после оплаты.",
+                        color = MaterialTheme.colorScheme.primary)
+                }
                 info?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
             }
         },
         confirmButton = {
-            Button(onClick = { context.findActivity()?.let(vm::buy) }, enabled = price != null) {
-                Text(if (price != null) "Купить за $price" else "Покупка недоступна")
+            Button(
+                onClick = { context.findActivity()?.let(vm::buy) },
+                // Второй платёж поверх ожидающего Play всё равно отклонит.
+                enabled = price != null && !entitlement.purchasePending,
+            ) {
+                Text(
+                    when {
+                        entitlement.purchasePending -> "Ожидает оплаты"
+                        price != null -> "Купить за $price"
+                        else -> "Покупка недоступна"
+                    },
+                )
             }
         },
         dismissButton = { TextButton(onClick = vm::dismissPaywall) { Text("Закрыть") } },
@@ -81,7 +96,7 @@ fun PaywallDialog(vm: ProViewModel) {
 
 /** Строка о состоянии Pro для экрана настроек. */
 fun proStatusText(e: Entitlement): String = when (e.source) {
-    ProSource.NONE -> "Бесплатная версия"
+    ProSource.NONE -> if (e.purchasePending) "Бесплатная версия · платёж Pro ожидает подтверждения" else "Бесплатная версия"
     ProSource.PLAY -> "Pro активен (покупка в Google Play)"
     ProSource.LICENSE -> {
         val until = e.licenseExpiresAt?.let { " до " + DateFormat.getDateInstance().format(Date(it * 1000)) } ?: ""

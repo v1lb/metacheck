@@ -10,6 +10,7 @@ import com.example.metacheck.MetaCheckApplication
 import com.example.metacheck.domain.model.Entitlement
 import com.example.metacheck.domain.repository.EntitlementRepository
 import kotlinx.coroutines.CancellationException
+import com.example.metacheck.domain.model.PurchaseEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,12 +29,40 @@ class ProViewModel(private val repository: EntitlementRepository) : ViewModel() 
     private val _info = MutableStateFlow<String?>(null)
     val info: StateFlow<String?> = _info.asStateFlow()
 
+    /** Сообщения о покупке для snackbar (показываются и при закрытом окне Pro). */
+    private val _message = MutableStateFlow<String?>(null)
+    val message: StateFlow<String?> = _message.asStateFlow()
+
     init {
-        // refresh() по контракту не бросает, try/catch оставлен как второй рубеж: исключение
-        // в viewModelScope без обработчика убивает процесс.
         viewModelScope.launch {
+            repository.purchaseEvents.collect { event ->
+                messageFor(event)?.let { _message.value = it }
+                if (event == PurchaseEvent.COMPLETED || event == PurchaseEvent.ALREADY_OWNED) _paywallVisible.value = false
+            }
+        }
+    }
+
+    /**
+     * Сверка с Google Play. Вызывается на каждом ON_RESUME: так подхватываются отложенные платежи,
+     * оплаченные вне приложения, и возвраты денег. Первый вызов приходится на старт экрана.
+     */
+    fun refresh() {
+        viewModelScope.launch {
+            // refresh() по контракту не бросает, try/catch оставлен как второй рубеж.
             try { repository.refresh() } catch (e: CancellationException) { throw e } catch (_: Exception) { }
         }
+    }
+
+    fun consumeMessage() {
+        _message.value = null
+    }
+
+    private fun messageFor(event: PurchaseEvent): String? = when (event) {
+        PurchaseEvent.COMPLETED -> "Pro активирован. Спасибо за покупку!"
+        PurchaseEvent.PENDING -> "Платёж ожидает подтверждения. Pro включится автоматически после оплаты."
+        PurchaseEvent.ALREADY_OWNED -> "Покупка Pro восстановлена"
+        PurchaseEvent.FAILED -> "Покупка не завершена. Попробуйте ещё раз позже."
+        PurchaseEvent.CANCELED, PurchaseEvent.UPDATED -> null
     }
 
     fun openPaywall() {
