@@ -55,6 +55,13 @@ check('Release workflows check permissions of the built app',
 proguard = (ROOT / 'app/proguard-rules.pro').read_text(encoding='utf-8')
 check('R8 keeps Kotlin null checks (no -assumenosideeffects for Intrinsics)',
       not re.search(r'^\s*-assumenosideeffects\s+class\s+kotlin\.jvm\.internal\.Intrinsics', proguard, re.M))
+wrapper_props = ROOT / 'gradle/wrapper/gradle-wrapper.properties'
+check('Gradle Wrapper present with pinned SHA-256',
+      (ROOT / 'gradlew').is_file() and (ROOT / 'gradle/wrapper/gradle-wrapper.jar').is_file() and
+      wrapper_props.is_file() and re.search(r'^distributionSha256Sum=[0-9a-f]{64}$', wrapper_props.read_text(), re.M))
+check('Workflows build with ./gradlew, not a system Gradle',
+      not any(re.search(r'(run|script):\s*gradle\s', (ROOT / '.github/workflows' / n).read_text(encoding='utf-8'))
+              for n in ('ci.yml', 'build-apk.yml', 'release-aab.yml', 'android-instrumentation.yml')))
 workflows = ROOT / '.github/workflows'
 release_wf = [(workflows / n).read_text(encoding='utf-8') for n in ('release-aab.yml', 'build-apk.yml') if (workflows / n).is_file()]
 def code_lines(text):

@@ -6,8 +6,9 @@
    в Play Console идентификатор изменить нельзя. `namespace` (пакет в коде) трогать не нужно.
 2. Нужна свежая Android Studio: проект использует AGP 8.13, Gradle 8.14.3, Kotlin 2.2 и compileSdk/targetSdk 36. Версии всех зависимостей: `gradle/libs.versions.toml`.
    Если Sync просит обновить плагин, соглашайся через Upgrade Assistant.
-3. В архиве нет `gradlew` и `gradle-wrapper.jar`. Android Studio обходится без них. Для командной строки
-   один раз выполни `gradle wrapper --gradle-version 8.14.3` (нужен установленный Gradle), после этого работает `./gradlew`.
+3. Сборка идёт через Gradle Wrapper (`./gradlew`, в Windows `gradlew.bat`): он сам скачивает Gradle 8.14.3
+   и сверяет архив по SHA-256 из `gradle/wrapper/gradle-wrapper.properties`. Отдельно ставить Gradle не нужно,
+   Android Studio использует ту же версию. Обновлять так: `./gradlew wrapper --gradle-version <версия> --gradle-distribution-sha256-sum <sha>`.
 4. Проверь, что проходят тесты: `./gradlew test`. UI-тесты (нужен телефон или эмулятор): `./gradlew connectedDebugAndroidTest`.
 
 ## 1. Ключ загрузки (делается один раз)
