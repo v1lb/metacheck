@@ -5,13 +5,13 @@
 | Компонент | Версия | Лицензия |
 |---|---|---|
 | osmdroid-android | 6.1.20 | Apache License 2.0 |
-| AndroidX Core KTX | 1.13.1 | Apache License 2.0 |
-| AndroidX Lifecycle (runtime, viewmodel, compose) | 2.8.6 | Apache License 2.0 |
-| AndroidX Activity Compose | 1.9.2 | Apache License 2.0 |
-| AndroidX ExifInterface | 1.3.7 | Apache License 2.0 |
-| AndroidX DataStore Preferences | 1.1.1 | Apache License 2.0 |
-| Jetpack Compose (BOM) | 2024.09.03 | Apache License 2.0 |
-| Kotlin Coroutines | 1.8.1 | Apache License 2.0 |
+| AndroidX Core KTX | 1.17.0 | Apache License 2.0 |
+| AndroidX Lifecycle (runtime, viewmodel, compose) | 2.9.2 | Apache License 2.0 |
+| AndroidX Activity Compose | 1.10.1 | Apache License 2.0 |
+| AndroidX ExifInterface | 1.4.1 | Apache License 2.0 |
+| AndroidX DataStore Preferences | 1.1.7 | Apache License 2.0 |
+| Jetpack Compose (BOM) | 2025.08.00 | Apache License 2.0 |
+| Kotlin Coroutines | 1.10.2 | Apache License 2.0 |
 | OkHttp (и Okio) | 4.12.0 | Apache License 2.0 |
 | Google Play Billing Library | 8.0.0 | Лицензия Android SDK (Google), см. https://developer.android.com/studio/terms |
 

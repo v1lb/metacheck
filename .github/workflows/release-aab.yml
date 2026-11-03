@@ -33,7 +33,7 @@ jobs:
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 8.11.1
+          gradle-version: 8.14.3
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
