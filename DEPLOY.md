@@ -4,10 +4,10 @@
 1. **Подтверди `applicationId`** в `app/build.gradle.kts` (сейчас `dev.metacheck.app`). [ТРЕБУЕТСЯ ВЫ: решение окончательное.]
    Google Play не принимает идентификаторы, начинающиеся с `com.example`. После первой загрузки
    в Play Console идентификатор изменить нельзя. `namespace` (пакет в коде) трогать не нужно.
-2. Нужна свежая Android Studio: проект использует AGP 8.9.1, Gradle 8.11.1 и compileSdk/targetSdk 36.
+2. Нужна свежая Android Studio: проект использует AGP 8.13, Gradle 8.14.3, Kotlin 2.2 и compileSdk/targetSdk 36. Версии всех зависимостей: `gradle/libs.versions.toml`.
    Если Sync просит обновить плагин, соглашайся через Upgrade Assistant.
 3. В архиве нет `gradlew` и `gradle-wrapper.jar`. Android Studio обходится без них. Для командной строки
-   один раз выполни `gradle wrapper --gradle-version 8.11.1` (нужен установленный Gradle), после этого работает `./gradlew`.
+   один раз выполни `gradle wrapper --gradle-version 8.14.3` (нужен установленный Gradle), после этого работает `./gradlew`.
 4. Проверь, что проходят тесты: `./gradlew test`. UI-тесты (нужен телефон или эмулятор): `./gradlew connectedDebugAndroidTest`.
 
 ## 1. Ключ загрузки (делается один раз)
