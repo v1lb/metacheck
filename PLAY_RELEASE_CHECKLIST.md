@@ -11,8 +11,8 @@ Status: Android preview. A green debug build does NOT equal Google Play producti
 5. Storage tests: Google Photos/Files, local providers, inaccessible documents, zero-byte files, corrupt JPEG/PNG, huge images, low disk, cancelled SAF operations and provider read-back failure.
 6. Metadata edit + strip: verify source untouched for duplicate operation; verify EXIF/XMP/IPTC/GPS results independently on copies. Ensure failures never present an unverified file as successful.
 7. Purchases: register `pro_lifetime` in Play Console and test purchases/refunds/restore/pending/offline/acknowledgment with license testers.
-8. High-scale sales: implement a secure backend with Google Play Developer API purchase-token verification, server acknowledgement and revoked-purchase reconciliation. **Current client-only implementation is a release blocker for hardened monetization**. Never place developer API credentials in APK.
-9. Privacy policy: publish an externally accessible finalized document with legal entity/contact; accurately disclose optional outgoing JSON metadata and Google Play billing. Placeholders in PRIVACY_POLICY.md are filled; publish the page and enter its URL in Play Console (see RELEASE_TODO.md).
+8. Purchase integrity: the client verifies the Google Play purchase signature (`PurchaseSignature`, key in `PlayPublicKey.kt`). For hardened anti-fraud at scale, add a backend with Google Play Developer API token verification and revoked-purchase reconciliation (optional for launch). Never place developer API credentials in the APK.
+9. Privacy policy: publish an externally accessible finalized document with legal entity/contact; accurately disclose optional outgoing JSON metadata and Google Play billing. Sources are in `legal/`; publish the pages and enter the URL in Play Console (see RELEASE_TODO.md).
 10. Play Data safety declarations, age rating, store images, store listing, app support address, intellectual property/licensing, crash monitoring consent, test tracks and staged rollout.
 11. Real-world beta cohort: at least 20 real users with consent, measure crashes/ANRs, upload errors, user comprehension and willingness to pay. For certain newly created personal Play developer accounts, at least 12 opted-in testers for 14 days of closed testing are required by Play Console.
 12. Privacy claims: absence of AI markers is NOT evidence that an image is authentic. Current analysis is metadata-based; pixel-based AI detection and C2PA signature validation are not implemented.
@@ -22,5 +22,5 @@ Status: Android preview. A green debug build does NOT equal Google Play producti
 - JPEG metadata editing; cleaning JPEG/PNG re-encodes images (may change quality and dimensions).
 - Pixel hidden information, remote copies/backups and unsupported proprietary blocks are outside the strip guarantee.
 - No end-to-end instrumentation evidence until emulator workflow succeeds.
-- Client-only Pro verification is not secure against a modified client; a server is needed for commercial anti-fraud.
+- Pro verification on the device (purchase signature) does not protect against a modified APK; a server is needed for that.
 - Debug APK cannot be submitted as Play production release. Publish upload-signed AAB.

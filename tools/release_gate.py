@@ -33,11 +33,11 @@ check('No broad media/storage permissions', not permissions.intersection({
 application = manifest.find('application')
 check('Backup disabled', application is not None and application.get(ns+'allowBackup') == 'false')
 check('Cleartext disabled', application is not None and application.get(ns+'usesCleartextTraffic') == 'false')
-check('Policy document exists', (ROOT / 'PRIVACY_POLICY.md').is_file())
+check('Policy documents exist', all((ROOT / 'legal' / n).is_file() for n in ['PRIVACY_POLICY_RU.md', 'PRIVACY_POLICY_EN.md']))
 check('Release checklist exists', (ROOT / 'PLAY_RELEASE_CHECKLIST.md').is_file())
 check('CI runs tests and lint', all(token in CI.read_text(encoding='utf-8') for token in ['testDebugUnitTest','lintDebug','assembleDebug','assembleDebugAndroidTest']))
 check('Emulator workflow present', (ROOT / '.github/workflows/android-instrumentation.yml').is_file())
-policy_text = (ROOT / 'PRIVACY_POLICY.md').read_text(encoding='utf-8') if (ROOT / 'PRIVACY_POLICY.md').is_file() else ''
+policy_text = ''.join((ROOT / 'legal' / n).read_text(encoding='utf-8') for n in ['PRIVACY_POLICY_RU.md', 'PRIVACY_POLICY_EN.md'] if (ROOT / 'legal' / n).is_file())
 check('Privacy policy has no unresolved placeholders', not re.search(r'\[(дата|имя|email|name|date)[^\]]*\]', policy_text, re.I))
 check('Legal documents folder exists', all((ROOT / 'legal' / n).is_file() for n in ['PRIVACY_POLICY_RU.md', 'PRIVACY_POLICY_EN.md', 'TERMS_RU.md', 'TERMS_EN.md']))
 check('AAB cannot be built without own signing key', 'bundleRelease' in cfg and 'GradleException' in cfg)
@@ -62,6 +62,9 @@ check('Gradle Wrapper present with pinned SHA-256',
 check('Workflows build with ./gradlew, not a system Gradle',
       not any(re.search(r'(run|script):\s*gradle\s', (ROOT / '.github/workflows' / n).read_text(encoding='utf-8'))
               for n in ('ci.yml', 'build-apk.yml', 'release-aab.yml', 'android-instrumentation.yml')))
+# Аудит, п. 28: юридические тексты живут только в legal/, копии в корне расходились с оригиналом.
+check('No duplicate legal texts outside legal/',
+      not any((ROOT / n).exists() for n in ('PRIVACY_POLICY.md', 'TERMS.md', 'PRIVACY_POLICY_EN.md', 'PRIVACY_POLICY_RU.md')))
 workflows = ROOT / '.github/workflows'
 release_wf = [(workflows / n).read_text(encoding='utf-8') for n in ('release-aab.yml', 'build-apk.yml') if (workflows / n).is_file()]
 def code_lines(text):
