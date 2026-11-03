@@ -52,6 +52,9 @@ check('Every map provider is named in privacy policy and terms (RU/EN)',
 check('Release workflows check permissions of the built app',
       all('check_apk_permissions.py' in (ROOT / '.github/workflows' / n).read_text(encoding='utf-8')
           for n in ('ci.yml', 'build-apk.yml', 'release-aab.yml')))
+proguard = (ROOT / 'app/proguard-rules.pro').read_text(encoding='utf-8')
+check('R8 keeps Kotlin null checks (no -assumenosideeffects for Intrinsics)',
+      not re.search(r'^\s*-assumenosideeffects\s+class\s+kotlin\.jvm\.internal\.Intrinsics', proguard, re.M))
 workflows = ROOT / '.github/workflows'
 release_wf = [(workflows / n).read_text(encoding='utf-8') for n in ('release-aab.yml', 'build-apk.yml') if (workflows / n).is_file()]
 def code_lines(text):

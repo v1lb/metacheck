@@ -12,11 +12,9 @@
     public static int i(...);
 }
 
-# Если в Kotlin останутся проверки, их тоже убираем из release.
--assumenosideeffects class kotlin.jvm.internal.Intrinsics {
-    public static void checkNotNull(java.lang.Object, java.lang.String);
-    public static void checkNotNullParameter(java.lang.Object, java.lang.String);
-}
+# Проверки Kotlin на null (Intrinsics.checkNotNull*) НЕ вырезаем (аудит, п. 23).
+# Без них null из Java/Android API тихо уходит дальше и роняет приложение в случайном месте,
+# а отчёт о сбое в Play Console указывает не туда. Выигрыш в размере — единицы килобайт.
 
 # OkHttp: необязательные TLS-провайдеры отсутствуют на Android, предупреждения не нужны.
 -dontwarn okhttp3.internal.platform.**
