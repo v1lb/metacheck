@@ -17,8 +17,11 @@ class SharedCopies(context: Context) {
     fun newTarget(source: String): Target {
         val jpeg = runCatching {
             app.contentResolver.openInputStream(Uri.parse(source))?.use { stream ->
+                // read() может вернуть меньше байт, чем просили: дочитываем, иначе JPEG ушёл бы как «.png».
                 val head = ByteArray(3)
-                stream.read(head) == 3 && head[0] == 0xFF.toByte() && head[1] == 0xD8.toByte() && head[2] == 0xFF.toByte()
+                var n = 0
+                while (n < head.size) { val r = stream.read(head, n, head.size - n); if (r < 0) break; n += r }
+                n == 3 && head[0] == 0xFF.toByte() && head[1] == 0xD8.toByte() && head[2] == 0xFF.toByte()
             } ?: false
         }.getOrDefault(false)
         val file = File(dir, "metacheck_${System.currentTimeMillis()}.${if (jpeg) "jpg" else "png"}")

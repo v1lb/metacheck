@@ -84,17 +84,24 @@ class FileHistoryRepository(
     }
 
     override suspend fun delete(id: String) {
-        withContext(io) { deleteBlocking(id) }
+        withContext(io) { lock.withLock { deleteBlocking(id) } }
     }
 
+    /** Файл, который не удалось удалить, — ошибка: иначе интерфейс сообщил бы об удалении, а отчёт остался. */
     private fun deleteBlocking(id: String) {
-        if (idRegex.matches(id)) File(dir, "$id.rep").delete()
+        if (!idRegex.matches(id)) return
+        val file = File(dir, "$id.rep")
+        if (!file.delete() && file.exists()) throw AppFailure(FailureCode.HISTORY_UNAVAILABLE)
     }
 
     override suspend fun clear() {
         withContext(io) {
             lock.withLock {
                 dir.listFiles()?.forEach { if (it.name.endsWith(".rep") || it.name.endsWith(".tmp")) it.delete() }
+                // «История удалена» показываем, только если файлов действительно не осталось.
+                if (dir.listFiles { f -> f.name.endsWith(".rep") }?.isNotEmpty() == true) {
+                    throw AppFailure(FailureCode.HISTORY_UNAVAILABLE)
+                }
             }
         }
     }
