@@ -86,7 +86,7 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
         if (report.gps == null) listOf(ReportTab.OVERVIEW, ReportTab.METADATA)
         else ReportTab.entries.toList()
     }
-    var selected by rememberSaveable(report.file.name) { mutableIntStateOf(0) }
+    var selected by rememberSaveable(reportStateKey(report)) { mutableIntStateOf(0) }
     val tab = tabs[selected.coerceIn(0, tabs.lastIndex)]
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -328,3 +328,10 @@ private fun GpsTab(gps: GpsPoint, onWipeGps: (() -> Unit)?) {
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }
+
+/**
+ * Ключ состояния экрана отчёта: имя, размер, формат и координаты. Переживает поворот экрана
+ * (строка), но различает разные фото с одинаковым именем.
+ */
+internal fun reportStateKey(report: MetaReport): String =
+    "${report.file.name}|${report.file.sizeBytes}|${report.file.format}|${report.gps?.latitude}|${report.gps?.longitude}"
