@@ -520,7 +520,7 @@
     <string name="settings_api_pin_note">Необязательный pin сертификата сервера.</string>
     <string name="settings_security_eyebrow">SECURITY STATUS</string>
     <string name="settings_security_title">Хранение только на устройстве</string>
-    <string name="settings_security_text">Сеть используется только по вашему действию: карта OpenStreetMap, поиск адреса, внешний API (если включён) и Google Play для покупки Pro.</string>
+    <string name="settings_security_text">Сеть используется только по вашему действию: карта, поиск адреса и внешний API (если включён). Google Play проверяет покупку Pro.</string>
     <string name="appearance_section">ЯЗЫК И ОФОРМЛЕНИЕ</string>
     <string name="appearance_language">Язык приложения</string>
     <string name="appearance_language_system">Как в системе</string>
