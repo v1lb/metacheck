@@ -78,7 +78,8 @@ class ManifestSecurityTest {
             // Начиная с Android 12 атрибут обязателен для компонентов с intent-filter.
             assertTrue("$name: exported должен быть задан явно", exported.isNotEmpty())
             if (exported == "true") {
-                assertEquals("Экспортируется лишнее: $name", ".ui.MainActivity", name)
+                // Лаунчер и второй пункт «Поделиться» («Отправить без метаданных») — оба ведут в MainActivity.
+                assertTrue("Экспортируется лишнее: $name", name in setOf(".ui.MainActivity", ".ui.CleanShareAlias"))
             }
         }
     }

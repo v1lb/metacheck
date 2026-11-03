@@ -83,6 +83,19 @@ class MainViewModel(
     private val _apiDialog = MutableStateFlow<ApiDialog?>(null)
     val apiDialog: StateFlow<ApiDialog?> = _apiDialog.asStateFlow()
 
+    /** Фото пришло через «Отправить без метаданных»: экран очищает его и открывает «Поделиться». */
+    private val _cleanShareRequest = MutableStateFlow<String?>(null)
+    val cleanShareRequest: StateFlow<String?> = _cleanShareRequest.asStateFlow()
+
+    fun requestCleanShare(uri: Uri) {
+        _cleanShareRequest.value = uri.toString()
+        onImagePicked(uri) // отчёт тоже показываем: пользователь видит, что именно удалено
+    }
+
+    fun consumeCleanShare() {
+        _cleanShareRequest.value = null
+    }
+
     private var analyzeJob: Job? = null
     private var apiJob: Job? = null
     private var historyJob: Job? = null

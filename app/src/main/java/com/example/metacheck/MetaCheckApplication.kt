@@ -14,6 +14,8 @@ class MetaCheckApplication : Application() {
         warmUpPreferences()
         cleanOldCameraShots()
         cleanStaleMetadataTemps()
+        // Очищенные копии для «Отправить без метаданных»: получатель мог читать файл позже, держим сутки.
+        Thread { runCatching { container.sharedCopies.cleanOld() } }.start()
     }
 
     /**

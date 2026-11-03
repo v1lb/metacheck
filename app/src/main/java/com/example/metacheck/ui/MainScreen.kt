@@ -110,6 +110,8 @@ fun MainScreen(
     val studioVm: MetadataStudioViewModel = viewModel(factory = MetadataStudioViewModel.Factory)
     val studioMessage by studioVm.message.collectAsStateWithLifecycle()
     val studioBusy by studioVm.busy.collectAsStateWithLifecycle()
+    val shareReady by studioVm.shareReady.collectAsStateWithLifecycle()
+    val cleanShareRequest by viewModel.cleanShareRequest.collectAsStateWithLifecycle()
     val entitlement by proVm.entitlement.collectAsStateWithLifecycle()
     val paywallVisible by proVm.paywallVisible.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -130,6 +132,29 @@ fun MainScreen(
     LaunchedEffect(proMessage) {
         proMessage?.let { snackbar.showSnackbar(it.asString(context)); proVm.consumeMessage() }
     }
+    // «Отправить без метаданных» из меню «Поделиться» другого приложения: очищаем сразу.
+    LaunchedEffect(cleanShareRequest) {
+        cleanShareRequest?.let { studioVm.cleanAndShare(it); viewModel.consumeCleanShare() }
+    }
+    // Копия очищена и проверена: системное окно «Поделиться» с разовым правом чтения для получателя.
+    val chooserTitle = stringResource(R.string.share_chooser_title)
+    LaunchedEffect(shareReady) {
+        val target = shareReady ?: return@LaunchedEffect
+        studioVm.consumeShare()
+        val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            type = target.mime
+            putExtra(android.content.Intent.EXTRA_STREAM, target.uri)
+            clipData = android.content.ClipData.newRawUri("", target.uri)
+            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            context.startActivity(android.content.Intent.createChooser(send, chooserTitle)
+                .addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION))
+        } catch (_: ActivityNotFoundException) {
+            viewModel.showMessage(UiText.Res(R.string.share_no_app))
+        }
+    }
+
     // Google требует сверять покупки при возврате в приложение: отложенные платежи, возвраты,
     // покупки на другом устройстве. Срабатывает и при первом показе экрана.
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { proVm.refresh() }
@@ -315,6 +340,12 @@ fun MainScreen(
                                         pendingStripSource = s.source
                                         if (format.extension == "jpg") saveJpeg.launch("$name-clean.jpg")
                                         else savePng.launch("$name-clean.png")
+                                    }
+                                },
+                                onCleanShare = if (s.source == null) null else {
+                                    share@{
+                                        if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@share }
+                                        studioVm.cleanAndShare(s.source)
                                     }
                                 },
                                 onApi = if (!settings.apiEnabled) null else {

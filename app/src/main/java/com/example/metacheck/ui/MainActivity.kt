@@ -105,10 +105,13 @@ class MainActivity : AppCompatActivity() {
     private fun handleSharedImage(intent: Intent?) {
         if (intent?.action != Intent.ACTION_SEND || intent.type?.startsWith("image/") != true) return
         val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java) ?: return
-        viewModel.onImagePicked(uri)
+        // Второй пункт в меню «Поделиться» (activity-alias): сразу очистить и переслать дальше.
+        if (intent.component?.className?.endsWith(CLEAN_SHARE_ALIAS) == true) viewModel.requestCleanShare(uri)
+        else viewModel.onImagePicked(uri)
     }
 
     private companion object {
         const val MAX_SPLASH_MS = 1_500L
+        const val CLEAN_SHARE_ALIAS = ".ui.CleanShareAlias"
     }
 }
