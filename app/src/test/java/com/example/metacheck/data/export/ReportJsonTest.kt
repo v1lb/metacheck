@@ -37,6 +37,28 @@ class ReportJsonTest {
         assertTrue(ReportJson.toJson(sampleReport(gps = true)).has("gps"))
     }
 
+    /** Без GPS не уходят и координаты из XMP, и GPS-раздел EXIF (раньше они попадали в отчёт для сервера). */
+    @Test
+    fun omittingGpsRemovesEveryLocationField() {
+        val base = sampleReport(gps = true)
+        val report = base.copy(
+            exifSections = base.exifSections + com.example.metacheck.domain.model.MetaSection(
+                "", listOf(com.example.metacheck.domain.model.MetaItem("GPSAltitude", "120", "exif:GPSAltitude")),
+                com.example.metacheck.domain.model.SectionKey.GPS,
+            ),
+            xmpItems = base.xmpItems + com.example.metacheck.domain.model.MetaItem("exif:GPSLatitude", "55,45.0N", "xmp:exif:GPSLatitude"),
+            pngTextItems = base.pngTextItems + com.example.metacheck.domain.model.MetaItem("gps_location", "55.75,37.62"),
+        )
+        val text = ReportJson.toJson(report, includeGps = false).toString()
+        for (leak in listOf("55,45.0N", "55.75,37.62", "GPSAltitude", "\"gps\"")) assertFalse(leak, text.contains(leak))
+        // Остальное на месте.
+        assertTrue(text.contains("Pixel 8"))
+        assertTrue(text.contains("Editor"))
+        // С GPS всё сохраняется.
+        val full = ReportJson.toJson(report).toString()
+        assertTrue(full.contains("55,45.0N") && full.contains("GPSAltitude"))
+    }
+
     @Test
     fun hasSchemaAndVerdict() {
         val json = ReportJson.toJson(sampleReport(ai = true))

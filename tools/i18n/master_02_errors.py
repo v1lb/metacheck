@@ -81,6 +81,8 @@ S = [
     ("patch_aperture_range", "Aperture must be between f/0.5 and f/128", "Диафрагма должна быть от f/0.5 до f/128"),
     ("patch_exposure_range", "Shutter speed must be between 1/1000000 and 3600 seconds",
      "Выдержка должна быть от 1/1000000 до 3600 секунд"),
+    ("patch_text_not_ascii", "%1$s: EXIF accepts only Latin letters, digits and basic symbols",
+     "%1$s: в EXIF можно писать только латиницей, цифрами и обычными знаками"),
     ("patch_text_invalid", "%1$s: invalid characters or longer than 512 characters",
      "%1$s: недопустимые символы или длина более 512 символов"),
     ("patch_date_format", "%1$s: use the format YYYY:MM:DD HH:MM:SS", "%1$s: формат ГГГГ:ММ:ДД ЧЧ:ММ:СС"),

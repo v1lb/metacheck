@@ -37,6 +37,14 @@ class MetadataPatchValidatorTest {
         assertEquals(listOf(PatchIssue(PatchIssue.Code.TEXT_INVALID, PatchField.AUTHOR)),
             MetadataPatchValidator.validate(MetadataPatch(author = "a\u0000b")))
     }
+    /** ASCII-теги EXIF: кириллица превратилась бы в «?», поэтому объясняем до записи. */
+    @Test fun rejectsNonLatinTextForAsciiTags() {
+        assertEquals(listOf(PatchIssue(PatchIssue.Code.TEXT_NOT_ASCII, PatchField.AUTHOR)),
+            MetadataPatchValidator.validate(MetadataPatch(author = "Виктор")))
+        assertEquals(listOf(PatchIssue(PatchIssue.Code.TEXT_NOT_ASCII, PatchField.COPYRIGHT)),
+            MetadataPatchValidator.validate(MetadataPatch(copyright = "© 2026 Viktor")))
+        assertTrue(MetadataPatchValidator.validate(MetadataPatch(author = "Viktor (c) 2026", model = "Pixel 8")).isEmpty())
+    }
     @Test fun checksExposureLimits() {
         assertTrue(MetadataPatchValidator.validate(MetadataPatch(exposureSeconds = 0.0)).isNotEmpty())
         assertTrue(MetadataPatchValidator.validate(MetadataPatch(iso = -1)).isNotEmpty())
