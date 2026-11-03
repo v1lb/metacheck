@@ -17,6 +17,8 @@ import com.example.metacheck.domain.metadata.BatchProgress
 import com.example.metacheck.domain.metadata.MetadataPatch
 import com.example.metacheck.domain.metadata.MetadataStudioUseCase
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +29,7 @@ class MetadataStudioViewModel(
     private val studio: MetadataStudioUseCase,
     private val savedState: SavedStateHandle = SavedStateHandle(),
     private val uriAccess: UriAccess? = null,
+    private val sharedCopies: com.example.metacheck.data.share.SharedCopies? = null,
 ) : ViewModel() {
     /** Файл выбран пользователем: сохраняем доступ, чтобы он пережил выгрузку процесса. */
     fun persistAccess(uri: Uri) {
@@ -62,6 +65,31 @@ class MetadataStudioViewModel(
     }
 
     fun clearMessage() { _message.value = null }
+
+    /** Готовая к отправке очищенная копия: экран открывает системное окно «Поделиться» и сбрасывает значение. */
+    private val _shareReady = MutableStateFlow<com.example.metacheck.data.share.SharedCopies.Target?>(null)
+    val shareReady = _shareReady.asStateFlow()
+
+    fun consumeShare() { _shareReady.value = null }
+
+    /**
+     * «Очистить и отправить»: очищенная копия во временную папку и сразу окно «Поделиться».
+     * Отправляется только проверенная копия: непроверенную удаляем, чтобы GPS случайно не ушёл.
+     */
+    fun cleanAndShare(source: String) {
+        val copies = sharedCopies ?: return
+        work {
+            val target = withContext(Dispatchers.IO) { copies.newTarget(source) }
+            studio.strip(source, target.uri.toString()).fold(
+                onSuccess = {
+                    if (it.verified) _shareReady.value = target
+                    else { copies.discard(target); _message.value = UiText.Res(R.string.share_not_verified) }
+                },
+                onFailure = { copies.discard(target); _message.value = failMessage(it) },
+            )
+            usedToday.value = studio.usedToday()
+        }
+    }
     fun stripCopy(
         source: String,
         destination: Uri,
@@ -187,7 +215,7 @@ class MetadataStudioViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val c = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MetaCheckApplication).container
-                MetadataStudioViewModel(c.metadataStudio, createSavedStateHandle(), c.uriAccess)
+                MetadataStudioViewModel(c.metadataStudio, createSavedStateHandle(), c.uriAccess, c.sharedCopies)
             }
         }
     }

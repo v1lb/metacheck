@@ -624,4 +624,33 @@
     <string name="licenses_intro">Open-source software used in MetaCheck</string>
     <string name="licenses_map_data">Map data © OpenStreetMap contributors, available under the Open Database License (ODbL) 1.0.</string>
     <string name="licenses_map_tiles">Map tiles are served by MapTiler (© MapTiler) when it is configured, otherwise by the OpenStreetMap Foundation servers.</string>
+
+    <!-- master_19_privacy.py -->
+    <string name="privacy_eyebrow">PRIVACY EXPOSURE</string>
+    <string name="privacy_title">What this photo reveals</string>
+    <string name="privacy_hint">Anyone you send the original file to can see this.</string>
+    <string name="privacy_none_text">No location, names or device serial numbers in the metadata.</string>
+    <string name="privacy_level_none">Nothing personal</string>
+    <string name="privacy_level_low">Low risk</string>
+    <string name="privacy_level_medium">Medium risk</string>
+    <string name="privacy_level_high">High risk</string>
+    <string name="privacy_score_description">Privacy risk %1$d out of 100</string>
+    <string name="privacy_kind_exact_location">Exact location</string>
+    <string name="privacy_kind_location_tags">Location tags</string>
+    <string name="privacy_kind_owner">Camera owner</string>
+    <string name="privacy_kind_device_serial">Device serial number</string>
+    <string name="privacy_kind_author">Author and rights</string>
+    <string name="privacy_kind_ai_prompt">AI prompt and settings</string>
+    <string name="privacy_kind_capture_time">When it was taken</string>
+    <string name="privacy_kind_description">Description and comments</string>
+    <string name="privacy_kind_device">Camera or phone</string>
+    <string name="privacy_kind_edit_history">Edit history</string>
+    <string name="privacy_kind_software">Software</string>
+    <string name="privacy_value_present">found in the file</string>
+    <string name="privacy_clean_share">Clean and share</string>
+    <string name="privacy_clean_save">Clean and save a copy</string>
+    <string name="share_target_label">Send without metadata</string>
+    <string name="share_chooser_title">Send the cleaned photo</string>
+    <string name="share_no_app">No app found to share the photo</string>
+    <string name="share_not_verified">The cleaned copy could not be verified, so it was not shared</string>
 </resources>

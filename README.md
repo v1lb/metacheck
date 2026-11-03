@@ -59,6 +59,8 @@ com.example.metacheck
 - Cleaning re-encodes pixels: JPEG stays JPEG (q=95), everything else is saved as PNG, orientation is
   applied to the pixels, images above 16 MP are downscaled, GIF animation is lost.
   A wide-gamut color profile (Display P3) is written anew by Android.
+- Privacy score (0–100) with the actual exposed values, and "Send without metadata": a second Share-menu entry
+  that cleans the photo and passes it on in one step.
 - GPS removal from JPEG without re-encoding; tag editing for JPEG EXIF only; overwriting the original only
   after a verified external backup.
 

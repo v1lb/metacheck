@@ -15,6 +15,8 @@ What it does:
 • Reads Content Credentials (C2PA): "created by AI" and "edited with AI" labels from ChatGPT, Gemini, Adobe Firefly and others.
 • Copies all metadata and saves a report as PDF or JSON.
 • Cleans metadata: saves a copy of the photo without EXIF and GPS; the original file is not changed.
+• Privacy score: shows what a photo reveals — exact location, device serial number, author, capture time.
+• "Send without metadata" in the Share menu: pick it in any app and the photo is cleaned before it is sent.
 • Keeps scan history encrypted on your device (can be turned off).
 • Accepts photos from the gallery, camera, clipboard and via Share.
 

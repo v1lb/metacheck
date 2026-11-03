@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Только cache/camera: туда системная камера кладёт снимок. Остальные папки не открываем. -->
+<!--
+    cache/camera: туда системная камера кладёт снимок.
+    cache/shared: очищенные копии для «Очистить и отправить» (выдаются получателю на чтение).
+    Остальные папки не открываем.
+-->
 <paths>
     <cache-path name="camera" path="camera/" />
+    <cache-path name="shared" path="shared/" />
 </paths>

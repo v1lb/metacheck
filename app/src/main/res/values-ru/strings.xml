@@ -624,4 +624,33 @@
     <string name="licenses_intro">Открытое ПО, используемое в MetaCheck</string>
     <string name="licenses_map_data">Картографические данные © участники OpenStreetMap, доступны по лицензии Open Database License (ODbL) 1.0.</string>
     <string name="licenses_map_tiles">Фрагменты карты загружаются с MapTiler (© MapTiler), если он настроен, иначе с серверов OpenStreetMap Foundation.</string>
+
+    <!-- master_19_privacy.py -->
+    <string name="privacy_eyebrow">PRIVACY EXPOSURE</string>
+    <string name="privacy_title">Что раскрывает это фото</string>
+    <string name="privacy_hint">Это увидит любой, кому вы отправите оригинал файла.</string>
+    <string name="privacy_none_text">В метаданных нет координат, имён и серийных номеров устройства.</string>
+    <string name="privacy_level_none">Ничего личного</string>
+    <string name="privacy_level_low">Низкий риск</string>
+    <string name="privacy_level_medium">Средний риск</string>
+    <string name="privacy_level_high">Высокий риск</string>
+    <string name="privacy_score_description">Риск для приватности: %1$d из 100</string>
+    <string name="privacy_kind_exact_location">Точное место съёмки</string>
+    <string name="privacy_kind_location_tags">Метки местоположения</string>
+    <string name="privacy_kind_owner">Владелец камеры</string>
+    <string name="privacy_kind_device_serial">Серийный номер устройства</string>
+    <string name="privacy_kind_author">Автор и права</string>
+    <string name="privacy_kind_ai_prompt">Промпт и настройки ИИ</string>
+    <string name="privacy_kind_capture_time">Когда снято</string>
+    <string name="privacy_kind_description">Описание и комментарии</string>
+    <string name="privacy_kind_device">Камера или телефон</string>
+    <string name="privacy_kind_edit_history">История правок</string>
+    <string name="privacy_kind_software">Программа</string>
+    <string name="privacy_value_present">есть в файле</string>
+    <string name="privacy_clean_share">Очистить и отправить</string>
+    <string name="privacy_clean_save">Очистить и сохранить копию</string>
+    <string name="share_target_label">Отправить без метаданных</string>
+    <string name="share_chooser_title">Отправить очищенное фото</string>
+    <string name="share_no_app">Не найдено приложение, чтобы отправить фото</string>
+    <string name="share_not_verified">Очищенную копию не удалось проверить, поэтому она не отправлена</string>
 </resources>

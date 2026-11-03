@@ -76,6 +76,8 @@ data class ResultActions(
     val onCsv: (() -> Unit)? = null,
     val onEdit: (() -> Unit)? = null,
     val onWipeGps: (() -> Unit)? = null,
+    /** Очистить и сразу открыть «Поделиться». */
+    val onCleanShare: (() -> Unit)? = null,
 )
 
 @Composable
@@ -145,6 +147,10 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
     }
     LazyColumn(modifier = Modifier.testTag("overview_list"), contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(15.dp)) {
         item { PhotoPreview(sourceUri, report.file.name) }
+        item {
+            val exposure = remember(report) { com.example.metacheck.domain.privacy.PrivacyExposures.of(report) }
+            PrivacyExposureCard(exposure, actions.onCleanShare, actions.onClean)
+        }
         if (GpsPrivacy.hasLocationMarkers(report)) {
             item { GpsPrivacyAlert(report.gps, actions.onWipeGps, partialTags = report.gps == null) }
         }

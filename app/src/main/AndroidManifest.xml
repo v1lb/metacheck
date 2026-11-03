@@ -55,6 +55,22 @@
             </intent-filter>
         </activity>
 
+        <!--
+            «Отправить без метаданных» в меню «Поделиться»: то же окно приложения, но фото сразу очищается
+            и пересылается дальше (MainActivity.handleSharedImage различает вход по имени alias).
+        -->
+        <activity-alias
+            android:name=".ui.CleanShareAlias"
+            android:exported="true"
+            android:label="@string/share_target_label"
+            android:targetActivity=".ui.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity-alias>
+
         <!-- Язык приложения на Android 8–12: AppCompat сам сохраняет выбор (на 13+ его хранит система). -->
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"

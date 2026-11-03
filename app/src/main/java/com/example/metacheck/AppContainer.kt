@@ -31,6 +31,7 @@ import java.io.File
 class AppContainer(app: Application) {
     val contentResolver = app.contentResolver
     val uriAccess = UriAccess(app.contentResolver)
+    val sharedCopies = com.example.metacheck.data.share.SharedCopies(app)
     val uiPreferences = UiPreferences(app)
     private val crypto: Crypto = KeystoreCrypto()
     private val imageRepository: ImageRepository = ImageRepositoryImpl(app.contentResolver)
