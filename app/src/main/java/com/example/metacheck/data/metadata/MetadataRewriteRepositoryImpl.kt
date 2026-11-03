@@ -305,11 +305,14 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             BitmapFactory.decodeFile(raw.absolutePath, bounds)
             if (bounds.outWidth <= 0 || bounds.outHeight <= 0) throw IOException("Неподдерживаемый формат изображения")
-            var sample = 1
-            while ((bounds.outWidth.toLong() / sample) * (bounds.outHeight.toLong() / sample) > MAX_PIXELS) sample *= 2
             val orientation = runCatching {
                 ExifInterface(raw.absolutePath).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
             }.getOrDefault(ExifInterface.ORIENTATION_NORMAL)
+            // Поворот по EXIF создаёт вторую полную копию растра: учитываем её в бюджете памяти.
+            val copies = if (needsTransform(orientation)) 2 else 1
+            val sample = DecodeBudget.sampleSize(
+                bounds.outWidth, bounds.outHeight, MAX_PIXELS, copies, DecodeBudget.availableHeapBytes(),
+            )
             val decoded = BitmapFactory.decodeFile(
                 raw.absolutePath,
                 BitmapFactory.Options().apply { inSampleSize = sample; inMutable = true },
@@ -351,6 +354,9 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         "XMP".takeIf { xmp }, "IPTC".takeIf { iptc }, "COM".takeIf { comment }, "MPF".takeIf { mpf },
         "данные после EOI".takeIf { trailer }, "миниатюра EXIF".takeIf { exifThumbnail },
     ).joinToString(", ")
+
+    private fun needsTransform(orientation: Int): Boolean =
+        orientation != ExifInterface.ORIENTATION_NORMAL && orientation != ExifInterface.ORIENTATION_UNDEFINED
 
     private fun applyExifOrientation(bitmap: Bitmap, orientation: Int): Bitmap {
         val matrix = Matrix()

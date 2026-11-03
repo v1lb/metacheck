@@ -59,6 +59,11 @@ private fun fragments(value: String): String = value
     .replace("Проверка скрытых данных не пройдена: ", "Hidden data check failed: ")
     .replace("данные после EOI", "data after end of image")
     .replace("миниатюра EXIF", "EXIF thumbnail")
+    .replace("Недостаточно памяти для обработки изображения", "Not enough memory to process the image")
+    .replace("Не удалось прочитать пиксели. Попробуйте другое изображение", "Could not read the pixels. Try another image")
+    .replace("Неподдерживаемый формат изображения", "Unsupported image format")
+    .replace("Кодирование изображения не удалось", "Image encoding failed")
+    .replace("Создан пустой файл", "An empty file was created")
 
 
 private val translations: Map<String, String> = mapOf(
@@ -295,6 +300,7 @@ private val translations: Map<String, String> = mapOf(
     "Не удалось завершить операцию" to "Could not complete the operation",
     "Это не изображение в поддерживаемом формате (JPEG, PNG, WebP, GIF, HEIC, AVIF)." to "This is not an image in a supported format (JPEG, PNG, WebP, GIF, HEIC, AVIF).",
     "Не удалось прочитать файл. Попробуй другой." to "Could not read the file. Try another one.",
+    "Не хватило памяти для анализа этого файла. Закройте другие приложения и попробуйте снова." to "Not enough memory to analyze this file. Close other apps and try again.",
     "Допускается до 50 фото за один запуск" to "Up to 50 photos per run",
     "Проверьте числа: GPS, ISO, диафрагму и выдержку" to "Check the numbers: GPS, ISO, aperture and shutter speed",
     "PRO · Без ограничений на очистку" to "PRO · Unlimited cleaning",
