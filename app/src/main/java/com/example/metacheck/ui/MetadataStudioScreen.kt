@@ -144,7 +144,22 @@ fun MetadataStudioScreen(
     }
 
     val chooseImage = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) { source = uri.toString(); actionError = null }
+        if (uri != null) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
+    }
+    // После выгрузки процесса rememberSaveable возвращает URI, но временное право на него уже отозвано.
+    // Проверяем один раз при восстановлении и честно просим выбрать файл снова.
+    LaunchedEffect(Unit) {
+        if (source.isNotBlank() && !vm.canRead(source)) {
+            source = ""
+            actionError = MetadataStudioViewModel.LOST_ACCESS
+        }
+        if (batchSources.isNotEmpty()) {
+            val still = vm.readable(batchSources)
+            if (still.size != batchSources.size) {
+                batchSources = still
+                actionError = MetadataStudioViewModel.LOST_ACCESS
+            }
+        }
     }
     val chooseMultiple = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { list ->
         if (list.isNotEmpty()) {
@@ -159,10 +174,10 @@ fun MetadataStudioScreen(
         }
     }
     val saveCleanJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
-        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { source = uri.toString(); actionError = null }
+        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
     }
     val saveCleanPng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
-        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { source = uri.toString(); actionError = null }
+        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
     }
     // Операция и её параметры берутся только из ViewModel (SavedStateHandle), а не из состояния Composable:
     // после пересоздания Activity локальные remember-переменные уже потеряны.

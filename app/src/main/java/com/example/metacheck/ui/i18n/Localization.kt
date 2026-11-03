@@ -300,6 +300,8 @@ private val translations: Map<String, String> = mapOf(
     "Не удалось завершить операцию" to "Could not complete the operation",
     "Это не изображение в поддерживаемом формате (JPEG, PNG, WebP, GIF, HEIC, AVIF)." to "This is not an image in a supported format (JPEG, PNG, WebP, GIF, HEIC, AVIF).",
     "Не удалось прочитать файл. Попробуй другой." to "Could not read the file. Try another one.",
+    "Нет доступа к файлу. Выберите его снова." to "No access to the file. Please select it again.",
+    "Нет доступа к файлу: Android отозвал разрешение после перезапуска приложения. Выберите файл снова" to "No access to the file: Android revoked the permission after the app was restarted. Please select the file again",
     "Не хватило памяти для анализа этого файла. Закройте другие приложения и попробуйте снова." to "Not enough memory to analyze this file. Close other apps and try again.",
     "Допускается до 50 фото за один запуск" to "Up to 50 photos per run",
     "Проверьте числа: GPS, ISO, диафрагму и выдержку" to "Check the numbers: GPS, ISO, aperture and shutter speed",

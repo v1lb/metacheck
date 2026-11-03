@@ -139,6 +139,8 @@ fun MainScreen(
     }
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
+            // Доступ должен пережить выгрузку процесса: из результата можно перейти в студию очистки.
+            (context.applicationContext as com.example.metacheck.MetaCheckApplication).container.uriAccess.persist(uri)
             if (Build.VERSION.SDK_INT >= 29 &&
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_MEDIA_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 pendingGpsUri = uri
