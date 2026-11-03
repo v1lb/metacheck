@@ -78,6 +78,11 @@ class PrivacyExposureTest {
         assertEquals(listOf(ExposureKind.LOCATION_TAGS), result.items.map { it.kind })
     }
 
+    @Test fun ordinaryPngCommentIsNotAPrompt() {
+        val result = PrivacyExposures.of(report(png = listOf(MetaItem("Comment", "Created with GIMP"))))
+        assertTrue(result.items.none { it.kind == ExposureKind.AI_PROMPT })
+    }
+
     @Test fun longValuesAreShortened() {
         val result = PrivacyExposures.of(report(exif = listOf(exif("ImageDescription", "x".repeat(500)))))
         assertEquals(80, result.items.single().value.length)
