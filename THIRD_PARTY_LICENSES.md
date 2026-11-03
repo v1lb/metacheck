@@ -1,24 +1,24 @@
-# Сторонние компоненты и лицензии / Third-party licenses
+# Third-party licenses
 
-Версии указаны по `gradle/libs.versions.toml` (тот же список показывает приложение: «О приложении» → «Лицензии открытого кода»). Полный список включая транзитивные зависимости: `gradle :app:dependencies`.
+Versions follow `gradle/libs.versions.toml` (the app shows the same list: About → Open source licenses). The full list including transitive dependencies: `./gradlew :app:dependencies`.
 
-| Компонент | Версия | Лицензия |
+| Component | Version | License |
 |---|---|---|
 | osmdroid-android | 6.1.20 | Apache License 2.0 |
 | AndroidX Core KTX | 1.17.0 | Apache License 2.0 |
 | AndroidX Lifecycle (runtime, viewmodel, compose) | 2.9.2 | Apache License 2.0 |
 | AndroidX Activity Compose | 1.10.1 | Apache License 2.0 |
-| AndroidX AppCompat (язык приложения) | 1.7.1 | Apache License 2.0 |
+| AndroidX AppCompat (app language) | 1.7.1 | Apache License 2.0 |
 | AndroidX ExifInterface | 1.4.1 | Apache License 2.0 |
 | AndroidX DataStore Preferences | 1.1.7 | Apache License 2.0 |
 | Jetpack Compose (BOM) | 2025.08.00 | Apache License 2.0 |
 | Kotlin Coroutines | 1.10.2 | Apache License 2.0 |
-| OkHttp (и Okio) | 4.12.0 | Apache License 2.0 |
-| Google Play Billing Library | 8.0.0 | Лицензия Android SDK (Google), см. https://developer.android.com/studio/terms |
+| OkHttp (and Okio) | 4.12.0 | Apache License 2.0 |
+| Google Play Billing Library | 8.0.0 | Android SDK license (Google), see https://developer.android.com/studio/terms |
 
-Текст Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0
+Apache License 2.0 text: https://www.apache.org/licenses/LICENSE-2.0
 
-## Данные карты
-Картографические данные © участники OpenStreetMap (OpenStreetMap contributors), лицензия Open Database License 1.0.
-Подробности: https://www.openstreetmap.org/copyright
-Фрагменты карты загружаются по запросу пользователя с MapTiler (© MapTiler), если в сборке задан ключ, иначе с серверов OpenStreetMap Foundation.
+## Map data
+Map data © OpenStreetMap contributors, Open Database License 1.0.
+Details: https://www.openstreetmap.org/copyright
+Map tiles are loaded on user request from MapTiler (© MapTiler) when the build has a key, otherwise from the OpenStreetMap Foundation servers.

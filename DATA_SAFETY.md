@@ -1,32 +1,34 @@
-# Шпаргалка для формы Data safety (Google Play)
+# Data safety form cheat sheet (Google Play)
 
-Это ориентир, составленный по коду приложения. Определения «собирает» и «передаёт» в Google Play меняются.
-**[ТРЕБУЕТСЯ ВЫ]** Перед отправкой формы сверьте каждый ответ с текущей справкой Play Console.
+Русская версия: [DATA_SAFETY.ru.md](DATA_SAFETY.ru.md).
 
-## Что приложение делает с данными
-- Изображения, метаданные, история отчётов, настройки: только на устройстве, в сеть не уходят.
-  История хранится зашифрованной, ключ API в Android Keystore.
-- Карта: после нажатия кнопки приложение запрашивает фрагменты карты по HTTPS у MapTiler (если при сборке задан
-  ключ `METACHECK_MAPTILER_KEY`), иначе у серверов OpenStreetMap Foundation. Поставщик видит IP-адрес и номера
-  фрагментов (из них виден примерный район точки). Файл и метаданные не отправляются.
-  Перед отправкой формы проверьте, с каким поставщиком собран релиз: название видно на кнопке «Показать карту».
-- Поиск адреса: текст запроса получает системный геокодер телефона (на многих устройствах это служба Google).
-- JSON-отчёт на сервер пользователя: необязательно, по умолчанию выключено; получатель выбирается пользователем.
-- Покупка Pro: через Google Play, платёжные данные приложению недоступны.
-- Нет аккаунтов, рекламы, аналитики, сторонних SDK для отслеживания.
+This is a guide derived from the app's code. Google Play's definitions of "collected" and "shared" change over time.
+**[ACTION REQUIRED]** Before submitting the form, check every answer against the current Play Console help.
 
-## Предлагаемые ответы
-| Вопрос формы | Ответ |
+## What the app does with data
+- Images, metadata, report history, settings: on the device only, never sent over the network.
+  History is stored encrypted; the API key is protected by Android Keystore.
+- Map: after the button press the app requests map tiles over HTTPS from MapTiler (if the build has the
+  `METACHECK_MAPTILER_KEY` key), otherwise from the OpenStreetMap Foundation servers. The provider sees the IP address
+  and tile numbers (which reveal the approximate area of the point). The file and its metadata are not sent.
+  Before submitting the form, check which provider the release uses: its name is shown on the "Show map" button.
+- Address search: the query text goes to the phone's system geocoder (on many devices a Google service).
+- JSON report to the user's server: optional, off by default; the user chooses the recipient.
+- Pro purchase: through Google Play; payment data is not available to the app.
+- No accounts, ads, analytics or third-party tracking SDKs.
+
+## Suggested answers
+| Form question | Answer |
 |---|---|
-| Собирает или передаёт ли приложение данные пользователя? | Да: примерное местоположение (район точки при загрузке карты). Остальное остаётся на устройстве. |
-| Примерное местоположение | Передаётся третьей стороне (MapTiler или OpenStreetMap — по сборке), необязательно (по кнопке), цель: функциональность приложения. |
-| Фото и видео, файлы | Не собираются (обрабатываются только на устройстве). |
-| Данные шифруются при передаче? | Да (HTTPS). |
-| Можно ли запросить удаление данных? | Разработчик данные не хранит; кэш карты удаляется очисткой кэша или удалением приложения. |
-| Реклама | Нет. |
-| Приложение для детей | Нет. |
+| Does the app collect or share user data? | Yes: approximate location (the area of the point when the map loads). Everything else stays on the device. |
+| Approximate location | Shared with a third party (MapTiler or OpenStreetMap, depending on the build), optional (on button press), purpose: app functionality. |
+| Photos and videos, files | Not collected (processed on the device only). |
+| Is data encrypted in transit? | Yes (HTTPS). |
+| Can users request data deletion? | The developer stores no data; the map cache is removed by clearing the cache or uninstalling the app. |
+| Ads | No. |
+| App for children | No. |
 
-## Что проверить в справке Play
-1. Считается ли запрос тайлов карты по нажатию кнопки «передачей» и подлежит ли декларации (определения «collected» и «shared», исключения для действий, которые пользователь инициирует сам).
-2. Нужно ли отдельно указывать IP-адрес.
-3. Как отразить ACCESS_MEDIA_LOCATION: координаты из фото читаются на устройстве, не передаются.
+## What to check in the Play help
+1. Whether a tile request triggered by a button press counts as "sharing" that must be declared (definitions of "collected" and "shared", exceptions for user-initiated actions).
+2. Whether the IP address must be declared separately.
+3. How to reflect ACCESS_MEDIA_LOCATION: coordinates from photos are read on the device and not transmitted.

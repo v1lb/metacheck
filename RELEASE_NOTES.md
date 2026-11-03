@@ -1,4 +1,4 @@
-# Заметки о версии для Google Play (до 500 символов на язык)
+# Google Play release notes (up to 500 characters per language)
 
 ## ru-RU
 Версия 2.6.0

@@ -1,37 +1,39 @@
-# Тексты интерфейса / UI strings
+# UI strings
 
-Все тексты MetaCheck лежат в ресурсах Android: `app/src/main/res/values/strings.xml` (английский,
-язык по умолчанию) и `values-ru/strings.xml`. Эти файлы **генерируются** из `tools/i18n/*.py`,
-вручную их не правят: CI проверяет `python3 tools/i18n/gen.py --check`.
+Русская версия: [README.ru.md](README.ru.md).
 
-## Изменить или добавить строку
+All MetaCheck texts live in Android resources: `app/src/main/res/values/strings.xml` (English,
+the default language) and `values-ru/strings.xml`. These files are **generated** from `tools/i18n/*.py`
+and are never edited by hand: CI runs `python3 tools/i18n/gen.py --check`.
 
-1. Найдите нужный `master_*.py` (файлы разбиты по экранам) и добавьте запись `(key, en, ru)`.
-   Аргументы только позиционные: `%1$s`, `%2$d`. Числа с окончаниями («5 полей») — через plurals:
-   `{"one": ..., "other": ...}` для EN и `{"one", "few", "many", "other"}` для RU.
+## Changing or adding a string
+
+1. Find the right `master_*.py` (files are split by screen) and add an entry `(key, en, ru)`.
+   Arguments are positional only: `%1$s`, `%2$d`. Numbers with word endings ("5 fields") use plurals:
+   `{"one": ..., "other": ...}` for EN and `{"one", "few", "many", "other"}` for RU.
 2. `python3 tools/i18n/gen.py`
-3. В коде: `stringResource(R.string.key)` в Compose, `UiText.Res(R.string.key)` в ViewModel.
+3. In code: `stringResource(R.string.key)` in Compose, `UiText.Res(R.string.key)` in a ViewModel.
 
-Правила: пишем на «вы»; декоративные метки-«брови» (`FORENSIC REPORT / ON-DEVICE`) одинаковы в обоих
-языках; числа в значениях метаданных форматируются с точкой (Locale.US), переводятся только слова.
-Кириллица в строковых литералах Kotlin запрещена тестом `StringResourcesTest`
-(исключение — `LegacyLabels.kt`, это данные для чтения старых отчётов).
+Rules: Russian texts address the user formally ("вы"); decorative eyebrow labels (`FORENSIC REPORT / ON-DEVICE`)
+are the same in both languages; numbers in metadata values are formatted with a dot (Locale.US), only words are translated.
+Cyrillic in Kotlin string literals is forbidden by `StringResourcesTest`
+(the exception is `LegacyLabels.kt`, data for reading old reports).
 
-## Добавить язык (например, немецкий)
+## Adding a language (for example, German)
 
-1. Создайте `tools/i18n/lang_de.py` со словарём `T = {"key": "Text", ...}` для всех переводимых ключей
-   (генератор перечислит недостающие). Формы plurals для языка заданы в `PLURAL_FORMS` в `gen.py`.
-2. В `master_14_settings.py` добавьте самоназвание: `("language_name_de", "Deutsch", None)`.
-3. В `AppLanguage` (`ui/preferences/UiSelection.kt`) добавьте `DE("de")`,
-   в `AppLocales.nameRes` — `AppLanguage.DE -> R.string.language_name_de`.
-4. `python3 tools/i18n/gen.py`. Список языков для системных настроек Android 13+
-   (`generateLocaleConfig`) обновится сам при сборке.
-5. Политика конфиденциальности и условия: адреса `legal_privacy_url` / `legal_terms_url` тоже
-   переводимые строки; для нового языка укажите страницу на этом языке или английскую.
+1. Create `tools/i18n/lang_de.py` with a dictionary `T = {"key": "Text", ...}` for every translatable key
+   (the generator lists the missing ones). Plural forms per language are defined in `PLURAL_FORMS` in `gen.py`.
+2. In `master_14_settings.py` add the native name: `("language_name_de", "Deutsch", None)`.
+3. In `AppLanguage` (`ui/preferences/UiSelection.kt`) add `DE("de")`,
+   and in `AppLocales.nameRes` add `AppLanguage.DE -> R.string.language_name_de`.
+4. `python3 tools/i18n/gen.py`. The language list for Android 13+ system settings
+   (`generateLocaleConfig`) updates itself during the build.
+5. Privacy policy and terms: the `legal_privacy_url` / `legal_terms_url` addresses are translatable strings too;
+   for a new language point them to a page in that language or to the English one.
 
-## Язык приложения
+## App language
 
-Выбор хранит не приложение, а AppCompat (`AppCompatDelegate.setApplicationLocales`): на Android 13+
-это системный per-app language (Настройки → Приложения → MetaCheck → Язык), на 8–12 AppCompat сохраняет
-выбор сам (`autoStoreLocales` в манифесте). Language split в AAB выключен: иначе Google Play поставил бы
-только язык устройства и выбор другого языка внутри приложения не работал бы.
+The choice is stored by AppCompat, not by the app (`AppCompatDelegate.setApplicationLocales`): on Android 13+
+it is the system per-app language (Settings → Apps → MetaCheck → Language); on 8–12 AppCompat stores the choice
+itself (`autoStoreLocales` in the manifest). The language split in the AAB is off: otherwise Google Play would
+install only the device language and choosing another language inside the app would not work.
