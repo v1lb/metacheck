@@ -48,8 +48,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import com.example.metacheck.ui.LocalizedText as Text
-import com.example.metacheck.ui.i18n.localize
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.example.metacheck.R
+import com.example.metacheck.ui.text.UiText
+import com.example.metacheck.ui.text.asString
+import com.example.metacheck.ui.text.rememberMetaTexts
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -69,6 +73,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -111,20 +116,21 @@ fun MainScreen(
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val snackbar = remember { SnackbarHostState() }
-    val uiLanguage = LocalUiLanguage.current
+    val texts = rememberMetaTexts()
     var showSettings by rememberSaveable { mutableStateOf(false) }
     var showStudio by rememberSaveable { mutableStateOf(false) }
     var confirmApi by rememberSaveable { mutableStateOf(false) }
 
+    // Сообщения ViewModel приходят как UiText и превращаются в строку здесь, на языке экрана.
     LaunchedEffect(studioMessage) {
-        studioMessage?.let { snackbar.showSnackbar(localize(it, uiLanguage)); studioVm.clearMessage() }
+        studioMessage?.let { snackbar.showSnackbar(it.asString(context)); studioVm.clearMessage() }
     }
     LaunchedEffect(message) {
-        message?.let { snackbar.showSnackbar(localize(it, uiLanguage)); viewModel.consumeMessage() }
+        message?.let { snackbar.showSnackbar(it.asString(context)); viewModel.consumeMessage() }
     }
     val proMessage by proVm.message.collectAsStateWithLifecycle()
     LaunchedEffect(proMessage) {
-        proMessage?.let { snackbar.showSnackbar(localize(it, uiLanguage)); proVm.consumeMessage() }
+        proMessage?.let { snackbar.showSnackbar(it.asString(context)); proVm.consumeMessage() }
     }
     // Google требует сверять покупки при возврате в приложение: отложенные платежи, возвраты,
     // покупки на другом устройстве. Срабатывает и при первом показе экрана.
@@ -163,10 +169,10 @@ fun MainScreen(
             takePicture.launch(uri)
         } catch (_: ActivityNotFoundException) {
             pendingCameraUri = null
-            viewModel.showMessage("На устройстве нет приложения камеры")
+            viewModel.showMessage(UiText.Res(R.string.main_msg_no_camera_app))
         } catch (_: Exception) {
             pendingCameraUri = null
-            viewModel.showMessage("Не удалось запустить камеру")
+            viewModel.showMessage(UiText.Res(R.string.main_msg_camera_failed))
         }
     }
     fun pasteImage() {
@@ -174,14 +180,14 @@ fun MainScreen(
             val clip = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).primaryClip
             val uri = if (clip != null && clip.itemCount > 0) clip.getItemAt(0).uri else null
             if (uri?.scheme == ContentResolver.SCHEME_CONTENT) viewModel.onImagePicked(uri)
-            else viewModel.showMessage("В буфере нет ссылки на изображение")
-        } catch (_: Exception) { viewModel.showMessage("Не удалось прочитать буфер") }
+            else viewModel.showMessage(UiText.Res(R.string.main_msg_clipboard_no_image))
+        } catch (_: Exception) { viewModel.showMessage(UiText.Res(R.string.main_msg_clipboard_failed)) }
     }
 
-    val saveJson = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { it?.let(viewModel::exportJson) }
-    val savePdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { it?.let(viewModel::exportPdf) }
+    val saveJson = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri -> uri?.let { viewModel.exportJson(it, texts) } }
+    val savePdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri -> uri?.let { viewModel.exportPdf(it, texts) } }
     val saveCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { it?.let(viewModel::exportHistoryCsv) }
-    val saveMetadataCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { it?.let(viewModel::exportMetadataCsv) }
+    val saveMetadataCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri -> uri?.let { viewModel.exportMetadataCsv(it, texts) } }
     var pendingStripSource by rememberSaveable { mutableStateOf<String?>(null) }
     var pendingWipeSource by rememberSaveable { mutableStateOf<String?>(null) }
     val saveJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
@@ -221,8 +227,20 @@ fun MainScreen(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text("◈", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleLarge)
-                            Text(if (showStudio) "Metadata Studio" else if (showSettings) "Настройки" else "MetaCheck", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
-                            if (!showSettings && !showStudio && !inResult) CyberEyebrow("2.5.1")
+                            Text(
+                                if (showStudio) stringResource(R.string.studio_name)
+                                else if (showSettings) stringResource(R.string.main_title_settings)
+                                else stringResource(R.string.app_name),
+                                style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            if (!showSettings && !showStudio && !inResult) {
+                                // Версия из PackageManager, а не строкой в коде (раньше здесь была устаревшая "2.5.1").
+                                val version = remember { runCatching {
+                                    @Suppress("DEPRECATION")
+                                    context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                                }.getOrNull().orEmpty() }
+                                if (version.isNotEmpty()) CyberEyebrow(version)
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = .7f)),
@@ -231,12 +249,12 @@ fun MainScreen(
                             if (showStudio) showStudio = false
                             else if (showSettings) { showSettings = false; viewModel.refreshHistory() }
                             else viewModel.close()
-                        }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Назад") }
+                        }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.common_back)) }
                     },
                     actions = {
                         if (!showSettings && !showStudio && !inResult) {
                             IconButton(onClick = { showSettings = true }) {
-                                Icon(Icons.Default.Settings, "Настройки", tint = MaterialTheme.colorScheme.primary)
+                                Icon(Icons.Default.Settings, stringResource(R.string.main_title_settings), tint = MaterialTheme.colorScheme.primary)
                             }
                         }
                     },
@@ -281,8 +299,8 @@ fun MainScreen(
                                     }
                                 },
                                 onCopy = {
-                                    clipboard.setText(AnnotatedString(ReportText.format(s.report)))
-                                    viewModel.showMessage("Отчёт скопирован")
+                                    clipboard.setText(AnnotatedString(ReportText.format(s.report, texts)))
+                                    viewModel.showMessage(UiText.Res(R.string.main_msg_report_copied))
                                 },
                                 onJson = { if (entitlement.isPro) saveJson.launch("$name-metacheck.json") else proVm.openPaywall() },
                                 onPdf = { if (entitlement.isPro) savePdf.launch("$name-metacheck.pdf") else proVm.openPaywall() },
@@ -310,19 +328,23 @@ fun MainScreen(
     if (paywallVisible && !entitlement.isPro) PaywallDialog(proVm)
     if (confirmApi) {
         val host = remember(settings.apiEndpoint) {
-            runCatching { URI(settings.apiEndpoint.trim()).host }.getOrNull() ?: "указанный сервер"
-        }
+            runCatching { URI(settings.apiEndpoint.trim()).host }.getOrNull()
+        } ?: stringResource(R.string.main_api_unknown_server)
         AlertDialog(
             onDismissRequest = { confirmApi = false },
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             textContentColor = MaterialTheme.colorScheme.onSurface,
             shape = RoundedCornerShape(26.dp),
-            title = { Text("Подтвердить отправку") },
-            text = { Text("JSON-отчёт будет отправлен на $host. Исходная фотография не отправляется. GPS: " +
-                if (settings.apiSendGps) "включён в отчёт." else "исключён из отчёта.") },
-            confirmButton = { TextButton(onClick = { confirmApi = false; viewModel.sendToApi() }) { Text("Отправить") } },
-            dismissButton = { TextButton(onClick = { confirmApi = false }) { Text("Отмена") } },
+            title = { Text(stringResource(R.string.main_api_confirm_title)) },
+            text = {
+                Text(stringResource(
+                    if (settings.apiSendGps) R.string.main_api_confirm_text_with_gps else R.string.main_api_confirm_text_without_gps,
+                    host,
+                ))
+            },
+            confirmButton = { TextButton(onClick = { confirmApi = false; viewModel.sendToApi(texts) }) { Text(stringResource(R.string.main_api_send)) } },
+            dismissButton = { TextButton(onClick = { confirmApi = false }) { Text(stringResource(R.string.common_cancel)) } },
         )
     }
     apiDialog?.let { dialog ->
@@ -332,20 +354,20 @@ fun MainScreen(
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             textContentColor = MaterialTheme.colorScheme.onSurface,
             shape = RoundedCornerShape(26.dp),
-            title = { Text("Внешний API") },
+            title = { Text(stringResource(R.string.main_api_dialog_title)) },
             text = {
                 when (dialog) {
                     ApiDialog.Loading -> Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator(Modifier.height(28.dp)); Text("Ожидание ответа сервера…")
+                        CircularProgressIndicator(Modifier.height(28.dp)); Text(stringResource(R.string.main_api_waiting))
                     }
                     is ApiDialog.Success -> Column(Modifier.verticalScroll(rememberScrollState())) {
                         Text("HTTP ${dialog.statusCode}", color = MaterialTheme.colorScheme.tertiary)
-                        SelectionContainer { Text(dialog.body.take(4000).ifEmpty { "Ответ пуст" }) }
+                        SelectionContainer { Text(dialog.body.take(4000).ifEmpty { stringResource(R.string.main_api_empty_response) }) }
                     }
-                    is ApiDialog.Error -> Text(dialog.message, color = MaterialTheme.colorScheme.error)
+                    is ApiDialog.Error -> Text(dialog.message.asString(), color = MaterialTheme.colorScheme.error)
                 }
             },
-            confirmButton = { TextButton(onClick = viewModel::dismissApiDialog) { Text("Закрыть") } },
+            confirmButton = { TextButton(onClick = viewModel::dismissApiDialog) { Text(stringResource(R.string.common_close)) } },
         )
     }
 }
@@ -358,7 +380,12 @@ private fun Dashboard(
     onCsv: () -> Unit, onUpgrade: () -> Unit, onStudio: () -> Unit,
 ) {
     val insight = remember(history) { HistoryInsights.from(history) }
-    val dateFormat = remember { SimpleDateFormat("dd.MM · HH:mm", Locale.getDefault()) }
+    val texts = rememberMetaTexts()
+    // Формат даты по языку интерфейса (день/месяц и 12/24 часа в привычном для него порядке).
+    val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
+    val dateFormat = remember(locale) {
+        SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(locale, "ddMMjjmm"), locale)
+    }
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
@@ -367,10 +394,10 @@ private fun Dashboard(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                    PulseIndicator(); CyberEyebrow("SECURE IMAGE INTELLIGENCE")
+                    PulseIndicator(); CyberEyebrow(stringResource(R.string.dash_eyebrow_secure))
                 }
-                Text("Цифровая\nэкспертиза фото", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onSurface)
-                Text("Проверьте происхождение файла, метаданные камеры и технические признаки ИИ.",
+                Text(stringResource(R.string.dash_title), style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onSurface)
+                Text(stringResource(R.string.dash_subtitle),
                     color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -379,44 +406,44 @@ private fun Dashboard(
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween) {
-                        CyberEyebrow("NEW SCAN / 001")
+                        CyberEyebrow(stringResource(R.string.dash_eyebrow_new_scan))
                         Text("⌁", color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.headlineMedium)
                     }
-                    Text("Исследовать изображение", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
-                    Text("Выбирайте исходный JPEG, PNG или HEIC: в скриншоте часть данных уже потеряна.",
+                    Text(stringResource(R.string.dash_scan_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+                    Text(stringResource(R.string.dash_scan_hint),
                         color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                     ScanningBars(Modifier.fillMaxWidth().height(52.dp))
-                    NeonButton("＋  Выбрать фотографию", onPick, Modifier.fillMaxWidth())
+                    NeonButton("＋  " + stringResource(R.string.dash_choose_photo), onPick, Modifier.fillMaxWidth())
                     Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                        CyberOutlineButton("◎  Камера", onCamera, Modifier.weight(1f))
-                        CyberOutlineButton("▣  Буфер", onClipboard, Modifier.weight(1f))
+                        CyberOutlineButton("◎  " + stringResource(R.string.dash_camera), onCamera, Modifier.weight(1f))
+                        CyberOutlineButton("▣  " + stringResource(R.string.dash_clipboard), onClipboard, Modifier.weight(1f))
                     }
                 }
             }
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                MetricPanel("EXIF", "КАМЕРА И GPS", Modifier.weight(1f))
-                MetricPanel("XMP", "МЕТАДАННЫЕ", Modifier.weight(1f), MaterialTheme.colorScheme.secondary)
-                MetricPanel("AI", "МЕТКИ ГЕНЕРАЦИИ", Modifier.weight(1f), MaterialTheme.colorScheme.tertiary)
+                MetricPanel("EXIF", stringResource(R.string.dash_metric_exif), Modifier.weight(1f))
+                MetricPanel("XMP", stringResource(R.string.dash_metric_xmp), Modifier.weight(1f), MaterialTheme.colorScheme.secondary)
+                MetricPanel("AI", stringResource(R.string.dash_metric_ai), Modifier.weight(1f), MaterialTheme.colorScheme.tertiary)
             }
         }
         item {
             GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
                 Column(Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                    CyberEyebrow("METADATA STUDIO / 2.4")
-                    Text("Очистка · EXIF-редактор · пакетная обработка",
+                    CyberEyebrow(stringResource(R.string.dash_eyebrow_studio))
+                    Text(stringResource(R.string.dash_studio_features),
                         color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleMedium)
-                    CyberOutlineButton("Открыть Metadata Studio →", onStudio, Modifier.fillMaxWidth())
+                    CyberOutlineButton(stringResource(R.string.dash_open_studio), onStudio, Modifier.fillMaxWidth())
                 }
             }
         }
-        item { SectionLabel("ВАША АНАЛИТИКА") }
+        item { SectionLabel(stringResource(R.string.dash_section_analytics)) }
         item {
             GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Лимит сохранённой истории", color = MaterialTheme.colorScheme.onSurface,
+                        Text(stringResource(R.string.dash_history_limit), color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.titleMedium)
                         Text("${history.size} / ${if (isPro) 50 else 10}", color = MaterialTheme.colorScheme.tertiary)
                     }
@@ -426,9 +453,9 @@ private fun Dashboard(
                         color = MaterialTheme.colorScheme.tertiary,
                         trackColor = MaterialTheme.colorScheme.outline,
                     )
-                    Text(if (isPro) "Pro: до 50 локальных отчётов" else "Free: до 10 отчётов · Pro: до 50",
+                    Text(stringResource(if (isPro) R.string.dash_history_limit_pro else R.string.dash_history_limit_free),
                         color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                    if (!isPro) CyberOutlineButton("Увеличить лимит с Pro", onUpgrade, Modifier.fillMaxWidth())
+                    if (!isPro) CyberOutlineButton(stringResource(R.string.dash_upgrade_limit), onUpgrade, Modifier.fillMaxWidth())
                 }
             }
         }
@@ -437,21 +464,21 @@ private fun Dashboard(
                 Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
                         Column(Modifier.weight(1f)) {
-                            CyberEyebrow("ВСЕГО ОТЧЁТОВ")
+                            CyberEyebrow(stringResource(R.string.dash_stat_total))
                             Text("${insight.total}", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                         Column(Modifier.weight(1f)) {
-                            CyberEyebrow("С ПРИЗНАКАМИ ИИ", color = MaterialTheme.colorScheme.secondary)
+                            CyberEyebrow(stringResource(R.string.dash_stat_ai), color = MaterialTheme.colorScheme.secondary)
                             Text("${insight.aiEvidenceCount}", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                         Column(Modifier.weight(1f)) {
-                            CyberEyebrow("С GPS", color = MaterialTheme.colorScheme.tertiary)
+                            CyberEyebrow(stringResource(R.string.dash_stat_gps), color = MaterialTheme.colorScheme.tertiary)
                             Text("${insight.gpsCount}", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
-                    CyberEyebrow("АКТИВНОСТЬ ЗА 7 ДНЕЙ")
+                    CyberEyebrow(stringResource(R.string.dash_stat_activity))
                     ActivityChart(insight.lastSevenDays, Modifier.fillMaxWidth().height(78.dp))
-                    Text("Статистика только по сохранённой истории, без облака и оценок подлинности.",
+                    Text(stringResource(R.string.dash_stat_note),
                         color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
             }
@@ -459,15 +486,15 @@ private fun Dashboard(
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                CyberEyebrow("ИСТОРИЯ ПРОВЕРОК")
-                Text("CSV ↗", modifier = Modifier.clickable { onCsv() }.padding(8.dp), color = MaterialTheme.colorScheme.primary)
+                CyberEyebrow(stringResource(R.string.dash_history_title))
+                Text(stringResource(R.string.dash_history_csv), modifier = Modifier.clickable { onCsv() }.padding(8.dp), color = MaterialTheme.colorScheme.primary)
             }
         }
         if (history.isEmpty()) item {
             GlassPanel(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                    Text("Здесь появятся отчёты", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-                    Text(if (historyEnabled) "История пока пуста. Начните первую проверку." else "Сохранение истории отключено в настройках.",
+                    Text(stringResource(R.string.dash_history_empty_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                    Text(stringResource(if (historyEnabled) R.string.dash_history_empty else R.string.dash_history_disabled),
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
@@ -477,14 +504,14 @@ private fun Dashboard(
                 Row(Modifier.fillMaxWidth().clickable { onOpen(entry.id) }.padding(start = 15.dp, top = 10.dp, bottom = 10.dp, end = 5.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(entry.fileName, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        Text(entry.fileName.ifBlank { stringResource(R.string.common_unnamed) }, maxLines = 1, overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleMedium)
-                        Text("${dateFormat.format(Date(entry.createdAt))}  •  ${entry.format.label}" +
-                            if (entry.hasAiEvidence) "  •  AI TRACE" else "",
+                        Text("${dateFormat.format(Date(entry.createdAt))}  •  ${texts.formatName(entry.format)}" +
+                            if (entry.hasAiEvidence) "  •  " + stringResource(R.string.dash_history_ai_badge) else "",
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
                     IconButton(onClick = { onDelete(entry.id) }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Удалить ${entry.fileName}", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.dash_history_delete, entry.fileName), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -495,8 +522,8 @@ private fun Dashboard(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("◈", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.tertiary)
                     Column(Modifier.weight(1f)) {
-                        Text(if (isPro) "PRO ACTIVE" else "METACHECK PRO", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-                        Text(if (isPro) "Экспорт PDF/JSON и расширенная история доступны" else "PDF, JSON, 50 отчётов и собственный API",
+                        Text(stringResource(if (isPro) R.string.dash_pro_active else R.string.dash_pro_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(if (isPro) R.string.dash_pro_active_text else R.string.dash_pro_text),
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
                     if (!isPro) Text("↗", modifier = Modifier.clickable { onUpgrade() }.padding(8.dp),
@@ -504,7 +531,7 @@ private fun Dashboard(
                 }
             }
         }
-        item { Text("Приватность по умолчанию: изображения не отправляются MetaCheck в сеть. Для API требуется отдельное согласие.",
+        item { Text(stringResource(R.string.dash_privacy_footer),
             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall) }
     }
 }
@@ -535,10 +562,10 @@ private fun LoadingScreen() {
             Column(Modifier.padding(26.dp), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(17.dp)) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                CyberEyebrow("ANALYZING / ON DEVICE")
-                Text("Сканирование метаданных", style = MaterialTheme.typography.titleLarge)
+                CyberEyebrow(stringResource(R.string.loading_eyebrow))
+                Text(stringResource(R.string.loading_title), style = MaterialTheme.typography.titleLarge)
                 ScanningBars(Modifier.fillMaxWidth().height(65.dp))
-                Text("Проверяем структуру файла, EXIF, XMP и признаки генерации.",
+                Text(stringResource(R.string.loading_text),
                     color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -546,15 +573,15 @@ private fun LoadingScreen() {
 }
 
 @Composable
-private fun ErrorScreen(message: String, onRetry: () -> Unit, onBack: () -> Unit) {
+private fun ErrorScreen(message: UiText, onRetry: () -> Unit, onBack: () -> Unit) {
     Box(Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
         GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.error) {
             Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                CyberEyebrow("SCAN ERROR", color = MaterialTheme.colorScheme.error)
-                Text("Не удалось проверить файл", style = MaterialTheme.typography.titleLarge)
-                Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                NeonButton("Выбрать другой файл", onRetry, Modifier.fillMaxWidth())
-                CyberOutlineButton("На главную", onBack, Modifier.fillMaxWidth())
+                CyberEyebrow(stringResource(R.string.error_eyebrow), color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.error_title), style = MaterialTheme.typography.titleLarge)
+                Text(message.asString(), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                NeonButton(stringResource(R.string.error_choose_other), onRetry, Modifier.fillMaxWidth())
+                CyberOutlineButton(stringResource(R.string.error_home), onBack, Modifier.fillMaxWidth())
             }
         }
     }

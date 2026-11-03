@@ -1,12 +1,13 @@
 package com.example.metacheck.domain.metadata
 
 import com.example.metacheck.domain.model.MetaReport
+import com.example.metacheck.domain.model.SectionKey
 import java.util.Locale
 
 /** Signals are based on actual GPS tags, never on guesses from location-like text. */
 object GpsPrivacy {
     fun hasExifLocation(report: MetaReport): Boolean = report.gps != null ||
-        report.exifSections.any { it.title == "Геолокация EXIF" && it.items.isNotEmpty() }
+        report.exifSections.any { it.key == SectionKey.GPS && it.items.isNotEmpty() }
 
     /** Also recognize explicit XMP and PNG GPS keys. The map still needs a valid EXIF coordinate pair. */
     fun hasLocationMarkers(report: MetaReport): Boolean = hasExifLocation(report) ||

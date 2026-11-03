@@ -9,6 +9,7 @@ composeBom = "2025.08.00"
 coreKtx = "1.17.0"
 lifecycle = "2.9.2"
 activity = "1.10.1"
+appcompat = "1.7.1"
 exifinterface = "1.4.1"
 datastore = "1.1.7"
 billing = "8.0.0"
@@ -24,6 +25,8 @@ androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtim
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
+# Только для языка приложения (AppCompatDelegate.setApplicationLocales) на Android 8–12.
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }

@@ -7,7 +7,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.metacheck.MetaCheckApplication
+import com.example.metacheck.R
+import com.example.metacheck.ui.text.ErrorTexts
+import com.example.metacheck.ui.text.UiText
 import com.example.metacheck.domain.model.Entitlement
+import com.example.metacheck.domain.model.LicenseException
 import com.example.metacheck.domain.repository.EntitlementRepository
 import kotlinx.coroutines.CancellationException
 import com.example.metacheck.domain.model.PurchaseEvent
@@ -26,12 +30,12 @@ class ProViewModel(private val repository: EntitlementRepository) : ViewModel() 
     private val _price = MutableStateFlow<String?>(null)
     val price: StateFlow<String?> = _price.asStateFlow()
 
-    private val _info = MutableStateFlow<String?>(null)
-    val info: StateFlow<String?> = _info.asStateFlow()
+    private val _info = MutableStateFlow<UiText?>(null)
+    val info: StateFlow<UiText?> = _info.asStateFlow()
 
     /** Сообщения о покупке для snackbar (показываются и при закрытом окне Pro). */
-    private val _message = MutableStateFlow<String?>(null)
-    val message: StateFlow<String?> = _message.asStateFlow()
+    private val _message = MutableStateFlow<UiText?>(null)
+    val message: StateFlow<UiText?> = _message.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -57,11 +61,11 @@ class ProViewModel(private val repository: EntitlementRepository) : ViewModel() 
         _message.value = null
     }
 
-    private fun messageFor(event: PurchaseEvent): String? = when (event) {
-        PurchaseEvent.COMPLETED -> "Pro активирован. Спасибо за покупку!"
-        PurchaseEvent.PENDING -> "Платёж ожидает подтверждения. Pro включится автоматически после оплаты."
-        PurchaseEvent.ALREADY_OWNED -> "Покупка Pro восстановлена"
-        PurchaseEvent.FAILED -> "Покупка не завершена. Попробуйте ещё раз позже."
+    private fun messageFor(event: PurchaseEvent): UiText? = when (event) {
+        PurchaseEvent.COMPLETED -> UiText.Res(R.string.pro_msg_completed)
+        PurchaseEvent.PENDING -> UiText.Res(R.string.pro_payment_pending)
+        PurchaseEvent.ALREADY_OWNED -> UiText.Res(R.string.pro_msg_restored)
+        PurchaseEvent.FAILED -> UiText.Res(R.string.pro_msg_failed)
         PurchaseEvent.CANCELED, PurchaseEvent.UPDATED -> null
     }
 
@@ -79,7 +83,7 @@ class ProViewModel(private val repository: EntitlementRepository) : ViewModel() 
 
     fun buy(activity: Activity) {
         if (!repository.launchPurchase(activity)) {
-            _info.value = "Не удалось открыть покупку. Проверь Google Play и интернет."
+            _info.value = UiText.Res(R.string.pro_msg_launch_failed)
         }
     }
 
@@ -87,10 +91,13 @@ class ProViewModel(private val repository: EntitlementRepository) : ViewModel() 
         viewModelScope.launch {
             repository.redeem(token).fold(
                 onSuccess = {
-                    _info.value = "Ключ принят"
+                    _info.value = UiText.Res(R.string.pro_msg_key_accepted)
                     _paywallVisible.value = false
                 },
-                onFailure = { _info.value = it.message ?: "Некорректный ключ" },
+                onFailure = {
+                    // Общий текст ErrorTexts говорит о файлах; для ключа уместно «некорректный ключ».
+                    _info.value = if (it is LicenseException) ErrorTexts.reason(it) else UiText.Res(R.string.license_error_malformed)
+                },
             )
         }
     }

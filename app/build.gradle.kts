@@ -75,8 +75,17 @@ android {
         }
     }
 
+    // Языки приложения для системных настроек Android 13+ (Приложения → MetaCheck → Язык).
+    // Список берётся из res/values-* , язык res/values задан в res/resources.properties.
+    androidResources {
+        generateLocaleConfig = true
+    }
+
     bundle {
-        language { enableSplit = true }
+        // Язык выбирается внутри приложения, поэтому все языки должны быть в установленном APK.
+        // Со split Google Play ставит только язык устройства: выбор «Русский» на английском телефоне
+        // молча показывал бы английский текст. Строки весят килобайты, разбиение не нужно.
+        language { enableSplit = false }
         density { enableSplit = true }
         abi { enableSplit = true }
     }
@@ -116,6 +125,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.exifinterface)

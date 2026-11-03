@@ -12,3 +12,4 @@ keystore.properties
 *.jks
 *.keystore
 *.aab
+__pycache__/

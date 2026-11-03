@@ -43,7 +43,9 @@ enum class PurchaseEvent {
     val needsRefresh: Boolean get() = this != CANCELED && this != FAILED
 }
 
-class ProRequiredException : Exception("Эта функция доступна в Pro")
+class ProRequiredException : Exception("Pro feature")
 
-/** Сообщение предназначено для показа пользователю. */
-class LicenseException(message: String) : Exception(message)
+/** Причина отказа ключа Pro. Текст для пользователя подбирает интерфейс по коду. */
+enum class LicenseError { NOT_ENABLED, MALFORMED, BAD_SIGNATURE, EXPIRED }
+
+class LicenseException(val code: LicenseError) : Exception(code.name)

@@ -22,7 +22,11 @@ object PngTextParser {
     const val MAX_INFLATED_BYTES = 1 shl 20
     const val MAX_ENTRIES = 64
     const val MAX_TEXT_CHARS = 20_000
-    const val BAD_DATA = "(данные повреждены или превышают лимит)"
+    /**
+     * Текст повреждённого или слишком большого блока. Это маркер, а не текст для пользователя:
+     * ImageRepository превращает его в MetaItem с ValueFormat.BAD_DATA, подпись локализует интерфейс.
+     */
+    const val BAD_DATA = "\u0000metacheck:bad-data\u0000"
 
     fun parse(data: ByteArray): List<PngTextEntry> {
         if (!data.startsWith(PNG_SIGNATURE)) return emptyList()

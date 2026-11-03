@@ -12,6 +12,7 @@ import com.example.metacheck.domain.repository.SettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
@@ -45,8 +46,13 @@ class SettingsViewModel(
         viewModelScope.launch(Dispatchers.IO) { runCatching { settingsRepository.saveApiKey(null) } }
     }
 
-    fun clearHistory() {
-        viewModelScope.launch { history.clear() }
+    /** [onDone] вызывается в главном потоке после фактического удаления. */
+    /** onDone(true) только если история действительно удалена: иначе пользователь думал бы, что данных нет. */
+    fun clearHistory(onDone: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            val ok = try { history.clear(); true } catch (e: CancellationException) { throw e } catch (_: Exception) { false }
+            onDone(ok)
+        }
     }
 
     companion object {

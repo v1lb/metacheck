@@ -23,6 +23,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -95,7 +96,7 @@ fun GlassPanel(modifier: Modifier = Modifier, accent: Color = MaterialTheme.colo
 @Composable
 fun CyberEyebrow(text: String, modifier: Modifier = Modifier,
                  color: Color = MaterialTheme.colorScheme.primary) {
-    LocalizedText(text, modifier = modifier, color = color,
+    Text(text, modifier = modifier, color = color,
         style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
 }
 
@@ -106,7 +107,7 @@ fun NeonButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary)) {
-        LocalizedText(text, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(text, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -116,7 +117,7 @@ fun CyberOutlineButton(text: String, onClick: () -> Unit, modifier: Modifier = M
     OutlinedButton(onClick = onClick, modifier = modifier, enabled = enabled,
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = .55f))) {
-        LocalizedText(text, color = MaterialTheme.colorScheme.primary,
+        Text(text, color = MaterialTheme.colorScheme.primary,
             maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
@@ -138,9 +139,9 @@ fun MetricPanel(value: String, label: String, modifier: Modifier = Modifier,
                 accent: Color = MaterialTheme.colorScheme.primary) {
     GlassPanel(modifier, accent) {
         Column(Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            LocalizedText(value, color = accent, style = MaterialTheme.typography.titleLarge,
+            Text(value, color = accent, style = MaterialTheme.typography.titleLarge,
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
-            LocalizedText(label, style = MaterialTheme.typography.labelMedium,
+            Text(label, style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
         }
     }

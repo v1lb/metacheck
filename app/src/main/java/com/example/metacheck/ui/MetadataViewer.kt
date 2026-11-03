@@ -24,7 +24,12 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import com.example.metacheck.ui.LocalizedText as Text
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.example.metacheck.R
+import com.example.metacheck.ui.text.ResourceMetaTexts
+import com.example.metacheck.ui.text.rememberMetaTexts
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,14 +60,16 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
     val lat = selectedLat
     val lon = selectedLon
     val selectedGps = if (lat != null && lon != null) GpsPoint(lat, lon, report.gps?.altitudeMeters) else null
-    var saveStatus by rememberSaveable(report.file.name) { mutableStateOf("") }
+    // Флаг, а не текст: текст берётся из ресурсов при показе и следует за языком интерфейса.
+    var pointChanged by rememberSaveable(report.file.name) { mutableStateOf(false) }
     val saveGpsFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { destination ->
         // Параметры операции берутся из ViewModel, результат приходит сообщением внизу экрана.
         studioVm.onEditCopyDestination(destination)
-        if (destination != null) saveStatus = ""
+        if (destination != null) pointChanged = false
     }
 
-    val records = remember(report) { MetadataCatalog.from(report) }
+    val texts = rememberMetaTexts()
+    val records = remember(report, texts) { MetadataCatalog.from(report, texts) }
     var query by rememberSaveable(report.file.name) { mutableStateOf("") }
     var groupId by rememberSaveable(report.file.name) { mutableStateOf("") }
     val group = MetadataGroup.entries.firstOrNull { it.name == groupId }
@@ -75,9 +82,9 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
     ) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                CyberEyebrow("NATIVE METADATA EXPLORER  /  LOCAL")
-                Text("Метаданные файла", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
-                Text("${records.size} полей · просмотр прямо на устройстве", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                CyberEyebrow(stringResource(R.string.viewer_eyebrow))
+                Text(stringResource(R.string.viewer_title), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
+                Text(pluralStringResource(R.plurals.viewer_field_count, records.size, records.size), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         item {
@@ -85,11 +92,11 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
                 value = query,
                 onValueChange = { query = it.take(120) },
                 modifier = Modifier.fillMaxWidth().testTag("metadata_search"),
-                label = { Text("Поиск по тегам и значениям") },
-                placeholder = { Text("Например: ISO, GPS, Adobe") },
+                label = { Text(stringResource(R.string.viewer_search_label)) },
+                placeholder = { Text(stringResource(R.string.viewer_search_placeholder)) },
                 singleLine = true,
                 trailingIcon = {
-                    if (query.isNotEmpty()) TextButton(onClick = { query = "" }) { Text("Сброс") }
+                    if (query.isNotEmpty()) TextButton(onClick = { query = "" }) { Text(stringResource(R.string.viewer_search_clear)) }
                 },
                 shape = RoundedCornerShape(16.dp),
             )
@@ -97,30 +104,30 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
         item {
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                MetadataChip("Все", group == null) { groupId = "" }
+                MetadataChip(stringResource(R.string.viewer_group_all), group == null) { groupId = "" }
                 availableGroups.forEach { candidate ->
-                    MetadataChip(candidate.title, group == candidate) { groupId = candidate.name }
+                    MetadataChip(stringResource(ResourceMetaTexts.groupTitleId(candidate)), group == candidate) { groupId = candidate.name }
                 }
             }
         }
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("НАЙДЕНО: ${results.size}", style = MaterialTheme.typography.labelMedium,
+                Text(stringResource(R.string.viewer_found, results.size), style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary)
                 if (onCsv != null) {
-                    TextButton(onClick = onCsv) { Text("Экспорт CSV ↗", color = MaterialTheme.colorScheme.primary) }
+                    TextButton(onClick = onCsv) { Text(stringResource(R.string.viewer_export_csv), color = MaterialTheme.colorScheme.primary) }
                 }
             }
         }
         item(key = "gps_editor") {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                SectionLabel("GPS / ИНТЕРАКТИВНАЯ КАРТА")
+                SectionLabel(stringResource(R.string.viewer_gps_section))
                 val point = selectedGps
                 if (point != null) {
                     CyberGeoMap(gps = point, onSelect = { newLat, newLon ->
                         selectedLat = newLat
                         selectedLon = newLon
-                        saveStatus = "Точка выбрана. Сохраните копию фотографии."
+                        pointChanged = true
                     })
                     Button(
                         enabled = sourceUri != null && report.file.format.name == "JPEG" && !studioBusy,
@@ -130,14 +137,14 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
                                 saveGpsFile.launch("gps-${report.file.name.substringBeforeLast('.')}.jpg")
                             }
                         },
-                    ) { Text(if (studioBusy) "Сохранение…" else "Сохранить GPS в JPEG") }
+                    ) { Text(stringResource(if (studioBusy) R.string.viewer_saving else R.string.viewer_save_gps)) }
                     if (report.file.format.name != "JPEG") {
-                        Text("Запись GPS пока поддерживается только для JPEG.")
+                        Text(stringResource(R.string.viewer_gps_jpeg_only))
                     }
-                    if (sourceUri == null) Text("Исходный файл недоступен: откройте оригинал фотографии.")
-                    if (saveStatus.isNotBlank()) Text(saveStatus)
+                    if (sourceUri == null) Text(stringResource(R.string.viewer_source_unavailable))
+                    if (pointChanged) Text(stringResource(R.string.viewer_point_selected))
                 } else {
-                    Text("В фотографии нет GPS-координат.")
+                    Text(stringResource(R.string.viewer_no_gps))
                 }
             }
         }
@@ -145,13 +152,12 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
             item {
                 GlassPanel(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(19.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                        Text("Ничего не найдено", style = MaterialTheme.typography.titleMedium,
+                        Text(stringResource(R.string.viewer_nothing_found), style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface)
-                        Text(if (records.isEmpty()) "Файл не содержит распознанных метаданных."
-                            else "Попробуйте другой запрос или выберите категорию «Все».",
+                        Text(stringResource(if (records.isEmpty()) R.string.viewer_no_metadata else R.string.viewer_try_other_query),
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (query.isNotEmpty() || group != null) {
-                            CyberOutlineButton("Сбросить фильтры", { query = ""; groupId = "" })
+                            CyberOutlineButton(stringResource(R.string.viewer_reset_filters), { query = ""; groupId = "" })
                         }
                     }
                 }
@@ -160,14 +166,13 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
             val sections = results.groupBy { it.group }
             sections.forEach { (category, entries) ->
                 item {
-                    SectionLabel("${category.marker} / ${category.title.uppercase()}")
+                    SectionLabel("${category.marker} / ${stringResource(ResourceMetaTexts.groupTitleId(category)).uppercase()}")
                 }
                 items(entries) { entry -> MetadataEntry(entry) }
             }
         }
         item {
-            Text("Показаны доступные поля, извлечённые локальными парсерами MetaCheck. " +
-                "Отсутствие тега не доказывает подлинность файла. GPS может содержать личные данные.",
+            Text(stringResource(R.string.viewer_footer),
                 color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
         }
     }

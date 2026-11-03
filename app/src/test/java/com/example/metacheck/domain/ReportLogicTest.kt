@@ -5,6 +5,7 @@ import com.example.metacheck.domain.export.CleanFormat
 import com.example.metacheck.domain.export.ReportText
 import com.example.metacheck.domain.model.ImageFormat
 import com.example.metacheck.sampleReport
+import com.example.metacheck.testutil.FakeTexts
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -17,21 +18,33 @@ class ReportLogicTest {
 
     @Test
     fun textContainsKeyFacts() {
-        val text = ReportText.format(sampleReport(name = "cat.png", ai = true))
-        assertTrue(text.contains("cat.png"))
-        assertTrue(text.contains("Следы ИИ"))
-        assertTrue(text.contains("Модель: Pixel 8"))
-        assertTrue(text.contains("55.750000, 37.620000"))
+        val text = ReportText.format(sampleReport(name = "cat.png", ai = true), FakeTexts())
+        assertTrue(text.contains("FILE_NAME_LINE(cat.png)"))
+        assertTrue(text.contains("AI_FOUND"))
+        assertTrue(text.contains("[AI_EVIDENCE] SD_PARAMETERS"))
+        assertTrue(text.contains("== CAMERA =="))
+        assertTrue(text.contains("Model: Pixel 8"))
+        assertTrue(text.contains("COORDINATES_LINE(55.75, 37.62)"))
+        assertTrue(text.contains("ALTITUDE_LINE(120.0)"))
     }
 
     @Test
     fun textOmitsGpsWhenAbsent() {
-        assertTrue(!ReportText.format(sampleReport(gps = false)).contains("Геолокация"))
+        assertTrue(!ReportText.format(sampleReport(gps = false), FakeTexts()).contains("GEOLOCATION"))
+    }
+
+    @Test
+    fun unknownSizeAndPartialScanUseOwnPhrases() {
+        val base = sampleReport()
+        val r = base.copy(file = base.file.copy(sizeBytes = -1, truncated = true, scannedBytes = 512))
+        val text = ReportText.format(r, FakeTexts())
+        assertTrue(text.contains("FILE_SIZE_UNKNOWN_LINE"))
+        assertTrue(text.contains("FILE_PARTIAL_LINE(512)"))
     }
 
     @Test
     fun longValuesAreTruncated() {
-        val text = ReportText.format(sampleReport(prompt = "a".repeat(5000)))
+        val text = ReportText.format(sampleReport(prompt = "a".repeat(5000)), FakeTexts())
         val line = text.lines().first { it.startsWith("parameters: ") }
         assertEquals("parameters: ".length + 2000, line.length)
     }

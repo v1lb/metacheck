@@ -37,20 +37,26 @@ object XmpExtractor {
      */
     private const val MAX_ATTEMPTS_PER_NAME = 1024
 
+    /** Ключ поля XMP: "xmp:" + полное имя свойства (например, "xmp:dc:title"). Подпись — из ресурсов. */
+    const val KEY_PREFIX = "xmp:"
+    /** Ключ сводного поля «программы в истории правок» (все stEvt:softwareAgent). */
+    const val KEY_HISTORY_AGENTS = "xmp:history_agents"
+
+    /** Порядок показа известных свойств. */
     private val known = listOf(
-        KEY_CREATOR_TOOL to "Инструмент создания",
-        "xmp:CreateDate" to "Дата создания (XMP)",
-        "xmp:ModifyDate" to "Дата изменения (XMP)",
-        "dc:title" to "Название",
-        "dc:creator" to "Автор",
-        "dc:description" to "Описание",
-        "dc:rights" to "Права",
-        "tiff:Make" to "Производитель (XMP)",
-        "tiff:Model" to "Модель (XMP)",
-        "exif:GPSLatitude" to "GPSLatitude (XMP)",
-        "exif:GPSLongitude" to "GPSLongitude (XMP)",
-        "exif:GPSAltitude" to "GPSAltitude (XMP)",
-        SignalEngine.KEY_DIGITAL_SOURCE_TYPE to "Тип источника (IPTC)",
+        KEY_CREATOR_TOOL,
+        "xmp:CreateDate",
+        "xmp:ModifyDate",
+        "dc:title",
+        "dc:creator",
+        "dc:description",
+        "dc:rights",
+        "tiff:Make",
+        "tiff:Model",
+        "exif:GPSLatitude",
+        "exif:GPSLongitude",
+        "exif:GPSAltitude",
+        SignalEngine.KEY_DIGITAL_SOURCE_TYPE,
     )
 
     fun extractPacket(data: ByteArray, pngText: List<PngTextEntry> = emptyList()): String? {
@@ -67,15 +73,15 @@ object XmpExtractor {
     fun parse(packet: String): XmpData {
         val fields = LinkedHashMap<String, String>()
         val items = mutableListOf<MetaItem>()
-        for ((name, label) in known) {
+        for (name in known) {
             val value = valuesOf(packet, name).firstOrNull() ?: continue
             fields[name] = value
-            items += MetaItem(label, value)
+            items += MetaItem(name, value, KEY_PREFIX + name)
         }
         val agents = valuesOf(packet, KEY_SOFTWARE_AGENT).distinct().take(10)
         if (agents.isNotEmpty()) {
             fields[KEY_SOFTWARE_AGENT] = agents.joinToString(", ")
-            items += MetaItem("Программы в истории правок", agents.joinToString(", "))
+            items += MetaItem(KEY_SOFTWARE_AGENT, agents.joinToString(", "), KEY_HISTORY_AGENTS)
         }
         return XmpData(items, fields)
     }

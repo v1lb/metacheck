@@ -1,0 +1,34 @@
+# Pro: окно покупки, статус, сообщения о покупке (ProUi.kt, ProViewModel.kt). (key, en, ru)
+
+S = [
+    ("pro_title", "MetaCheck Pro", "MetaCheck Pro"),
+    ("pro_eyebrow", "FREE  →  PRO", "FREE  →  PRO"),
+    ("pro_free_features",
+     "Free: scanning and GPS Privacy Shield, EXIF viewer, editing and cleaning of up to %1$d photos per day (UTC), 10 reports in history.",
+     "Free: анализ и GPS Privacy Shield, просмотр EXIF, правка и очистка до %1$d фото в сутки (UTC), 10 отчётов в истории."),
+    ("pro_pro_features",
+     "Pro: unlimited cleaning and editing, batch processing of up to 50 photos, PDF/JSON, 50 reports, API.",
+     "Pro: безлимитная очистка и правка, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API."),
+    ("pro_one_time", "One-time purchase through Google Play, no subscription.", "Разовая покупка через Google Play, без подписки."),
+    ("pro_key_label", "Pro key, if you have one", "Ключ Pro, если он у вас есть"),
+    ("pro_key_apply", "Apply key", "Применить ключ"),
+    ("pro_payment_pending", "The payment is awaiting confirmation. Pro will turn on automatically once it is paid.",
+     "Платёж ожидает подтверждения. Pro включится автоматически после оплаты."),
+    ("pro_buy_pending", "Awaiting payment", "Ожидает оплаты"),
+    ("pro_buy_for", "Buy for %1$s", "Купить за %1$s"),
+    ("pro_buy_unavailable", "Purchase unavailable", "Покупка недоступна"),
+
+    ("pro_status_free", "Free version", "Бесплатная версия"),
+    ("pro_status_free_pending", "Free version · Pro payment awaiting confirmation",
+     "Бесплатная версия · платёж Pro ожидает подтверждения"),
+    ("pro_status_play", "Pro active (Google Play purchase)", "Pro активен (покупка в Google Play)"),
+    ("pro_status_license", "Pro active with a key", "Pro активен по ключу"),
+    ("pro_status_license_until", "Pro active with a key until %1$s", "Pro активен по ключу до %1$s"),
+
+    ("pro_msg_completed", "Pro activated. Thank you for your purchase!", "Pro активирован. Спасибо за покупку!"),
+    ("pro_msg_restored", "Pro purchase restored", "Покупка Pro восстановлена"),
+    ("pro_msg_failed", "The purchase was not completed. Please try again later.", "Покупка не завершена. Попробуйте ещё раз позже."),
+    ("pro_msg_launch_failed", "Could not open the purchase. Check Google Play and your internet connection.",
+     "Не удалось открыть покупку. Проверьте Google Play и интернет."),
+    ("pro_msg_key_accepted", "Key accepted", "Ключ принят"),
+]

@@ -2,6 +2,8 @@ package com.example.metacheck.data.history
 
 import com.example.metacheck.data.crypto.Crypto
 import com.example.metacheck.data.export.ReportJson
+import com.example.metacheck.domain.AppFailure
+import com.example.metacheck.domain.FailureCode
 import com.example.metacheck.domain.model.HistoryEntry
 import com.example.metacheck.domain.model.MetaReport
 import com.example.metacheck.domain.repository.HistoryRepository
@@ -12,7 +14,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.IOException
 import java.util.UUID
 
 /**
@@ -35,14 +36,14 @@ class FileHistoryRepository(
     override suspend fun save(report: MetaReport): Result<String> = withContext(io) {
         lock.withLock {
             runCatchingCancellable {
-                if (!dir.exists() && !dir.mkdirs()) throw IOException("Не удалось создать папку истории")
+                if (!dir.exists() && !dir.mkdirs()) throw AppFailure(FailureCode.HISTORY_UNAVAILABLE)
                 val id = clock().toString().padStart(13, '0') + "_" + UUID.randomUUID().toString().replace("-", "")
                 val bytes = crypto.encrypt(ReportJson.toJson(report).toString().toByteArray(Charsets.UTF_8))
                 val tmp = File(dir, "$id.tmp")
                 tmp.writeBytes(bytes)
                 if (!tmp.renameTo(File(dir, "$id.rep"))) {
                     tmp.delete()
-                    throw IOException("Не удалось сохранить отчёт")
+                    throw AppFailure(FailureCode.HISTORY_UNAVAILABLE)
                 }
                 reportFiles().drop(maxEntries()).forEach { it.delete() }
                 id

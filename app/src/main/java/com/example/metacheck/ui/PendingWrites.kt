@@ -49,12 +49,12 @@ class PendingWrites(private val store: StateStore) {
     val current: PendingWrite? get() = store[KEY] as? PendingWrite
 
     fun requestEditCopy(source: String, patch: MetadataPatch) {
-        require(source.isNotBlank()) { "Не выбран файл" }
+        require(source.isNotBlank()) { "No source file selected" }
         store[KEY] = PendingWrite.EditCopy(source, patch)
     }
 
     fun requestOverwrite(source: String, op: OverwriteOp) {
-        require(source.isNotBlank()) { "Не выбран файл" }
+        require(source.isNotBlank()) { "No source file selected" }
         store[KEY] = PendingWrite.Overwrite(source, op)
     }
 

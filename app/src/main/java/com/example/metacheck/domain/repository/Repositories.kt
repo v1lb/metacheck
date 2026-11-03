@@ -5,6 +5,7 @@ import com.example.metacheck.domain.model.AppSettings
 import com.example.metacheck.domain.model.HistoryEntry
 import com.example.metacheck.domain.model.ImageFormat
 import com.example.metacheck.domain.model.MetaReport
+import com.example.metacheck.domain.text.MetaTexts
 import kotlinx.coroutines.flow.StateFlow
 
 interface HistoryRepository {
@@ -15,13 +16,14 @@ interface HistoryRepository {
     suspend fun clear()
 }
 
+/** [texts] — тексты на языке пользователя: экспортированный файл читает человек. */
 interface ExportRepository {
-    suspend fun exportJson(report: MetaReport, target: String): Result<Unit>
-    suspend fun exportPdf(report: MetaReport, target: String): Result<Unit>
+    suspend fun exportJson(report: MetaReport, target: String, texts: MetaTexts): Result<Unit>
+    suspend fun exportPdf(report: MetaReport, target: String, texts: MetaTexts): Result<Unit>
 }
 
 interface ApiRepository {
-    suspend fun send(report: MetaReport): Result<ApiResult>
+    suspend fun send(report: MetaReport, texts: MetaTexts): Result<ApiResult>
 }
 
 interface SettingsRepository {

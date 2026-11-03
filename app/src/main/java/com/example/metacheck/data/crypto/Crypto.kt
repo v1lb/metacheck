@@ -59,7 +59,7 @@ class KeystoreCrypto(private val alias: String = "metacheck_aes_key") : Crypto {
     }
 
     override fun decrypt(blob: ByteArray): ByteArray {
-        require(blob.size >= IV_SIZE + TAG_BITS / 8) { "Повреждённые данные" }
+        require(blob.size >= IV_SIZE + TAG_BITS / 8) { "Corrupted ciphertext" }
         return try {
             decryptOnce(blob)
         } catch (first: Exception) {
@@ -124,4 +124,4 @@ class KeystoreCrypto(private val alias: String = "metacheck_aes_key") : Crypto {
 }
 
 /** Keystore недоступен даже после пересоздания ключа. Вызывающий код должен работать без шифрования/кэша. */
-class CryptoUnavailableException(cause: Throwable) : Exception("Защищённое хранилище ключей недоступно", cause)
+class CryptoUnavailableException(cause: Throwable) : Exception("Android Keystore unavailable", cause)

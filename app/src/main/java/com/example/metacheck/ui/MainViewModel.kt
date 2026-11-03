@@ -14,6 +14,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.metacheck.MetaCheckApplication
+import com.example.metacheck.R
+import com.example.metacheck.domain.text.MetaTexts
+import com.example.metacheck.ui.text.ErrorTexts
+import com.example.metacheck.ui.text.UiText
 import com.example.metacheck.domain.model.ApiException
 import com.example.metacheck.domain.model.AppSettings
 import com.example.metacheck.domain.model.HistoryEntry
@@ -35,7 +39,7 @@ import kotlinx.coroutines.launch
 sealed interface UiState {
     data object Idle : UiState
     data object Loading : UiState
-    data class Failed(val message: String) : UiState
+    data class Failed(val message: UiText) : UiState
 
     /** [source] есть только у свежего анализа; у отчёта из истории исходный файл недоступен. */
     data class Done(val report: MetaReport, val source: String?) : UiState
@@ -44,7 +48,7 @@ sealed interface UiState {
 sealed interface ApiDialog {
     data object Loading : ApiDialog
     data class Success(val statusCode: Int, val body: String) : ApiDialog
-    data class Error(val message: String) : ApiDialog
+    data class Error(val message: UiText) : ApiDialog
 }
 
 class MainViewModel(
@@ -65,8 +69,8 @@ class MainViewModel(
     private val _history = MutableStateFlow<List<HistoryEntry>>(emptyList())
     val historyEntries: StateFlow<List<HistoryEntry>> = _history.asStateFlow()
 
-    private val _message = MutableStateFlow<String?>(null)
-    val message: StateFlow<String?> = _message.asStateFlow()
+    private val _message = MutableStateFlow<UiText?>(null)
+    val message: StateFlow<UiText?> = _message.asStateFlow()
 
     private val _busy = MutableStateFlow(false)
     val busy: StateFlow<Boolean> = _busy.asStateFlow()
@@ -85,11 +89,11 @@ class MainViewModel(
         viewModelScope.launch {
             try { _history.value = history.list() }
             catch (e: CancellationException) { throw e }
-            catch (_: Exception) { showMessage("Не удалось загрузить историю") }
+            catch (_: Exception) { showMessage(UiText.Res(R.string.main_msg_history_load_failed)) }
         }
     }
 
-    fun showMessage(text: String) {
+    fun showMessage(text: UiText) {
         _message.value = text
     }
 
@@ -110,13 +114,13 @@ class MainViewModel(
                                 history.save(report)
                                 refreshHistory()
                             } catch (e: CancellationException) { throw e }
-                            catch (_: Exception) { showMessage("Проверка завершена, но историю сохранить не удалось") }
+                            catch (_: Exception) { showMessage(UiText.Res(R.string.main_msg_history_save_failed)) }
                         }
                     },
-                    onFailure = { _state.value = UiState.Failed(it.toUserMessage()) },
+                    onFailure = { _state.value = UiState.Failed(analysisError(it)) },
                 )
             } catch (e: CancellationException) { throw e }
-            catch (_: Exception) { _state.value = UiState.Failed("Ошибка чтения файла. Попробуйте другой источник.") }
+            catch (_: Exception) { _state.value = UiState.Failed(UiText.Res(R.string.main_error_read_source)) }
         }
     }
 
@@ -126,7 +130,7 @@ class MainViewModel(
                 catch (e: CancellationException) { throw e }
                 catch (_: Exception) { null }
             if (report == null) {
-                showMessage("Не удалось открыть отчёт")
+                showMessage(UiText.Res(R.string.main_msg_report_open_failed))
                 refreshHistory()
             } else {
                 _state.value = UiState.Done(report, null)
@@ -138,7 +142,7 @@ class MainViewModel(
         viewModelScope.launch {
             try { history.delete(id); refreshHistory() }
             catch (e: CancellationException) { throw e }
-            catch (_: Exception) { showMessage("Не удалось удалить отчёт") }
+            catch (_: Exception) { showMessage(UiText.Res(R.string.main_msg_report_delete_failed)) }
         }
     }
 
@@ -155,56 +159,57 @@ class MainViewModel(
                 withContext(Dispatchers.IO) {
                     val data = HistoryCsv.encode(history.list())
                     resolver.openOutputStream(target, "wt")?.use { it.write(data) }
-                        ?: error("Невозможно открыть файл")
+                        ?: error("Cannot open output")
                 }
-                showMessage("CSV с историей сохранён")
+                showMessage(UiText.Res(R.string.main_msg_history_csv_saved))
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {
-                showMessage("Не удалось сохранить CSV")
+                showMessage(UiText.Res(R.string.main_msg_csv_failed))
             } finally {
                 _busy.value = false
             }
         }
     }
 
-    fun exportMetadataCsv(target: Uri) = withDone { done ->
+    /** [texts] — тексты экрана, с которого запущен экспорт: файл будет на языке интерфейса. */
+    fun exportMetadataCsv(target: Uri, texts: MetaTexts) = withDone { done ->
         withContext(Dispatchers.IO) {
-            val data = MetadataCsv.encode(MetadataCatalog.from(done.report))
+            val data = MetadataCsv.encode(MetadataCatalog.from(done.report, texts))
             resolver.openOutputStream(target, "wt")?.use { it.write(data) }
-                ?: error("Не удалось открыть файл")
+                ?: error("Cannot open output")
         }
-        showMessage("CSV с метаданными сохранён")
+        showMessage(UiText.Res(R.string.main_msg_metadata_csv_saved))
     }
 
-    fun exportJson(target: Uri) = withDone { done ->
-        exportReport.json(done.report, target.toString()).fold(
-            onSuccess = { showMessage("JSON-отчёт сохранён") },
+    fun exportJson(target: Uri, texts: MetaTexts) = withDone { done ->
+        exportReport.json(done.report, target.toString(), texts).fold(
+            onSuccess = { showMessage(UiText.Res(R.string.main_msg_json_saved)) },
             onFailure = { showMessage(exportError(it)) },
         )
     }
 
-    fun exportPdf(target: Uri) = withDone { done ->
-        exportReport.pdf(done.report, target.toString()).fold(
-            onSuccess = { showMessage("PDF-отчёт сохранён") },
+    fun exportPdf(target: Uri, texts: MetaTexts) = withDone { done ->
+        exportReport.pdf(done.report, target.toString(), texts).fold(
+            onSuccess = { showMessage(UiText.Res(R.string.main_msg_pdf_saved)) },
             onFailure = { showMessage(exportError(it)) },
         )
     }
 
 
-    fun sendToApi() {
+    fun sendToApi(texts: MetaTexts) {
         val done = _state.value as? UiState.Done ?: return
         apiJob?.cancel()
         _apiDialog.value = ApiDialog.Loading
         apiJob = viewModelScope.launch {
-            _apiDialog.value = checkViaApi(done.report).fold(
+            _apiDialog.value = checkViaApi(done.report, texts).fold(
                 onSuccess = { ApiDialog.Success(it.statusCode, it.body) },
                 onFailure = {
                     ApiDialog.Error(
                         when (it) {
-                            is ApiException -> it.message ?: "Не удалось выполнить запрос."
-                            is ProRequiredException -> "Отправка в API доступна в Pro."
-                            else -> "Не удалось выполнить запрос."
+                            is ApiException -> ErrorTexts.reason(it)
+                            is ProRequiredException -> UiText.Res(R.string.main_api_pro_only)
+                            else -> UiText.Res(R.string.api_error_request_failed)
                         },
                     )
                 },
@@ -226,21 +231,20 @@ class MainViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {
-                showMessage("Не удалось завершить операцию")
+                showMessage(UiText.Res(R.string.main_msg_operation_failed))
             } finally {
                 _busy.value = false
             }
         }
     }
 
-    private fun exportError(e: Throwable): String =
-        if (e is ProRequiredException) "Экспорт доступен в Pro" else "Не удалось сохранить файл"
+    private fun exportError(e: Throwable): UiText =
+        UiText.Res(if (e is ProRequiredException) R.string.main_msg_export_pro_only else R.string.main_msg_save_failed)
 
-    private fun Throwable.toUserMessage(): String = when (this) {
-        is UnsupportedFormatException -> "Это не изображение в поддерживаемом формате (JPEG, PNG, WebP, GIF, HEIC, AVIF)."
-        is TooLargeException -> "Не хватило памяти для анализа этого файла. Закройте другие приложения и попробуйте снова."
-        is SecurityException -> "Нет доступа к файлу. Выберите его снова."
-        else -> "Не удалось прочитать файл. Попробуй другой."
+    private fun analysisError(e: Throwable): UiText = when (e) {
+        is UnsupportedFormatException, is TooLargeException -> ErrorTexts.reason(e)
+        is SecurityException -> UiText.Res(R.string.main_error_no_access)
+        else -> UiText.Res(R.string.main_error_read_file)
     }
 
     companion object {
