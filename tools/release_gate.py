@@ -40,6 +40,15 @@ check('Privacy policy has no unresolved placeholders', not re.search(r'\[(дат
 check('Legal documents folder exists', all((ROOT / 'legal' / n).is_file() for n in ['PRIVACY_POLICY_RU.md', 'PRIVACY_POLICY_EN.md', 'TERMS_RU.md', 'TERMS_EN.md']))
 check('AAB cannot be built without own signing key', 'bundleRelease' in cfg and 'GradleException' in cfg)
 check('Third-party licenses listed', (ROOT / 'THIRD_PARTY_LICENSES.md').is_file())
+workflows = ROOT / '.github/workflows'
+release_wf = [(workflows / n).read_text(encoding='utf-8') for n in ('release-aab.yml', 'build-apk.yml') if (workflows / n).is_file()]
+def code_lines(text):
+    return [l for l in text.splitlines() if not l.lstrip().startswith('#')]
+check('Release workflows do not skip lint (-x lint*)',
+      release_wf and not any(re.search(r'-x\s+lint', l) for t in release_wf for l in code_lines(t)))
+check('Release AAB workflow runs tests and lintRelease before bundleRelease',
+      any('lintRelease' in t and 'testReleaseUnitTest' in t and t.index('lintRelease') < t.index('bundleRelease')
+          for t in release_wf if 'bundleRelease' in t))
 for label, ok in checks:
     print(('PASS' if ok else 'FAIL') + '  ' + label)
 if not all(ok for _, ok in checks):

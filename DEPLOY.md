@@ -23,6 +23,22 @@ keytool -genkeypair -v -keystore secrets/metacheck-upload.jks \
 `METACHECK_STORE_FILE`, `METACHECK_STORE_PASSWORD`, `METACHECK_KEY_ALIAS`, `METACHECK_KEY_PASSWORD`.
 
 ## 2. Сборка AAB
+
+### Через GitHub Actions (рекомендуется)
+1. Подними `versionCode` и `versionName` в `app/build.gradle.kts`, закоммить.
+2. Поставь тег с той же версией и отправь его:
+   ```bash
+   git tag v2.6.1 && git push origin v2.6.1
+   ```
+3. Workflow «Release AAB for Google Play» запустится сам: проверит, что тег совпадает с `versionName`,
+   прогонит `release_gate.py`, unit-тесты и `lintRelease`, и только потом подпишет и соберёт AAB.
+   Если тесты или lint упали, AAB не собирается: отчёты лежат в артефакте `MetaCheck-release-reports-*`.
+4. Скачай артефакт `MetaCheck-play-release-v2.6.1` (AAB + `mapping.txt`).
+
+Пропускать проверку через `-x lintVitalRelease` нельзя: это последний барьер перед Play
+(ошибки манифеста, непереведённые строки и т. п.). `release_gate.py` падает, если найдёт такой флаг.
+
+### Локально
 ```bash
 ./gradlew clean test lintRelease bundleRelease
 ```
