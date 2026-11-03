@@ -17,11 +17,24 @@ jobs:
       # Сборка через ./gradlew (версия Gradle и её SHA-256 — в gradle/wrapper/gradle-wrapper.properties).
       # setup-gradle v4 сам проверяет gradle-wrapper.jar по списку официальных контрольных сумм.
       - uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install Android platform 36
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      # Сборка до запуска эмулятора: эмулятор не простаивает, пока компилируется проект.
+      - name: Build app and test APKs
+        run: ./gradlew --no-daemon assembleDebug assembleDebugAndroidTest
+      # Без KVM эмулятор шёл в программном режиме и не успевал загрузиться (adb exit 224).
+      # Правило udev срабатывало не сразу, поэтому права на /dev/kvm выдаются напрямую и проверяются.
       - name: Enable hardware acceleration
         run: |
           sudo sh -c 'echo KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm" > /etc/udev/rules.d/99-kvm4all.rules'
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+          sudo chmod 666 /dev/kvm
+          ls -l /dev/kvm
+          test -w /dev/kvm
       - name: Run Compose and file-writing tests on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -29,6 +42,8 @@ jobs:
           arch: x86_64
           target: google_apis
           disable-animations: true
+          disable-linux-hw-accel: false
+          emulator-boot-timeout: 900
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: ./gradlew --no-daemon connectedDebugAndroidTest
       - name: Save instrumented-test reports
