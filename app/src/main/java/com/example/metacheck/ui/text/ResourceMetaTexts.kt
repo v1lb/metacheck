@@ -165,6 +165,7 @@ class ResourceMetaTexts(private val context: Context) : MetaTexts {
         TextKey.GEOLOCATION -> s(R.string.report_geolocation)
         TextKey.COORDINATES_LINE -> s(R.string.report_coordinates, *args.map { number(it, 6) }.toTypedArray())
         TextKey.ALTITUDE_LINE -> s(R.string.report_altitude, *args.map { number(it, 0) }.toTypedArray())
+        TextKey.PDF_TRUNCATED -> s(R.string.report_pdf_truncated, *args)
         TextKey.CATALOG_FILE_SECTION -> s(R.string.catalog_file_section)
         TextKey.CATALOG_COORDINATES_SECTION -> s(R.string.catalog_coordinates_section)
         TextKey.FIELD_NAME -> s(R.string.field_name)

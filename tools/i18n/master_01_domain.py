@@ -222,4 +222,7 @@ S = [
     ("report_geolocation", "Geolocation", "Геолокация"),
     ("report_coordinates", "Coordinates: %1$s, %2$s", "Координаты: %1$s, %2$s"),
     ("report_altitude", "Altitude: %1$s m", "Высота: %1$s м"),
+    ("report_pdf_truncated",
+     "The report is shortened to %1$d pages (the PDF limit). Export JSON to get the full report.",
+     "Отчёт сокращён до %1$d стр. (предел PDF). Полный отчёт сохраняется в экспорте JSON."),
 ]

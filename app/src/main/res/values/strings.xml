@@ -173,6 +173,7 @@
     <string name="report_geolocation">Geolocation</string>
     <string name="report_coordinates">Coordinates: %1$s, %2$s</string>
     <string name="report_altitude">Altitude: %1$s m</string>
+    <string name="report_pdf_truncated">The report is shortened to %1$d pages (the PDF limit). Export JSON to get the full report.</string>
 
     <!-- master_02_errors.py -->
     <string name="error_operation_failed">Operation failed: %1$s</string>

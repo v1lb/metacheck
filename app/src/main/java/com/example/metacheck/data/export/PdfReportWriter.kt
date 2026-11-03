@@ -7,6 +7,7 @@ import android.graphics.pdf.PdfDocument
 import com.example.metacheck.domain.export.ReportText
 import com.example.metacheck.domain.model.MetaReport
 import com.example.metacheck.domain.text.MetaTexts
+import com.example.metacheck.domain.text.TextKey
 import java.io.OutputStream
 
 /** Простой постраничный PDF из текстового представления отчёта (формат A4) на языке пользователя. */
@@ -27,6 +28,12 @@ object PdfReportWriter {
             var page = doc.startPage(PdfDocument.PageInfo.Builder(PAGE_W, PAGE_H, pageNo).create())
             var y = MARGIN
 
+            // На последней разрешённой странице снизу оставляем место под пометку о сокращении.
+            val notice = wrap(texts.text(TextKey.PDF_TRUNCATED, MAX_PAGES), bold, width)
+            val reserve = notice.size * bold.fontSpacing + 8f
+            fun bottom(): Float = PAGE_H - MARGIN - if (pageNo >= MAX_PAGES) reserve else 0f
+            var truncated = false
+
             fun newPage(): Boolean {
                 if (pageNo >= MAX_PAGES) return false
                 doc.finishPage(page)
@@ -43,10 +50,21 @@ object PdfReportWriter {
                 if (heading) y += 8f
                 for (rawLine in block.text.split('\n')) {
                     for (line in wrap(rawLine, paint, width)) {
-                        if (y + lineHeight > PAGE_H - MARGIN && !newPage()) break@loop
+                        if (y + lineHeight > bottom() && !newPage()) {
+                            truncated = true
+                            break@loop
+                        }
                         page.canvas.drawText(line, MARGIN, y + lineHeight - paint.descent(), paint)
                         y += lineHeight
                     }
+                }
+            }
+            // Аудит, п. 29: раньше PDF молча обрывался на 40-й странице, и читатель не знал, что часть данных пропала.
+            if (truncated) {
+                y += 8f
+                for (line in notice) {
+                    page.canvas.drawText(line, MARGIN, y + bold.fontSpacing - bold.descent(), bold)
+                    y += bold.fontSpacing
                 }
             }
             doc.finishPage(page)

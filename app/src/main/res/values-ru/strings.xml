@@ -172,6 +172,7 @@
     <string name="report_geolocation">Геолокация</string>
     <string name="report_coordinates">Координаты: %1$s, %2$s</string>
     <string name="report_altitude">Высота: %1$s м</string>
+    <string name="report_pdf_truncated">Отчёт сокращён до %1$d стр. (предел PDF). Полный отчёт сохраняется в экспорте JSON.</string>
 
     <!-- master_02_errors.py -->
     <string name="error_operation_failed">Операция не выполнена: %1$s</string>

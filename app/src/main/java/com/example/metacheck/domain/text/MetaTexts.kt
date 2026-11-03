@@ -49,6 +49,8 @@ enum class TextKey {
     COORDINATES_LINE,
     /** args: высота в метрах (Double) */
     ALTITUDE_LINE,
+    /** Последняя строка обрезанного PDF. args: предел страниц (Int) */
+    PDF_TRUNCATED,
 
     // Каталог метаданных
     CATALOG_FILE_SECTION,
