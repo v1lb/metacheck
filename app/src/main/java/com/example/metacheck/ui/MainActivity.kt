@@ -37,6 +37,17 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels { MainViewModel.Factory }
 
+    /**
+     * Фото, присланное через «Поделиться», ждёт ответа на запрос «Доступ к местоположению в фото».
+     * Без этого разрешения Android 10+ отдаёт файл без GPS, и отчёт ошибочно показывал бы, что координат нет.
+     */
+    private var pendingSharedUri: Uri? = null
+    private val mediaLocationPermission =
+        registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) {
+            pendingSharedUri?.let(viewModel::onImagePicked)
+            pendingSharedUri = null
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -106,8 +117,15 @@ class MainActivity : AppCompatActivity() {
         if (intent?.action != Intent.ACTION_SEND || intent.type?.startsWith("image/") != true) return
         val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java) ?: return
         // Второй пункт в меню «Поделиться» (activity-alias): сразу очистить и переслать дальше.
+        // Для него разрешение не нужно: всё равно удаляется всё, а лишний диалог сломал бы «одно касание».
         if (intent.component?.className?.endsWith(CLEAN_SHARE_ALIAS) == true) viewModel.requestCleanShare(uri)
-        else viewModel.onImagePicked(uri)
+        else if (android.os.Build.VERSION.SDK_INT >= 29 && androidx.core.content.ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.ACCESS_MEDIA_LOCATION,
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            pendingSharedUri = uri
+            mediaLocationPermission.launch(android.Manifest.permission.ACCESS_MEDIA_LOCATION)
+        } else viewModel.onImagePicked(uri)
     }
 
     private companion object {
