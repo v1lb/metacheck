@@ -37,7 +37,7 @@ MapTiler, OpenStreetMap and Google servers may be located outside your country.
 - **Access to location in media (ACCESS_MEDIA_LOCATION)** — to read the coordinates stored in your photos. Coordinates are processed on the device.
 - **Google Play billing (BILLING)** — to make and verify the Pro purchase.
 
-The app does not request direct access to your gallery or camera: files are chosen and saved through system dialogs, and photos are taken by your phone's camera app.
+The app does not request direct access to your gallery, camera, shared storage or Wi-Fi: files are chosen and saved through system dialogs, and photos are taken by your phone's camera app. If a library the app uses declares such permissions, they are removed at build time.
 
 ## 5. What the app does not do
 The app does not create accounts, show ads, use analytics or third-party tracking SDKs, or sell or share data with ad networks. It uses the Google Play Billing and osmdroid libraries; a list of components is available in the app.

@@ -17,7 +17,9 @@ def check(label, passed):
 cfg = APP.read_text(encoding='utf-8')
 manifest = ET.parse(MANIFEST).getroot()
 ns = '{http://schemas.android.com/apk/res/android}'
-permissions = {p.get(ns+'name') for p in manifest.findall('uses-permission')}
+tools_ns = '{http://schemas.android.com/tools}'
+# Строки с tools:node="remove" не запрашивают разрешение, а вырезают его из библиотек (аудит, п. 20).
+permissions = {p.get(ns+'name') for p in manifest.findall('uses-permission') if p.get(tools_ns+'node') != 'remove'}
 check('targetSdk >= 36 (2026 Play requirement)', bool(re.search(r'\btargetSdk\s*=\s*(3[6-9]|[4-9][0-9])\b', cfg)))
 app_id = re.search(r'\bapplicationId\s*=\s*"([^"]+)"', cfg)
 check('Non-example applicationId', bool(app_id and app_id.group(1).count('.') >= 2 and not app_id.group(1).startswith(('com.example', 'org.example'))))
@@ -47,6 +49,9 @@ legal_texts = [(ROOT / 'legal' / n).read_text(encoding='utf-8') for n in
                ['PRIVACY_POLICY_RU.md', 'PRIVACY_POLICY_EN.md', 'TERMS_RU.md', 'TERMS_EN.md']]
 check('Every map provider is named in privacy policy and terms (RU/EN)',
       providers and all(p in t for p in providers for t in legal_texts))
+check('Release workflows check permissions of the built app',
+      all('check_apk_permissions.py' in (ROOT / '.github/workflows' / n).read_text(encoding='utf-8')
+          for n in ('ci.yml', 'build-apk.yml', 'release-aab.yml')))
 workflows = ROOT / '.github/workflows'
 release_wf = [(workflows / n).read_text(encoding='utf-8') for n in ('release-aab.yml', 'build-apk.yml') if (workflows / n).is_file()]
 def code_lines(text):
