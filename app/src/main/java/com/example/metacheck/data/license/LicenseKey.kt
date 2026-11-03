@@ -9,5 +9,5 @@ object LicenseKey {
      * [ТРЕБУЕТСЯ ВЫ] Если хотите выдавать ключи Pro вручную (партнёрам, тестерам), создайте пару ключей
      * и вставьте открытый ключ сюда. Если нет, оставьте пустым: покупка Pro через Google Play работает отдельно.
      */
-    const val PUBLIC_KEY_BASE64 = ""
+    const val PUBLIC_KEY_BASE64 = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE84nzSRhInK2CpP4c9eaFKRU/2FPI3GraJ8DeyFpDbO1WP2BdT8vgJfGgWLxr/HThgXsfqfE6DiFPE7XD5iboFA=="
 }
