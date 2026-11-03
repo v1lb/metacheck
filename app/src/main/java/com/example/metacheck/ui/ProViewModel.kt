@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.metacheck.MetaCheckApplication
 import com.example.metacheck.domain.model.Entitlement
 import com.example.metacheck.domain.repository.EntitlementRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,13 +29,19 @@ class ProViewModel(private val repository: EntitlementRepository) : ViewModel() 
     val info: StateFlow<String?> = _info.asStateFlow()
 
     init {
-        viewModelScope.launch { repository.refresh() }
+        // refresh() по контракту не бросает, try/catch оставлен как второй рубеж: исключение
+        // в viewModelScope без обработчика убивает процесс.
+        viewModelScope.launch {
+            try { repository.refresh() } catch (e: CancellationException) { throw e } catch (_: Exception) { }
+        }
     }
 
     fun openPaywall() {
         _info.value = null
         _paywallVisible.value = true
-        viewModelScope.launch { _price.value = repository.priceText() }
+        viewModelScope.launch {
+            _price.value = try { repository.priceText() } catch (e: CancellationException) { throw e } catch (_: Exception) { null }
+        }
     }
 
     fun dismissPaywall() {

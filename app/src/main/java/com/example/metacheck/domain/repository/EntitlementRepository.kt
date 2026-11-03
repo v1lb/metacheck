@@ -8,7 +8,10 @@ import kotlinx.coroutines.flow.StateFlow
 interface EntitlementRepository {
     val entitlement: StateFlow<Entitlement>
 
-    /** Сверяет покупки с Google Play. Без сети остаётся последнее известное состояние. */
+    /**
+     * Сверяет покупки с Google Play. Без сети остаётся последнее известное состояние.
+     * Никогда не бросает исключений (кроме CancellationException): вызывается на каждом запуске.
+     */
     suspend fun refresh()
     suspend fun priceText(): String?
     fun launchPurchase(activity: Activity): Boolean
