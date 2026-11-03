@@ -74,6 +74,8 @@ jobs:
           METACHECK_STORE_PASSWORD: ${{ secrets.METACHECK_STORE_PASSWORD }}
           METACHECK_KEY_ALIAS: ${{ secrets.METACHECK_KEY_ALIAS }}
           METACHECK_KEY_PASSWORD: ${{ secrets.METACHECK_KEY_PASSWORD }}
+          # Необязательно: без ключа карта работает на тайлах OpenStreetMap.
+          METACHECK_MAPTILER_KEY: ${{ secrets.METACHECK_MAPTILER_KEY }}
         run: gradle --no-daemon bundleRelease
 
       - name: Remove keystore from runner

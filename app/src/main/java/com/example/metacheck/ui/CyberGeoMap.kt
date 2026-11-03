@@ -19,16 +19,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.metacheck.domain.model.GpsPoint
+import com.example.metacheck.ui.map.MapTiles
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import java.util.Locale
 
 private val cyan = Color(0xFF00F3FF)
@@ -42,18 +41,30 @@ private val pink = Color(0xFFFF0055)
 @Composable
 fun CyberGeoMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = null) {
     var enabled by rememberSaveable(gps.latitude, gps.longitude) { mutableStateOf(false) }
+    val provider = MapTiles.provider(LocalContext.current)
     if (enabled) {
         LiveOsmMap(gps, onSelect)
     } else {
         Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
             Text("КАРТА ВЫКЛЮЧЕНА · В СЕТЬ НИЧЕГО НЕ ОТПРАВЛЯЕТСЯ", color = cyan)
             Text("%.6f, %.6f".format(Locale.US, gps.latitude, gps.longitude), color = cyan)
+            // Пользователь должен знать, чей сервер увидит район точки: текст зависит от провайдера.
             Text(
-                "Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов OpenStreetMap. " +
-                    "Серверы увидят ваш IP-адрес и примерный район точки. Само фото и его метаданные не отправляются.",
+                if (provider == MapTiles.Provider.MAPTILER) {
+                    "Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов MapTiler. " +
+                        "Серверы увидят ваш IP-адрес и примерный район точки. Само фото и его метаданные не отправляются."
+                } else {
+                    "Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов OpenStreetMap. " +
+                        "Серверы увидят ваш IP-адрес и примерный район точки. Само фото и его метаданные не отправляются."
+                },
                 color = Color.LightGray,
             )
-            Button(onClick = { enabled = true }) { Text("Показать карту (запрос к OpenStreetMap)") }
+            Button(onClick = { enabled = true }) {
+                Text(
+                    if (provider == MapTiles.Provider.MAPTILER) "Показать карту (запрос к MapTiler)"
+                    else "Показать карту (запрос к OpenStreetMap)",
+                )
+            }
             if (onSelect != null) {
                 Text("Чтобы выбрать новые координаты на карте, сначала включите карту.", color = pink)
             }
@@ -70,13 +81,10 @@ private fun LiveOsmMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = nu
     var address by remember { mutableStateOf("") }
     var status by remember { mutableStateOf("Нажмите на карту, чтобы выбрать точку") }
     val map = remember(context) {
-        Configuration.getInstance().apply {
-            userAgentValue = context.packageName
-            osmdroidBasePath = context.filesDir.resolve("osmdroid").apply { mkdirs() }
-            osmdroidTileCache = context.cacheDir.resolve("osm-tiles").apply { mkdirs() }
-        }
+        // User-Agent с контактом, лимит кэша 50 МБ, не больше 2 загрузок одновременно (Tile Usage Policy).
+        MapTiles.configure(context)
         MapView(context).apply {
-            setTileSource(TileSourceFactory.MAPNIK)
+            setTileSource(MapTiles.tileSource(context))
             setMultiTouchControls(true)
             setUseDataConnection(true)
             controller.setZoom(15.0)
@@ -138,6 +146,13 @@ private fun LiveOsmMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = nu
         } else {
             Text("Выберите точку на карте, затем нажмите «Сохранить GPS в JPEG» в разделе метаданных.", color = pink)
         }
-        Text("© OpenStreetMap contributors · тайлы требуют интернет; ранее загруженные доступны из кэша", color = Color.LightGray)
+        Text(
+            if (MapTiles.provider(context) == MapTiles.Provider.MAPTILER) {
+                "© MapTiler © OpenStreetMap contributors · тайлы требуют интернет; ранее загруженные доступны из кэша"
+            } else {
+                "© OpenStreetMap contributors · тайлы требуют интернет; ранее загруженные доступны из кэша"
+            },
+            color = Color.LightGray,
+        )
     }
 }

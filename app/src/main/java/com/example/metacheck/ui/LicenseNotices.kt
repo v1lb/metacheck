@@ -16,5 +16,5 @@ Android SDK License: https://developer.android.com/studio/terms
 
 Map data (c) OpenStreetMap contributors, licensed under the Open Database License (ODbL) 1.0.
 https://www.openstreetmap.org/copyright
-Map tiles are served by OpenStreetMap Foundation servers."""
+Map tiles are served by MapTiler (© MapTiler) when configured, otherwise by OpenStreetMap Foundation servers."""
 }
