@@ -14,9 +14,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      # Сборка через ./gradlew (версия Gradle и её SHA-256 — в gradle/wrapper/gradle-wrapper.properties).
+      # setup-gradle v4 сам проверяет gradle-wrapper.jar по списку официальных контрольных сумм.
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.14.3
       # Подписанный релиз собирается вручную (см. DEPLOY.md), в CI проверяем тесты, линт и debug-сборку.
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
@@ -31,7 +31,7 @@ jobs:
       - name: Check Play release preflight
         run: python3 tools/release_gate.py
       - name: Run unit tests, lint, compile instrumentation tests and build APK
-        run: gradle --no-daemon testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest
+        run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest
       - name: Check permissions of the built APK
         run: python3 tools/check_apk_permissions.py app/build/outputs/apk/debug/app-debug.apk
       - name: Upload unit-test reports when available

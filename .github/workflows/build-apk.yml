@@ -19,21 +19,21 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      # Сборка через ./gradlew (версия Gradle и её SHA-256 — в gradle/wrapper/gradle-wrapper.properties).
+      # setup-gradle v4 сам проверяет gradle-wrapper.jar по списку официальных контрольных сумм.
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.14.3
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
       - name: Install Android platform 36
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - name: Unit tests and release lint
-        run: gradle --no-daemon testReleaseUnitTest lintRelease
+        run: ./gradlew --no-daemon testReleaseUnitTest lintRelease
       # lintVitalRelease выполняется внутри assembleRelease, больше не пропускаем его через -x.
       - name: Build release APK
         env:
           METACHECK_MAPTILER_KEY: ${{ secrets.METACHECK_MAPTILER_KEY }}
-        run: gradle --no-daemon assembleRelease
+        run: ./gradlew --no-daemon assembleRelease
       - name: Check permissions of the built APK
         run: python3 tools/check_apk_permissions.py app/build/outputs/apk/release/app-release.apk
       - name: Upload APK

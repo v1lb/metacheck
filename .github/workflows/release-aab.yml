@@ -31,9 +31,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      # Сборка через ./gradlew (версия Gradle и её SHA-256 — в gradle/wrapper/gradle-wrapper.properties).
+      # setup-gradle v4 сам проверяет gradle-wrapper.jar по списку официальных контрольных сумм.
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.14.3
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
@@ -55,7 +55,7 @@ jobs:
         run: python3 tools/release_gate.py
 
       - name: Unit tests and release lint
-        run: gradle --no-daemon testReleaseUnitTest lintRelease
+        run: ./gradlew --no-daemon testReleaseUnitTest lintRelease
 
       - name: Decode upload keystore
         env:
@@ -88,7 +88,7 @@ jobs:
           METACHECK_KEY_PASSWORD: ${{ secrets.METACHECK_KEY_PASSWORD }}
           # Обязателен для релиза (проверка выше).
           METACHECK_MAPTILER_KEY: ${{ secrets.METACHECK_MAPTILER_KEY }}
-        run: gradle --no-daemon bundleRelease
+        run: ./gradlew --no-daemon bundleRelease
 
       # Из AAB разрешения aapt2 не читает, поэтому проверяем итоговый манифест release-сборки.
       - name: Check permissions of the release manifest
