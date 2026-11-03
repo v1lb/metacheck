@@ -20,13 +20,20 @@ import java.util.UUID
  * История хранится в приватной папке приложения (filesDir), каждый отчёт отдельным зашифрованным файлом.
  * Копии самих фотографий не сохраняются никогда.
  * Идентификатор проверяется по строгому шаблону, поэтому через него нельзя выйти из папки (path traversal).
+ *
+ * Лимиты (аудит, п. 18). На диске всегда хранится до [STORAGE_LIMIT] отчётов, а тариф влияет
+ * только на то, сколько из них показывается ([visibleLimit]). Раньше лимит тарифа применялся при
+ * сохранении и удалял файлы: в первые секунды после запуска статус Pro ещё не прочитан (Free),
+ * и отчёт, сохранённый в этот момент, безвозвратно стирал 40 отчётов платящего пользователя.
+ * То же случалось после возврата денег, смены аккаунта Google Play или сбоя сверки с Play.
+ * «Очистить историю» удаляет все файлы, в том числе скрытые.
  */
 class FileHistoryRepository(
     private val dir: File,
     private val crypto: Crypto,
     private val clock: () -> Long = System::currentTimeMillis,
-    /** Лимит читается при каждом сохранении: в Pro история длиннее. */
-    private val maxEntries: () -> Int = { 50 },
+    /** Сколько последних отчётов показывать. Читается при каждом [list]: зависит от тарифа. */
+    private val visibleLimit: suspend () -> Int = { STORAGE_LIMIT },
     private val io: CoroutineDispatcher = Dispatchers.IO,
 ) : HistoryRepository {
 
@@ -45,14 +52,17 @@ class FileHistoryRepository(
                     tmp.delete()
                     throw AppFailure(FailureCode.HISTORY_UNAVAILABLE)
                 }
-                reportFiles().drop(maxEntries()).forEach { it.delete() }
+                // Только физический предел хранилища, не тариф: см. описание класса.
+                reportFiles().drop(STORAGE_LIMIT).forEach { it.delete() }
                 id
             }
         }
     }
 
     override suspend fun list(): List<HistoryEntry> = withContext(io) {
-        reportFiles().mapNotNull { file ->
+        val limit = visibleLimit().coerceIn(0, STORAGE_LIMIT)
+        // Расшифровываем только показываемые отчёты; повреждённые пропускаем и берём следующие.
+        reportFiles().asSequence().mapNotNull { file ->
             val report = readReport(file) ?: return@mapNotNull null
             val id = file.name.removeSuffix(".rep")
             HistoryEntry(
@@ -63,9 +73,10 @@ class FileHistoryRepository(
                 hasAiEvidence = report.hasAiEvidence,
                 hasGps = report.gps != null,
             )
-        }
+        }.take(limit).toList()
     }
 
+    /** Открывается любой хранимый отчёт: id приходит только из [list], то есть из показанных. */
     override suspend fun load(id: String): MetaReport? = withContext(io) {
         if (!idRegex.matches(id)) return@withContext null
         val file = File(dir, "$id.rep")
@@ -100,4 +111,9 @@ class FileHistoryRepository(
         } catch (e: Exception) {
             null // повреждённый файл или ключ Keystore больше недоступен
         }
+
+    companion object {
+        /** Сколько отчётов хранится на диске при любом тарифе. Равен лимиту Pro. */
+        const val STORAGE_LIMIT = 50
+    }
 }
