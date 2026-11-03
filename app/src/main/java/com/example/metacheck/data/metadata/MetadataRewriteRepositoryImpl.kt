@@ -352,6 +352,10 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         HiddenPart.MPF.takeIf { mpf }, HiddenPart.TRAILER.takeIf { trailer }, HiddenPart.EXIF_THUMBNAIL.takeIf { exifThumbnail },
     ).map { it.name }.toTypedArray()
 
+    /** Ориентация, при которой [applyExifOrientation] создаёт второй растр (поворот или отражение). */
+    private fun needsTransform(orientation: Int): Boolean =
+        orientation != ExifInterface.ORIENTATION_NORMAL && orientation != ExifInterface.ORIENTATION_UNDEFINED
+
     private fun applyExifOrientation(bitmap: Bitmap, orientation: Int): Bitmap {
         val matrix = Matrix()
         when (orientation) {
