@@ -45,6 +45,12 @@ data class PatchIssue(val code: Code, val field: PatchField? = null) {
         ISO_RANGE, APERTURE_RANGE, EXPOSURE_RANGE,
         /** Недопустимые символы или длина больше 512; [field] указывает поле. */
         TEXT_INVALID,
+        /**
+         * Не латиница: текстовые теги EXIF (Make, Model, Artist, Copyright, ImageDescription) хранятся в ASCII,
+         * и ExifInterface заменил бы кириллицу на «?». Раньше это давало ошибку «поле не проверено» после
+         * сохранения, а теперь объясняется до записи. [field] указывает поле.
+         */
+        TEXT_NOT_ASCII,
         /** Формат даты ГГГГ:ММ:ДД ЧЧ:ММ:СС; [field] указывает поле. */
         DATE_FORMAT,
         NO_CHANGES,
@@ -81,6 +87,8 @@ object MetadataPatchValidator {
             PatchField.AUTHOR to patch.author, PatchField.COPYRIGHT to patch.copyright, PatchField.DESCRIPTION to patch.description)) {
             if (value != null && (value.length > 512 || value.any { it == '\u0000' || (it.code < 32 && it != '\n' && it != '\t') })) {
                 add(PatchIssue(PatchIssue.Code.TEXT_INVALID, field))
+            } else if (value != null && value.any { it.code > 0x7E }) {
+                add(PatchIssue(PatchIssue.Code.TEXT_NOT_ASCII, field))
             }
         }
         for ((field, value) in listOf(PatchField.DATE_TAKEN to patch.dateTaken, PatchField.DATE_DIGITIZED to patch.dateDigitized)) {

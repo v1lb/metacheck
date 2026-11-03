@@ -1,5 +1,6 @@
 package com.example.metacheck.data.export
 
+import com.example.metacheck.domain.metadata.GpsPrivacy
 import com.example.metacheck.domain.model.FileInfo
 import com.example.metacheck.domain.model.GpsPoint
 import com.example.metacheck.domain.model.ImageFormat
@@ -27,8 +28,15 @@ import org.json.JSONObject
 object ReportJson {
     const val SCHEMA = 2
 
-    /** [includeGps] = false убирает координаты (например, при отправке на сервер). */
+    /**
+     * [includeGps] = false убирает все данные о местоположении (например, при отправке на сервер):
+     * не только блок "gps", но и раздел GPS из EXIF и GPS-поля XMP/PNG. Раньше координаты из XMP
+     * (Lightroom, Google Фото) уходили на сервер, хотя пользователь выключил отправку GPS.
+     */
     fun toJson(r: MetaReport, includeGps: Boolean = true, texts: MetaTexts? = null): JSONObject = JSONObject().apply {
+        val exifSections = if (includeGps) r.exifSections else r.exifSections.filter { it.key != SectionKey.GPS }
+        val xmpItems = if (includeGps) r.xmpItems else r.xmpItems.filterNot(GpsPrivacy::isLocationItem)
+        val pngItems = if (includeGps) r.pngTextItems else r.pngTextItems.filterNot(GpsPrivacy::isLocationItem)
         put("schema", SCHEMA)
         put("generator", "MetaCheck")
         put(
@@ -62,7 +70,7 @@ object ReportJson {
         put(
             "exif",
             JSONArray().apply {
-                r.exifSections.forEach { s ->
+                exifSections.forEach { s ->
                     put(
                         JSONObject().apply {
                             put("title", texts?.sectionTitle(s) ?: s.title)
@@ -73,8 +81,8 @@ object ReportJson {
                 }
             },
         )
-        put("xmp", itemsToJson(r.xmpItems, texts))
-        put("pngText", itemsToJson(r.pngTextItems, texts))
+        put("xmp", itemsToJson(xmpItems, texts))
+        put("pngText", itemsToJson(pngItems, texts))
         if (includeGps) {
             r.gps?.let { g ->
                 put(

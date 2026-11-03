@@ -15,7 +15,8 @@ class MetaCheckApplication : Application() {
         cleanOldCameraShots()
         cleanStaleMetadataTemps()
         // Очищенные копии для «Отправить без метаданных»: получатель мог читать файл позже, держим сутки.
-        Thread { runCatching { container.sharedCopies.cleanOld() } }.start()
+        // Отдельный экземпляр, а не container: иначе весь AppContainer (Keystore, Billing) создавался бы в этом потоке.
+        Thread { runCatching { com.example.metacheck.data.share.SharedCopies(this).cleanOld() } }.start()
     }
 
     /**

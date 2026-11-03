@@ -65,6 +65,7 @@ object ErrorTexts {
         PatchIssue.Code.APERTURE_RANGE -> UiText.Res(R.string.patch_aperture_range)
         PatchIssue.Code.EXPOSURE_RANGE -> UiText.Res(R.string.patch_exposure_range)
         PatchIssue.Code.TEXT_INVALID -> UiText.Res(R.string.patch_text_invalid, UiText.Res(fieldName(issue.field)))
+        PatchIssue.Code.TEXT_NOT_ASCII -> UiText.Res(R.string.patch_text_not_ascii, UiText.Res(fieldName(issue.field)))
         PatchIssue.Code.DATE_FORMAT -> UiText.Res(R.string.patch_date_format, UiText.Res(fieldName(issue.field)))
         PatchIssue.Code.NO_CHANGES -> UiText.Res(R.string.patch_no_changes)
     }

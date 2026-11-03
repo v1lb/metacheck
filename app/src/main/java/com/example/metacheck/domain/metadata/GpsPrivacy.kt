@@ -11,12 +11,16 @@ object GpsPrivacy {
 
     /** Also recognize explicit XMP and PNG GPS keys. The map still needs a valid EXIF coordinate pair. */
     fun hasLocationMarkers(report: MetaReport): Boolean = hasExifLocation(report) ||
-        (report.xmpItems + report.pngTextItems).any {
-            val label = it.label.lowercase(Locale.ROOT)
-            label.contains("gpslatitude") || label.contains("gpslongitude") ||
-                label.contains("gpsaltitude") || label.startsWith("gps:") ||
-                label.startsWith("gps_")
-        }
+        (report.xmpItems + report.pngTextItems).any(::isLocationItem)
+
+    /** Поле с координатами или другими GPS-данными (XMP exif:GPS*, ключи PNG вида gps_*). */
+    fun isLocationItem(item: com.example.metacheck.domain.model.MetaItem): Boolean {
+        val label = item.label.lowercase(Locale.ROOT)
+        val key = item.key.orEmpty().lowercase(Locale.ROOT)
+        return label.contains("gpslatitude") || label.contains("gpslongitude") ||
+            label.contains("gpsaltitude") || label.startsWith("gps:") || label.startsWith("gps_") ||
+            key.contains(":gps")
+    }
 
     fun validCoordinates(latitude: Double, longitude: Double): Boolean =
         latitude.isFinite() && longitude.isFinite() && latitude in -90.0..90.0 && longitude in -180.0..180.0
