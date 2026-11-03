@@ -12,6 +12,16 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 import android.net.Uri
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -288,14 +298,32 @@ fun MainScreen(
         ) { padding ->
             Column(Modifier.padding(padding).fillMaxSize()) {
                 if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
-                if (showStudio) MetadataStudioScreen(
-                    initialUri = (state as? UiState.Done)?.source,
+                // Плавный переход между экранами. Снимок состояния передаётся в каждый экран, поэтому
+                // уходящий экран дорисовывает свои данные, даже когда состояние уже сменилось
+                // (например, отчёт при возврате на главный).
+                val screen = Screen(
+                    when {
+                        showStudio -> ScreenKind.STUDIO
+                        showSettings -> ScreenKind.SETTINGS
+                        else -> ScreenKind.of(state)
+                    },
+                    state,
+                )
+                AnimatedContent(
+                    targetState = screen,
+                    contentKey = { it.kind },
+                    transitionSpec = { screenTransition(initialState.kind, targetState.kind) },
+                    modifier = Modifier.fillMaxSize(),
+                    label = "screens",
+                ) { current ->
+                if (current.kind == ScreenKind.STUDIO) MetadataStudioScreen(
+                    initialUri = (current.ui as? UiState.Done)?.source,
                     isPro = entitlement.isPro,
                     onUpgrade = proVm::openPaywall,
                     onBack = { showStudio = false },
                 )
-                else if (showSettings) SettingsScreen(onMessage = viewModel::showMessage, uiPreferences = uiPreferences)
-                else when (val s = state) {
+                else if (current.kind == ScreenKind.SETTINGS) SettingsScreen(onMessage = viewModel::showMessage, uiPreferences = uiPreferences)
+                else when (val s = current.ui) {
                     UiState.Idle -> Dashboard(
                         history = history, historyEnabled = settings.saveHistory, isPro = entitlement.isPro,
                         onPick = { pick.launch(arrayOf("image/*")) },
@@ -354,6 +382,7 @@ fun MainScreen(
                             ),
                         )
                     }
+                }
                 }
             }
         }
@@ -646,3 +675,37 @@ private fun suggestedName(fileName: String): String =
     fileName.substringBeforeLast('.').filter { it.isLetterOrDigit() || it == '-' || it == '_' || it == ' ' }
         .trim().take(60).ifBlank { "image" } // иначе файл назывался бы «-clean.jpg»
         .trim().ifEmpty { "image" }.take(60)
+
+/** Экран верхнего уровня. [depth] задаёт направление перехода: вглубь — справа, назад — слева. */
+private enum class ScreenKind(val depth: Int) {
+    HOME(0), LOADING(1), FAILED(1), SETTINGS(1), REPORT(2), STUDIO(3);
+
+    companion object {
+        fun of(state: UiState): ScreenKind = when (state) {
+            UiState.Idle -> HOME
+            UiState.Loading -> LOADING
+            is UiState.Failed -> FAILED
+            is UiState.Done -> REPORT
+        }
+    }
+}
+
+private data class Screen(val kind: ScreenKind, val ui: UiState)
+
+/**
+ * Вглубь — новый экран выезжает справа, назад — слева; плюс растворение.
+ * Всё, что связано с загрузкой, только растворяется: это смена содержимого, а не переход
+ * (иначе повторный анализ очищенной копии «уезжал» бы назад и снова вперёд).
+ */
+private fun screenTransition(from: ScreenKind, to: ScreenKind): ContentTransform {
+    val easing = FastOutSlowInEasing
+    if (from == ScreenKind.LOADING || to == ScreenKind.LOADING) {
+        return fadeIn(tween(260, easing = easing)) + scaleIn(tween(260, easing = easing), initialScale = .98f) togetherWith
+            fadeOut(tween(160))
+    }
+    val direction = if (to.depth >= from.depth) 1 else -1
+    return (slideInHorizontally(tween(320, easing = easing)) { width -> direction * width / 5 } +
+        fadeIn(tween(260, delayMillis = 40, easing = easing))) togetherWith
+        (slideOutHorizontally(tween(260, easing = easing)) { width -> -direction * width / 8 } +
+            fadeOut(tween(180, easing = easing)))
+}
