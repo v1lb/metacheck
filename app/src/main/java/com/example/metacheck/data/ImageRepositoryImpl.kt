@@ -47,6 +47,9 @@ class ImageRepositoryImpl(
         } catch (e: OutOfMemoryError) {
             // Error, а не Exception: раньше он проходил мимо catch и ронял приложение.
             Result.failure(TooLargeException())
+        } catch (e: StackOverflowError) {
+            // Специально собранный файл (например, вложенные IFD в EXIF) не должен ронять приложение.
+            Result.failure(AppFailure(FailureCode.CANNOT_READ_SOURCE))
         }
     }
 
