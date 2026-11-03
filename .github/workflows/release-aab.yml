@@ -67,6 +67,24 @@ jobs:
           fi
           echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
 
+      # Аудит, п. 26: без ключа лицензирования Play подпись покупок не проверяется и Pro можно подделать.
+      - name: Require Google Play public key for purchase signatures
+        run: |
+          python3 - <<'PY'
+          import base64, re, sys
+          src = open('app/src/main/java/com/example/metacheck/data/billing/PlayPublicKey.kt', encoding='utf-8').read()
+          m = re.search(r'const val BASE64 = "([^"]*)"', src)
+          key = (m.group(1) if m else '').strip()
+          try:
+              der = base64.b64decode(key, validate=False)
+          except Exception:
+              der = b''
+          if len(der) < 200 or der[0] != 0x30:
+              print('::error::PlayPublicKey.BASE64 пуст или не похож на ключ из Play Console (Монетизация → Лицензирование). См. RELEASE_TODO.md.')
+              sys.exit(1)
+          print(f'Ключ Play задан ({len(der)} байт).')
+          PY
+
       # Карточка Play и политика называют MapTiler основным поставщиком карты (аудит, п. 19),
       # а tile.openstreetmap.org по своим правилам не рассчитан на нагрузку от приложений.
       # Поэтому релиз без ключа MapTiler не собирается.
