@@ -350,6 +350,7 @@
     <string name="main_msg_json_saved">JSON report saved</string>
     <string name="main_msg_pdf_saved">PDF report saved</string>
     <string name="main_msg_operation_failed">Could not complete the operation</string>
+    <string name="main_msg_busy">Wait until the current operation finishes</string>
     <string name="main_msg_export_pro_only">Export is available in Pro</string>
     <string name="main_msg_save_failed">Could not save the file</string>
     <string name="main_msg_no_camera_app">There is no camera app on this device</string>
@@ -425,6 +426,7 @@
     <string name="studio_source_eyebrow">01 / SOURCE IMAGE</string>
     <string name="studio_source_none">No file selected</string>
     <string name="studio_source_selected">Image selected</string>
+    <string name="studio_wait_format">Checking the file format, try again in a moment</string>
     <string name="studio_strip_eyebrow">02 / FULL CLEANING</string>
     <string name="studio_strip_title">Remove metadata</string>
     <string name="studio_strip_text">The file is decoded and saved again without carried-over EXIF, XMP, IPTC and GPS. JPEG is recompressed; HEIC/GIF/WebP are saved as PNG, and animation may be lost. C2PA signatures become invalid.</string>

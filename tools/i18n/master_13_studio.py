@@ -18,6 +18,7 @@ S = [
     ("studio_source_eyebrow", "01 / SOURCE IMAGE", "01 / ИСХОДНОЕ ИЗОБРАЖЕНИЕ"),
     ("studio_source_none", "No file selected", "Файл не выбран"),
     ("studio_source_selected", "Image selected", "Изображение выбрано"),
+    ("studio_wait_format", "Checking the file format, try again in a moment", "Проверяется формат файла, повторите через секунду"),
 
     ("studio_strip_eyebrow", "02 / FULL CLEANING", "02 / ПОЛНАЯ ОЧИСТКА"),
     ("studio_strip_title", "Remove metadata", "Удалить метаданные"),

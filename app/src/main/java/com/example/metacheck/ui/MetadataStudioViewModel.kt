@@ -149,7 +149,8 @@ class MetadataStudioViewModel(
     }
 
     private fun work(operation: suspend () -> Unit) {
-        if (_busy.value) return
+        // Не молча: к этому моменту системный диалог уже мог создать пустой файл под новую операцию.
+        if (_busy.value) { _message.value = UiText.Res(R.string.main_msg_busy); return }
         viewModelScope.launch {
             _busy.value = true
             try { operation() }

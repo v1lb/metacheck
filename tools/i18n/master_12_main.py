@@ -24,6 +24,7 @@ S = [
     ("main_msg_json_saved", "JSON report saved", "JSON-отчёт сохранён"),
     ("main_msg_pdf_saved", "PDF report saved", "PDF-отчёт сохранён"),
     ("main_msg_operation_failed", "Could not complete the operation", "Не удалось завершить операцию"),
+    ("main_msg_busy", "Wait until the current operation finishes", "Дождитесь окончания текущей операции"),
     ("main_msg_export_pro_only", "Export is available in Pro", "Экспорт доступен в Pro"),
     ("main_msg_save_failed", "Could not save the file", "Не удалось сохранить файл"),
     ("main_msg_no_camera_app", "There is no camera app on this device", "На устройстве нет приложения камеры"),

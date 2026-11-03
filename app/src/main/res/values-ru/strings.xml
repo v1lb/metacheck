@@ -353,6 +353,7 @@
     <string name="main_msg_json_saved">JSON-отчёт сохранён</string>
     <string name="main_msg_pdf_saved">PDF-отчёт сохранён</string>
     <string name="main_msg_operation_failed">Не удалось завершить операцию</string>
+    <string name="main_msg_busy">Дождитесь окончания текущей операции</string>
     <string name="main_msg_export_pro_only">Экспорт доступен в Pro</string>
     <string name="main_msg_save_failed">Не удалось сохранить файл</string>
     <string name="main_msg_no_camera_app">На устройстве нет приложения камеры</string>
@@ -428,6 +429,7 @@
     <string name="studio_source_eyebrow">01 / ИСХОДНОЕ ИЗОБРАЖЕНИЕ</string>
     <string name="studio_source_none">Файл не выбран</string>
     <string name="studio_source_selected">Изображение выбрано</string>
+    <string name="studio_wait_format">Проверяется формат файла, повторите через секунду</string>
     <string name="studio_strip_eyebrow">02 / ПОЛНАЯ ОЧИСТКА</string>
     <string name="studio_strip_title">Удалить метаданные</string>
     <string name="studio_strip_text">Файл будет декодирован и сохранён заново без переносимых EXIF, XMP, IPTC и GPS. JPEG повторно сжимается; HEIC/GIF/WebP сохраняются как PNG, а анимация может потеряться. Подписи C2PA становятся недействительными.</string>
