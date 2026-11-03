@@ -370,34 +370,8 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
     private fun verifyNoMetadata(source: File, mime: String): Boolean =
         if (mime == "image/jpeg") JpegSegments.isStrippedJpeg(source) else hasOnlyImagePngChunks(source)
 
-    private fun hasOnlyImagePngChunks(file: File): Boolean {
-        BufferedInputStream(FileInputStream(file)).use { input ->
-            val signature = ByteArray(8)
-            if (input.read(signature) != 8 || signature.toList() != listOf(137,80,78,71,13,10,26,10).map { it.toByte() }) return false
-            while (true) {
-                val header = ByteArray(8)
-                if (input.read(header) != 8) return false
-                val length = ((header[0].toLong() and 255) shl 24) or
-                    ((header[1].toLong() and 255) shl 16) or
-                    ((header[2].toLong() and 255) shl 8) or (header[3].toLong() and 255)
-                if (length > 200_000_000L) return false
-                val type = String(header, 4, 4, Charsets.US_ASCII)
-                if (type in setOf("eXIf", "tEXt", "zTXt", "iTXt", "tIME", "iCCP")) return false
-                if (!skipAll(input, length + 4)) return false
-                if (type == "IEND") return true
-            }
-        }
-    }
-
-    private fun skipAll(input: InputStream, amount: Long): Boolean {
-        var left = amount
-        while (left > 0) {
-            val skipped = input.skip(left)
-            if (skipped > 0) left -= skipped
-            else if (input.read() < 0) return false else left--
-        }
-        return true
-    }
+    private fun hasOnlyImagePngChunks(file: File): Boolean =
+        BufferedInputStream(FileInputStream(file)).use(PngCleanCheck::isClean)
 
     private fun writeDocument(uri: Uri, staged: File, allowNewFileFallback: Boolean = false) {
         // "rwt" is mandatory for overwriting an existing original: it must truncate.
