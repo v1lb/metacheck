@@ -7,7 +7,7 @@ import android.os.Build
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import com.example.metacheck.data.parser.C2paDetector
+import com.example.metacheck.data.parser.C2paReader
 import com.example.metacheck.data.parser.ExifReader
 import com.example.metacheck.data.parser.ExifResult
 import com.example.metacheck.data.parser.ImageFormatDetector
@@ -20,13 +20,17 @@ import com.example.metacheck.domain.model.FileInfo
 import com.example.metacheck.domain.model.ImageFormat
 import com.example.metacheck.domain.model.MetaItem
 import com.example.metacheck.domain.model.MetaReport
+import com.example.metacheck.domain.AppFailure
+import com.example.metacheck.domain.FailureCode
+import com.example.metacheck.domain.ensure
+import com.example.metacheck.domain.model.TooLargeException
+import com.example.metacheck.domain.model.ValueFormat
 import com.example.metacheck.domain.model.UnsupportedFormatException
 import com.example.metacheck.domain.repository.ImageRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class ImageRepositoryImpl(
     private val resolver: ContentResolver,
@@ -40,18 +44,26 @@ class ImageRepositoryImpl(
             throw e
         } catch (e: Exception) {
             Result.failure(e)
+        } catch (e: OutOfMemoryError) {
+            // Error, а не Exception: раньше он проходил мимо catch и ронял приложение.
+            Result.failure(TooLargeException())
+        } catch (e: StackOverflowError) {
+            // Специально собранный файл (например, вложенные IFD в EXIF) не должен ронять приложение.
+            Result.failure(AppFailure(FailureCode.CANNOT_READ_SOURCE))
         }
     }
 
     private fun analyzeBlocking(uri: Uri): MetaReport {
         // Только content://. file:// позволил бы подсунуть путь к приватным файлам приложения.
-        require(uri.scheme == ContentResolver.SCHEME_CONTENT) { "Недопустимый источник файла" }
+        ensure(uri.scheme == ContentResolver.SCHEME_CONTENT, FailureCode.INVALID_URI)
 
         val (name, size) = queryNameAndSize(uri)
-        val mime = resolver.getType(uri) ?: "неизвестно"
+        // Пустые имя и MIME интерфейс показывает как «без имени» / «неизвестно» на языке пользователя.
+        val mime = resolver.getType(uri).orEmpty()
 
-        val (bytes, truncated) = resolver.openInputStream(uri)?.use { readBounded(it, MAX_SCAN_BYTES) }
-            ?: throw IOException("Не удалось открыть файл")
+        // Размер известен заранее: буфер выделяется сразу, без удвоений и лишней копии.
+        val (bytes, truncated) = resolver.openInputStream(uri)?.use { readBounded(it, MAX_SCAN_BYTES, size) }
+            ?: throw AppFailure(FailureCode.CANNOT_READ_SOURCE)
 
         val format = ImageFormatDetector.detect(bytes)
         if (format == ImageFormat.UNKNOWN) throw UnsupportedFormatException()
@@ -60,7 +72,8 @@ class ImageRepositoryImpl(
         val xmp = XmpExtractor.extractPacket(bytes, png)?.let(XmpExtractor::parse)
         // Android 10+ вырезает GPS из обычных потоков MediaStore. Читаем EXIF из «оригинального» URI.
         val exif = readExifWithLocation(uri)
-        val hasC2pa = C2paDetector.looksPresent(bytes)
+        // Ошибка разбора C2PA не должна ломать анализ: тогда просто нет сведений из манифеста.
+        val c2pa = try { C2paReader.read(bytes, format) } catch (_: Exception) { null }
 
         val xmpTools = listOfNotNull(
             xmp?.fields?.get(XmpExtractor.KEY_CREATOR_TOOL)?.let { MetaItem("XMP CreatorTool", it) },
@@ -69,7 +82,10 @@ class ImageRepositoryImpl(
         val xmpItems = xmp?.items.orEmpty()
         val pngItems = png
             .filter { it.keyword != "XML:com.adobe.xmp" }
-            .map { MetaItem(it.keyword, it.text) }
+            .map {
+                if (it.text == PngTextParser.BAD_DATA) MetaItem(it.keyword, "", format = ValueFormat.BAD_DATA)
+                else MetaItem(it.keyword, it.text)
+            }
 
         val signals = SignalEngine.evaluate(
             SignalInput(
@@ -77,9 +93,10 @@ class ImageRepositoryImpl(
                 freeTextFields = exif.freeTextFields,
                 xmpFields = xmp?.fields.orEmpty(),
                 pngText = png,
-                hasC2pa = hasC2pa,
+                c2pa = c2pa,
+                fileName = name,
                 hasGps = exif.gps != null,
-                hasAnyMetadata = exif.hasData || xmpItems.isNotEmpty() || pngItems.isNotEmpty(),
+                hasAnyMetadata = exif.hasData || xmpItems.isNotEmpty() || pngItems.isNotEmpty() || c2pa != null,
                 truncated = truncated,
             ),
         )
@@ -136,7 +153,7 @@ class ImageRepositoryImpl(
     }
 
     private fun queryNameAndSize(uri: Uri): Pair<String, Long> {
-        var name = "без имени"
+        var name = ""
         var size = -1L
         resolver.query(uri, null, null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {

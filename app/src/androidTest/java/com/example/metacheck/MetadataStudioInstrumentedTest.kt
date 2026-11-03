@@ -1,12 +1,14 @@
 package com.example.metacheck
 
 import android.graphics.Bitmap
+import android.graphics.ColorSpace
 import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.metacheck.data.metadata.MetadataRewriteRepositoryImpl
+import com.example.metacheck.data.metadata.PngCleanCheck
 import com.example.metacheck.domain.metadata.MetadataPatch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
@@ -30,6 +32,24 @@ class MetadataStudioInstrumentedTest {
             setLatLong(41.9028, 12.4964)
             setAttribute(ExifInterface.TAG_MODEL, "Legacy Camera")
             saveAttributes()
+        }
+    }
+
+    /** Аудит, п. 21: очистка PNG и JPEG в цветовом пространстве Display P3 (скриншоты iPhone и т. п.). */
+    @Test fun stripCopyWorksForDisplayP3Images() = runBlocking {
+        val p3 = ColorSpace.get(ColorSpace.Named.DISPLAY_P3)
+        for ((format, ext) in listOf(Bitmap.CompressFormat.PNG to "png", Bitmap.CompressFormat.JPEG to "jpg")) {
+            val original = File(cache, "p3_source_${System.nanoTime()}.$ext")
+            val target = File(cache, "p3_clean_${System.nanoTime()}.$ext")
+            try {
+                val bitmap = Bitmap.createBitmap(48, 48, Bitmap.Config.ARGB_8888, true, p3)
+                bitmap.eraseColor(android.graphics.Color.rgb(250, 30, 40))
+                try { FileOutputStream(original).use { assertTrue(bitmap.compress(format, 95, it)) } }
+                finally { bitmap.recycle() }
+                val result = MetadataRewriteRepositoryImpl(context).stripCopy(uri(original).toString(), uri(target).toString())
+                assertTrue("$ext: ${result.format}", result.verified)
+                if (ext == "png") assertTrue(target.inputStream().buffered().use(PngCleanCheck::isClean))
+            } finally { original.delete(); target.delete() }
         }
     }
 

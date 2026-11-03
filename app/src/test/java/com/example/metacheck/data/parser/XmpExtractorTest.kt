@@ -74,7 +74,7 @@ class XmpExtractorTest {
 
     @Test
     fun c2paNeedsBothMarkers() {
-        assertEquals(false, C2paDetector.looksPresent("jumb only".toByteArray()))
-        assertEquals(true, C2paDetector.looksPresent("xx jumb yy c2pa zz".toByteArray()))
+        assertEquals(false, C2paReader.looksPresent("jumb only".toByteArray()))
+        assertEquals(true, C2paReader.looksPresent("xx jumb yy c2pa zz".toByteArray()))
     }
 }

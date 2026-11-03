@@ -5,7 +5,7 @@ lang: en
 
 # MetaCheck Privacy Policy
 
-**Effective date:** 2026-10-28
+**Effective date:** 2026-11-03
 **Developer:** Puwer Studio
 **Contact:** werk9886@gmail.com
 
@@ -21,19 +21,24 @@ MetaCheck shows image metadata (EXIF, GPS, XMP, PNG text chunks, Content Credent
 ## 3. When data leaves the device
 By default the app transmits nothing. Data is sent only after your own action:
 
-- **OpenStreetMap map.** If an image contains GPS coordinates, the map is off. After you tap "Show map (request to OpenStreetMap)" the app downloads map tiles from OpenStreetMap servers over HTTPS. Tiles are requested by number, so the servers can infer the approximate area of the point shown, and they also see your IP address and the app name. The image and its metadata are not sent. Downloaded tiles are cached on the device and removed with the cache or the app. OpenStreetMap Foundation privacy policy: https://osmfoundation.org/wiki/Privacy_Policy
+- **Map.** If an image contains GPS coordinates, the map is off. After you tap "Show map (request to …)" the app downloads map tiles over HTTPS from the map provider named on that button:
+  - **MapTiler** (MapTiler AG, Switzerland) is the main provider. The MapTiler map is built on OpenStreetMap data. MapTiler privacy policy: https://www.maptiler.com/privacy-policy/
+  - **OpenStreetMap Foundation** is used in builds without MapTiler. OpenStreetMap Foundation privacy policy: https://osmfoundation.org/wiki/Privacy_Policy
+
+  Tiles are requested by number, so the map provider can infer the approximate area of the point shown, and it also sees your IP address and the app name. The provider may use a content delivery network (CDN) that also processes your IP address. The image and its metadata are not sent. Downloaded tiles are cached on the device (up to 50 MB) and removed with the cache or the app.
 - **Address search.** If you tap "Find on map", the text you typed is handled by your phone's system geocoder (on many devices this is a Google service). The app itself does not store or forward the query.
 - **API check (optional).** If you turn it on in Settings, enter a server address and tap "Check via API", a text JSON report is sent to that address. It does not contain the image, and GPS coordinates are excluded unless you enable them separately. The server you choose receives the data; the MetaCheck developer does not.
+- **"Send without metadata".** If you choose this option, the app creates a cleaned copy of the photo and passes it to the app you selected in the Share window. The copy is kept temporarily in the MetaCheck cache and deleted within a day. The MetaCheck developer does not receive it.
 - **Purchases.** Pro is bought through Google Play, and Google processes payment data. The app only receives confirmation of the purchase.
 
-OpenStreetMap and Google servers may be located outside your country.
+MapTiler, OpenStreetMap and Google servers may be located outside your country.
 
 ## 4. Android permissions
 - **Internet and network state** — only to load the map when you press the button, to send an optional report to your address, and to check whether a network is available.
 - **Access to location in media (ACCESS_MEDIA_LOCATION)** — to read the coordinates stored in your photos. Coordinates are processed on the device.
 - **Google Play billing (BILLING)** — to make and verify the Pro purchase.
 
-The app does not request direct access to your gallery or camera: files are chosen and saved through system dialogs, and photos are taken by your phone's camera app.
+The app does not request direct access to your gallery, camera, shared storage or Wi-Fi: files are chosen and saved through system dialogs, and photos are taken by your phone's camera app. If a library the app uses declares such permissions, they are removed at build time.
 
 ## 5. What the app does not do
 The app does not create accounts, show ads, use analytics or third-party tracking SDKs, or sell or share data with ad networks. It uses the Google Play Billing and osmdroid libraries; a list of components is available in the app.

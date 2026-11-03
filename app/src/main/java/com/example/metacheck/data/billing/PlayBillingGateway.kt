@@ -13,9 +13,13 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
+import com.example.metacheck.domain.model.PurchaseEvent
+import com.example.metacheck.domain.model.PurchaseSnapshot
 import com.example.metacheck.domain.repository.BillingGateway
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
@@ -24,40 +28,76 @@ import kotlin.coroutines.resume
  * Разовая покупка Pro через Google Play Billing Library 8.
  * Идентификатор товара в Play Console должен совпадать с [PRODUCT_ID].
  * Вызовы выполняются на главном потоке, как рекомендует библиотека.
+ *
+ * Исправлено (аудит, п. 8):
+ *  - подключение защищено Mutex: параллельные refresh() и priceText() больше не вызывают
+ *    startConnection дважды (второй вызов получал ошибку, и кнопка «Купить» оставалась неактивной);
+ *  - enableAutoServiceReconnection(): библиотека сама переподключается после разрыва связи с Play;
+ *  - результат покупки разбирается полностью: PENDING, ITEM_ALREADY_OWNED, отмена, ошибка.
  */
-class PlayBillingGateway(context: Context) : BillingGateway {
+class PlayBillingGateway(
+    context: Context,
+    /** Подпись покупок (аудит, п. 26): ключ из Play Console, см. [PlayPublicKey]. */
+    private val signature: PurchaseSignature = PurchaseSignature(PlayPublicKey.BASE64),
+) : BillingGateway {
 
-    override var onPurchasesChanged: (() -> Unit)? = null
+    override var onPurchaseUpdate: ((PurchaseEvent) -> Unit)? = null
 
+    @Volatile
     private var details: ProductDetails? = null
+    private val connectLock = Mutex()
 
     private val client: BillingClient = BillingClient.newBuilder(context.applicationContext)
-        .setListener(
-            PurchasesUpdatedListener { result, purchases ->
-                if (result.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
-                    purchases.forEach { acknowledgeIfNeeded(it) }
-                    onPurchasesChanged?.invoke()
-                }
-            },
-        )
+        .setListener(PurchasesUpdatedListener { result, purchases -> onPurchasesUpdated(result, purchases) })
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+        .enableAutoServiceReconnection()
         .build()
 
-    override suspend fun queryOwned(): Boolean? = withContext(Dispatchers.Main.immediate) {
-        if (!ensureConnected()) return@withContext null
-        withTimeoutOrNull(BILLING_TIMEOUT_MS) { suspendCancellableCoroutine<Boolean?> { cont ->
-            val params = QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build()
-            client.queryPurchasesAsync(params) { result, purchases ->
-                if (!cont.isActive) return@queryPurchasesAsync
-                if (result.responseCode != BillingClient.BillingResponseCode.OK) {
-                    cont.resume(null)
-                } else {
-                    val owned = purchases.filter { it.isProPurchased() }
-                    owned.forEach { acknowledgeIfNeeded(it) }
-                    cont.resume(owned.isNotEmpty())
+    private fun onPurchasesUpdated(result: BillingResult, purchases: List<Purchase>?) {
+        val event = when (result.responseCode) {
+            BillingClient.BillingResponseCode.OK -> {
+                val all = purchases.orEmpty().filter { it.products.contains(PRODUCT_ID) }
+                val ours = all.filter(::isGenuine)
+                ours.forEach { acknowledgeIfNeeded(it) }
+                when {
+                    // Есть «покупка», но подпись не сходится: подделка, Pro не включаем.
+                    ours.isEmpty() && all.isNotEmpty() -> PurchaseEvent.FAILED
+                    ours.any { it.purchaseState == Purchase.PurchaseState.PURCHASED } -> PurchaseEvent.COMPLETED
+                    ours.any { it.purchaseState == Purchase.PurchaseState.PENDING } -> PurchaseEvent.PENDING
+                    else -> PurchaseEvent.UPDATED
                 }
             }
-        } }
+            BillingClient.BillingResponseCode.USER_CANCELED -> PurchaseEvent.CANCELED
+            BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> PurchaseEvent.ALREADY_OWNED
+            else -> PurchaseEvent.FAILED
+        }
+        onPurchaseUpdate?.invoke(event)
+    }
+
+    override suspend fun queryPurchases(): PurchaseSnapshot? = withContext(Dispatchers.Main.immediate) {
+        if (!ensureConnected()) return@withContext null
+        withTimeoutOrNull(BILLING_TIMEOUT_MS) {
+            suspendCancellableCoroutine<PurchaseSnapshot?> { cont ->
+                val params = QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build()
+                client.queryPurchasesAsync(params) { result, purchases ->
+                    if (!cont.isActive) return@queryPurchasesAsync
+                    if (result.responseCode != BillingClient.BillingResponseCode.OK) {
+                        cont.resume(null)
+                    } else {
+                        // Покупки с неверной подписью не считаются: ни Pro, ни подтверждения.
+                        val ours = purchases.filter { it.products.contains(PRODUCT_ID) && isGenuine(it) }
+                        // Повторное подтверждение при каждой проверке: без него через 3 дня Google вернёт деньги.
+                        ours.forEach { acknowledgeIfNeeded(it) }
+                        cont.resume(
+                            PurchaseSnapshot(
+                                owned = ours.any { it.purchaseState == Purchase.PurchaseState.PURCHASED },
+                                pending = ours.any { it.purchaseState == Purchase.PurchaseState.PENDING },
+                            ),
+                        )
+                    }
+                }
+            }
+        }
     }
 
     override suspend fun priceText(): String? = withContext(Dispatchers.Main.immediate) {
@@ -73,18 +113,20 @@ class PlayBillingGateway(context: Context) : BillingGateway {
                 ),
             )
             .build()
-        withTimeoutOrNull(BILLING_TIMEOUT_MS) { suspendCancellableCoroutine<String?> { cont ->
-            client.queryProductDetailsAsync(params) { result, queryResult ->
-                if (!cont.isActive) return@queryProductDetailsAsync
-                val found = if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                    queryResult.productDetailsList.firstOrNull()
-                } else {
-                    null
+        withTimeoutOrNull(BILLING_TIMEOUT_MS) {
+            suspendCancellableCoroutine<String?> { cont ->
+                client.queryProductDetailsAsync(params) { result, queryResult ->
+                    if (!cont.isActive) return@queryProductDetailsAsync
+                    val found = if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                        queryResult.productDetailsList.firstOrNull()
+                    } else {
+                        null
+                    }
+                    if (found != null) details = found
+                    cont.resume(found?.oneTimePurchaseOfferDetails?.formattedPrice)
                 }
-                details = found
-                cont.resume(found?.oneTimePurchaseOfferDetails?.formattedPrice)
             }
-        } }
+        }
     }
 
     override fun launchPurchase(activity: Activity): Boolean {
@@ -97,23 +139,23 @@ class PlayBillingGateway(context: Context) : BillingGateway {
         return client.launchBillingFlow(activity, flow).responseCode == BillingClient.BillingResponseCode.OK
     }
 
-    private fun Purchase.isProPurchased(): Boolean =
-        products.contains(PRODUCT_ID) && purchaseState == Purchase.PurchaseState.PURCHASED
+    private fun isGenuine(purchase: Purchase): Boolean =
+        signature.isValid(purchase.originalJson, purchase.signature)
 
-    /** Без подтверждения в течение 3 дней Google автоматически вернёт деньги. */
+    /** Без подтверждения в течение 3 дней Google автоматически вернёт деньги. PENDING подтверждать нельзя. */
     private fun acknowledgeIfNeeded(purchase: Purchase) {
-        if (purchase.isProPurchased() && !purchase.isAcknowledged) {
+        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged) {
             client.acknowledgePurchase(
                 AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build(),
-            ) { }
+            ) { /* при ошибке повторим на следующей проверке покупок (onResume) */ }
         }
     }
 
-    private suspend fun ensureConnected(): Boolean =
-        if (client.isReady) {
-            true
-        } else {
-            withTimeoutOrNull(BILLING_TIMEOUT_MS) { suspendCancellableCoroutine<Boolean> { cont ->
+    /** Одно подключение за раз: остальные вызовы ждут его результата, а не запускают своё. */
+    private suspend fun ensureConnected(): Boolean = connectLock.withLock {
+        if (client.isReady) return@withLock true
+        withTimeoutOrNull(BILLING_TIMEOUT_MS) {
+            suspendCancellableCoroutine<Boolean> { cont ->
                 client.startConnection(
                     object : BillingClientStateListener {
                         override fun onBillingSetupFinished(result: BillingResult) {
@@ -121,15 +163,18 @@ class PlayBillingGateway(context: Context) : BillingGateway {
                         }
 
                         override fun onBillingServiceDisconnected() {
-                            // Подключимся заново при следующем обращении.
+                            // С enableAutoServiceReconnection библиотека переподключится сама при следующем вызове.
+                            if (cont.isActive) cont.resume(false)
                         }
                     },
                 )
-            } } ?: false
-        }
+            }
+        } ?: false
+    }
 
     companion object {
         private const val BILLING_TIMEOUT_MS = 15_000L
+
         /**
          * Должен совпадать с идентификатором товара в Play Console.
          * [ТРЕБУЕТСЯ ВЫ] Создайте разовый товар `pro_lifetime` в Play Console (Монетизация → Товары в приложении)

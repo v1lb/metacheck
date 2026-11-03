@@ -1,5 +1,9 @@
 package com.example.metacheck.ui
 
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,7 +18,12 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
-import com.example.metacheck.ui.LocalizedText as Text
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.example.metacheck.R
+import com.example.metacheck.ui.text.ErrorTexts
+import com.example.metacheck.ui.text.UiText
+import com.example.metacheck.ui.text.asString
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,12 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metacheck.domain.api.ApiConfigValidator
+import com.example.metacheck.domain.metadata.DailyCleanQuota
 import com.example.metacheck.domain.model.ProSource
 import com.example.metacheck.ui.theme.CyberPalette
 
 @Composable
 fun SettingsScreen(
-    onMessage: (String) -> Unit,
+    onMessage: (UiText) -> Unit,
     uiPreferences: com.example.metacheck.ui.preferences.UiPreferences,
     vm: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory),
 ) {
@@ -56,98 +66,100 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            CyberEyebrow("CONTROL CENTER / LOCAL FIRST")
-            Text("Центр управления", style = MaterialTheme.typography.headlineMedium)
-            Text("Приватность, доступ и расширенные возможности", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            CyberEyebrow(stringResource(R.string.settings_eyebrow))
+            Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.settings_subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         AppearanceSettings(uiPreferences, onMessage)
         GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
             Column(Modifier.padding(19.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                CyberEyebrow("PLAN / ACCESS", color = MaterialTheme.colorScheme.secondary)
-                Text(if (entitlement.isPro) "METACHECK PRO" else "METACHECK FREE", style = MaterialTheme.typography.titleLarge)
+                CyberEyebrow(stringResource(R.string.settings_plan_eyebrow), color = MaterialTheme.colorScheme.secondary)
+                Text(stringResource(if (entitlement.isPro) R.string.dash_pro_title else R.string.settings_plan_free), style = MaterialTheme.typography.titleLarge)
                 Text(proStatusText(entitlement), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(if (entitlement.isPro) "У вас доступен расширенный экспорт и API." else
-                    "Бесплатно: анализ, GPS Privacy Shield и 75 обработок в сутки. Pro: безлимитная очистка, пакетная обработка, PDF/JSON.",
+                Text(if (entitlement.isPro) stringResource(R.string.settings_plan_pro_text)
+                    else stringResource(R.string.settings_plan_free_text, DailyCleanQuota.FREE_DAILY_LIMIT),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                if (!entitlement.isPro) NeonButton("Возможности Pro", proVm::openPaywall, Modifier.fillMaxWidth())
-                if (entitlement.source == ProSource.LICENSE) CyberOutlineButton("Отключить лицензию", proVm::removeLicense)
+                if (!entitlement.isPro) NeonButton(stringResource(R.string.settings_pro_features), proVm::openPaywall, Modifier.fillMaxWidth())
+                if (entitlement.source == ProSource.LICENSE) CyberOutlineButton(stringResource(R.string.settings_remove_license), proVm::removeLicense)
             }
         }
-        SectionLabel("ЛОКАЛЬНАЯ ИСТОРИЯ")
+        SectionLabel(stringResource(R.string.settings_section_history))
         GlassPanel(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(19.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 SwitchRow(
-                    title = "Сохранять отчёты",
-                    subtitle = "Шифрование через Android Keystore. Фотографии не копируются. Free: 10, Pro: 50.",
+                    title = stringResource(R.string.settings_save_history),
+                    subtitle = stringResource(R.string.settings_save_history_text),
                     checked = settings.saveHistory,
                 ) { enabled -> vm.update { it.copy(saveHistory = enabled) } }
-                CyberOutlineButton("Удалить историю с телефона", { clearConfirm = true }, Modifier.fillMaxWidth())
+                CyberOutlineButton(stringResource(R.string.settings_clear_history), { clearConfirm = true }, Modifier.fillMaxWidth())
             }
         }
-        SectionLabel("СОБСТВЕННЫЙ API")
+        SectionLabel(stringResource(R.string.settings_section_api))
         GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
             Column(Modifier.padding(19.dp), verticalArrangement = Arrangement.spacedBy(15.dp)) {
                 SwitchRow(
-                    title = "Отправлять JSON-отчёт",
-                    subtitle = "Только с подтверждением и только в Pro. Исходное изображение не передаётся.",
+                    title = stringResource(R.string.settings_api_enabled),
+                    subtitle = stringResource(R.string.settings_api_enabled_text),
                     checked = settings.apiEnabled,
                     enabled = entitlement.isPro,
                 ) { enabled -> vm.update { it.copy(apiEnabled = enabled) } }
                 Row(Modifier.fillMaxWidth().clickable { expandedApi = !expandedApi }.padding(vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text("Настройки соединения", style = MaterialTheme.typography.titleMedium)
-                    Text(if (expandedApi) "−" else "+", color = MaterialTheme.colorScheme.primary)
+                    Text(stringResource(R.string.settings_api_connection), style = MaterialTheme.typography.titleMedium)
+                    Icon(if (expandedApi) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 }
                 if (expandedApi) {
                     OutlinedTextField(
                         value = endpoint,
                         onValueChange = { endpoint = it; vm.update { s -> s.copy(apiEndpoint = it) } },
-                        label = { Text("Адрес API (HTTPS)") },
+                        label = { Text(stringResource(R.string.settings_api_url)) },
                         singleLine = true, enabled = settings.apiEnabled,
                         isError = endpoint.isNotBlank() && ApiConfigValidator.validateUrl(endpoint) != null,
-                        supportingText = { ApiConfigValidator.validateUrl(endpoint)?.let { Text(it) } },
+                        supportingText = { ApiConfigValidator.validateUrl(endpoint)?.let { Text(ErrorTexts.configIssue(it).asString()) } },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
                         modifier = Modifier.fillMaxWidth(),
                     )
                     OutlinedTextField(
                         value = header,
                         onValueChange = { header = it; vm.update { s -> s.copy(apiHeaderName = it) } },
-                        label = { Text("Имя заголовка авторизации") },
+                        label = { Text(stringResource(R.string.settings_api_header)) },
                         singleLine = true, enabled = settings.apiEnabled,
                         isError = ApiConfigValidator.validateHeaderName(header) != null,
-                        supportingText = { ApiConfigValidator.validateHeaderName(header)?.let { Text(it) } },
+                        supportingText = { ApiConfigValidator.validateHeaderName(header)?.let { Text(ErrorTexts.configIssue(it).asString()) } },
                         modifier = Modifier.fillMaxWidth(),
                     )
                     OutlinedTextField(
                         value = keyInput,
                         onValueChange = { keyInput = it },
-                        label = { Text(if (settings.hasApiKey) "Заменить сохранённый ключ" else "Ключ API") },
+                        label = { Text(stringResource(if (settings.hasApiKey) R.string.settings_api_key_replace else R.string.settings_api_key)) },
                         singleLine = true, enabled = settings.apiEnabled,
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        supportingText = { Text("Сохраняется зашифрованным; значение нельзя прочитать из настроек.") },
+                        supportingText = { Text(stringResource(R.string.settings_api_key_note)) },
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        NeonButton("Сохранить ключ", {
-                            if (vm.saveKey(keyInput)) { keyInput = ""; onMessage("Ключ сохранён") }
-                            else onMessage("Ошибка сохранения ключа")
+                        NeonButton(stringResource(R.string.settings_api_key_save), {
+                            vm.saveKey(keyInput) { ok ->
+                                if (ok) { keyInput = ""; onMessage(UiText.Res(R.string.settings_msg_key_saved)) }
+                                else onMessage(UiText.Res(R.string.settings_msg_key_save_failed))
+                            }
                         }, Modifier.weight(1f), enabled = settings.apiEnabled && keyInput.isNotBlank())
-                        CyberOutlineButton("Удалить", {
-                            vm.deleteKey(); keyInput = ""; onMessage("Ключ удалён")
+                        CyberOutlineButton(stringResource(R.string.common_delete), {
+                            vm.deleteKey(); keyInput = ""; onMessage(UiText.Res(R.string.settings_msg_key_deleted))
                         }, Modifier.weight(1f), enabled = settings.hasApiKey)
                     }
-                    SwitchRow("Отправлять GPS", "По умолчанию геолокация из JSON исключена.",
+                    SwitchRow(stringResource(R.string.settings_api_send_gps), stringResource(R.string.settings_api_send_gps_text),
                         settings.apiSendGps, settings.apiEnabled) { enabled -> vm.update { it.copy(apiSendGps = enabled) } }
-                    SwitchRow("Только TLS 1.3", "Работает с совместимыми серверами на Android 10+.",
+                    SwitchRow(stringResource(R.string.settings_api_tls13), stringResource(R.string.settings_api_tls13_text),
                         settings.tls13Only, settings.apiEnabled) { enabled -> vm.update { it.copy(tls13Only = enabled) } }
                     OutlinedTextField(
                         value = pin,
                         onValueChange = { pin = it; vm.update { s -> s.copy(certPin = it) } },
-                        label = { Text("SHA-256 публичного ключа (base64)") },
+                        label = { Text(stringResource(R.string.settings_api_pin)) },
                         singleLine = true, enabled = settings.apiEnabled,
                         isError = ApiConfigValidator.validatePin(pin) != null,
-                        supportingText = { Text(ApiConfigValidator.validatePin(pin) ?: "Необязательный pin сертификата сервера.") },
+                        supportingText = { Text(ApiConfigValidator.validatePin(pin)?.let { ErrorTexts.configIssue(it).asString() } ?: stringResource(R.string.settings_api_pin_note)) },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -155,9 +167,9 @@ fun SettingsScreen(
         }
         GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                CyberEyebrow("SECURITY STATUS", color = MaterialTheme.colorScheme.tertiary)
-                Text("Хранение только на устройстве", style = MaterialTheme.typography.titleMedium)
-                Text("Сеть используется только по вашему действию: карта OpenStreetMap, поиск адреса, внешний API (если включён) и Google Play для покупки Pro.",
+                CyberEyebrow(stringResource(R.string.settings_security_eyebrow), color = MaterialTheme.colorScheme.tertiary)
+                Text(stringResource(R.string.settings_security_title), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.settings_security_text),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
@@ -170,12 +182,14 @@ fun SettingsScreen(
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         textContentColor = MaterialTheme.colorScheme.onSurface,
         shape = RoundedCornerShape(26.dp),
-        title = { Text("Удалить все отчёты?") },
-        text = { Text("Это действие удалит сохранённые отчёты без возможности восстановления.") },
+        title = { Text(stringResource(R.string.settings_clear_title)) },
+        text = { Text(stringResource(R.string.settings_clear_text)) },
         confirmButton = { TextButton(onClick = {
-            clearConfirm = false; vm.clearHistory(); onMessage("Запрошена очистка истории")
-        }) { Text("Удалить") } },
-        dismissButton = { TextButton(onClick = { clearConfirm = false }) { Text("Отмена") } },
+            clearConfirm = false; vm.clearHistory { ok ->
+                onMessage(UiText.Res(if (ok) R.string.settings_msg_history_cleared else R.string.settings_msg_history_clear_failed))
+            }
+        }) { Text(stringResource(R.string.common_delete)) } },
+        dismissButton = { TextButton(onClick = { clearConfirm = false }) { Text(stringResource(R.string.common_cancel)) } },
     )
 }
 

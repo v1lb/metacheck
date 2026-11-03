@@ -5,7 +5,7 @@ lang: en
 
 # MetaCheck Terms of Use
 
-**Effective date:** 2026-10-28
+**Effective date:** 2026-11-03
 **Developer:** Puwer Studio
 **Contact:** werk9886@gmail.com
 
@@ -30,7 +30,7 @@ Some features are free with limits (at the time of publication, metadata cleanin
 Payments are processed by Google Play. Cancellation and refund requests are made through Google Play and handled under its rules and applicable law. The developer does not receive payment details and cannot promise a refund in every case. These terms do not limit mandatory consumer rights.
 
 ## 7. External services
-The map uses OpenStreetMap data and servers (© OpenStreetMap contributors, ODbL) and loads only after you press the button. Address search uses your phone's system geocoder. A JSON report is sent only to the address you configured yourself. These services are governed by their own terms. See the privacy policy for details on data transfers.
+The map loads only after you press the button. Map tiles are provided by MapTiler (© MapTiler), or by the OpenStreetMap Foundation servers in builds without it. Map data © OpenStreetMap contributors, ODbL. Address search uses your phone's system geocoder. A JSON report is sent only to the address you configured yourself. These services are governed by their own terms. See the privacy policy for details on data transfers.
 
 ## 8. Rights in the app
 You receive a limited, non-transferable right to use the app. You may not distribute cracked builds, present the app as your own, or decompile it beyond what the law expressly allows. Open-source libraries in the app are licensed under their own terms.

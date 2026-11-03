@@ -1,31 +1,95 @@
 package com.example.metacheck.ui
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.metacheck.MetaCheckApplication
+import com.example.metacheck.R
+import com.example.metacheck.ui.text.ErrorTexts
+import com.example.metacheck.ui.text.UiText
+import com.example.metacheck.data.UriAccess
 import com.example.metacheck.domain.metadata.BatchProgress
 import com.example.metacheck.domain.metadata.MetadataPatch
 import com.example.metacheck.domain.metadata.MetadataStudioUseCase
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /** Operations survive ordinary Compose recomposition; work is on Dispatchers.IO in repository. */
-class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewModel() {
+class MetadataStudioViewModel(
+    private val studio: MetadataStudioUseCase,
+    private val savedState: SavedStateHandle = SavedStateHandle(),
+    private val uriAccess: UriAccess? = null,
+    private val sharedCopies: com.example.metacheck.data.share.SharedCopies? = null,
+) : ViewModel() {
+    /** Файл выбран пользователем: сохраняем доступ, чтобы он пережил выгрузку процесса. */
+    fun persistAccess(uri: Uri) {
+        uriAccess?.persist(uri)
+    }
+
+    /** true, если к восстановленному после перезапуска URI ещё есть доступ. */
+    suspend fun canRead(uri: String): Boolean = uriAccess?.canRead(uri) ?: true
+
+    suspend fun readable(uris: List<String>): List<String> = uriAccess?.readable(uris) ?: uris
+
+    private val pendingWrites = PendingWrites(object : StateStore {
+        override fun get(key: String): Any? = savedState[key]
+        override fun set(key: String, value: Any?) { savedState[key] = value }
+    })
+
+    /** Ожидающая ответа SAF операция. Переживает пересоздание Activity и смерть процесса. */
+    val pending: StateFlow<PendingWrite?> = savedState.getStateFlow(PendingWrites.KEY, null)
+
     private val _busy = MutableStateFlow(false)
     val busy = _busy.asStateFlow()
-    private val _message = MutableStateFlow<String?>(null)
+    private val _message = MutableStateFlow<UiText?>(null)
     val message = _message.asStateFlow()
     private val _batch = MutableStateFlow(BatchProgress())
     val batch = _batch.asStateFlow()
-    val usedToday = MutableStateFlow(studio.usedToday())
+    /** Счётчик читается в фоне (Keystore): в конструкторе ViewModel, т. е. в главном потоке, его не трогаем. */
+    val usedToday = MutableStateFlow(0)
+
+    init {
+        viewModelScope.launch {
+            usedToday.value = try { studio.usedToday() } catch (e: CancellationException) { throw e } catch (_: Exception) { 0 }
+        }
+    }
 
     fun clearMessage() { _message.value = null }
+
+    /** Готовая к отправке очищенная копия: экран открывает системное окно «Поделиться» и сбрасывает значение. */
+    private val _shareReady = MutableStateFlow<com.example.metacheck.data.share.SharedCopies.Target?>(null)
+    val shareReady = _shareReady.asStateFlow()
+
+    fun consumeShare() { _shareReady.value = null }
+
+    /**
+     * «Очистить и отправить»: очищенная копия во временную папку и сразу окно «Поделиться».
+     * Отправляется только проверенная копия: непроверенную удаляем, чтобы GPS случайно не ушёл.
+     */
+    fun cleanAndShare(source: String) {
+        val copies = sharedCopies ?: return
+        work {
+            val target = withContext(Dispatchers.IO) { copies.newTarget(source) }
+            studio.strip(source, target.uri.toString()).fold(
+                onSuccess = {
+                    if (it.verified) _shareReady.value = target
+                    else { copies.discard(target); _message.value = UiText.Res(R.string.share_not_verified) }
+                },
+                onFailure = { copies.discard(target); _message.value = failMessage(it) },
+            )
+            usedToday.value = studio.usedToday()
+        }
+    }
     fun stripCopy(
         source: String,
         destination: Uri,
@@ -33,7 +97,7 @@ class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewM
     ) = work {
         studio.strip(source, destination.toString()).fold(
             onSuccess = {
-                _message.value = successMessage("Очищенная копия сохранена", it.verified, it.downscaled)
+                _message.value = successMessage(R.string.studio_msg_clean_saved, it.verified, it.downscaled)
                 if (it.verified) onSavedCopy?.invoke()
             },
             onFailure = { _message.value = failMessage(it) },
@@ -44,24 +108,55 @@ class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewM
     fun wipeGpsCopy(source: String, destination: Uri) = work {
         studio.wipeGps(source, destination.toString()).fold(
             onSuccess = {
-                _message.value = successMessage("GPS удалён из новой копии", it.verified, it.downscaled) +
-                    if (it.verified) ". Для отправки используйте новую копию, а не оригинал" else ""
+                _message.value = successMessage(
+                    R.string.studio_msg_gps_removed, it.verified, it.downscaled,
+                    extra = if (it.verified) UiText.Res(R.string.studio_msg_share_copy) else null,
+                )
             },
             onFailure = { _message.value = failMessage(it) },
         )
         usedToday.value = studio.usedToday()
     }
 
-    fun editCopy(source: String, destination: Uri, patch: MetadataPatch) = work {
+    fun requestEditCopy(source: String, patch: MetadataPatch) = pendingWrites.requestEditCopy(source, patch)
+
+    fun requestOverwrite(source: String, op: OverwriteOp) = pendingWrites.requestOverwrite(source, op)
+
+    /** true: можно открывать диалог выбора места для резервной копии. */
+    fun confirmOverwrite(): Boolean = pendingWrites.confirmOverwrite()
+
+    fun cancelPending() = pendingWrites.cancel()
+
+    /** Результат CreateDocument для «Сохранить изменённую копию». */
+    fun onEditCopyDestination(destination: Uri?) {
+        val op = pendingWrites.takeEditCopy()
+        if (destination == null) return
+        if (op == null) { _message.value = INTERRUPTED; return }
+        editCopy(op.source, destination, op.patch)
+    }
+
+    /** Результат CreateDocument для резервной копии перед перезаписью оригинала. */
+    fun onBackupDestination(destination: Uri?) {
+        val op = pendingWrites.takeConfirmedOverwrite()
+        if (destination == null) return
+        if (op == null) { _message.value = INTERRUPTED; return }
+        val patch = when (val mode = op.op) {
+            OverwriteOp.Strip -> null
+            is OverwriteOp.Edit -> mode.patch
+        }
+        overwrite(op.source, destination, patch)
+    }
+
+    private fun editCopy(source: String, destination: Uri, patch: MetadataPatch) = work {
         studio.edit(source, destination.toString(), patch).fold(
-            onSuccess = { _message.value = successMessage("EXIF записан в новый файл", it.verified, false) },
+            onSuccess = { _message.value = successMessage(R.string.studio_msg_exif_saved, it.verified, false) },
             onFailure = { _message.value = failMessage(it) },
         )
     }
 
-    fun overwrite(source: String, backup: Uri, patch: MetadataPatch?) = work {
+    private fun overwrite(source: String, backup: Uri, patch: MetadataPatch?) = work {
         studio.overwrite(source, backup.toString(), patch).fold(
-            onSuccess = { _message.value = successMessage("Оригинал заменён. Резервная копия сохранена", it.verified, it.downscaled) },
+            onSuccess = { _message.value = successMessage(R.string.studio_msg_original_replaced, it.verified, it.downscaled) },
             onFailure = { _message.value = failMessage(it) },
         )
         usedToday.value = studio.usedToday()
@@ -71,7 +166,7 @@ class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewM
         _batch.value = BatchProgress(total = sources.size, running = true)
         studio.batch(sources, targetTree.toString()) { _batch.value = it }.fold(
             onSuccess = {
-                _message.value = "Пакетная очистка завершена: сохранено ${it.succeeded}, ошибок ${it.failed}."
+                _message.value = UiText.Res(R.string.studio_msg_batch_done, it.succeeded, it.failed)
                 _batch.value = it
             },
             onFailure = {
@@ -82,7 +177,8 @@ class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewM
     }
 
     private fun work(operation: suspend () -> Unit) {
-        if (_busy.value) return
+        // Не молча: к этому моменту системный диалог уже мог создать пустой файл под новую операцию.
+        if (_busy.value) { _message.value = UiText.Res(R.string.main_msg_busy); return }
         viewModelScope.launch {
             _busy.value = true
             try { operation() }
@@ -92,18 +188,34 @@ class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewM
         }
     }
 
-    private fun successMessage(title: String, verified: Boolean, downscaled: Boolean): String =
-        title + (if (!verified) ". Не удалось перепроверить запись: откройте файл вручную" else ". Запись проверена") +
-            if (downscaled) ". Разрешение уменьшено для безопасной обработки" else ""
+    /** Сообщение собирается из предложений-ресурсов: так оно переводится целиком, без склейки строк. */
+    private fun successMessage(
+        @androidx.annotation.StringRes title: Int,
+        verified: Boolean,
+        downscaled: Boolean,
+        extra: UiText? = null,
+    ): UiText = UiText.Joined(
+        listOfNotNull(
+            UiText.Res(title),
+            UiText.Res(if (verified) R.string.studio_msg_verified else R.string.studio_msg_not_verified),
+            if (downscaled) UiText.Res(R.string.studio_msg_downscaled) else null,
+            extra,
+        ),
+        separator = " ",
+    )
 
-    private fun failMessage(error: Throwable): String =
-        "Операция не выполнена: " + (error.message ?: "ошибка доступа или формата").take(250)
+    private fun failMessage(error: Throwable): UiText = ErrorTexts.operationFailed(error)
 
     companion object {
+        /** Пустой файл, созданный диалогом, остаётся у пользователя: удалять его без операции не будем. */
+        private val INTERRUPTED = UiText.Res(R.string.studio_msg_interrupted)
+
+        val LOST_ACCESS = UiText.Res(R.string.error_access_lost)
+
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val c = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MetaCheckApplication).container
-                MetadataStudioViewModel(c.metadataStudio)
+                MetadataStudioViewModel(c.metadataStudio, createSavedStateHandle(), c.uriAccess, c.sharedCopies)
             }
         }
     }

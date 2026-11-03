@@ -2,10 +2,13 @@ package com.example.metacheck.domain.export
 
 import com.example.metacheck.domain.model.MetaItem
 import com.example.metacheck.domain.model.MetaReport
-import com.example.metacheck.domain.model.Severity
-import java.util.Locale
+import com.example.metacheck.domain.text.MetaTexts
+import com.example.metacheck.domain.text.TextKey
 
-/** Текстовое представление отчёта. Из него делаются и буфер обмена, и PDF. */
+/**
+ * Текстовое представление отчёта на языке пользователя. Из него делаются и буфер обмена, и PDF.
+ * Все фразы приходят из [MetaTexts], значения метаданных выводятся как есть.
+ */
 object ReportText {
     enum class Kind { HEADING, LINE }
 
@@ -13,58 +16,50 @@ object ReportText {
 
     private const val MAX_VALUE = 2000
 
-    fun blocks(r: MetaReport): List<Block> {
+    fun blocks(r: MetaReport, texts: MetaTexts): List<Block> {
         val out = mutableListOf<Block>()
         fun heading(t: String) { out += Block(Kind.HEADING, t) }
         fun line(t: String) { out += Block(Kind.LINE, t) }
         fun items(list: List<MetaItem>) {
-            list.forEach { line("${it.label}: ${it.value.take(MAX_VALUE)}") }
+            list.forEach { line("${texts.itemLabel(it)}: ${texts.itemValue(it).take(MAX_VALUE)}") }
         }
 
-        heading("MetaCheck: отчёт об изображении")
+        heading(texts.text(TextKey.REPORT_TITLE))
 
-        heading("Файл")
+        heading(texts.text(TextKey.FILE))
         val f = r.file
-        line("Имя: ${f.name}")
-        line("Формат: ${f.format.label}")
-        line("MIME: ${f.mimeType}")
-        line("Размер: ${if (f.sizeBytes >= 0) "${f.sizeBytes} байт" else "неизвестно"}")
-        if (f.truncated) line("Проанализировано только начало файла (${f.scannedBytes} байт)")
+        line(texts.text(TextKey.FILE_NAME_LINE, f.name.ifBlank { texts.text(TextKey.UNNAMED) }))
+        line(texts.text(TextKey.FILE_FORMAT_LINE, texts.formatName(f.format)))
+        line(texts.text(TextKey.FILE_MIME_LINE, f.mimeType.ifBlank { texts.text(TextKey.UNKNOWN) }))
+        line(if (f.sizeBytes >= 0) texts.text(TextKey.FILE_SIZE_LINE, f.sizeBytes) else texts.text(TextKey.FILE_SIZE_UNKNOWN_LINE))
+        if (f.truncated) line(texts.text(TextKey.FILE_PARTIAL_LINE, f.scannedBytes))
 
-        heading("ИИ-анализ")
-        line(
-            if (r.hasAiEvidence) "Найдены следы ИИ-генерации в метаданных"
-            else "Явных следов ИИ в метаданных не найдено (это не доказывает подлинность)",
-        )
+        heading(texts.text(TextKey.AI_ANALYSIS))
+        line(texts.text(if (r.hasAiEvidence) TextKey.AI_FOUND else TextKey.AI_NOT_FOUND))
         r.signals.forEach { s ->
-            val tag = when (s.severity) {
-                Severity.AI_EVIDENCE -> "Следы ИИ"
-                Severity.CAUTION -> "Внимание"
-                Severity.INFO -> "Заметка"
-            }
-            line("[$tag] ${s.title}: ${s.detail}")
+            line("[${texts.severityTag(s.severity)}] ${texts.signalTitle(s)}: ${texts.signalDetail(s)}")
         }
 
         r.exifSections.forEach { section ->
-            heading(section.title)
+            heading(texts.sectionTitle(section))
             items(section.items)
         }
         if (r.xmpItems.isNotEmpty()) {
-            heading("XMP / IPTC")
+            heading(texts.text(TextKey.XMP_IPTC))
             items(r.xmpItems)
         }
         if (r.pngTextItems.isNotEmpty()) {
-            heading("Текстовые блоки PNG")
+            heading(texts.text(TextKey.PNG_TEXT))
             items(r.pngTextItems)
         }
         r.gps?.let { g ->
-            heading("Геолокация")
-            line(String.format(Locale.US, "Координаты: %.6f, %.6f", g.latitude, g.longitude))
-            g.altitudeMeters?.let { line(String.format(Locale.US, "Высота: %.0f м", it)) }
+            heading(texts.text(TextKey.GEOLOCATION))
+            line(texts.text(TextKey.COORDINATES_LINE, g.latitude, g.longitude))
+            g.altitudeMeters?.let { line(texts.text(TextKey.ALTITUDE_LINE, it)) }
         }
         return out
     }
 
-    fun format(r: MetaReport): String =
-        blocks(r).joinToString("\n") { if (it.kind == Kind.HEADING) "\n== ${it.text} ==" else it.text }.trim()
+    fun format(r: MetaReport, texts: MetaTexts): String =
+        blocks(r, texts).joinToString("\n") { if (it.kind == Kind.HEADING) "\n== ${it.text} ==" else it.text }.trim()
 }

@@ -8,20 +8,44 @@ data class LicenseInfo(val id: String, val expiresAt: Long?, val note: String?)
 data class Entitlement(
     val source: ProSource = ProSource.NONE,
     val licenseExpiresAt: Long? = null,
+    /** Покупка оформлена, но не оплачена (наличные, перевод, ожидание банка). Pro ещё НЕ даёт. */
+    val purchasePending: Boolean = false,
 ) {
     val isPro: Boolean get() = source != ProSource.NONE
 
     companion object {
         /** Покупка в Google Play важнее ключа: у неё нет срока. */
-        fun resolve(playOwned: Boolean, license: LicenseInfo?): Entitlement = when {
+        fun resolve(playOwned: Boolean, license: LicenseInfo?, pending: Boolean = false): Entitlement = when {
             playOwned -> Entitlement(ProSource.PLAY)
-            license != null -> Entitlement(ProSource.LICENSE, license.expiresAt)
-            else -> Entitlement()
+            license != null -> Entitlement(ProSource.LICENSE, license.expiresAt, purchasePending = pending)
+            else -> Entitlement(purchasePending = pending)
         }
     }
 }
 
-class ProRequiredException : Exception("Эта функция доступна в Pro")
+/** Состояние покупок в Google Play на момент запроса. */
+data class PurchaseSnapshot(val owned: Boolean, val pending: Boolean)
 
-/** Сообщение предназначено для показа пользователю. */
-class LicenseException(message: String) : Exception(message)
+/** Итог покупки для показа пользователю. */
+enum class PurchaseEvent {
+    /** Оплачено, Pro активен. */
+    COMPLETED,
+    /** Оформлено, ждёт оплаты: Pro включится сам, когда платёж пройдёт. */
+    PENDING,
+    /** Товар уже куплен (например, после переустановки): восстанавливаем. */
+    ALREADY_OWNED,
+    CANCELED,
+    FAILED,
+    /** Покупки изменились без действия пользователя (возврат, другой товар): только перечитать. */
+    UPDATED;
+
+    /** После этих событий нужно перечитать покупки у Play. */
+    val needsRefresh: Boolean get() = this != CANCELED && this != FAILED
+}
+
+class ProRequiredException : Exception("Pro feature")
+
+/** Причина отказа ключа Pro. Текст для пользователя подбирает интерфейс по коду. */
+enum class LicenseError { NOT_ENABLED, MALFORMED, BAD_SIGNATURE, EXPIRED }
+
+class LicenseException(val code: LicenseError) : Exception(code.name)
