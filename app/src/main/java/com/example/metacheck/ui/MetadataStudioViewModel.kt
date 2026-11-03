@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.metacheck.MetaCheckApplication
+import com.example.metacheck.data.UriAccess
 import com.example.metacheck.domain.metadata.BatchProgress
 import com.example.metacheck.domain.metadata.MetadataPatch
 import com.example.metacheck.domain.metadata.MetadataStudioUseCase
@@ -22,7 +23,18 @@ import kotlinx.coroutines.launch
 class MetadataStudioViewModel(
     private val studio: MetadataStudioUseCase,
     private val savedState: SavedStateHandle = SavedStateHandle(),
+    private val uriAccess: UriAccess? = null,
 ) : ViewModel() {
+    /** Файл выбран пользователем: сохраняем доступ, чтобы он пережил выгрузку процесса. */
+    fun persistAccess(uri: Uri) {
+        uriAccess?.persist(uri)
+    }
+
+    /** true, если к восстановленному после перезапуска URI ещё есть доступ. */
+    suspend fun canRead(uri: String): Boolean = uriAccess?.canRead(uri) ?: true
+
+    suspend fun readable(uris: List<String>): List<String> = uriAccess?.readable(uris) ?: uris
+
     private val pendingWrites = PendingWrites(object : StateStore {
         override fun get(key: String): Any? = savedState[key]
         override fun set(key: String, value: Any?) { savedState[key] = value }
@@ -147,17 +159,24 @@ class MetadataStudioViewModel(
             if (downscaled) ". Разрешение уменьшено для безопасной обработки" else ""
 
     private fun failMessage(error: Throwable): String =
-        "Операция не выполнена: " + (error.message ?: "ошибка доступа или формата").take(250)
+        if (error.isAccessLost()) LOST_ACCESS
+        else "Операция не выполнена: " + (error.message ?: "ошибка доступа или формата").take(250)
+
+    private fun Throwable.isAccessLost(): Boolean =
+        generateSequence(this) { it.cause }.take(8).any { it is SecurityException }
 
     companion object {
         /** Пустой файл, созданный диалогом, остаётся у пользователя: удалять его без операции не будем. */
         private const val INTERRUPTED =
             "Операция прервана: приложение было перезапущено системой. Повторите действие; созданный пустой файл можно удалить"
 
+        const val LOST_ACCESS =
+            "Нет доступа к файлу: Android отозвал разрешение после перезапуска приложения. Выберите файл снова"
+
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val c = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MetaCheckApplication).container
-                MetadataStudioViewModel(c.metadataStudio, createSavedStateHandle())
+                MetadataStudioViewModel(c.metadataStudio, createSavedStateHandle(), c.uriAccess)
             }
         }
     }

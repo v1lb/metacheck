@@ -3,6 +3,7 @@ package com.example.metacheck
 import android.app.Application
 import android.content.Context
 import com.example.metacheck.data.ImageRepositoryImpl
+import com.example.metacheck.data.UriAccess
 import com.example.metacheck.data.api.ApiRepositoryImpl
 import com.example.metacheck.data.billing.PlayBillingGateway
 import com.example.metacheck.data.metadata.MetadataRewriteRepositoryImpl
@@ -29,6 +30,7 @@ import java.io.File
 /** Ручной DI: для проекта такого размера Hilt не нужен. */
 class AppContainer(app: Application) {
     val contentResolver = app.contentResolver
+    val uriAccess = UriAccess(app.contentResolver)
     val uiPreferences = UiPreferences(app)
     private val crypto: Crypto = KeystoreCrypto()
     private val imageRepository: ImageRepository = ImageRepositoryImpl(app.contentResolver)

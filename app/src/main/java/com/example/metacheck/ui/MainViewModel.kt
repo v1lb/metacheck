@@ -239,6 +239,7 @@ class MainViewModel(
     private fun Throwable.toUserMessage(): String = when (this) {
         is UnsupportedFormatException -> "Это не изображение в поддерживаемом формате (JPEG, PNG, WebP, GIF, HEIC, AVIF)."
         is TooLargeException -> "Не хватило памяти для анализа этого файла. Закройте другие приложения и попробуйте снова."
+        is SecurityException -> "Нет доступа к файлу. Выберите его снова."
         else -> "Не удалось прочитать файл. Попробуй другой."
     }
 
