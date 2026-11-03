@@ -46,7 +46,11 @@ data class PrivacyExposure(val score: Int, val items: List<Exposure>) {
 object PrivacyExposures {
 
     private const val MAX_VALUE = 80
-    private val promptKeywords = setOf("parameters", "prompt", "workflow", "dream", "sd-metadata", "invokeai_metadata", "comment")
+    /**
+     * Блоки PNG, где генераторы хранят промпт. «Comment» сюда не входит: его пишут и обычные редакторы
+     * («Created with GIMP»). JSON NovelAI в Comment распознаёт SignalEngine (GENERATION_PARAMS).
+     */
+    private val promptKeywords = setOf("parameters", "prompt", "workflow", "dream", "sd-metadata", "invokeai_metadata")
 
     fun of(report: MetaReport): PrivacyExposure {
         val fields = (report.exifSections.flatMap { it.items } + report.xmpItems)
