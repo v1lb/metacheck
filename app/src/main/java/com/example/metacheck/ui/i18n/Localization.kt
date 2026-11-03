@@ -56,6 +56,9 @@ private fun fragments(value: String): String = value
     .replace(". Не удалось перепроверить запись: откройте файл вручную", ". Could not verify the write: open the file manually")
     .replace(". Разрешение уменьшено для безопасной обработки", ". Resolution was reduced for safe processing")
     .replace("ошибка доступа или формата", "access or format error")
+    .replace("Проверка скрытых данных не пройдена: ", "Hidden data check failed: ")
+    .replace("данные после EOI", "data after end of image")
+    .replace("миниатюра EXIF", "EXIF thumbnail")
 
 
 private val translations: Map<String, String> = mapOf(
@@ -107,6 +110,7 @@ private val translations: Map<String, String> = mapOf(
     "Выбрать папку и запустить" to "Choose folder and start",
     "ОШИБКИ ПО ФАЙЛАМ" to "FILE ERRORS",
     "Заменить оригинальный файл?" to "Replace original file?",
+    "Защищённое хранилище ключей недоступно" to "Secure key storage is unavailable",
     "Pro активирован. Спасибо за покупку!" to "Pro activated. Thank you for your purchase!",
     "Платёж ожидает подтверждения. Pro включится автоматически после оплаты." to "Payment pending. Pro will turn on automatically once it is paid.",
     "Покупка Pro восстановлена" to "Pro purchase restored",
