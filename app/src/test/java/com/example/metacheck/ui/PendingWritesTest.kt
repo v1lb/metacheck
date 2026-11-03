@@ -91,7 +91,18 @@ class PendingWritesTest {
         assertEquals(src, w.takeConfirmedOverwrite()!!.source)
     }
 
-    @Test fun patchIsSerializable() {
-        assertTrue(MetadataPatch() is Serializable)
+    /** Операция хранится в SavedStateHandle: после смерти процесса она должна восстановиться без потерь. */
+    @Test fun pendingWritesSurviveSerialization() {
+        fun <T> roundTrip(value: T): T {
+            val bytes = java.io.ByteArrayOutputStream().also { java.io.ObjectOutputStream(it).use { o -> o.writeObject(value) } }.toByteArray()
+            @Suppress("UNCHECKED_CAST")
+            return java.io.ObjectInputStream(bytes.inputStream()).use { it.readObject() } as T
+        }
+        val edit = PendingWrite.Overwrite(src, OverwriteOp.Edit(MetadataPatch(model = "Pixel", latitude = 1.0, longitude = 2.0)), confirmed = true)
+        assertEquals(edit, roundTrip(edit))
+        val copy = PendingWrite.EditCopy(src, MetadataPatch(removeGps = true))
+        assertEquals(copy, roundTrip(copy))
+        // Strip — объект-одиночка: после восстановления это тот же объект, иначе when/is по режиму сломался бы.
+        assertTrue(roundTrip<OverwriteOp>(OverwriteOp.Strip) === OverwriteOp.Strip)
     }
 }

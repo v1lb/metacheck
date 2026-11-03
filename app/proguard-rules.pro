@@ -26,3 +26,13 @@
 # Без этих правил R8 может обрезать нужные классы, и в release-сборке карта останется пустой.
 -keep class org.osmdroid.** { *; }
 -dontwarn org.osmdroid.**
+
+# Ожидающие операции студии (PendingWrite, OverwriteOp, MetadataPatch) хранятся в SavedStateHandle через
+# java.io.Serializable и должны пережить смерть процесса. readResolve нужен объекту-одиночке OverwriteOp.Strip.
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
