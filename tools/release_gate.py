@@ -65,6 +65,11 @@ check('Workflows build with ./gradlew, not a system Gradle',
 # Аудит, п. 28: юридические тексты живут только в legal/, копии в корне расходились с оригиналом.
 check('No duplicate legal texts outside legal/',
       not any((ROOT / n).exists() for n in ('PRIVACY_POLICY.md', 'TERMS.md', 'PRIVACY_POLICY_EN.md', 'PRIVACY_POLICY_RU.md')))
+# Сторонние действия закреплены по SHA: release-aab получает ключ подписи, подмена тега могла бы его украсть.
+unpinned = [f'{w.name}: {m.group(1)}' for w in sorted((ROOT / '.github/workflows').glob('*.yml'))
+            for m in re.finditer(r'uses:\s*(\S+)', w.read_text(encoding='utf-8'))
+            if not re.search(r'@[0-9a-f]{40}$', m.group(1))]
+check('GitHub Actions pinned to commit SHAs' + (f' (not pinned: {unpinned[:3]})' if unpinned else ''), not unpinned)
 workflows = ROOT / '.github/workflows'
 release_wf = [(workflows / n).read_text(encoding='utf-8') for n in ('release-aab.yml', 'build-apk.yml') if (workflows / n).is_file()]
 def code_lines(text):
