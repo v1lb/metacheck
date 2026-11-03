@@ -45,15 +45,23 @@ class AppContainer(app: Application) {
         billing = PlayBillingGateway(app),
     )
 
-    /** Бесплатно хранится 10 последних отчётов, в Pro 50. */
+    /**
+     * Free показывает 10 последних отчётов, Pro — 50. Хранится всегда до 50: тариф только скрывает лишнее.
+     * current() дожидается чтения статуса Pro из кэша, поэтому сразу после запуска Pro не считается Free.
+     */
     val history: HistoryRepository = FileHistoryRepository(
         dir = File(app.filesDir, "reports"),
         crypto = crypto,
-        maxEntries = { if (entitlements.entitlement.value.isPro) 50 else 10 },
+        visibleLimit = { if (entitlements.current().isPro) FileHistoryRepository.STORAGE_LIMIT else FREE_HISTORY_LIMIT },
     )
 
     val analyzeImage = AnalyzeImageUseCase(imageRepository)
     val exportReport = ExportReportUseCase(ExportRepositoryImpl(app.contentResolver), entitlements)
     val metadataStudio = MetadataStudioUseCase(MetadataRewriteRepositoryImpl(app), entitlements, PreferencesDailyCleanQuota(app, crypto))
     val checkViaApi = CheckViaApiUseCase(ApiRepositoryImpl(settings), entitlements)
+
+    companion object {
+        /** Сколько отчётов истории видно без Pro. Совпадает с текстами dash_history_limit_free и pro_free_*. */
+        const val FREE_HISTORY_LIMIT = 10
+    }
 }

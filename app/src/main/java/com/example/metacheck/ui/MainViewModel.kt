@@ -25,6 +25,7 @@ import com.example.metacheck.domain.model.MetaReport
 import com.example.metacheck.domain.model.ProRequiredException
 import com.example.metacheck.domain.model.TooLargeException
 import com.example.metacheck.domain.model.UnsupportedFormatException
+import com.example.metacheck.domain.repository.EntitlementRepository
 import com.example.metacheck.domain.repository.HistoryRepository
 import com.example.metacheck.domain.repository.SettingsRepository
 import com.example.metacheck.domain.usecase.AnalyzeImageUseCase
@@ -34,6 +35,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 sealed interface UiState {
@@ -58,6 +62,7 @@ class MainViewModel(
     private val history: HistoryRepository,
     private val resolver: ContentResolver,
     settingsRepository: SettingsRepository,
+    entitlements: EntitlementRepository,
 ) : ViewModel() {
 
     private val settingsState = settingsRepository.settings
@@ -80,13 +85,20 @@ class MainViewModel(
 
     private var analyzeJob: Job? = null
     private var apiJob: Job? = null
+    private var historyJob: Job? = null
 
     init {
         refreshHistory()
+        // Сколько отчётов видно, зависит от Pro: после покупки (или её отмены) список перечитывается.
+        viewModelScope.launch {
+            entitlements.entitlement.map { it.isPro }.distinctUntilChanged().drop(1).collect { refreshHistory() }
+        }
     }
 
+    /** Новый запрос отменяет старый: иначе более ранний ответ мог бы перезаписать свежий список. */
     fun refreshHistory() {
-        viewModelScope.launch {
+        historyJob?.cancel()
+        historyJob = viewModelScope.launch {
             try { _history.value = history.list() }
             catch (e: CancellationException) { throw e }
             catch (_: Exception) { showMessage(UiText.Res(R.string.main_msg_history_load_failed)) }
@@ -111,7 +123,8 @@ class MainViewModel(
                         _state.value = UiState.Done(report, uri.toString())
                         if (settingsState.value.saveHistory) {
                             try {
-                                history.save(report)
+                                // save возвращает Result: без getOrThrow ошибка сохранения молча терялась.
+                                history.save(report).getOrThrow()
                                 refreshHistory()
                             } catch (e: CancellationException) { throw e }
                             catch (_: Exception) { showMessage(UiText.Res(R.string.main_msg_history_save_failed)) }
@@ -251,7 +264,7 @@ class MainViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val c = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MetaCheckApplication).container
-                MainViewModel(c.analyzeImage, c.exportReport, c.checkViaApi, c.history, c.contentResolver, c.settings)
+                MainViewModel(c.analyzeImage, c.exportReport, c.checkViaApi, c.history, c.contentResolver, c.settings, c.entitlements)
             }
         }
     }
