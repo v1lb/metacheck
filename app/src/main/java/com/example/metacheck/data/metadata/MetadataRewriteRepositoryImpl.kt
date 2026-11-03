@@ -4,8 +4,10 @@ import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Matrix
 import android.net.Uri
+import android.os.Build
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import androidx.exifinterface.media.ExifInterface
@@ -66,6 +68,9 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
                     require(exif.latLong == null && GPS_TAGS.all { exif.getAttribute(it) == null }) {
                         "Проверка GPS-тегов не пройдена"
                     }
+                    // Координаты прячутся не только в EXIF: Motion Photo, MPF-кадры, XMP, миниатюра.
+                    val hidden = JpegSegments.inspect(stage)
+                    require(!hidden.hasHiddenPayload) { "Проверка скрытых данных не пройдена: ${hidden.describe()}" }
                     Prepared("image/jpeg", false)
                 }
                 "image/png" -> {
@@ -235,7 +240,8 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         val original = createTemp("editable_original", ".jpg")
         try {
             copyUriToFile(source, original)
-            JpegSegments.removeContradictorySegments(original, output)
+            // При удалении GPS убираем и миниатюру EXIF: у обрезанного фото она показывает исходный кадр.
+            JpegSegments.removeContradictorySegments(original, output, dropExifThumbnail = patch.removeGps)
             val exif = ExifInterface(output.absolutePath)
             if (patch.removeGps || (patch.latitude != null && patch.longitude != null)) {
                 GPS_TAGS.forEach { exif.setAttribute(it, null) }
@@ -276,6 +282,10 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
                 }
             }
             if (output.length() == 0L) throw IOException("Пустой результат редактирования")
+            if (patch.removeGps) {
+                val hidden = JpegSegments.inspect(output)
+                if (hidden.hasHiddenPayload) throw IOException("Проверка скрытых данных не пройдена: ${hidden.describe()}")
+            }
         } finally { original.delete() }
     }
 
@@ -300,8 +310,13 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             val orientation = runCatching {
                 ExifInterface(raw.absolutePath).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
             }.getOrDefault(ExifInterface.ORIENTATION_NORMAL)
-            val bitmap = BitmapFactory.decodeFile(raw.absolutePath, BitmapFactory.Options().apply { inSampleSize = sample })
-                ?: throw IOException("Не удалось прочитать пиксели. Попробуйте другое изображение")
+            val decoded = BitmapFactory.decodeFile(
+                raw.absolutePath,
+                BitmapFactory.Options().apply { inSampleSize = sample; inMutable = true },
+            ) ?: throw IOException("Не удалось прочитать пиксели. Попробуйте другое изображение")
+            // Android 14+: Ultra HDR фото декодируются с gain map, и Bitmap.compress пишет обратно
+            // MPF + второй кадр. Очищенная копия должна быть обычным JPEG без вторичных изображений.
+            val bitmap = withoutGainmap(decoded)
             var oriented = bitmap
             try {
                 oriented = applyExifOrientation(bitmap, orientation)
@@ -320,6 +335,22 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             throw IOException("Недостаточно памяти для обработки изображения", outOfMemory)
         } finally { raw.delete() }
     }
+
+    private fun withoutGainmap(bitmap: Bitmap): Bitmap {
+        if (Build.VERSION.SDK_INT < 34 || !bitmap.hasGainmap()) return bitmap
+        runCatching { bitmap.gainmap = null }
+        if (!bitmap.hasGainmap()) return bitmap
+        // Запасной путь: перерисовать пиксели в новый bitmap, у которого gain map нет.
+        val copy = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        Canvas(copy).drawBitmap(bitmap, 0f, 0f, null)
+        bitmap.recycle()
+        return copy
+    }
+
+    private fun JpegSegments.Findings.describe(): String = listOfNotNull(
+        "XMP".takeIf { xmp }, "IPTC".takeIf { iptc }, "COM".takeIf { comment }, "MPF".takeIf { mpf },
+        "данные после EOI".takeIf { trailer }, "миниатюра EXIF".takeIf { exifThumbnail },
+    ).joinToString(", ")
 
     private fun applyExifOrientation(bitmap: Bitmap, orientation: Int): Bitmap {
         val matrix = Matrix()
