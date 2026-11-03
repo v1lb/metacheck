@@ -3,12 +3,21 @@ package com.example.metacheck.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
+import android.view.View
+import android.view.ViewTreeObserver
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Modifier
+import com.example.metacheck.ui.preferences.StartDestination
+import com.example.metacheck.ui.preferences.UiPreferences
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.metacheck.MetaCheckApplication
@@ -25,25 +34,47 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val uiPrefs = (application as MetaCheckApplication).container.uiPreferences
+        holdFirstFrameUntilLoaded(uiPrefs)
         // Повторно не анализируем после поворота экрана: состояние уже в ViewModel.
         if (savedInstanceState == null) handleSharedImage(intent)
         setContent {
-            val uiPrefs = remember { (application as MetaCheckApplication).container.uiPreferences }
             val selection by uiPrefs.state.collectAsStateWithLifecycle()
+            val loaded by uiPrefs.loaded.collectAsStateWithLifecycle()
             val config = LocalConfiguration.current
             val systemLanguage = config.locales[0]?.language ?: "en"
             val language = UiSelection.effectiveLanguage(selection.language, systemLanguage)
             val dark = UiSelection.effectiveDark(selection.appearance, isSystemInDarkTheme())
             CompositionLocalProvider(LocalUiLanguage provides language) {
                 MetaCheckTheme(darkTheme = dark) {
-                    if (!selection.completed) {
-                        OnboardingFlow(uiPrefs)
-                    } else {
-                        MainScreen(viewModel, uiPreferences = uiPrefs)
+                    when (UiSelection.startDestination(loaded, selection.completed)) {
+                        // Пустой фон, а не онбординг: виден, только если DataStore читается дольше MAX_SPLASH_MS.
+                        StartDestination.LOADING ->
+                            Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
+                        StartDestination.ONBOARDING -> OnboardingFlow(uiPrefs)
+                        StartDestination.MAIN -> MainScreen(viewModel, uiPreferences = uiPrefs)
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Держим системный splash (Android 12+) или фон окна (Android 8–11), пока настройки не прочитаны.
+     * Документированный способ через OnPreDrawListener, без новой зависимости.
+     * Ограничение по времени, чтобы зависший диск не оставил пользователя на splash навсегда.
+     */
+    private fun holdFirstFrameUntilLoaded(uiPrefs: UiPreferences) {
+        if (uiPrefs.loaded.value) return
+        val startedAt = SystemClock.uptimeMillis()
+        val content = findViewById<View>(android.R.id.content)
+        content.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                val ready = uiPrefs.loaded.value || SystemClock.uptimeMillis() - startedAt > MAX_SPLASH_MS
+                if (ready) content.viewTreeObserver.removeOnPreDrawListener(this)
+                return ready
+            }
+        })
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -57,5 +88,9 @@ class MainActivity : ComponentActivity() {
         if (intent?.action != Intent.ACTION_SEND || intent.type?.startsWith("image/") != true) return
         val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java) ?: return
         viewModel.onImagePicked(uri)
+    }
+
+    private companion object {
+        const val MAX_SPLASH_MS = 1_500L
     }
 }
