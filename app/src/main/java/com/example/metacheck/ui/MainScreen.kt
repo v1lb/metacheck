@@ -72,10 +72,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -114,7 +112,6 @@ fun MainScreen(
     val entitlement by proVm.entitlement.collectAsStateWithLifecycle()
     val paywallVisible by proVm.paywallVisible.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val clipboard = LocalClipboardManager.current
     val snackbar = remember { SnackbarHostState() }
     val texts = rememberMetaTexts()
     var showSettings by rememberSaveable { mutableStateOf(false) }
@@ -299,8 +296,12 @@ fun MainScreen(
                                     }
                                 },
                                 onCopy = {
-                                    clipboard.setText(AnnotatedString(ReportText.format(s.report, texts)))
-                                    viewModel.showMessage(UiText.Res(R.string.main_msg_report_copied))
+                                    val shownBySystem = runCatching {
+                                        SensitiveClipboard.copy(context, context.getString(R.string.app_name), ReportText.format(s.report, texts))
+                                    }
+                                    // Android 13+ сам показывает «Скопировано»: второе сообщение было бы дублем.
+                                    shownBySystem.onSuccess { if (!it) viewModel.showMessage(UiText.Res(R.string.main_msg_report_copied)) }
+                                        .onFailure { viewModel.showMessage(UiText.Res(R.string.main_msg_operation_failed)) }
                                 },
                                 onJson = { if (entitlement.isPro) saveJson.launch("$name-metacheck.json") else proVm.openPaywall() },
                                 onPdf = { if (entitlement.isPro) savePdf.launch("$name-metacheck.pdf") else proVm.openPaywall() },
