@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!--
         Разрешения минимальные:
@@ -12,6 +13,18 @@
     -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+
+    <!--
+        Аудит, п. 20. Библиотеки (в первую очередь osmdroid) могут добавлять свои разрешения в итоговый
+        манифест. Доступ к общему хранилищу и Wi-Fi приложению не нужен: кэш карты лежит в приватных папках
+        (MapTiles.configure), файлы идут через системные диалоги. Убираем их явно; если библиотека их
+        не объявляет, правило ничего не меняет.
+        ACCESS_NETWORK_STATE не убираем: osmdroid проверяет сеть перед загрузкой тайлов, без него падает.
+        Итоговый набор разрешений собранного APK проверяет CI (tools/check_apk_permissions.py).
+    -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" tools:node="remove" />
 
     <application
         android:name=".MetaCheckApplication"

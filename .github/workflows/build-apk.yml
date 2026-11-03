@@ -34,6 +34,8 @@ jobs:
         env:
           METACHECK_MAPTILER_KEY: ${{ secrets.METACHECK_MAPTILER_KEY }}
         run: gradle --no-daemon assembleRelease
+      - name: Check permissions of the built APK
+        run: python3 tools/check_apk_permissions.py app/build/outputs/apk/release/app-release.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

@@ -90,6 +90,16 @@ jobs:
           METACHECK_MAPTILER_KEY: ${{ secrets.METACHECK_MAPTILER_KEY }}
         run: gradle --no-daemon bundleRelease
 
+      # Из AAB разрешения aapt2 не читает, поэтому проверяем итоговый манифест release-сборки.
+      - name: Check permissions of the release manifest
+        run: |
+          manifest=$(find app/build/intermediates -path '*merged_manifest*' -path '*release*' -name AndroidManifest.xml | head -n 1)
+          if [ -z "$manifest" ]; then
+            echo "::error::Не найден итоговый манифест release-сборки"
+            exit 1
+          fi
+          python3 tools/check_apk_permissions.py "$manifest"
+
       - name: Remove keystore from runner
         if: always()
         run: rm -f "$RUNNER_TEMP/upload.jks"
