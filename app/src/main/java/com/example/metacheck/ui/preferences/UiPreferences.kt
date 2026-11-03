@@ -22,29 +22,31 @@ private val Context.uiDataStore by preferencesDataStore(
     produceMigrations = { context -> listOf(SharedPreferencesMigration(context, "ui_preferences_v3")) },
 )
 
-/** Persistent app language and appearance, with automatic migration of v2.3 preferences. */
+/**
+ * Persistent app language and appearance, with automatic migration of v2.3 preferences.
+ *
+ * Пока DataStore не прочитан, [loaded] = false и экран не должен решать «онбординг или главный».
+ * Раньше начальное значение бралось из старых SharedPreferences, которые SharedPreferencesMigration
+ * уже удалила. В итоге completed=false, и онбординг мелькал на каждом холодном старте.
+ */
 class UiPreferences(context: Context) {
     private val appContext = context.applicationContext
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val legacy = appContext.getSharedPreferences("ui_preferences_v3", Context.MODE_PRIVATE)
-    private val mutable = MutableStateFlow(readLegacy())
+    private val mutable = MutableStateFlow(UiPreferencesState())
     val state: StateFlow<UiPreferencesState> = mutable.asStateFlow()
+
+    private val mutableLoaded = MutableStateFlow(false)
+    /** true после первого чтения DataStore (или ошибки чтения: тогда действуют значения по умолчанию). */
+    val loaded: StateFlow<Boolean> = mutableLoaded.asStateFlow()
 
     init {
         scope.launch {
             appContext.uiDataStore.data.catch { emit(emptyPreferences()) }.collect { preferences ->
                 mutable.value = preferences.asUiState()
+                mutableLoaded.value = true
             }
         }
     }
-
-    private fun readLegacy() = UiPreferencesState(
-        completed = legacy.getBoolean("completed", false),
-        language = runCatching { AppLanguage.valueOf(legacy.getString("language", "SYSTEM") ?: "SYSTEM") }
-            .getOrDefault(AppLanguage.SYSTEM),
-        appearance = runCatching { AppAppearance.valueOf(legacy.getString("appearance", "SYSTEM") ?: "SYSTEM") }
-            .getOrDefault(AppAppearance.SYSTEM),
-    )
 
     private fun Preferences.asUiState() = UiPreferencesState(
         completed = this[KEY_COMPLETE] ?: false,
@@ -66,6 +68,7 @@ class UiPreferences(context: Context) {
             if (completed != null) preferences[KEY_COMPLETE] = completed
         }
         mutable.value = stored.asUiState()
+        mutableLoaded.value = true
         true
     } catch (_: Exception) { false }
 

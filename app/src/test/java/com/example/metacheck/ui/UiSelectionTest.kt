@@ -2,6 +2,7 @@ package com.example.metacheck.ui
 
 import com.example.metacheck.ui.preferences.AppAppearance
 import com.example.metacheck.ui.preferences.AppLanguage
+import com.example.metacheck.ui.preferences.StartDestination
 import com.example.metacheck.ui.preferences.UiSelection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -27,5 +28,15 @@ class UiSelectionTest {
     }
     @Test fun lightOverridesDarkPhone() {
         assertFalse(UiSelection.effectiveDark(AppAppearance.LIGHT, true))
+    }
+
+    // Регрессия аудита, п. 6: пока настройки не прочитаны, онбординг показывать нельзя.
+    @Test fun notLoaded_neverShowsOnboarding() {
+        assertEquals(StartDestination.LOADING, UiSelection.startDestination(loaded = false, completed = false))
+        assertEquals(StartDestination.LOADING, UiSelection.startDestination(loaded = false, completed = true))
+    }
+    @Test fun loaded_routesByCompletion() {
+        assertEquals(StartDestination.ONBOARDING, UiSelection.startDestination(loaded = true, completed = false))
+        assertEquals(StartDestination.MAIN, UiSelection.startDestination(loaded = true, completed = true))
     }
 }
