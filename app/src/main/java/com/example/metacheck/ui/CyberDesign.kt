@@ -101,22 +101,34 @@ fun CyberEyebrow(text: String, modifier: Modifier = Modifier,
 }
 
 @Composable
-fun NeonButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+fun NeonButton(
+    text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true,
+    icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+) {
     Button(onClick = onClick, modifier = modifier, enabled = enabled,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary)) {
+        if (icon != null) {
+            androidx.compose.material3.Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+            androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
+        }
         Text(text, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
 @Composable
 fun CyberOutlineButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier,
-                       enabled: Boolean = true) {
+                       enabled: Boolean = true, icon: androidx.compose.ui.graphics.vector.ImageVector? = null) {
     OutlinedButton(onClick = onClick, modifier = modifier, enabled = enabled,
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = .55f))) {
+        if (icon != null) {
+            androidx.compose.material3.Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(18.dp))
+            androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
+        }
         Text(text, color = MaterialTheme.colorScheme.primary,
             maxLines = 1, overflow = TextOverflow.Ellipsis)
     }

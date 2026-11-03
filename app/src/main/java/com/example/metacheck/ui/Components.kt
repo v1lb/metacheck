@@ -1,5 +1,9 @@
 package com.example.metacheck.ui
 
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.getValue
@@ -44,7 +48,7 @@ fun SectionCard(title: String, items: List<MetaItem>, initiallyExpanded: Boolean
                 Text(title, style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f))
-                Text(if (expanded) "−" else "+", color = MaterialTheme.colorScheme.primary)
+                Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             }
             if (!expanded) {
                 Text(pluralStringResource(R.plurals.section_fields_collapsed, items.size, items.size),

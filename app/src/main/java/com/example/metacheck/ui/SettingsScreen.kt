@@ -1,5 +1,9 @@
 package com.example.metacheck.ui
 
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -102,7 +106,7 @@ fun SettingsScreen(
                 Row(Modifier.fillMaxWidth().clickable { expandedApi = !expandedApi }.padding(vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.settings_api_connection), style = MaterialTheme.typography.titleMedium)
-                    Text(if (expandedApi) "−" else "+", color = MaterialTheme.colorScheme.primary)
+                    Icon(if (expandedApi) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 }
                 if (expandedApi) {
                     OutlinedTextField(

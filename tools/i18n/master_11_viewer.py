@@ -1,7 +1,7 @@
 # Просмотр метаданных (MetadataViewer.kt). (key, en, ru)
 
 S = [
-    ("viewer_eyebrow", "NATIVE METADATA EXPLORER  /  LOCAL", "NATIVE METADATA EXPLORER  /  LOCAL"),
+    ("viewer_eyebrow", "All metadata", "Все метаданные"),
     ("viewer_title", "File metadata", "Метаданные файла"),
     ("viewer_field_count",
      {"one": "%1$d field · viewed right on the device", "other": "%1$d fields · viewed right on the device"},
@@ -13,7 +13,7 @@ S = [
     ("viewer_group_all", "All", "Все"),
     ("viewer_found", "FOUND: %1$d", "НАЙДЕНО: %1$d"),
     ("viewer_export_csv", "Export CSV ↗", "Экспорт CSV ↗"),
-    ("viewer_gps_section", "GPS / INTERACTIVE MAP", "GPS / ИНТЕРАКТИВНАЯ КАРТА"),
+    ("viewer_gps_section", "GPS and map", "GPS и карта"),
     ("viewer_save_gps", "Save GPS to JPEG", "Сохранить GPS в JPEG"),
     ("viewer_saving", "Saving…", "Сохранение…"),
     ("viewer_gps_jpeg_only", "Writing GPS is currently supported for JPEG only.", "Запись GPS пока поддерживается только для JPEG."),

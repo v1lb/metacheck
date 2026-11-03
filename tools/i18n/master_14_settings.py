@@ -2,12 +2,12 @@
 # Запись (key, text, None) непереводимая: самоназвания языков одинаковы во всех локалях.
 
 S = [
-    ("settings_eyebrow", "CONTROL CENTER / LOCAL FIRST", "CONTROL CENTER / LOCAL FIRST"),
+    ("settings_eyebrow", "Everything stays on this device", "Всё хранится на этом устройстве"),
     ("settings_title", "Control center", "Центр управления"),
     ("settings_subtitle", "Privacy, access and advanced features", "Приватность, доступ и расширенные возможности"),
 
-    ("settings_plan_eyebrow", "PLAN / ACCESS", "PLAN / ACCESS"),
-    ("settings_plan_free", "METACHECK FREE", "METACHECK FREE"),
+    ("settings_plan_eyebrow", "Plan", "Тариф"),
+    ("settings_plan_free", "MetaCheck Free", "MetaCheck Free"),
     ("settings_plan_pro_text", "Advanced export and the API are available to you.", "У вас доступен расширенный экспорт и API."),
     ("settings_plan_free_text",
      "Free: scanning, GPS Privacy Shield and processing of up to %1$d photos per day. Pro: unlimited cleaning, batch processing, PDF/JSON.",
@@ -15,7 +15,7 @@ S = [
     ("settings_pro_features", "Pro features", "Возможности Pro"),
     ("settings_remove_license", "Remove license", "Отключить лицензию"),
 
-    ("settings_section_history", "LOCAL HISTORY", "ЛОКАЛЬНАЯ ИСТОРИЯ"),
+    ("settings_section_history", "History", "История"),
     ("settings_save_history", "Save reports", "Сохранять отчёты"),
     ("settings_save_history_text",
      "Encrypted with Android Keystore. Photos are not copied. Free: 10, Pro: 50.",
@@ -28,7 +28,7 @@ S = [
     ("settings_msg_history_clear_failed", "Could not delete the history. Please try again.",
      "Не удалось удалить историю. Повторите попытку."),
 
-    ("settings_section_api", "CUSTOM API", "СОБСТВЕННЫЙ API"),
+    ("settings_section_api", "Your API", "Собственный API"),
     ("settings_api_enabled", "Send the JSON report", "Отправлять JSON-отчёт"),
     ("settings_api_enabled_text", "Only after confirmation and only in Pro. The original image is never sent.",
      "Только с подтверждением и только в Pro. Исходное изображение не передаётся."),
@@ -50,14 +50,14 @@ S = [
     ("settings_api_pin", "Public key SHA-256 (base64)", "SHA-256 публичного ключа (base64)"),
     ("settings_api_pin_note", "Optional pin for the server certificate.", "Необязательный pin сертификата сервера."),
 
-    ("settings_security_eyebrow", "SECURITY STATUS", "SECURITY STATUS"),
+    ("settings_security_eyebrow", "Security", "Безопасность"),
     ("settings_security_title", "Stored on this device only", "Хранение только на устройстве"),
     ("settings_security_text",
      "The network is used only when you act: the map, address search and your API (if turned on). Google Play checks the Pro purchase.",
      "Сеть используется только по вашему действию: карта, поиск адреса и внешний API (если включён). Google Play проверяет покупку Pro."),
 
     # --- Язык и оформление ---
-    ("appearance_section", "LANGUAGE & APPEARANCE", "ЯЗЫК И ОФОРМЛЕНИЕ"),
+    ("appearance_section", "Language and appearance", "Язык и оформление"),
     ("appearance_language", "App language", "Язык приложения"),
     ("appearance_language_system", "As on device", "Как в системе"),
     ("appearance_language_current", "Now: %1$s", "Сейчас: %1$s"),

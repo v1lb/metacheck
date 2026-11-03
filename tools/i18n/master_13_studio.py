@@ -1,7 +1,7 @@
 # Metadata Studio (MetadataStudioScreen.kt, MetadataStudioViewModel.kt). (key, en, ru)
 
 S = [
-    ("studio_eyebrow", "METADATA STUDIO  /  ON-DEVICE", "METADATA STUDIO  /  ON-DEVICE"),
+    ("studio_eyebrow", "On this device", "На этом устройстве"),
     ("studio_title", "Metadata management", "Управление метаданными"),
     ("studio_quota_pro", "PRO · Unlimited cleaning", "PRO · Без ограничений на очистку"),
     ("studio_quota_free", "FREE · Cleaned today: %1$d of %2$d · Resets at 00:00 UTC",
@@ -15,12 +15,12 @@ S = [
     ("studio_check_numbers", "Check the numbers: GPS, ISO, aperture and shutter speed",
      "Проверьте числа: GPS, ISO, диафрагму и выдержку"),
 
-    ("studio_source_eyebrow", "01 / SOURCE IMAGE", "01 / ИСХОДНОЕ ИЗОБРАЖЕНИЕ"),
+    ("studio_source_eyebrow", "1 · Source image", "1 · Исходное фото"),
     ("studio_source_none", "No file selected", "Файл не выбран"),
     ("studio_source_selected", "Image selected", "Изображение выбрано"),
     ("studio_wait_format", "Checking the file format, try again in a moment", "Проверяется формат файла, повторите через секунду"),
 
-    ("studio_strip_eyebrow", "02 / FULL CLEANING", "02 / ПОЛНАЯ ОЧИСТКА"),
+    ("studio_strip_eyebrow", "2 · Full cleaning", "2 · Полная очистка"),
     ("studio_strip_title", "Remove metadata", "Удалить метаданные"),
     ("studio_strip_text",
      "The file is decoded and saved again without carried-over EXIF, XMP, IPTC and GPS. JPEG is recompressed; HEIC/GIF/WebP are saved as PNG, and animation may be lost. C2PA signatures become invalid.",
@@ -31,7 +31,7 @@ S = [
      "Only writable JPEG/PNG documents can be replaced. First you will choose where to save a full backup.",
      "Для перезаписи доступны только JPEG/PNG и только документы с правом записи. Сначала вы выберете место для полноценной резервной копии."),
 
-    ("studio_edit_eyebrow", "02 / EXIF EDITOR", "02 / РЕДАКТОР EXIF"),
+    ("studio_edit_eyebrow", "2 · EXIF editor", "2 · Редактор EXIF"),
     ("studio_edit_gps_title", "Coordinates and GPS", "Координаты и GPS"),
     ("studio_edit_remove_gps", "Remove all GPS", "Удалить GPS целиком"),
     ("studio_field_latitude", "Latitude (−90…90)", "Широта (−90…90)"),
@@ -54,7 +54,7 @@ S = [
     ("studio_edit_save_copy", "Save an edited JPEG copy", "Сохранить изменённую копию JPEG"),
     ("studio_edit_overwrite", "Replace the JPEG, with a backup", "Перезаписать JPEG с резервной копией"),
 
-    ("studio_batch_eyebrow", "BATCH STRIP / PRO", "BATCH STRIP / PRO"),
+    ("studio_batch_eyebrow", "Batch cleaning · Pro", "Пакетная очистка · Pro"),
     ("studio_batch_title", "Batch cleaning", "Массовая очистка"),
     ("studio_batch_text",
      "Up to 50 files per run. New copies are saved to the selected folder. The originals stay unchanged.",
@@ -64,7 +64,7 @@ S = [
     ("studio_batch_choose_folder_start", "Choose a folder and start", "Выбрать папку и запустить"),
     ("studio_batch_choose_files_first", "Choose the files first", "Сначала выберите файлы"),
     ("studio_batch_progress", "%1$d/%2$d · Succeeded: %3$d · Failed: %4$d", "%1$d/%2$d · Успешно: %3$d · Ошибок: %4$d"),
-    ("studio_batch_errors", "FILE ERRORS", "ОШИБКИ ПО ФАЙЛАМ"),
+    ("studio_batch_errors", "File errors", "Ошибки по файлам"),
     ("studio_batch_file_error", "%1$s: %2$s", "%1$s: %2$s"),
 
     ("studio_overwrite_title", "Replace the original file?", "Заменить оригинальный файл?"),

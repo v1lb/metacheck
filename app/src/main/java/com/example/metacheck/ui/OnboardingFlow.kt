@@ -1,5 +1,11 @@
 package com.example.metacheck.ui
 
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.RadioButtonChecked
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Icon
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.RepeatMode
@@ -90,8 +96,11 @@ fun OnboardingFlow(prefs: UiPreferences) {
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("◈  MetaCheck", color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.titleLarge)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Icon(Icons.Filled.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Text("MetaCheck", color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleLarge)
+                }
                 Text(stringResource(R.string.onboarding_step, step + 1, STEPS), color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge)
             }
@@ -121,7 +130,6 @@ fun OnboardingFlow(prefs: UiPreferences) {
                             GlassPanel(Modifier.fillMaxWidth()) {
                                 Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                                     CyberEyebrow(stringResource(R.string.onboarding_intro_eyebrow_panel))
-                                    ScanningBars(Modifier.fillMaxWidth().height(66.dp))
                                     Text(stringResource(R.string.onboarding_intro_disclaimer),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         style = MaterialTheme.typography.bodyMedium)
@@ -197,8 +205,8 @@ private fun NeonMark() {
     Box(Modifier.size(128.dp).background(
         Brush.radialGradient(listOf(MaterialTheme.colorScheme.primary.copy(alpha = pulse * .3f), Color.Transparent)),
         RoundedCornerShape(50)), contentAlignment = Alignment.Center) {
-        Text("◈", color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.headlineLarge)
+        Icon(Icons.Filled.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(56.dp))
     }
 }
 
@@ -219,8 +227,8 @@ private fun SelectTile(label: String, description: String, selected: Boolean, on
             Text(description, style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        Text(if (selected) "◉" else "○", color = accent,
-            style = MaterialTheme.typography.titleLarge)
+        Icon(if (selected) Icons.Filled.RadioButtonChecked else Icons.Filled.RadioButtonUnchecked,
+            contentDescription = null, tint = accent)
     }
 }
 
@@ -247,11 +255,12 @@ fun ThemePreviewCard(dark: Boolean, selected: Boolean, title: String, subtitle: 
                 Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall)
             }
-            Text(if (selected) "✓" else "○", color = MaterialTheme.colorScheme.primary)
+            Icon(if (selected) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
+                contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         }
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(13.dp))
             .background(base).padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("◈  MetaCheck    /    EXIF", color = text, style = MaterialTheme.typography.labelMedium)
+            Text("MetaCheck    /    EXIF", color = text, style = MaterialTheme.typography.labelMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                 Box(Modifier.weight(1f).height(38.dp).clip(RoundedCornerShape(8.dp))
                     .background(pane).border(1.dp, accent.copy(alpha = .3f), RoundedCornerShape(8.dp)),

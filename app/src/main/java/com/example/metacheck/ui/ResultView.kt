@@ -1,5 +1,10 @@
 package com.example.metacheck.ui
 
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.HideImage
+import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.Crossfade
 import android.content.Context
@@ -65,8 +70,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-private enum class ReportTab(@StringRes val label: Int, val glyph: String) {
-    OVERVIEW(R.string.result_tab_analysis, "◉"), METADATA(R.string.result_tab_metadata, "▤"), GPS(R.string.result_tab_map, "⌖")
+private enum class ReportTab(@StringRes val label: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    OVERVIEW(R.string.result_tab_analysis, androidx.compose.material.icons.Icons.Filled.Shield),
+    METADATA(R.string.result_tab_metadata, androidx.compose.material.icons.Icons.AutoMirrored.Filled.List),
+    GPS(R.string.result_tab_map, androidx.compose.material.icons.Icons.Filled.LocationOn)
 }
 
 data class ResultActions(
@@ -97,7 +104,8 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
                 Text(report.file.name.ifBlank { stringResource(R.string.common_unnamed) },
                     style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            PulseIndicator()
+            androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.PhoneAndroid, contentDescription = null,
+                tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(16.dp))
             Text(" " + stringResource(R.string.result_badge_local), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelMedium)
         }
         // Вкладки сменяются растворением, а не мгновенно.
@@ -129,8 +137,8 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
                         .clickable { selected = index }.padding(vertical = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text(item.glyph, style = MaterialTheme.typography.titleLarge,
-                        color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                    androidx.compose.material3.Icon(item.icon, contentDescription = null,
+                        tint = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(stringResource(item.label), style = MaterialTheme.typography.labelMedium,
                         color = if (active) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -162,10 +170,7 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
         item {
             GlassPanel(accent = color, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                        PulseIndicator(color)
-                        CyberEyebrow(stringResource(R.string.result_eyebrow_engine), color = color)
-                    }
+                    CyberEyebrow(stringResource(R.string.result_eyebrow_engine), color = color)
                     Text(
                         stringResource(
                             when {
@@ -179,7 +184,6 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
                     )
                     Text(stringResource(R.string.result_metadata_only),
                         color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
-                    ScanningBars(Modifier.fillMaxWidth().height(43.dp))
                     Text(
                         stringResource(R.string.result_disclaimer),
                         style = MaterialTheme.typography.bodyMedium,
@@ -269,7 +273,8 @@ private fun PhotoPreview(sourceUri: String?, name: String) {
                     contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
             } else {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("◇", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.headlineLarge)
+                    androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.HideImage, contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(40.dp))
                     Text(stringResource(if (sourceUri == null) R.string.result_preview_not_stored else R.string.result_preview_unavailable),
                         color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                 }
