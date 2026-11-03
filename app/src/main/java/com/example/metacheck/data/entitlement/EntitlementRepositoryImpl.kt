@@ -2,7 +2,6 @@ package com.example.metacheck.data.entitlement
 
 import android.app.Activity
 import android.content.SharedPreferences
-import android.util.Base64
 import com.example.metacheck.data.crypto.Crypto
 import com.example.metacheck.data.license.LicenseVerifier
 import com.example.metacheck.domain.model.Entitlement
@@ -10,6 +9,8 @@ import com.example.metacheck.domain.model.LicenseInfo
 import com.example.metacheck.domain.repository.BillingGateway
 import com.example.metacheck.domain.repository.EntitlementRepository
 import com.example.metacheck.domain.runCatchingCancellable
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -18,20 +19,30 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Base64
 
 /**
  * Pro = покупка в Google Play ИЛИ действующий лицензионный ключ.
  * Результат последней сверки с Play и ключ (в зашифрованном виде) кэшируются, поэтому Pro работает офлайн.
  * Ключ при каждом запуске проверяется заново, так что истёкший перестаёт действовать.
+ *
+ * Контракт устойчивости: [refresh] никогда не бросает исключений (кроме отмены корутины).
+ * Сбой Keystore или Play приводит только к тому, что кэш не обновится, а состояние посчитается
+ * по тому, что удалось прочитать. Раньше исключение из crypto.encrypt роняло процесс при каждом запуске.
  */
 class EntitlementRepositoryImpl(
     private val prefs: SharedPreferences,
     private val crypto: Crypto,
     private val verifier: LicenseVerifier,
     private val billing: BillingGateway,
+    private val io: CoroutineDispatcher = Dispatchers.IO,
+    /** Куда сообщать о проглоченных ошибках (лог/крэш-репортер). По умолчанию ничего не делаем. */
+    private val onError: (Throwable) -> Unit = {},
 ) : EntitlementRepository {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val scope = CoroutineScope(
+        SupervisorJob() + io + CoroutineExceptionHandler { _, e -> onError(e) },
+    )
     private val state = MutableStateFlow(computeNow())
     override val entitlement: StateFlow<Entitlement> = state.asStateFlow()
 
@@ -40,24 +51,38 @@ class EntitlementRepositoryImpl(
     }
 
     override suspend fun refresh() {
-        billing.queryOwned()?.let { owned ->
-            val encrypted = crypto.encrypt(owned.toString().toByteArray(Charsets.UTF_8))
-            prefs.edit().remove("play_owned")
-                .putString(K_PLAY, Base64.encodeToString(encrypted, Base64.NO_WRAP)).commit()
+        withContext(io) {
+            val owned = runCatchingCancellable { billing.queryOwned() }
+                .onFailure(onError)
+                .getOrNull()
+            val persisted = owned == null ||
+                runCatchingCancellable { persistPlayOwned(owned) }.onFailure(onError).isSuccess
+            state.value = if (persisted) {
+                computeNow()
+            } else {
+                // Keystore сломан: кэш на диск не записан, но в этой сессии статус от Play верный.
+                Entitlement.resolve(owned == true, storedLicense())
+            }
         }
-        state.value = computeNow()
     }
 
-    override suspend fun priceText(): String? = billing.priceText()
+    override suspend fun priceText(): String? =
+        runCatchingCancellable { billing.priceText() }.onFailure(onError).getOrNull()
 
-    override fun launchPurchase(activity: Activity): Boolean = billing.launchPurchase(activity)
+    override fun launchPurchase(activity: Activity): Boolean =
+        try {
+            billing.launchPurchase(activity)
+        } catch (e: Exception) {
+            onError(e)
+            false
+        }
 
-    override suspend fun redeem(token: String): Result<LicenseInfo> = withContext(Dispatchers.Default) {
+    override suspend fun redeem(token: String): Result<LicenseInfo> = withContext(io) {
         runCatchingCancellable {
             val clean = token.trim()
             val info = verifier.verify(clean).getOrThrow()
             val blob = crypto.encrypt(clean.toByteArray(Charsets.UTF_8))
-            prefs.edit().putString(K_LICENSE, Base64.encodeToString(blob, Base64.NO_WRAP)).apply()
+            prefs.edit().putString(K_LICENSE, encode(blob)).apply()
             state.value = computeNow()
             info
         }
@@ -68,25 +93,41 @@ class EntitlementRepositoryImpl(
         state.value = computeNow()
     }
 
+    private fun persistPlayOwned(owned: Boolean) {
+        val encrypted = crypto.encrypt(owned.toString().toByteArray(Charsets.UTF_8))
+        prefs.edit()
+            .remove("play_owned")
+            .putString(K_PLAY, encode(encrypted))
+            .apply()
+    }
+
     private fun computeNow(): Entitlement =
         Entitlement.resolve(cachedPlayOwned(), storedLicense())
 
-    private fun cachedPlayOwned(): Boolean {
-        return try {
+    private fun cachedPlayOwned(): Boolean =
+        try {
             val blob = prefs.getString(K_PLAY, null) ?: return false
-            crypto.decrypt(Base64.decode(blob, Base64.NO_WRAP)).toString(Charsets.UTF_8) == "true"
-        } catch (_: Exception) { false }
-    }
+            crypto.decrypt(decode(blob)).toString(Charsets.UTF_8) == "true"
+        } catch (e: Exception) {
+            onError(e)
+            false
+        }
 
     private fun storedLicense(): LicenseInfo? =
         try {
             prefs.getString(K_LICENSE, null)?.let {
-                val token = String(crypto.decrypt(Base64.decode(it, Base64.NO_WRAP)), Charsets.UTF_8)
+                val token = String(crypto.decrypt(decode(it)), Charsets.UTF_8)
                 verifier.verify(token).getOrNull()
             }
         } catch (e: Exception) {
+            onError(e)
             null
         }
+
+    // java.util.Base64 (API 26+, minSdk = 26) даёт те же байты, что android.util.Base64.NO_WRAP,
+    // но работает в JVM-тестах. Уже сохранённые значения читаются без миграции.
+    private fun encode(bytes: ByteArray): String = Base64.getEncoder().encodeToString(bytes)
+    private fun decode(text: String): ByteArray = Base64.getDecoder().decode(text)
 
     private companion object {
         const val K_PLAY = "play_owned_encrypted_v2"
