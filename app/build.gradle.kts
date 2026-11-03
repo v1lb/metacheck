@@ -27,6 +27,13 @@ android {
         versionCode = 20600
         versionName = "2.6.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Ключ MapTiler для карты (аудит, п. 10). Пусто -> тайлы OpenStreetMap по Tile Usage Policy.
+        // Задаётся в ~/.gradle/gradle.properties (METACHECK_MAPTILER_KEY=...) или секретом CI, не в репозитории.
+        val mapTilerKey = (project.findProperty("METACHECK_MAPTILER_KEY") as String?)
+            ?: System.getenv("METACHECK_MAPTILER_KEY")
+            ?: ""
+        resValue("string", "maptiler_key", mapTilerKey)
     }
 
     signingConfigs {
