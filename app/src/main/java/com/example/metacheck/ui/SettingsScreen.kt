@@ -130,8 +130,10 @@ fun SettingsScreen(
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         NeonButton("Сохранить ключ", {
-                            if (vm.saveKey(keyInput)) { keyInput = ""; onMessage("Ключ сохранён") }
-                            else onMessage("Ошибка сохранения ключа")
+                            vm.saveKey(keyInput) { ok ->
+                                if (ok) { keyInput = ""; onMessage("Ключ сохранён") }
+                                else onMessage("Ошибка сохранения ключа")
+                            }
                         }, Modifier.weight(1f), enabled = settings.apiEnabled && keyInput.isNotBlank())
                         CyberOutlineButton("Удалить", {
                             vm.deleteKey(); keyInput = ""; onMessage("Ключ удалён")

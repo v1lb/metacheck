@@ -37,7 +37,14 @@ class MetadataStudioViewModel(
     val message = _message.asStateFlow()
     private val _batch = MutableStateFlow(BatchProgress())
     val batch = _batch.asStateFlow()
-    val usedToday = MutableStateFlow(studio.usedToday())
+    /** Счётчик читается в фоне (Keystore): в конструкторе ViewModel, т. е. в главном потоке, его не трогаем. */
+    val usedToday = MutableStateFlow(0)
+
+    init {
+        viewModelScope.launch {
+            usedToday.value = try { studio.usedToday() } catch (e: CancellationException) { throw e } catch (_: Exception) { 0 }
+        }
+    }
 
     fun clearMessage() { _message.value = null }
     fun stripCopy(
