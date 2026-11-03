@@ -5,9 +5,13 @@ import android.content.SharedPreferences
 import com.example.metacheck.data.crypto.Crypto
 import com.example.metacheck.data.license.LicenseVerifier
 import com.example.metacheck.domain.model.ProSource
+import com.example.metacheck.domain.model.PurchaseEvent
+import com.example.metacheck.domain.model.PurchaseSnapshot
 import com.example.metacheck.domain.repository.BillingGateway
 import com.example.metacheck.testutil.FakePrefs
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -54,7 +58,7 @@ class EntitlementResilienceTest {
         val errors = mutableListOf<Throwable>()
         repo(BrokenCrypto(), billing, errors = errors)
 
-        billing.onPurchasesChanged!!.invoke() // Unconfined: выполняется синхронно
+        billing.onPurchaseUpdate!!.invoke(PurchaseEvent.COMPLETED) // Unconfined: выполняется синхронно
 
         assertTrue(errors.isNotEmpty())
     }
@@ -63,6 +67,53 @@ class EntitlementResilienceTest {
     fun priceAndPurchase_swallowBillingErrors() = runBlocking {
         val repo = repo(PlainCrypto(), FakeBilling(throws = true))
         assertEquals(null, repo.priceText())
+    }
+
+    // --- п. 8: отложенные платежи и события покупки ---
+
+    @Test
+    fun pendingPurchase_isVisible_butDoesNotGrantPro() = runBlocking {
+        val repo = repo(PlainCrypto(), FakeBilling(owned = false, pending = true))
+        repo.refresh()
+        assertFalse(repo.entitlement.value.isPro)
+        assertTrue(repo.entitlement.value.purchasePending)
+    }
+
+    @Test
+    fun pendingThenPaid_onResumeRefresh_grantsPro() = runBlocking {
+        val billing = FakeBilling(owned = false, pending = true)
+        val repo = repo(PlainCrypto(), billing)
+        repo.refresh()
+        billing.owned = true; billing.pending = false // оплатили наличными вне приложения
+        repo.refresh()                               // ON_RESUME
+        assertEquals(ProSource.PLAY, repo.entitlement.value.source)
+        assertFalse(repo.entitlement.value.purchasePending)
+    }
+
+    @Test
+    fun refund_revokesPro() = runBlocking {
+        val billing = FakeBilling(owned = true)
+        val repo = repo(PlainCrypto(), billing)
+        repo.refresh()
+        billing.owned = false
+        repo.refresh()
+        assertFalse(repo.entitlement.value.isPro)
+    }
+
+    @Test
+    fun purchaseEvents_reachUi_andCanceledDoesNotQueryPlay() = runBlocking {
+        val billing = FakeBilling(owned = false)
+        val repo = repo(PlainCrypto(), billing)
+        val seen = mutableListOf<PurchaseEvent>()
+        val job = launch(Dispatchers.Unconfined) { repo.purchaseEvents.toList(seen) }
+
+        billing.onPurchaseUpdate!!.invoke(PurchaseEvent.CANCELED)
+        assertEquals(0, billing.queries)
+        billing.onPurchaseUpdate!!.invoke(PurchaseEvent.ALREADY_OWNED)
+        assertEquals(1, billing.queries)
+
+        assertEquals(listOf(PurchaseEvent.CANCELED, PurchaseEvent.ALREADY_OWNED), seen)
+        job.cancel()
     }
 
     private fun repo(
@@ -83,9 +134,18 @@ private class PlainCrypto : Crypto {
     override fun decrypt(blob: ByteArray) = blob.copyOf()
 }
 
-private class FakeBilling(private val owned: Boolean? = null, private val throws: Boolean = false) : BillingGateway {
-    override var onPurchasesChanged: (() -> Unit)? = null
-    override suspend fun queryOwned(): Boolean? = if (throws) throw IllegalStateException("billing") else owned
+private class FakeBilling(
+    var owned: Boolean? = null,
+    private val throws: Boolean = false,
+    var pending: Boolean = false,
+) : BillingGateway {
+    var queries = 0
+    override var onPurchaseUpdate: ((PurchaseEvent) -> Unit)? = null
+    override suspend fun queryPurchases(): PurchaseSnapshot? {
+        queries++
+        if (throws) throw IllegalStateException("billing")
+        return owned?.let { PurchaseSnapshot(owned = it, pending = pending) }
+    }
     override suspend fun priceText(): String? = if (throws) throw IllegalStateException("billing") else "1 €"
     override fun launchPurchase(activity: Activity): Boolean = !throws
 }

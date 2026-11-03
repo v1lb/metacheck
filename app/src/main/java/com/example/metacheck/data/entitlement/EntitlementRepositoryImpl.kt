@@ -6,6 +6,7 @@ import com.example.metacheck.data.crypto.Crypto
 import com.example.metacheck.data.license.LicenseVerifier
 import com.example.metacheck.domain.model.Entitlement
 import com.example.metacheck.domain.model.LicenseInfo
+import com.example.metacheck.domain.model.PurchaseEvent
 import com.example.metacheck.domain.repository.BillingGateway
 import com.example.metacheck.domain.repository.EntitlementRepository
 import com.example.metacheck.domain.runCatchingCancellable
@@ -15,7 +16,10 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -50,8 +54,18 @@ class EntitlementRepositoryImpl(
     override val entitlement: StateFlow<Entitlement> = state.asStateFlow()
     private val initialLoad = CompletableDeferred<Unit>()
 
+    /** Ожидающий оплаты платёж. Не кэшируется на диск: при каждом onResume перечитывается у Play. */
+    @Volatile
+    private var pending = false
+
+    private val events = MutableSharedFlow<PurchaseEvent>(extraBufferCapacity = 8)
+    override val purchaseEvents: Flow<PurchaseEvent> = events.asSharedFlow()
+
     init {
-        billing.onPurchasesChanged = { scope.launch { refresh() } }
+        billing.onPurchaseUpdate = { event ->
+            events.tryEmit(event)
+            if (event.needsRefresh) scope.launch { refresh() }
+        }
         scope.launch {
             try { state.value = computeNow() } finally { initialLoad.complete(Unit) }
         }
@@ -66,16 +80,18 @@ class EntitlementRepositoryImpl(
         withContext(io) {
             // Иначе первичная загрузка из кэша может перезаписать более свежий ответ Play.
             initialLoad.await()
-            val owned = runCatchingCancellable { billing.queryOwned() }
+            val snapshot = runCatchingCancellable { billing.queryPurchases() }
                 .onFailure(onError)
                 .getOrNull()
+            if (snapshot != null) pending = snapshot.pending && !snapshot.owned
+            val owned = snapshot?.owned
             val persisted = owned == null ||
                 runCatchingCancellable { persistPlayOwned(owned) }.onFailure(onError).isSuccess
             state.value = if (persisted) {
                 computeNow()
             } else {
                 // Keystore сломан: кэш на диск не записан, но в этой сессии статус от Play верный.
-                Entitlement.resolve(owned == true, storedLicense())
+                Entitlement.resolve(owned == true, storedLicense(), pending)
             }
         }
     }
@@ -116,7 +132,7 @@ class EntitlementRepositoryImpl(
     }
 
     private fun computeNow(): Entitlement =
-        Entitlement.resolve(cachedPlayOwned(), storedLicense())
+        Entitlement.resolve(cachedPlayOwned(), storedLicense(), pending)
 
     private fun cachedPlayOwned(): Boolean =
         try {
