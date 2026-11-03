@@ -517,7 +517,7 @@
     <string name="settings_api_pin_note">Optional pin for the server certificate.</string>
     <string name="settings_security_eyebrow">SECURITY STATUS</string>
     <string name="settings_security_title">Stored on this device only</string>
-    <string name="settings_security_text">The network is used only when you act: the OpenStreetMap map, address search, your API (if turned on) and Google Play for buying Pro.</string>
+    <string name="settings_security_text">The network is used only when you act: the map, address search and your API (if turned on). Google Play checks the Pro purchase.</string>
     <string name="appearance_section">LANGUAGE &amp; APPEARANCE</string>
     <string name="appearance_language">App language</string>
     <string name="appearance_language_system">As on device</string>

@@ -67,6 +67,18 @@ jobs:
           fi
           echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
 
+      # Карточка Play и политика называют MapTiler основным поставщиком карты (аудит, п. 19),
+      # а tile.openstreetmap.org по своим правилам не рассчитан на нагрузку от приложений.
+      # Поэтому релиз без ключа MapTiler не собирается.
+      - name: Require MapTiler key
+        env:
+          MAPTILER_KEY: ${{ secrets.METACHECK_MAPTILER_KEY }}
+        run: |
+          if [ -z "$MAPTILER_KEY" ]; then
+            echo "::error::Нет секрета METACHECK_MAPTILER_KEY. Карта в релизе ушла бы на серверы OpenStreetMap, а карточка Play и политика говорят о MapTiler. См. RELEASE_TODO.md."
+            exit 1
+          fi
+
       # lintVitalRelease выполняется внутри bundleRelease автоматически, ничего не пропускаем.
       - name: Build signed AAB
         env:
@@ -74,7 +86,7 @@ jobs:
           METACHECK_STORE_PASSWORD: ${{ secrets.METACHECK_STORE_PASSWORD }}
           METACHECK_KEY_ALIAS: ${{ secrets.METACHECK_KEY_ALIAS }}
           METACHECK_KEY_PASSWORD: ${{ secrets.METACHECK_KEY_PASSWORD }}
-          # Необязательно: без ключа карта работает на тайлах OpenStreetMap.
+          # Обязателен для релиза (проверка выше).
           METACHECK_MAPTILER_KEY: ${{ secrets.METACHECK_MAPTILER_KEY }}
         run: gradle --no-daemon bundleRelease
 

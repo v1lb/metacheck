@@ -2,7 +2,7 @@
 
 ## ru-RU
 Версия 2.6.0
-• Карта OpenStreetMap включается только вашей кнопкой, до этого запросов в сеть нет
+• Карта включается только вашей кнопкой, до этого запросов к картам нет
 • Исправлено чтение GPS из фото
 • История Pro больше не сокращается до 10 отчётов после запуска
 • Метки ИИ из Content Credentials (ChatGPT, Gemini, Firefly) и ~70 генераторов
@@ -12,7 +12,7 @@
 
 ## en-US
 Version 2.6.0
-• The OpenStreetMap map loads only when you press its button, no network requests before that
+• The map loads only when you press its button, no map requests before that
 • Fixed reading GPS from photos
 • Pro report history is no longer cut to 10 reports after launch
 • AI labels from Content Credentials (ChatGPT, Gemini, Firefly) and ~70 generators

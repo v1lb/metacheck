@@ -53,8 +53,8 @@ S = [
     ("settings_security_eyebrow", "SECURITY STATUS", "SECURITY STATUS"),
     ("settings_security_title", "Stored on this device only", "Хранение только на устройстве"),
     ("settings_security_text",
-     "The network is used only when you act: the OpenStreetMap map, address search, your API (if turned on) and Google Play for buying Pro.",
-     "Сеть используется только по вашему действию: карта OpenStreetMap, поиск адреса, внешний API (если включён) и Google Play для покупки Pro."),
+     "The network is used only when you act: the map, address search and your API (if turned on). Google Play checks the Pro purchase.",
+     "Сеть используется только по вашему действию: карта, поиск адреса и внешний API (если включён). Google Play проверяет покупку Pro."),
 
     # --- Язык и оформление ---
     ("appearance_section", "LANGUAGE & APPEARANCE", "ЯЗЫК И ОФОРМЛЕНИЕ"),

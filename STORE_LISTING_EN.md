@@ -10,9 +10,9 @@ MetaCheck shows what is hidden inside an image and looks for traces of AI genera
 
 What it does:
 • Shows EXIF: camera, lens, shutter speed, aperture, ISO, dates and more.
-• Finds the shooting location; with your button press it shows the point on an OpenStreetMap map or opens it in your maps app.
+• Finds the shooting location; with your button press it shows the point on a map or opens it in your maps app.
 • Reads XMP and PNG text chunks: Stable Diffusion prompts, ComfyUI graphs, IPTC "created by AI" labels.
-• Detects Content Credentials (C2PA).
+• Reads Content Credentials (C2PA): "created by AI" and "edited with AI" labels from ChatGPT, Gemini, Adobe Firefly and others.
 • Copies all metadata and saves a report as PDF or JSON.
 • Cleans metadata: saves a copy of the photo without EXIF and GPS; the original file is not changed.
 • Keeps scan history encrypted on your device (can be turned off).
@@ -24,7 +24,7 @@ PDF and JSON export, history of 50 reports, sending a report to your own API.
 
 Privacy:
 • Analysis runs on your device. Images are never uploaded.
-• The OpenStreetMap map turns on only when you press its button; until then the app makes no network requests. Once on, the map servers see your IP address and the approximate area of the point.
+• The map (MapTiler, OpenStreetMap data) turns on only when you press its button; until then no map requests are made. Once on, the map provider sees your IP address and the approximate area of the point.
 • No accounts, ads or analytics.
 • Sending a JSON report to your own server is off by default and works only on your command.
 

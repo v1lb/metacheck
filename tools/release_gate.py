@@ -40,6 +40,13 @@ check('Privacy policy has no unresolved placeholders', not re.search(r'\[(дат
 check('Legal documents folder exists', all((ROOT / 'legal' / n).is_file() for n in ['PRIVACY_POLICY_RU.md', 'PRIVACY_POLICY_EN.md', 'TERMS_RU.md', 'TERMS_EN.md']))
 check('AAB cannot be built without own signing key', 'bundleRelease' in cfg and 'GradleException' in cfg)
 check('Third-party licenses listed', (ROOT / 'THIRD_PARTY_LICENSES.md').is_file())
+# Аудит, п. 19: каждый поставщик карты из MapTiles.kt назван в политике и условиях на обоих языках.
+tiles_src = (ROOT / 'app/src/main/java/com/example/metacheck/ui/map/MapTiles.kt').read_text(encoding='utf-8')
+providers = re.findall(r'^\s*[A-Z_]+\("([^"]+)",', tiles_src, re.M)
+legal_texts = [(ROOT / 'legal' / n).read_text(encoding='utf-8') for n in
+               ['PRIVACY_POLICY_RU.md', 'PRIVACY_POLICY_EN.md', 'TERMS_RU.md', 'TERMS_EN.md']]
+check('Every map provider is named in privacy policy and terms (RU/EN)',
+      providers and all(p in t for p in providers for t in legal_texts))
 workflows = ROOT / '.github/workflows'
 release_wf = [(workflows / n).read_text(encoding='utf-8') for n in ('release-aab.yml', 'build-apk.yml') if (workflows / n).is_file()]
 def code_lines(text):
