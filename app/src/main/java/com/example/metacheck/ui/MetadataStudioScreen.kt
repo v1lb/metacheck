@@ -86,9 +86,8 @@ fun MetadataStudioScreen(
     var mode by rememberSaveable { mutableStateOf(StudioMode.STRIP) }
     var source by rememberSaveable { mutableStateOf(initialUri.orEmpty()) }
     var batchSources by rememberSaveable { mutableStateOf(emptyList<String>()) }
-    var overwriteConfirm by remember { mutableStateOf(false) }
     var worldPicker by remember { mutableStateOf(false) }
-    var pendingPatch by remember { mutableStateOf<MetadataPatch?>(null) }
+    val pending by vm.pending.collectAsStateWithLifecycle()
     var actionError by remember { mutableStateOf<String?>(null) }
     var gpsRemove by rememberSaveable { mutableStateOf(false) }
     var latitude by rememberSaveable { mutableStateOf("") }
@@ -165,15 +164,16 @@ fun MetadataStudioScreen(
     val saveCleanPng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
         if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { source = uri.toString(); actionError = null }
     }
+    // Операция и её параметры берутся только из ViewModel (SavedStateHandle), а не из состояния Composable:
+    // после пересоздания Activity локальные remember-переменные уже потеряны.
     val saveEdited = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
-        val patch = pendingPatch
-        if (uri != null && patch != null && source.isNotBlank()) vm.editCopy(source, uri, patch)
+        vm.onEditCopyDestination(uri)
     }
     val backupJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
-        if (uri != null && source.isNotBlank()) vm.overwrite(source, uri, pendingPatch)
+        vm.onBackupDestination(uri)
     }
     val backupPng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
-        if (uri != null && source.isNotBlank()) vm.overwrite(source, uri, pendingPatch)
+        vm.onBackupDestination(uri)
     }
 
     fun patchOrError(): MetadataPatch? {
@@ -282,7 +282,7 @@ fun MetadataStudioScreen(
                             }
                         }, modifier = Modifier.fillMaxWidth())
                         CyberOutlineButton("Перезаписать оригинал с резервной копией", {
-                            pendingPatch = null; overwriteConfirm = true
+                            if (source.isNotBlank() && !busy) vm.requestOverwrite(source, OverwriteOp.Strip)
                         }, Modifier.fillMaxWidth())
                         Text("Для перезаписи доступны только JPEG/PNG и только документы с правом записи. Сначала вы выберете место для полноценной резервной копии.",
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
@@ -323,12 +323,12 @@ fun MetadataStudioScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                         NeonButton("Сохранить изменённую копию JPEG", onClick = {
                             if (source.isNotBlank() && !busy) {
-                                patchOrError()?.let { pendingPatch = it; saveEdited.launch("metacheck-edited-${System.currentTimeMillis()}.jpg") }
+                                patchOrError()?.let { vm.requestEditCopy(source, it); saveEdited.launch("metacheck-edited-${System.currentTimeMillis()}.jpg") }
                             }
                         }, modifier = Modifier.fillMaxWidth())
                         CyberOutlineButton("Перезаписать JPEG с резервной копией", {
                             if (source.isNotBlank() && !busy) {
-                                patchOrError()?.let { pendingPatch = it; overwriteConfirm = true }
+                                patchOrError()?.let { vm.requestOverwrite(source, OverwriteOp.Edit(it)) }
                             }
                         }, Modifier.fillMaxWidth())
                     }
@@ -367,9 +367,10 @@ fun MetadataStudioScreen(
         }
     }
 
-    if (overwriteConfirm) {
+    val awaitingConfirm = (pending as? PendingWrite.Overwrite)?.takeIf { !it.confirmed }
+    if (awaitingConfirm != null) {
         AlertDialog(
-            onDismissRequest = { overwriteConfirm = false },
+            onDismissRequest = { vm.cancelPending() },
             containerColor = MaterialTheme.colorScheme.surface,
             title = { Text("Заменить оригинальный файл?", color = MaterialTheme.colorScheme.onSurface) },
             text = { Text(
@@ -378,12 +379,13 @@ fun MetadataStudioScreen(
             ) },
             confirmButton = {
                 TextButton(onClick = {
-                    overwriteConfirm = false
-                    if (sourceIsJpeg) backupJpeg.launch("metacheck-original-backup-${System.currentTimeMillis()}.jpg")
-                    else backupPng.launch("metacheck-original-backup-${System.currentTimeMillis()}.png")
+                    if (vm.confirmOverwrite()) {
+                        if (sourceIsJpeg) backupJpeg.launch("metacheck-original-backup-${System.currentTimeMillis()}.jpg")
+                        else backupPng.launch("metacheck-original-backup-${System.currentTimeMillis()}.png")
+                    }
                 }) { Text("Создать резервную копию", color = MaterialTheme.colorScheme.primary) }
             },
-            dismissButton = { TextButton(onClick = { overwriteConfirm = false }) { Text("Отмена") } },
+            dismissButton = { TextButton(onClick = { vm.cancelPending() }) { Text("Отмена") } },
         )
     }
     if (worldPicker) {

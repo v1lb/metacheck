@@ -6,7 +6,10 @@ import java.time.format.DateTimeParseException
 import java.time.format.ResolverStyle
 import java.util.Locale
 
-/** Nullable attributes mean "leave the existing EXIF tag unchanged". */
+/**
+ * Nullable attributes mean "leave the existing EXIF tag unchanged".
+ * Serializable: патч хранится в SavedStateHandle, пока открыт системный диалог сохранения.
+ */
 data class MetadataPatch(
     val removeGps: Boolean = false,
     val latitude: Double? = null,
@@ -21,11 +24,15 @@ data class MetadataPatch(
     val iso: Int? = null,
     val aperture: Double? = null,
     val exposureSeconds: Double? = null,
-) {
+) : java.io.Serializable {
     val hasChanges: Boolean get() = removeGps || latitude != null || longitude != null ||
         dateTaken != null || dateDigitized != null || make != null || model != null ||
         author != null || copyright != null || description != null || iso != null ||
         aperture != null || exposureSeconds != null
+
+    private companion object {
+        private const val serialVersionUID = 1L
+    }
 }
 
 object MetadataPatchValidator {

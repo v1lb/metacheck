@@ -1,8 +1,10 @@
 package com.example.metacheck.ui
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -12,11 +14,23 @@ import com.example.metacheck.domain.metadata.MetadataPatch
 import com.example.metacheck.domain.metadata.MetadataStudioUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /** Operations survive ordinary Compose recomposition; work is on Dispatchers.IO in repository. */
-class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewModel() {
+class MetadataStudioViewModel(
+    private val studio: MetadataStudioUseCase,
+    private val savedState: SavedStateHandle = SavedStateHandle(),
+) : ViewModel() {
+    private val pendingWrites = PendingWrites(object : StateStore {
+        override fun get(key: String): Any? = savedState[key]
+        override fun set(key: String, value: Any?) { savedState[key] = value }
+    })
+
+    /** Ожидающая ответа SAF операция. Переживает пересоздание Activity и смерть процесса. */
+    val pending: StateFlow<PendingWrite?> = savedState.getStateFlow(PendingWrites.KEY, null)
+
     private val _busy = MutableStateFlow(false)
     val busy = _busy.asStateFlow()
     private val _message = MutableStateFlow<String?>(null)
@@ -52,14 +66,43 @@ class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewM
         usedToday.value = studio.usedToday()
     }
 
-    fun editCopy(source: String, destination: Uri, patch: MetadataPatch) = work {
+    fun requestEditCopy(source: String, patch: MetadataPatch) = pendingWrites.requestEditCopy(source, patch)
+
+    fun requestOverwrite(source: String, op: OverwriteOp) = pendingWrites.requestOverwrite(source, op)
+
+    /** true: можно открывать диалог выбора места для резервной копии. */
+    fun confirmOverwrite(): Boolean = pendingWrites.confirmOverwrite()
+
+    fun cancelPending() = pendingWrites.cancel()
+
+    /** Результат CreateDocument для «Сохранить изменённую копию». */
+    fun onEditCopyDestination(destination: Uri?) {
+        val op = pendingWrites.takeEditCopy()
+        if (destination == null) return
+        if (op == null) { _message.value = INTERRUPTED; return }
+        editCopy(op.source, destination, op.patch)
+    }
+
+    /** Результат CreateDocument для резервной копии перед перезаписью оригинала. */
+    fun onBackupDestination(destination: Uri?) {
+        val op = pendingWrites.takeConfirmedOverwrite()
+        if (destination == null) return
+        if (op == null) { _message.value = INTERRUPTED; return }
+        val patch = when (val mode = op.op) {
+            OverwriteOp.Strip -> null
+            is OverwriteOp.Edit -> mode.patch
+        }
+        overwrite(op.source, destination, patch)
+    }
+
+    private fun editCopy(source: String, destination: Uri, patch: MetadataPatch) = work {
         studio.edit(source, destination.toString(), patch).fold(
             onSuccess = { _message.value = successMessage("EXIF записан в новый файл", it.verified, false) },
             onFailure = { _message.value = failMessage(it) },
         )
     }
 
-    fun overwrite(source: String, backup: Uri, patch: MetadataPatch?) = work {
+    private fun overwrite(source: String, backup: Uri, patch: MetadataPatch?) = work {
         studio.overwrite(source, backup.toString(), patch).fold(
             onSuccess = { _message.value = successMessage("Оригинал заменён. Резервная копия сохранена", it.verified, it.downscaled) },
             onFailure = { _message.value = failMessage(it) },
@@ -100,10 +143,14 @@ class MetadataStudioViewModel(private val studio: MetadataStudioUseCase) : ViewM
         "Операция не выполнена: " + (error.message ?: "ошибка доступа или формата").take(250)
 
     companion object {
+        /** Пустой файл, созданный диалогом, остаётся у пользователя: удалять его без операции не будем. */
+        private const val INTERRUPTED =
+            "Операция прервана: приложение было перезапущено системой. Повторите действие; созданный пустой файл можно удалить"
+
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val c = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MetaCheckApplication).container
-                MetadataStudioViewModel(c.metadataStudio)
+                MetadataStudioViewModel(c.metadataStudio, createSavedStateHandle())
             }
         }
     }

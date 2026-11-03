@@ -122,7 +122,8 @@ fun MainScreen(
     }
 
     // OpenDocument preserves more of the source file's original metadata than a transcoding photo picker.
-    var pendingGpsUri by remember { mutableStateOf<Uri?>(null) }
+    // rememberSaveable: системный диалог разрешения может пересоздать Activity, выбранное фото не должно теряться.
+    var pendingGpsUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     val gpsPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
         pendingGpsUri?.let(viewModel::onImagePicked)
         pendingGpsUri = null

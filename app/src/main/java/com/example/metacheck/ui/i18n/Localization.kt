@@ -107,6 +107,8 @@ private val translations: Map<String, String> = mapOf(
     "Выбрать папку и запустить" to "Choose folder and start",
     "ОШИБКИ ПО ФАЙЛАМ" to "FILE ERRORS",
     "Заменить оригинальный файл?" to "Replace original file?",
+    "Операция прервана: приложение было перезапущено системой. Повторите действие; созданный пустой файл можно удалить" to
+        "Operation interrupted: the app was restarted by the system. Please try again; you can delete the empty file that was created",
     "Действие нельзя гарантированно выполнить атомарно у всех файловых провайдеров. Вы сначала сохраните отдельную резервную копию; только после проверки копии будет произведена замена. При сбое приложение попытается восстановить оригинал." to "File providers do not guarantee atomic replacement. First save an independent backup; the app verifies it before replacing the original and attempts a rollback if anything fails.",
     "Создать резервную копию" to "Create backup",
     "Мировая сетка GPS" to "World GPS grid",
