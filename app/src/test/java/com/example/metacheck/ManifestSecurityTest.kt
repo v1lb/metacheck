@@ -36,11 +36,30 @@ class ManifestSecurityTest {
     private val manifest get() = parse("src/main/AndroidManifest.xml")
     private val application get() = manifest.children("application").single()
 
+    private val tools = "http://schemas.android.com/tools"
+
+    private fun permissions(removed: Boolean): Set<String> = manifest.children("uses-permission")
+        .filter { (it.getAttributeNS(tools, "node") == "remove") == removed }
+        .map { it.getAttributeNS(ns, "name") }
+        .toSet()
+
     @Test
     fun onlyInternetPermissionIsRequested() {
-        val permissions = manifest.children("uses-permission").map { it.getAttributeNS(ns, "name") }
-        assertEquals(setOf("android.permission.INTERNET", "android.permission.ACCESS_MEDIA_LOCATION"), permissions.toSet())
+        assertEquals(setOf("android.permission.INTERNET", "android.permission.ACCESS_MEDIA_LOCATION"), permissions(removed = false))
         assertTrue(manifest.children("uses-permission-sdk-23").isEmpty())
+    }
+
+    /** Аудит, п. 20: разрешения, которые могут прийти из библиотек, вырезаются из итогового манифеста. */
+    @Test
+    fun libraryStoragePermissionsAreRemoved() {
+        val removed = permissions(removed = true)
+        for (p in listOf("WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE", "ACCESS_WIFI_STATE")) {
+            assertTrue("$p должен быть убран через tools:node=\"remove\"", "android.permission.$p" in removed)
+        }
+        // Нельзя случайно вырезать то, без чего не работают карта или покупки.
+        assertFalse("android.permission.ACCESS_NETWORK_STATE" in removed)
+        assertFalse("android.permission.INTERNET" in removed)
+        assertFalse("com.android.vending.BILLING" in removed)
     }
 
     @Test
@@ -59,7 +78,8 @@ class ManifestSecurityTest {
             // Начиная с Android 12 атрибут обязателен для компонентов с intent-filter.
             assertTrue("$name: exported должен быть задан явно", exported.isNotEmpty())
             if (exported == "true") {
-                assertEquals("Экспортируется лишнее: $name", ".ui.MainActivity", name)
+                // Лаунчер и второй пункт «Поделиться» («Отправить без метаданных») — оба ведут в MainActivity.
+                assertTrue("Экспортируется лишнее: $name", name in setOf(".ui.MainActivity", ".ui.CleanShareAlias"))
             }
         }
     }

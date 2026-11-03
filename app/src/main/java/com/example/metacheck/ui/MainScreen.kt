@@ -12,6 +12,16 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 import android.net.Uri
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,6 +38,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -37,6 +48,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,8 +69,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import com.example.metacheck.ui.LocalizedText as Text
-import com.example.metacheck.ui.i18n.localize
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.example.metacheck.R
+import com.example.metacheck.ui.text.UiText
+import com.example.metacheck.ui.text.asString
+import com.example.metacheck.ui.text.rememberMetaTexts
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -68,13 +93,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metacheck.domain.analytics.HistoryInsights
@@ -104,31 +130,67 @@ fun MainScreen(
     val proVm: ProViewModel = viewModel(factory = ProViewModel.Factory)
     val studioVm: MetadataStudioViewModel = viewModel(factory = MetadataStudioViewModel.Factory)
     val studioMessage by studioVm.message.collectAsStateWithLifecycle()
+    val studioBusy by studioVm.busy.collectAsStateWithLifecycle()
+    val shareReady by studioVm.shareReady.collectAsStateWithLifecycle()
+    val cleanShareRequest by viewModel.cleanShareRequest.collectAsStateWithLifecycle()
     val entitlement by proVm.entitlement.collectAsStateWithLifecycle()
     val paywallVisible by proVm.paywallVisible.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val clipboard = LocalClipboardManager.current
     val snackbar = remember { SnackbarHostState() }
-    val uiLanguage = LocalUiLanguage.current
+    val texts = rememberMetaTexts()
     var showSettings by rememberSaveable { mutableStateOf(false) }
     var showStudio by rememberSaveable { mutableStateOf(false) }
     var confirmApi by rememberSaveable { mutableStateOf(false) }
 
+    // Сообщения ViewModel приходят как UiText и превращаются в строку здесь, на языке экрана.
     LaunchedEffect(studioMessage) {
-        studioMessage?.let { snackbar.showSnackbar(localize(it, uiLanguage)); studioVm.clearMessage() }
+        studioMessage?.let { snackbar.showSnackbar(it.asString(context)); studioVm.clearMessage() }
     }
     LaunchedEffect(message) {
-        message?.let { snackbar.showSnackbar(localize(it, uiLanguage)); viewModel.consumeMessage() }
+        message?.let { snackbar.showSnackbar(it.asString(context)); viewModel.consumeMessage() }
+    }
+    val proMessage by proVm.message.collectAsStateWithLifecycle()
+    LaunchedEffect(proMessage) {
+        proMessage?.let { snackbar.showSnackbar(it.asString(context)); proVm.consumeMessage() }
+    }
+    // «Отправить без метаданных» из меню «Поделиться» другого приложения: очищаем сразу.
+    LaunchedEffect(cleanShareRequest) {
+        cleanShareRequest?.let { studioVm.cleanAndShare(it); viewModel.consumeCleanShare() }
+    }
+    // Копия очищена и проверена: системное окно «Поделиться» с разовым правом чтения для получателя.
+    val chooserTitle = stringResource(R.string.share_chooser_title)
+    LaunchedEffect(shareReady) {
+        val target = shareReady ?: return@LaunchedEffect
+        studioVm.consumeShare()
+        val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            type = target.mime
+            putExtra(android.content.Intent.EXTRA_STREAM, target.uri)
+            clipData = android.content.ClipData.newRawUri("", target.uri)
+            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            context.startActivity(android.content.Intent.createChooser(send, chooserTitle)
+                .addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION))
+        } catch (_: ActivityNotFoundException) {
+            viewModel.showMessage(UiText.Res(R.string.share_no_app))
+        }
     }
 
+    // Google требует сверять покупки при возврате в приложение: отложенные платежи, возвраты,
+    // покупки на другом устройстве. Срабатывает и при первом показе экрана.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { proVm.refresh() }
+
     // OpenDocument preserves more of the source file's original metadata than a transcoding photo picker.
-    var pendingGpsUri by remember { mutableStateOf<Uri?>(null) }
+    // rememberSaveable: системный диалог разрешения может пересоздать Activity, выбранное фото не должно теряться.
+    var pendingGpsUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     val gpsPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
         pendingGpsUri?.let(viewModel::onImagePicked)
         pendingGpsUri = null
     }
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
+            // Доступ должен пережить выгрузку процесса: из результата можно перейти в студию очистки.
+            (context.applicationContext as com.example.metacheck.MetaCheckApplication).container.uriAccess.persist(uri)
             if (Build.VERSION.SDK_INT >= 29 &&
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_MEDIA_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 pendingGpsUri = uri
@@ -151,10 +213,10 @@ fun MainScreen(
             takePicture.launch(uri)
         } catch (_: ActivityNotFoundException) {
             pendingCameraUri = null
-            viewModel.showMessage("На устройстве нет приложения камеры")
+            viewModel.showMessage(UiText.Res(R.string.main_msg_no_camera_app))
         } catch (_: Exception) {
             pendingCameraUri = null
-            viewModel.showMessage("Не удалось запустить камеру")
+            viewModel.showMessage(UiText.Res(R.string.main_msg_camera_failed))
         }
     }
     fun pasteImage() {
@@ -162,25 +224,25 @@ fun MainScreen(
             val clip = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).primaryClip
             val uri = if (clip != null && clip.itemCount > 0) clip.getItemAt(0).uri else null
             if (uri?.scheme == ContentResolver.SCHEME_CONTENT) viewModel.onImagePicked(uri)
-            else viewModel.showMessage("В буфере нет ссылки на изображение")
-        } catch (_: Exception) { viewModel.showMessage("Не удалось прочитать буфер") }
+            else viewModel.showMessage(UiText.Res(R.string.main_msg_clipboard_no_image))
+        } catch (_: Exception) { viewModel.showMessage(UiText.Res(R.string.main_msg_clipboard_failed)) }
     }
 
-    val saveJson = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { it?.let(viewModel::exportJson) }
-    val savePdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { it?.let(viewModel::exportPdf) }
+    val saveJson = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri -> uri?.let { viewModel.exportJson(it, texts) } }
+    val savePdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri -> uri?.let { viewModel.exportPdf(it, texts) } }
     val saveCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { it?.let(viewModel::exportHistoryCsv) }
-    val saveMetadataCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { it?.let(viewModel::exportMetadataCsv) }
+    val saveMetadataCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri -> uri?.let { viewModel.exportMetadataCsv(it, texts) } }
     var pendingStripSource by rememberSaveable { mutableStateOf<String?>(null) }
     var pendingWipeSource by rememberSaveable { mutableStateOf<String?>(null) }
     val saveJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
         val original = pendingStripSource
         pendingStripSource = null
-        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri) }
+        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
     }
     val savePng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
         val original = pendingStripSource
         pendingStripSource = null
-        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri) }
+        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
     }
     val saveGpsJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
         val original = pendingWipeSource
@@ -193,8 +255,10 @@ fun MainScreen(
         if (uri != null && original != null) studioVm.wipeGpsCopy(original, uri)
     }
     val inResult = state is UiState.Done
+    // «Назад» с экрана ошибки и во время анализа раньше закрывало приложение: возвращаемся на главный.
+    val inFlow = inResult || state is UiState.Failed || state is UiState.Loading
 
-    BackHandler(enabled = showStudio || showSettings || inResult) {
+    BackHandler(enabled = showStudio || showSettings || inFlow) {
         if (showStudio) showStudio = false
         else if (showSettings) { showSettings = false; viewModel.refreshHistory() }
         else viewModel.close()
@@ -208,23 +272,35 @@ fun MainScreen(
                 TopAppBar(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("◈", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleLarge)
-                            Text(if (showStudio) "Metadata Studio" else if (showSettings) "Настройки" else "MetaCheck", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
-                            if (!showSettings && !showStudio && !inResult) CyberEyebrow("2.5.1")
+                            Icon(Icons.Filled.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            Text(
+                                if (showStudio) stringResource(R.string.studio_name)
+                                else if (showSettings) stringResource(R.string.main_title_settings)
+                                else stringResource(R.string.app_name),
+                                style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            if (!showSettings && !showStudio && !inResult) {
+                                // Версия из PackageManager, а не строкой в коде (раньше здесь была устаревшая "2.5.1").
+                                val version = remember { runCatching {
+                                    @Suppress("DEPRECATION")
+                                    context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                                }.getOrNull().orEmpty() }
+                                if (version.isNotEmpty()) CyberEyebrow(version)
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = .7f)),
                     navigationIcon = {
-                        if (showStudio || showSettings || inResult) IconButton(onClick = {
+                        if (showStudio || showSettings || inFlow) IconButton(onClick = {
                             if (showStudio) showStudio = false
                             else if (showSettings) { showSettings = false; viewModel.refreshHistory() }
                             else viewModel.close()
-                        }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Назад") }
+                        }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.common_back)) }
                     },
                     actions = {
-                        if (!showSettings && !showStudio && !inResult) {
+                        if (!showSettings && !showStudio && !inFlow) {
                             IconButton(onClick = { showSettings = true }) {
-                                Icon(Icons.Default.Settings, "Настройки", tint = MaterialTheme.colorScheme.primary)
+                                Icon(Icons.Default.Settings, stringResource(R.string.main_title_settings), tint = MaterialTheme.colorScheme.primary)
                             }
                         }
                     },
@@ -233,14 +309,32 @@ fun MainScreen(
         ) { padding ->
             Column(Modifier.padding(padding).fillMaxSize()) {
                 if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
-                if (showStudio) MetadataStudioScreen(
-                    initialUri = (state as? UiState.Done)?.source,
+                // Плавный переход между экранами. Снимок состояния передаётся в каждый экран, поэтому
+                // уходящий экран дорисовывает свои данные, даже когда состояние уже сменилось
+                // (например, отчёт при возврате на главный).
+                val screen = Screen(
+                    when {
+                        showStudio -> ScreenKind.STUDIO
+                        showSettings -> ScreenKind.SETTINGS
+                        else -> ScreenKind.of(state)
+                    },
+                    state,
+                )
+                AnimatedContent(
+                    targetState = screen,
+                    contentKey = { it.kind },
+                    transitionSpec = { screenTransition(initialState.kind, targetState.kind) },
+                    modifier = Modifier.fillMaxSize(),
+                    label = "screens",
+                ) { current ->
+                if (current.kind == ScreenKind.STUDIO) MetadataStudioScreen(
+                    initialUri = (current.ui as? UiState.Done)?.source,
                     isPro = entitlement.isPro,
                     onUpgrade = proVm::openPaywall,
                     onBack = { showStudio = false },
                 )
-                else if (showSettings) SettingsScreen(onMessage = viewModel::showMessage, uiPreferences = uiPreferences)
-                else when (val s = state) {
+                else if (current.kind == ScreenKind.SETTINGS) SettingsScreen(onMessage = viewModel::showMessage, uiPreferences = uiPreferences)
+                else when (val s = current.ui) {
                     UiState.Idle -> Dashboard(
                         history = history, historyEnabled = settings.saveHistory, isPro = entitlement.isPro,
                         onPick = { pick.launch(arrayOf("image/*")) },
@@ -262,23 +356,35 @@ fun MainScreen(
                                 onEdit = if (s.source == null) null else { { if (entitlement.isPro) showStudio = true else proVm.openPaywall() } },
                                 onWipeGps = if (s.source == null || !GpsPrivacy.hasLocationMarkers(s.report) ||
                                     s.report.file.format !in setOf(ImageFormat.JPEG, ImageFormat.PNG)) null else {
-                                    {
+                                    wipe@{
+                                        if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@wipe }
                                         pendingWipeSource = s.source
                                         if (s.report.file.format == ImageFormat.JPEG) saveGpsJpeg.launch("${name}-gps-safe.jpg")
                                         else saveGpsPng.launch("${name}-gps-safe.png")
                                     }
                                 },
                                 onCopy = {
-                                    clipboard.setText(AnnotatedString(ReportText.format(s.report)))
-                                    viewModel.showMessage("Отчёт скопирован")
+                                    val shownBySystem = runCatching {
+                                        SensitiveClipboard.copy(context, context.getString(R.string.app_name), ReportText.format(s.report, texts))
+                                    }
+                                    // Android 13+ сам показывает «Скопировано»: второе сообщение было бы дублем.
+                                    shownBySystem.onSuccess { if (!it) viewModel.showMessage(UiText.Res(R.string.main_msg_report_copied)) }
+                                        .onFailure { viewModel.showMessage(UiText.Res(R.string.main_msg_operation_failed)) }
                                 },
                                 onJson = { if (entitlement.isPro) saveJson.launch("$name-metacheck.json") else proVm.openPaywall() },
                                 onPdf = { if (entitlement.isPro) savePdf.launch("$name-metacheck.pdf") else proVm.openPaywall() },
                                 onClean = if (s.source == null) null else {
-                                    {
+                                    clean@{
+                                        if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@clean }
                                         pendingStripSource = s.source
                                         if (format.extension == "jpg") saveJpeg.launch("$name-clean.jpg")
                                         else savePng.launch("$name-clean.png")
+                                    }
+                                },
+                                onCleanShare = if (s.source == null) null else {
+                                    share@{
+                                        if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@share }
+                                        studioVm.cleanAndShare(s.source)
                                     }
                                 },
                                 onApi = if (!settings.apiEnabled) null else {
@@ -287,6 +393,7 @@ fun MainScreen(
                             ),
                         )
                     }
+                }
                 }
             }
         }
@@ -298,19 +405,23 @@ fun MainScreen(
     if (paywallVisible && !entitlement.isPro) PaywallDialog(proVm)
     if (confirmApi) {
         val host = remember(settings.apiEndpoint) {
-            runCatching { URI(settings.apiEndpoint.trim()).host }.getOrNull() ?: "указанный сервер"
-        }
+            runCatching { URI(settings.apiEndpoint.trim()).host }.getOrNull()
+        } ?: stringResource(R.string.main_api_unknown_server)
         AlertDialog(
             onDismissRequest = { confirmApi = false },
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             textContentColor = MaterialTheme.colorScheme.onSurface,
             shape = RoundedCornerShape(26.dp),
-            title = { Text("Подтвердить отправку") },
-            text = { Text("JSON-отчёт будет отправлен на $host. Исходная фотография не отправляется. GPS: " +
-                if (settings.apiSendGps) "включён в отчёт." else "исключён из отчёта.") },
-            confirmButton = { TextButton(onClick = { confirmApi = false; viewModel.sendToApi() }) { Text("Отправить") } },
-            dismissButton = { TextButton(onClick = { confirmApi = false }) { Text("Отмена") } },
+            title = { Text(stringResource(R.string.main_api_confirm_title)) },
+            text = {
+                Text(stringResource(
+                    if (settings.apiSendGps) R.string.main_api_confirm_text_with_gps else R.string.main_api_confirm_text_without_gps,
+                    host,
+                ))
+            },
+            confirmButton = { TextButton(onClick = { confirmApi = false; viewModel.sendToApi(texts) }) { Text(stringResource(R.string.main_api_send)) } },
+            dismissButton = { TextButton(onClick = { confirmApi = false }) { Text(stringResource(R.string.common_cancel)) } },
         )
     }
     apiDialog?.let { dialog ->
@@ -320,20 +431,20 @@ fun MainScreen(
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             textContentColor = MaterialTheme.colorScheme.onSurface,
             shape = RoundedCornerShape(26.dp),
-            title = { Text("Внешний API") },
+            title = { Text(stringResource(R.string.main_api_dialog_title)) },
             text = {
                 when (dialog) {
                     ApiDialog.Loading -> Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator(Modifier.height(28.dp)); Text("Ожидание ответа сервера…")
+                        CircularProgressIndicator(Modifier.height(28.dp)); Text(stringResource(R.string.main_api_waiting))
                     }
                     is ApiDialog.Success -> Column(Modifier.verticalScroll(rememberScrollState())) {
                         Text("HTTP ${dialog.statusCode}", color = MaterialTheme.colorScheme.tertiary)
-                        SelectionContainer { Text(dialog.body.take(4000).ifEmpty { "Ответ пуст" }) }
+                        SelectionContainer { Text(dialog.body.take(4000).ifEmpty { stringResource(R.string.main_api_empty_response) }) }
                     }
-                    is ApiDialog.Error -> Text(dialog.message, color = MaterialTheme.colorScheme.error)
+                    is ApiDialog.Error -> Text(dialog.message.asString(), color = MaterialTheme.colorScheme.error)
                 }
             },
-            confirmButton = { TextButton(onClick = viewModel::dismissApiDialog) { Text("Закрыть") } },
+            confirmButton = { TextButton(onClick = viewModel::dismissApiDialog) { Text(stringResource(R.string.common_close)) } },
         )
     }
 }
@@ -346,116 +457,76 @@ private fun Dashboard(
     onCsv: () -> Unit, onUpgrade: () -> Unit, onStudio: () -> Unit,
 ) {
     val insight = remember(history) { HistoryInsights.from(history) }
-    val dateFormat = remember { SimpleDateFormat("dd.MM · HH:mm", Locale.getDefault()) }
+    // Те же числа, что в AppContainer: раньше здесь были отдельно записанные 10 и 50.
+    // Удаление отчёта необратимо: раньше хватало одного касания по значку корзины.
+    var pendingDelete by rememberSaveable { mutableStateOf<String?>(null) }
+    pendingDelete?.let { id ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurface,
+            shape = RoundedCornerShape(26.dp),
+            title = { Text(stringResource(R.string.dash_delete_title)) },
+            text = { Text(stringResource(R.string.dash_delete_text)) },
+            confirmButton = { TextButton(onClick = { pendingDelete = null; onDelete(id) }) { Text(stringResource(R.string.common_delete)) } },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.common_cancel)) } },
+        )
+    }
+    val historyLimit = if (isPro) com.example.metacheck.data.history.FileHistoryRepository.STORAGE_LIMIT
+        else com.example.metacheck.AppContainer.FREE_HISTORY_LIMIT
+    val texts = rememberMetaTexts()
+    // Формат даты по языку интерфейса (день/месяц и 12/24 часа в привычном для него порядке).
+    val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
+    val dateFormat = remember(locale) {
+        SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(locale, "ddMMjjmm"), locale)
+    }
+    // Порядок: главное действие и объяснение, затем история, студия, статистика и Pro.
+    // Раньше новый пользователь видел пять блоков подряд до списка своих проверок.
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(17.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                    PulseIndicator(); CyberEyebrow("SECURE IMAGE INTELLIGENCE")
-                }
-                Text("Цифровая\nэкспертиза фото", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onSurface)
-                Text("Проверьте происхождение файла, метаданные камеры и технические признаки ИИ.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
-            }
-        }
-        item {
             GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.primary) {
-                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween) {
-                        CyberEyebrow("NEW SCAN / 001")
-                        Text("⌁", color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.headlineMedium)
+                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Icon(Icons.Filled.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp))
+                        CyberEyebrow(stringResource(R.string.dash_eyebrow_secure))
                     }
-                    Text("Исследовать изображение", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
-                    Text("Выбирайте исходный JPEG, PNG или HEIC: в скриншоте часть данных уже потеряна.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
-                    ScanningBars(Modifier.fillMaxWidth().height(52.dp))
-                    NeonButton("＋  Выбрать фотографию", onPick, Modifier.fillMaxWidth())
+                    Text(stringResource(R.string.dash_title), style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSurface)
+                    Text(stringResource(R.string.dash_subtitle),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyLarge)
+                    NeonButton(stringResource(R.string.dash_choose_photo), onPick, Modifier.fillMaxWidth().height(56.dp),
+                        icon = Icons.Filled.AddPhotoAlternate)
                     Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                        CyberOutlineButton("◎  Камера", onCamera, Modifier.weight(1f))
-                        CyberOutlineButton("▣  Буфер", onClipboard, Modifier.weight(1f))
+                        CyberOutlineButton(stringResource(R.string.dash_camera), onCamera, Modifier.weight(1f), icon = Icons.Filled.PhotoCamera)
+                        CyberOutlineButton(stringResource(R.string.dash_clipboard), onClipboard, Modifier.weight(1f), icon = Icons.Filled.ContentPaste)
                     }
-                }
-            }
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                MetricPanel("EXIF", "КАМЕРА И GPS", Modifier.weight(1f))
-                MetricPanel("XMP", "МЕТАДАННЫЕ", Modifier.weight(1f), MaterialTheme.colorScheme.secondary)
-                MetricPanel("AI", "МЕТКИ ГЕНЕРАЦИИ", Modifier.weight(1f), MaterialTheme.colorScheme.tertiary)
-            }
-        }
-        item {
-            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
-                Column(Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                    CyberEyebrow("METADATA STUDIO / 2.4")
-                    Text("Очистка · EXIF-редактор · пакетная обработка",
-                        color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleMedium)
-                    CyberOutlineButton("Открыть Metadata Studio →", onStudio, Modifier.fillMaxWidth())
-                }
-            }
-        }
-        item { SectionLabel("ВАША АНАЛИТИКА") }
-        item {
-            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Лимит сохранённой истории", color = MaterialTheme.colorScheme.onSurface,
-                            style = MaterialTheme.typography.titleMedium)
-                        Text("${history.size} / ${if (isPro) 50 else 10}", color = MaterialTheme.colorScheme.tertiary)
-                    }
-                    LinearProgressIndicator(
-                        progress = { (history.size.toFloat() / if (isPro) 50f else 10f).coerceIn(0f, 1f) },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.tertiary,
-                        trackColor = MaterialTheme.colorScheme.outline,
-                    )
-                    Text(if (isPro) "Pro: до 50 локальных отчётов" else "Free: до 10 отчётов · Pro: до 50",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                    if (!isPro) CyberOutlineButton("Увеличить лимит с Pro", onUpgrade, Modifier.fillMaxWidth())
-                }
-            }
-        }
-        item {
-            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
-                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                        Column(Modifier.weight(1f)) {
-                            CyberEyebrow("ВСЕГО ОТЧЁТОВ")
-                            Text("${insight.total}", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
-                        }
-                        Column(Modifier.weight(1f)) {
-                            CyberEyebrow("С ПРИЗНАКАМИ ИИ", color = MaterialTheme.colorScheme.secondary)
-                            Text("${insight.aiEvidenceCount}", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
-                        }
-                        Column(Modifier.weight(1f)) {
-                            CyberEyebrow("С GPS", color = MaterialTheme.colorScheme.tertiary)
-                            Text("${insight.gpsCount}", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
-                        }
-                    }
-                    CyberEyebrow("АКТИВНОСТЬ ЗА 7 ДНЕЙ")
-                    ActivityChart(insight.lastSevenDays, Modifier.fillMaxWidth().height(78.dp))
-                    Text("Статистика только по сохранённой истории, без облака и оценок подлинности.",
+                    Text(stringResource(R.string.dash_scan_hint),
                         color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
         item {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+            Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                CyberEyebrow("ИСТОРИЯ ПРОВЕРОК")
-                Text("CSV ↗", modifier = Modifier.clickable { onCsv() }.padding(8.dp), color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.dash_history_title), style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface)
+                if (history.isNotEmpty()) TextButton(onClick = onCsv) {
+                    Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Text(stringResource(R.string.dash_history_csv), modifier = Modifier.padding(start = 6.dp))
+                }
             }
         }
         if (history.isEmpty()) item {
             GlassPanel(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                    Text("Здесь появятся отчёты", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-                    Text(if (historyEnabled) "История пока пуста. Начните первую проверку." else "Сохранение истории отключено в настройках.",
+                    Text(stringResource(R.string.dash_history_empty_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                    Text(stringResource(if (historyEnabled) R.string.dash_history_empty else R.string.dash_history_disabled),
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
@@ -464,35 +535,93 @@ private fun Dashboard(
             GlassPanel(Modifier.fillMaxWidth(), if (entry.hasAiEvidence) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary) {
                 Row(Modifier.fillMaxWidth().clickable { onOpen(entry.id) }.padding(start = 15.dp, top = 10.dp, bottom = 10.dp, end = 5.dp),
                     verticalAlignment = Alignment.CenterVertically) {
+                    Icon(if (entry.hasGps) Icons.Filled.LocationOn else Icons.Filled.Image, contentDescription = null,
+                        tint = if (entry.hasGps) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(end = 12.dp))
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(entry.fileName, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        Text(entry.fileName.ifBlank { stringResource(R.string.common_unnamed) }, maxLines = 1, overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleMedium)
-                        Text("${dateFormat.format(Date(entry.createdAt))}  •  ${entry.format.label}" +
-                            if (entry.hasAiEvidence) "  •  AI TRACE" else "",
+                        Text("${dateFormat.format(Date(entry.createdAt))}  •  ${texts.formatName(entry.format)}" +
+                            if (entry.hasAiEvidence) "  •  " + stringResource(R.string.dash_history_ai_badge) else "",
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
-                    IconButton(onClick = { onDelete(entry.id) }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Удалить ${entry.fileName}", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    IconButton(onClick = { pendingDelete = entry.id }) {
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.dash_history_delete, entry.fileName), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
         }
         item {
-            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
-                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("◈", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.tertiary)
-                    Column(Modifier.weight(1f)) {
-                        Text(if (isPro) "PRO ACTIVE" else "METACHECK PRO", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-                        Text(if (isPro) "Экспорт PDF/JSON и расширенная история доступны" else "PDF, JSON, 50 отчётов и собственный API",
+            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
+                Row(Modifier.fillMaxWidth().clickable(onClick = onStudio).padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Icon(Icons.Filled.Tune, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Text(stringResource(R.string.dash_eyebrow_studio), style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(R.string.dash_studio_features),
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
-                    if (!isPro) Text("↗", modifier = Modifier.clickable { onUpgrade() }.padding(8.dp),
-                        color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleLarge)
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.dash_open_studio),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
-        item { Text("Приватность по умолчанию: изображения не отправляются MetaCheck в сеть. Для API требуется отдельное согласие.",
+        if (history.isNotEmpty()) item {
+            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
+                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(stringResource(R.string.dash_section_analytics), style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface)
+                    Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                        Column(Modifier.weight(1f)) {
+                            CyberEyebrow(stringResource(R.string.dash_stat_total))
+                            Text("${insight.total}", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                        Column(Modifier.weight(1f)) {
+                            CyberEyebrow(stringResource(R.string.dash_stat_ai), color = MaterialTheme.colorScheme.secondary)
+                            Text("${insight.aiEvidenceCount}", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                        Column(Modifier.weight(1f)) {
+                            CyberEyebrow(stringResource(R.string.dash_stat_gps), color = MaterialTheme.colorScheme.tertiary)
+                            Text("${insight.gpsCount}", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                    }
+                    CyberEyebrow(stringResource(R.string.dash_stat_activity))
+                    ActivityChart(insight.lastSevenDays, Modifier.fillMaxWidth().height(64.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(stringResource(R.string.dash_history_limit), color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodySmall)
+                        Text("${history.size} / $historyLimit", color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodySmall)
+                    }
+                    LinearProgressIndicator(
+                        progress = { (history.size.toFloat() / historyLimit).coerceIn(0f, 1f) },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.tertiary,
+                        trackColor = MaterialTheme.colorScheme.outline,
+                    )
+                    Text(stringResource(if (isPro) R.string.dash_history_limit_pro else R.string.dash_history_limit_free),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.dash_stat_note),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+        item {
+            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
+                Row(Modifier.fillMaxWidth().then(if (isPro) Modifier else Modifier.clickable(onClick = onUpgrade)).padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Icon(Icons.Filled.WorkspacePremium, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
+                    Column(Modifier.weight(1f)) {
+                        Text(stringResource(if (isPro) R.string.dash_pro_active else R.string.dash_pro_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(if (isPro) R.string.dash_pro_active_text else R.string.dash_pro_text),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    }
+                    if (!isPro) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.dash_upgrade_limit),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+        item { Text(stringResource(R.string.dash_privacy_footer),
             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall) }
     }
 }
@@ -523,10 +652,10 @@ private fun LoadingScreen() {
             Column(Modifier.padding(26.dp), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(17.dp)) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                CyberEyebrow("ANALYZING / ON DEVICE")
-                Text("Сканирование метаданных", style = MaterialTheme.typography.titleLarge)
+                CyberEyebrow(stringResource(R.string.loading_eyebrow))
+                Text(stringResource(R.string.loading_title), style = MaterialTheme.typography.titleLarge)
                 ScanningBars(Modifier.fillMaxWidth().height(65.dp))
-                Text("Проверяем структуру файла, EXIF, XMP и признаки генерации.",
+                Text(stringResource(R.string.loading_text),
                     color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -534,15 +663,15 @@ private fun LoadingScreen() {
 }
 
 @Composable
-private fun ErrorScreen(message: String, onRetry: () -> Unit, onBack: () -> Unit) {
+private fun ErrorScreen(message: UiText, onRetry: () -> Unit, onBack: () -> Unit) {
     Box(Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
         GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.error) {
             Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                CyberEyebrow("SCAN ERROR", color = MaterialTheme.colorScheme.error)
-                Text("Не удалось проверить файл", style = MaterialTheme.typography.titleLarge)
-                Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                NeonButton("Выбрать другой файл", onRetry, Modifier.fillMaxWidth())
-                CyberOutlineButton("На главную", onBack, Modifier.fillMaxWidth())
+                CyberEyebrow(stringResource(R.string.error_eyebrow), color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.error_title), style = MaterialTheme.typography.titleLarge)
+                Text(message.asString(), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                NeonButton(stringResource(R.string.error_choose_other), onRetry, Modifier.fillMaxWidth())
+                CyberOutlineButton(stringResource(R.string.error_home), onBack, Modifier.fillMaxWidth())
             }
         }
     }
@@ -550,4 +679,39 @@ private fun ErrorScreen(message: String, onRetry: () -> Unit, onBack: () -> Unit
 
 private fun suggestedName(fileName: String): String =
     fileName.substringBeforeLast('.').filter { it.isLetterOrDigit() || it == '-' || it == '_' || it == ' ' }
+        .trim().take(60).ifBlank { "image" } // иначе файл назывался бы «-clean.jpg»
         .trim().ifEmpty { "image" }.take(60)
+
+/** Экран верхнего уровня. [depth] задаёт направление перехода: вглубь — справа, назад — слева. */
+private enum class ScreenKind(val depth: Int) {
+    HOME(0), LOADING(1), FAILED(1), SETTINGS(1), REPORT(2), STUDIO(3);
+
+    companion object {
+        fun of(state: UiState): ScreenKind = when (state) {
+            UiState.Idle -> HOME
+            UiState.Loading -> LOADING
+            is UiState.Failed -> FAILED
+            is UiState.Done -> REPORT
+        }
+    }
+}
+
+private data class Screen(val kind: ScreenKind, val ui: UiState)
+
+/**
+ * Вглубь — новый экран выезжает справа, назад — слева; плюс растворение.
+ * Всё, что связано с загрузкой, только растворяется: это смена содержимого, а не переход
+ * (иначе повторный анализ очищенной копии «уезжал» бы назад и снова вперёд).
+ */
+private fun screenTransition(from: ScreenKind, to: ScreenKind): ContentTransform {
+    val easing = FastOutSlowInEasing
+    if (from == ScreenKind.LOADING || to == ScreenKind.LOADING) {
+        return fadeIn(tween(260, easing = easing)) + scaleIn(tween(260, easing = easing), initialScale = .98f) togetherWith
+            fadeOut(tween(160))
+    }
+    val direction = if (to.depth >= from.depth) 1 else -1
+    return (slideInHorizontally(tween(320, easing = easing)) { width -> direction * width / 5 } +
+        fadeIn(tween(260, delayMillis = 40, easing = easing))) togetherWith
+        (slideOutHorizontally(tween(260, easing = easing)) { width -> -direction * width / 8 } +
+            fadeOut(tween(180, easing = easing)))
+}

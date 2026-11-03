@@ -23,7 +23,17 @@ data class AppSettings(
 
 data class ApiResult(val statusCode: Int, val body: String)
 
-/** Сообщение предназначено для показа пользователю и не содержит секретов. */
-class ApiException(message: String) : Exception(message)
+/** Причина ошибки отправки отчёта. Текст для пользователя подбирает интерфейс по коду. */
+enum class ApiError {
+    DISABLED, CERTIFICATE, TLS_HANDSHAKE, HOST_NOT_FOUND, TIMEOUT, BAD_SETTINGS, KEY_UNREADABLE, REQUEST_FAILED,
+    /** Настройки не прошли проверку, подробности в [ApiException.configIssue]. */
+    INVALID_CONFIG,
+}
 
-class TooLargeException : Exception("Изображение слишком большое")
+/** Не содержит секретов: только код причины (и проблему настроек, если она есть). */
+class ApiException(
+    val code: ApiError,
+    val configIssue: com.example.metacheck.domain.api.ApiConfigIssue? = null,
+) : Exception(code.name)
+
+class TooLargeException : Exception("Image is too large")

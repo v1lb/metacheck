@@ -1,124 +1,85 @@
-# MetaCheck 2.4 — Metadata Studio
+# MetaCheck
 
-Новый модуль редактирования EXIF, полной очистки JPEG/PNG путём перекодирования, выбора координат и пакетной очистки до 50 изображений для Pro. Доступны копия и осторожная перезапись оригинала с внешней резервной копией и проверкой SHA-256.
+Русская версия: [README.ru.md](README.ru.md).
 
-**Реальные ограничения:** редактирование тегов — JPEG EXIF; универсальный XMP/IPTC-редактор не заявляется. Полная очистка перекодирует пиксели и может изменить качество, цвет и анимацию. Свежий Android APK ещё должен пройти GitHub Actions. Документация: [`RELEASE_2_4.md`](RELEASE_2_4.md).
+An Android app (Kotlin, Jetpack Compose) that shows image metadata (EXIF, GPS, XMP, IPTC, PNG text chunks,
+Content Credentials / C2PA), looks for traces of AI generation in it, and saves copies with cleaned or
+corrected metadata. Analysis runs on the phone; images are never uploaded.
 
----
+Version 2.6.0 · minSdk 26 · targetSdk 36 · applicationId `dev.metacheck.app`.
 
-# MetaCheck 2.3 — Cyber Grid / Neon Intelligence
+## Documents
+| File | Purpose |
+|---|---|
+| [`RELEASE_TODO.md`](RELEASE_TODO.md) | what is left for you to do before publishing |
+| [`DEPLOY.md`](DEPLOY.md) | upload key, building the AAB, CI secrets, Pro license keys |
+| [`PLAY_RELEASE_CHECKLIST.md`](PLAY_RELEASE_CHECKLIST.md) | release acceptance criteria |
+| [`legal/`](legal/) | privacy policy and terms (RU/EN), sources of the website pages |
+| [`DATA_SAFETY.md`](DATA_SAFETY.md) | answers for the Data safety form |
+| [`STORE_LISTING_EN.md`](STORE_LISTING_EN.md), [`STORE_LISTING.md`](STORE_LISTING.md) | Google Play listing texts (English, Russian) |
+| [`RELEASE_NOTES.md`](RELEASE_NOTES.md) | release notes for Play (ru-RU, en-US) |
+| [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md) | library licenses |
+| [`docs/`](docs/) | product strategy and an archive of notes from earlier versions (may not match the current code) |
 
-**Новый первый запуск:** Welcome → язык RU/EN → тема Dark/Light. Переключение сразу, настройки сохраняются. Встроенный Metadata Viewer не требует экспорта. Сведения об изменениях и проверках — [RELEASE_2_3.md](RELEASE_2_3.md).
+Most guides also exist in Russian as `*.ru.md` next to the English file.
 
-# MetaCheck · Cyber Grid 2.2
+## Building
+- Android Studio: File → Open → project folder, wait for Gradle Sync.
+- Command line: `./gradlew test` (JVM tests), `./gradlew assembleDebug`, UI tests on a device:
+  `./gradlew connectedDebugAndroidTest`. The Gradle version (8.14.3) is pinned by the Gradle Wrapper and verified by SHA-256.
+- APK for your own phone: GitHub → Actions → **Build installable APK** → Run workflow → artifact
+  `MetaCheck-installable-apk`. Without your own key it is signed with the debug key; if a build with a
+  different signature is installed, uninstall it first.
+- AAB for Google Play: the **Release AAB for Google Play** workflow (needs your upload key, a MapTiler key
+  and the Play licensing key, see `RELEASE_TODO.md`).
+- Static pre-release check: `python3 tools/release_gate.py`.
 
-Нативный просмотрщик всех извлечённых EXIF/XMP/GPS полей: категории, поиск и экспорт CSV.
-
-Локальный анализ изображений: метаданные и следы ИИ-генерации. Всё считается на телефоне.
-
-## Как открыть
-1. Распакуй архив.
-2. Android Studio: File -> Open -> папка MetaCheck.
-3. Дождись Gradle Sync (первый раз нужен интернет).
-4. Запусти на телефоне или эмуляторе.
-5. Тесты: `./gradlew test` (JVM, без устройства).
-
-## Структура (Clean Architecture + MVVM)
+## Structure
 ```
 com.example.metacheck
-├─ MetaCheckApplication, AppContainer     ручной DI
-├─ domain/                                чистый Kotlin, без Android
-│  ├─ model/Models.kt                     MetaReport, Signal, ...
-│  ├─ analysis/SignalEngine.kt            правила поиска следов ИИ
-│  ├─ repository/ImageRepository.kt
-│  └─ usecase/AnalyzeImageUseCase.kt
+├─ MetaCheckApplication, AppContainer   manual DI
+├─ domain/        pure Kotlin: models, SignalEngine (AI signals), metadata catalog, use cases, export
 ├─ data/
-│  ├─ ImageRepositoryImpl.kt              чтение файла с лимитами
-│  └─ parser/                             ExifReader, PngTextParser, XmpExtractor,
-│                                         ImageFormatDetector, C2paDetector, BoundedReader
-└─ ui/                                    Compose: MainScreen, ResultView (вкладки), MainViewModel
+│  ├─ parser/     EXIF, XMP, PNG, C2PA (JUMBF + CBOR), format detection by file signature
+│  ├─ metadata/   cleaning and editing copies, JPEG segments, result verification, daily limit
+│  ├─ billing/, entitlement/, license/   Pro purchase, signature check, offline keys
+│  ├─ crypto/     AES-GCM with keys in Android Keystore
+│  └─ history/, settings/, export/, api/
+└─ ui/            Compose: screens, ViewModels, texts from resources
 ```
 
-## Что умеет (этап 1)
-- Вкладки: ИИ-анализ, EXIF и камера, Файл и ПО, Карта (только если есть GPS).
-- EXIF: около 50 тегов в группах (камера, съёмка, изображение, даты, авторство), GPS.
-- XMP (CreatorTool, DigitalSourceType, история правок) и текстовые блоки PNG
-  (промпты Stable Diffusion / ComfyUI / InvokeAI).
-- Формат определяется по сигнатуре файла, а не по расширению.
+## Features
+- **Free:** analysis, all fields viewer, GPS Privacy Shield, cleaning and editing up to 75 photos per day (UTC),
+  the last 10 reports visible in history.
+- **Pro** (one-time purchase `pro_lifetime` or a license key): no daily limit, batch cleaning of up to
+  50 photos, PDF/JSON export, 50 reports in history, sending a report to your own API.
+- AI signals come from metadata only: C2PA (the manifest is read, the signature is not verified), IPTC
+  DigitalSourceType, generation parameters (A1111, ComfyUI, NovelAI, Fooocus), about 70 generator names.
+  Missing labels prove nothing: messengers and social networks strip them.
+- Cleaning re-encodes pixels: JPEG stays JPEG (q=95), everything else is saved as PNG, orientation is
+  applied to the pixels, images above 16 MP are downscaled, GIF animation is lost.
+  A wide-gamut color profile (Display P3) is written anew by Android.
+- Privacy score (0–100) with the actual exposed values, and "Send without metadata": a second Share-menu entry
+  that cleans the photo and passes it on in one step.
+- GPS removal from JPEG without re-encoding; tag editing for JPEG EXIF only; overwriting the original only
+  after a verified external backup.
 
-## Безопасность
-- Единственное разрешение: INTERNET, и только для необязательной отправки JSON-отчёта на адрес из настроек (по умолчанию выключено).
-  Изображения в сеть не уходят.
-- Принимаются только content:// URI.
-- Читается не больше 16 МБ файла; блоки PNG, число записей и размер текста ограничены.
-- Сжатые блоки PNG распаковываются с лимитом (защита от zip-бомбы).
-- XMP разбирается без XML-парсера (нет XXE).
+## Privacy and security
+- Permissions: `INTERNET` (map on button press, optional API), `ACCESS_MEDIA_LOCATION` (GPS from photos),
+  plus network state and Play billing from libraries. Storage permissions are stripped;
+  the final set in the built APK is checked by `tools/check_apk_permissions.py`.
+- Files only through system dialogs and `content://`; at most 16 MB is read; PNG, CBOR and XMP blocks
+  are parsed with limits (no XML parser, no XXE).
+- The map (osmdroid; MapTiler tiles, OpenStreetMap in builds without a key) loads only on button press.
+- History, API key and license are encrypted with Android Keystore keys; backup is disabled.
+- API: HTTPS only, no redirects, TLS 1.2+, optional pin; GPS is not sent by default.
+- Pro purchases are verified by the Google Play signature on the device; only a server protects against a modified APK.
 
-## Этап 2: релизная сборка
-- R8 + удаление логов, signing через `keystore.properties`, строгий `network_security_config`,
-  правила бэкапа, адаптивная иконка, `ManifestSecurityTest`.
-- Подробно: см. `DEPLOY.md`.
+## Languages
+The UI is in English (default) and Russian. Strings are generated from `tools/i18n`
+(how to add a string or a language: [`tools/i18n/README.md`](tools/i18n/README.md)). The language is chosen in the app
+or, on Android 13+, in the system app settings.
 
-## Этап 3: экспорт, очистка, история, API
-- Копировать все метаданные, экспорт в JSON и PDF (системный диалог сохранения, без разрешений на память).
-- Очистка метаданных: фото пересохраняется без EXIF/XMP/GPS (JPEG остаётся JPEG, q=95; остальное в PNG).
-  Исходный файл не меняется. Ориентация применяется к пикселям заранее. Анимация GIF теряется,
-  цветовой профиль не переносится, фото больше 16 Мп уменьшаются.
-- История: зашифрованные отчёты в приватной папке (AES-GCM, ключ в Android Keystore), максимум 50 штук,
-  копии фото не хранятся. Можно отключить и очистить в настройках.
-- API: `OkHttp`, только HTTPS, без редиректов, TLS 1.2+ (по желанию только 1.3), необязательный пин сертификата.
-  Ключ API хранится зашифрованным. Отправляется JSON-отчёт, GPS по умолчанию не включается.
-  Перед отправкой всегда показывается подтверждение.
-- Вместо `EncryptedSharedPreferences` своя обёртка над Keystore: `androidx.security:security-crypto` объявлена устаревшей.
-
-## Этап 5: доводка до публикации
-- Приём «Поделиться» из галереи и мессенджеров, кнопки «Сделать фото» (системная камера через FileProvider,
-  разрешение CAMERA не нужно) и «Из буфера».
-- UI-тест на Compose (`app/src/androidTest`), CI на GitHub Actions, `PRIVACY_POLICY.md` и `STORE_LISTING.md` (шаблоны).
-
-## Этап 6: Pro
-- Бесплатно: анализ, вкладки, копирование и очистка метаданных, история на 10 отчётов.
-- Pro (разовая покупка `pro_lifetime`): экспорт PDF/JSON, история до 50, отправка в API. Проверка стоит и в use case,
-  а не только в интерфейсе.
-- Выдать Pro можно промокодом Play или лицензионным ключом (`tools/license_tool.py`, подпись ECDSA P-256,
-  формат проверен на совместимость Python -> Java). Подробности в `DEPLOY.md`, раздел 6.
-
-## Ограничения
-- Это анализ метаданных, а не пикселей. Процента «ИИ / не ИИ» пока нет: нужна обученная модель (этап 4).
-- Подпись C2PA не проверяется, только факт наличия.
-- Метаданные легко удалить: их отсутствие ничего не доказывает.
-- Не сделано: перетаскивание файла (на телефонах почти не нужно), карта внутри приложения (нужен ключ Maps и сеть),
-  английская локализация, нейросетевой детектор (по решению владельца проекта не нужен).
-- Строки интерфейса пока в коде, вынос в strings.xml запланирован.
-
----
-
-## Cyber Grid / Neon Intelligence 2.1
-
-Этот архив содержит полные исходники нативного Android-приложения на Kotlin и Jetpack Compose. В обновлении: сетка Canvas с радиальными неоновыми градиентами, панель сканирования, безопасное превью исходного изображения, компоновка отчёта с нижней навигацией, история со статистикой за неделю, CSV-экспорт и трехшаговый onboarding. Новые функции не требуют WebView и не передают фотографии в интернет.
-
-**Технические ограничения:** проверка на ИИ относится только к доступным метаданным и не даёт процента подлинности. Для полноценной Android-сборки используйте GitHub Actions (workflow `CI`) или Android Studio с Android SDK 36 и Gradle 8.11.1. Файл `gradle-wrapper.jar` в этом архиве отсутствует; GitHub Actions устанавливает Gradle отдельно. Для real-money Pro необходимо настроить товар `pro_lifetime` в Google Play Console. Для выпуска подписанного релиза — собственный keystore и настройки из `DEPLOY.md`.
-
-Подробнее: [ARCHITECTURE_2_1.md](ARCHITECTURE_2_1.md).
-
-
-## Google Play release gate
-
-Run `python3 tools/release_gate.py` for static prerequisites, then execute the `Android emulator tests` workflow in GitHub Actions to run (rather than merely compile) the instrumentation suite. See `PLAY_RELEASE_CHECKLIST.md`. Neither step alone makes the app production-ready.
-
-See `RELEASE_CANDIDATE_2_4_1.md` for the latest code hardening and remaining release blockers, and `PRODUCT_STRATEGY.md` for the roadmap.
-
-## Как получить APK, который ставится на телефон
-
-1. Залить проект в GitHub, открыть **Actions → Build installable APK → Run workflow**.
-2. Скачать артефакт `MetaCheck-installable-apk`, распаковать, установить `app-release.apk`.
-3. Если на телефоне уже стоит старая версия с другой подписью — сначала удалить её (иначе «Приложение не установлено»).
-
-Без своего ключа release-APK подписывается debug-ключом (только для установки на свои устройства).
-Для Google Play нужен свой ключ: см. DEPLOY.md и `keystore.properties.example`.
-
-## Если GPS не показывается
-
-Android 10+ скрывает геометки в фото, пока приложению не выдано разрешение «Доступ к местоположению в фото».
-Выбирайте файл через «Выбрать файл» и нажмите «Разрешить» в системном запросе. Фото, пересланные через мессенджеры,
-обычно уже очищены от GPS — это нормально.
+## If GPS does not show up
+Android 10+ hides photo location until the app is granted "Access to media location".
+Choose the file with "Choose file" and tap "Allow". Photos received through messengers usually have no GPS — that is normal.

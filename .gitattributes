@@ -1,0 +1,4 @@
+# Gradle Wrapper: скрипт для Linux/macOS всегда с LF, иначе "bad interpreter"; для Windows — CRLF.
+gradlew text eol=lf
+*.bat text eol=crlf
+*.jar binary

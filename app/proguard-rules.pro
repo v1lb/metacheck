@@ -12,11 +12,9 @@
     public static int i(...);
 }
 
-# Если в Kotlin останутся проверки, их тоже убираем из release.
--assumenosideeffects class kotlin.jvm.internal.Intrinsics {
-    public static void checkNotNull(java.lang.Object, java.lang.String);
-    public static void checkNotNullParameter(java.lang.Object, java.lang.String);
-}
+# Проверки Kotlin на null (Intrinsics.checkNotNull*) НЕ вырезаем (аудит, п. 23).
+# Без них null из Java/Android API тихо уходит дальше и роняет приложение в случайном месте,
+# а отчёт о сбое в Play Console указывает не туда. Выигрыш в размере — единицы килобайт.
 
 # OkHttp: необязательные TLS-провайдеры отсутствуют на Android, предупреждения не нужны.
 -dontwarn okhttp3.internal.platform.**
@@ -28,3 +26,13 @@
 # Без этих правил R8 может обрезать нужные классы, и в release-сборке карта останется пустой.
 -keep class org.osmdroid.** { *; }
 -dontwarn org.osmdroid.**
+
+# Ожидающие операции студии (PendingWrite, OverwriteOp, MetadataPatch) хранятся в SavedStateHandle через
+# java.io.Serializable и должны пережить смерть процесса. readResolve нужен объекту-одиночке OverwriteOp.Strip.
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}

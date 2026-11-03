@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!--
         Разрешения минимальные:
@@ -12,6 +13,18 @@
     -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+
+    <!--
+        Аудит, п. 20. Библиотеки (в первую очередь osmdroid) могут добавлять свои разрешения в итоговый
+        манифест. Доступ к общему хранилищу и Wi-Fi приложению не нужен: кэш карты лежит в приватных папках
+        (MapTiles.configure), файлы идут через системные диалоги. Убираем их явно; если библиотека их
+        не объявляет, правило ничего не меняет.
+        ACCESS_NETWORK_STATE не убираем: osmdroid проверяет сеть перед загрузкой тайлов, без него падает.
+        Итоговый набор разрешений собранного APK проверяет CI (tools/check_apk_permissions.py).
+    -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" tools:node="remove" />
 
     <application
         android:name=".MetaCheckApplication"
@@ -41,6 +54,32 @@
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
+
+        <!--
+            «Отправить без метаданных» в меню «Поделиться»: то же окно приложения, но фото сразу очищается
+            и пересылается дальше (MainActivity.handleSharedImage различает вход по имени alias).
+        -->
+        <activity-alias
+            android:name=".ui.CleanShareAlias"
+            android:exported="true"
+            android:label="@string/share_target_label"
+            android:targetActivity=".ui.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Язык приложения на Android 8–12: AppCompat сам сохраняет выбор (на 13+ его хранит система). -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
 
         <!-- Нужен только для снимка с камеры: файл во временной папке cache/camera, наружу не экспортируется. -->
         <provider

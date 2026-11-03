@@ -26,8 +26,10 @@ class FileHistoryRepositoryTest {
 
     private var now = 1_700_000_000_000L
 
-    private fun repo(max: Int = 50) =
-        FileHistoryRepository(File(tmp.root, "reports"), XorCrypto(), { now++ }, { max })
+    private fun repo(visible: () -> Int = { FileHistoryRepository.STORAGE_LIMIT }) =
+        FileHistoryRepository(File(tmp.root, "reports"), XorCrypto(), { now++ }, { visible() })
+
+    private fun storedFiles() = File(tmp.root, "reports").listFiles { f -> f.name.endsWith(".rep") }!!.size
 
     @Test
     fun saveListAndLoadRoundTrip() = runBlocking {
@@ -53,10 +55,53 @@ class FileHistoryRepositoryTest {
     }
 
     @Test
-    fun oldReportsArePruned() = runBlocking {
-        val repo = repo(max = 3)
+    fun visibleLimitShowsNewestOnly() = runBlocking {
+        val repo = repo(visible = { 3 })
         for (i in 1..5) repo.save(sampleReport(name = "f$i.jpg"))
         assertEquals(listOf("f5.jpg", "f4.jpg", "f3.jpg"), repo.list().map { it.fileName })
+    }
+
+    /** Аудит, п. 18: статус Free в первые секунды после запуска не должен стирать отчёты Pro. */
+    @Test
+    fun lowerVisibleLimitNeverDeletesReports() = runBlocking {
+        var limit = FileHistoryRepository.STORAGE_LIMIT
+        val repo = repo(visible = { limit })
+        for (i in 1..30) repo.save(sampleReport(name = "f$i.jpg"))
+        limit = 10 // временно «Free»
+        repo.save(sampleReport(name = "f31.jpg"))
+        assertEquals(10, repo.list().size)
+        assertEquals(31, storedFiles())
+        limit = FileHistoryRepository.STORAGE_LIMIT // статус Pro прочитан
+        assertEquals(31, repo.list().size)
+        assertEquals("f1.jpg", repo.list().last().fileName)
+    }
+
+    @Test
+    fun storageLimitPrunesOldestOnDisk() = runBlocking {
+        val repo = repo()
+        val total = FileHistoryRepository.STORAGE_LIMIT + 3
+        for (i in 1..total) repo.save(sampleReport(name = "f$i.jpg"))
+        assertEquals(FileHistoryRepository.STORAGE_LIMIT, storedFiles())
+        assertEquals("f$total.jpg", repo.list().first().fileName)
+        assertEquals("f4.jpg", repo.list().last().fileName)
+    }
+
+    @Test
+    fun corruptedReportDoesNotShrinkVisibleList() = runBlocking {
+        val repo = repo(visible = { 2 })
+        repo.save(sampleReport(name = "old.jpg"))
+        repo.save(sampleReport(name = "mid.jpg"))
+        val id = repo.save(sampleReport(name = "new.jpg")).getOrThrow()
+        File(tmp.root, "reports/$id.rep").writeBytes(ByteArray(40) { 7 })
+        assertEquals(listOf("mid.jpg", "old.jpg"), repo.list().map { it.fileName })
+    }
+
+    @Test
+    fun clearRemovesHiddenReportsToo() = runBlocking {
+        val repo = repo(visible = { 1 })
+        for (i in 1..4) repo.save(sampleReport(name = "f$i.jpg"))
+        repo.clear()
+        assertEquals(0, storedFiles())
     }
 
     @Test

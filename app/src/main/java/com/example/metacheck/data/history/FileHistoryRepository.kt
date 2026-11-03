@@ -2,6 +2,8 @@ package com.example.metacheck.data.history
 
 import com.example.metacheck.data.crypto.Crypto
 import com.example.metacheck.data.export.ReportJson
+import com.example.metacheck.domain.AppFailure
+import com.example.metacheck.domain.FailureCode
 import com.example.metacheck.domain.model.HistoryEntry
 import com.example.metacheck.domain.model.MetaReport
 import com.example.metacheck.domain.repository.HistoryRepository
@@ -12,20 +14,26 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.IOException
 import java.util.UUID
 
 /**
  * История хранится в приватной папке приложения (filesDir), каждый отчёт отдельным зашифрованным файлом.
  * Копии самих фотографий не сохраняются никогда.
  * Идентификатор проверяется по строгому шаблону, поэтому через него нельзя выйти из папки (path traversal).
+ *
+ * Лимиты (аудит, п. 18). На диске всегда хранится до [STORAGE_LIMIT] отчётов, а тариф влияет
+ * только на то, сколько из них показывается ([visibleLimit]). Раньше лимит тарифа применялся при
+ * сохранении и удалял файлы: в первые секунды после запуска статус Pro ещё не прочитан (Free),
+ * и отчёт, сохранённый в этот момент, безвозвратно стирал 40 отчётов платящего пользователя.
+ * То же случалось после возврата денег, смены аккаунта Google Play или сбоя сверки с Play.
+ * «Очистить историю» удаляет все файлы, в том числе скрытые.
  */
 class FileHistoryRepository(
     private val dir: File,
     private val crypto: Crypto,
     private val clock: () -> Long = System::currentTimeMillis,
-    /** Лимит читается при каждом сохранении: в Pro история длиннее. */
-    private val maxEntries: () -> Int = { 50 },
+    /** Сколько последних отчётов показывать. Читается при каждом [list]: зависит от тарифа. */
+    private val visibleLimit: suspend () -> Int = { STORAGE_LIMIT },
     private val io: CoroutineDispatcher = Dispatchers.IO,
 ) : HistoryRepository {
 
@@ -35,23 +43,26 @@ class FileHistoryRepository(
     override suspend fun save(report: MetaReport): Result<String> = withContext(io) {
         lock.withLock {
             runCatchingCancellable {
-                if (!dir.exists() && !dir.mkdirs()) throw IOException("Не удалось создать папку истории")
+                if (!dir.exists() && !dir.mkdirs()) throw AppFailure(FailureCode.HISTORY_UNAVAILABLE)
                 val id = clock().toString().padStart(13, '0') + "_" + UUID.randomUUID().toString().replace("-", "")
                 val bytes = crypto.encrypt(ReportJson.toJson(report).toString().toByteArray(Charsets.UTF_8))
                 val tmp = File(dir, "$id.tmp")
                 tmp.writeBytes(bytes)
                 if (!tmp.renameTo(File(dir, "$id.rep"))) {
                     tmp.delete()
-                    throw IOException("Не удалось сохранить отчёт")
+                    throw AppFailure(FailureCode.HISTORY_UNAVAILABLE)
                 }
-                reportFiles().drop(maxEntries()).forEach { it.delete() }
+                // Только физический предел хранилища, не тариф: см. описание класса.
+                reportFiles().drop(STORAGE_LIMIT).forEach { it.delete() }
                 id
             }
         }
     }
 
     override suspend fun list(): List<HistoryEntry> = withContext(io) {
-        reportFiles().mapNotNull { file ->
+        val limit = visibleLimit().coerceIn(0, STORAGE_LIMIT)
+        // Расшифровываем только показываемые отчёты; повреждённые пропускаем и берём следующие.
+        reportFiles().asSequence().mapNotNull { file ->
             val report = readReport(file) ?: return@mapNotNull null
             val id = file.name.removeSuffix(".rep")
             HistoryEntry(
@@ -62,9 +73,10 @@ class FileHistoryRepository(
                 hasAiEvidence = report.hasAiEvidence,
                 hasGps = report.gps != null,
             )
-        }
+        }.take(limit).toList()
     }
 
+    /** Открывается любой хранимый отчёт: id приходит только из [list], то есть из показанных. */
     override suspend fun load(id: String): MetaReport? = withContext(io) {
         if (!idRegex.matches(id)) return@withContext null
         val file = File(dir, "$id.rep")
@@ -72,17 +84,24 @@ class FileHistoryRepository(
     }
 
     override suspend fun delete(id: String) {
-        withContext(io) { deleteBlocking(id) }
+        withContext(io) { lock.withLock { deleteBlocking(id) } }
     }
 
+    /** Файл, который не удалось удалить, — ошибка: иначе интерфейс сообщил бы об удалении, а отчёт остался. */
     private fun deleteBlocking(id: String) {
-        if (idRegex.matches(id)) File(dir, "$id.rep").delete()
+        if (!idRegex.matches(id)) return
+        val file = File(dir, "$id.rep")
+        if (!file.delete() && file.exists()) throw AppFailure(FailureCode.HISTORY_UNAVAILABLE)
     }
 
     override suspend fun clear() {
         withContext(io) {
             lock.withLock {
                 dir.listFiles()?.forEach { if (it.name.endsWith(".rep") || it.name.endsWith(".tmp")) it.delete() }
+                // «История удалена» показываем, только если файлов действительно не осталось.
+                if (dir.listFiles { f -> f.name.endsWith(".rep") }?.isNotEmpty() == true) {
+                    throw AppFailure(FailureCode.HISTORY_UNAVAILABLE)
+                }
             }
         }
     }
@@ -99,4 +118,9 @@ class FileHistoryRepository(
         } catch (e: Exception) {
             null // повреждённый файл или ключ Keystore больше недоступен
         }
+
+    companion object {
+        /** Сколько отчётов хранится на диске при любом тарифе. Равен лимиту Pro. */
+        const val STORAGE_LIMIT = 50
+    }
 }

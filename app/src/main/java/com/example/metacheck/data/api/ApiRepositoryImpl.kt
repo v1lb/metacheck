@@ -3,11 +3,13 @@ package com.example.metacheck.data.api
 import com.example.metacheck.data.export.ReportJson
 import com.example.metacheck.data.parser.readBounded
 import com.example.metacheck.domain.api.ApiConfigValidator
+import com.example.metacheck.domain.model.ApiError
 import com.example.metacheck.domain.model.ApiException
 import com.example.metacheck.domain.model.ApiResult
 import com.example.metacheck.domain.model.MetaReport
 import com.example.metacheck.domain.repository.ApiRepository
 import com.example.metacheck.domain.repository.SettingsRepository
+import com.example.metacheck.domain.text.MetaTexts
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -36,38 +38,38 @@ class ApiRepositoryImpl(
     private val io: CoroutineDispatcher = Dispatchers.IO,
 ) : ApiRepository {
 
-    override suspend fun send(report: MetaReport): Result<ApiResult> = withContext(io) {
+    override suspend fun send(report: MetaReport, texts: MetaTexts): Result<ApiResult> = withContext(io) {
         try {
-            Result.success(sendBlocking(report))
+            Result.success(sendBlocking(report, texts))
         } catch (e: CancellationException) {
             throw e
         } catch (e: ApiException) {
             Result.failure(e)
         } catch (e: SSLPeerUnverifiedException) {
-            Result.failure(ApiException("Сертификат сервера не прошёл проверку (недоверенный или не совпал пин)."))
+            Result.failure(ApiException(ApiError.CERTIFICATE))
         } catch (e: SSLHandshakeException) {
-            Result.failure(ApiException("Не удалось установить защищённое соединение. Проверь настройку «Только TLS 1.3»."))
+            Result.failure(ApiException(ApiError.TLS_HANDSHAKE))
         } catch (e: UnknownHostException) {
-            Result.failure(ApiException("Сервер не найден. Проверь адрес и интернет."))
+            Result.failure(ApiException(ApiError.HOST_NOT_FOUND))
         } catch (e: SocketTimeoutException) {
-            Result.failure(ApiException("Сервер не ответил вовремя."))
+            Result.failure(ApiException(ApiError.TIMEOUT))
         } catch (e: IllegalArgumentException) {
             // Сообщения OkHttp о неверных заголовках содержат значение, поэтому наружу их не отдаём.
-            Result.failure(ApiException("Неверные настройки API (адрес или заголовок)."))
+            Result.failure(ApiException(ApiError.BAD_SETTINGS))
         } catch (e: Exception) {
-            Result.failure(ApiException("Не удалось выполнить запрос."))
+            Result.failure(ApiException(ApiError.REQUEST_FAILED))
         }
     }
 
-    private fun sendBlocking(report: MetaReport): ApiResult {
+    private fun sendBlocking(report: MetaReport, texts: MetaTexts): ApiResult {
         val s = settingsRepository.settings.value
-        if (!s.apiEnabled) throw ApiException("Отправка отключена в настройках.")
-        ApiConfigValidator.validateUrl(s.apiEndpoint)?.let { throw ApiException(it) }
-        ApiConfigValidator.validateHeaderName(s.apiHeaderName)?.let { throw ApiException(it) }
-        ApiConfigValidator.validatePin(s.certPin)?.let { throw ApiException(it) }
+        if (!s.apiEnabled) throw ApiException(ApiError.DISABLED)
+        ApiConfigValidator.validateUrl(s.apiEndpoint)?.let { throw ApiException(ApiError.INVALID_CONFIG, it) }
+        ApiConfigValidator.validateHeaderName(s.apiHeaderName)?.let { throw ApiException(ApiError.INVALID_CONFIG, it) }
+        ApiConfigValidator.validatePin(s.certPin)?.let { throw ApiException(ApiError.INVALID_CONFIG, it) }
 
         val key = settingsRepository.readApiKey()
-        if (s.hasApiKey && key == null) throw ApiException("Не удалось прочитать сохранённый ключ. Введи его заново в настройках.")
+        if (s.hasApiKey && key == null) throw ApiException(ApiError.KEY_UNREADABLE)
 
         val url = s.apiEndpoint.trim().toHttpUrl()
         val spec = if (s.tls13Only) {
@@ -89,7 +91,7 @@ class ApiRepositoryImpl(
             )
         }
 
-        val body = ReportJson.toJson(report, includeGps = s.apiSendGps).toString()
+        val body = ReportJson.toJson(report, includeGps = s.apiSendGps, texts = texts).toString()
             .toRequestBody("application/json; charset=utf-8".toMediaType())
         val request = Request.Builder().url(url).post(body).header("User-Agent", "MetaCheck")
         if (key != null) request.header(s.apiHeaderName.trim(), key)

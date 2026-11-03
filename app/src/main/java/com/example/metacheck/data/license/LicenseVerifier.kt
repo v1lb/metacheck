@@ -1,5 +1,6 @@
 package com.example.metacheck.data.license
 
+import com.example.metacheck.domain.model.LicenseError
 import com.example.metacheck.domain.model.LicenseException
 import com.example.metacheck.domain.model.LicenseInfo
 import org.json.JSONObject
@@ -25,15 +26,15 @@ class LicenseVerifier(
         } catch (e: LicenseException) {
             Result.failure(e)
         } catch (e: Exception) {
-            Result.failure(LicenseException("Некорректный ключ"))
+            Result.failure(LicenseException(LicenseError.MALFORMED))
         }
 
     private fun verifyOrThrow(raw: String): LicenseInfo {
-        if (publicKeyBase64.isBlank()) throw LicenseException("Ключи Pro в этой сборке не включены")
+        if (publicKeyBase64.isBlank()) throw LicenseException(LicenseError.NOT_ENABLED)
         val token = raw.trim()
-        if (token.length > MAX_TOKEN_CHARS) throw LicenseException("Некорректный ключ")
+        if (token.length > MAX_TOKEN_CHARS) throw LicenseException(LicenseError.MALFORMED)
         val parts = token.split('.')
-        if (parts.size != 3 || parts[0] != PREFIX) throw LicenseException("Некорректный ключ")
+        if (parts.size != 3 || parts[0] != PREFIX) throw LicenseException(LicenseError.MALFORMED)
 
         val signed = (parts[0] + "." + parts[1]).toByteArray(Charsets.US_ASCII)
         val signature = Base64.getUrlDecoder().decode(parts[2])
@@ -42,13 +43,13 @@ class LicenseVerifier(
         val verifier = Signature.getInstance("SHA256withECDSA")
         verifier.initVerify(publicKey)
         verifier.update(signed)
-        if (!verifier.verify(signature)) throw LicenseException("Подпись ключа неверна")
+        if (!verifier.verify(signature)) throw LicenseException(LicenseError.BAD_SIGNATURE)
 
         val payload = JSONObject(String(Base64.getUrlDecoder().decode(parts[1]), Charsets.UTF_8))
         val id = payload.optString("id")
-        if (id.isBlank() || id.length > 64) throw LicenseException("Некорректный ключ")
+        if (id.isBlank() || id.length > 64) throw LicenseException(LicenseError.MALFORMED)
         val expiresAt = if (payload.has("exp")) payload.getLong("exp") else null
-        if (expiresAt != null && nowSeconds() > expiresAt) throw LicenseException("Срок действия ключа истёк")
+        if (expiresAt != null && nowSeconds() > expiresAt) throw LicenseException(LicenseError.EXPIRED)
         return LicenseInfo(id, expiresAt, payload.optString("note").take(100).ifBlank { null })
     }
 

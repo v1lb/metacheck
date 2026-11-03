@@ -1,49 +1,145 @@
 name: Release AAB for Google Play
 
-# Ручной запуск: Actions -> "Release AAB for Google Play" -> Run workflow.
+# Запуск:
+#  - автоматически при пуше тега вида v2.6.1 (git tag v2.6.1 && git push origin v2.6.1);
+#  - вручную: Actions -> "Release AAB for Google Play" -> Run workflow.
 # Нужны секреты репозитория: METACHECK_KEYSTORE_B64, METACHECK_STORE_PASSWORD,
-# METACHECK_KEY_ALIAS, METACHECK_KEY_PASSWORD (см. инструкцию в чате / DEPLOY.md).
+# METACHECK_KEY_ALIAS, METACHECK_KEY_PASSWORD (см. DEPLOY.md).
+#
+# Порядок важен: сначала тесты и lint, и только потом подпись и сборка AAB.
+# Раньше сборка шла с `-x lintVitalRelease`, то есть без проверки, которую AGP специально
+# делает перед релизом (ошибки манифеста, непереведённые строки, WrongConstant и т. п.).
 on:
+  push:
+    tags: ['v*']
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Действия закреплены по SHA коммита, а не по тегу (v4): этот workflow получает ключ подписи Google Play,
+# и подменённый тег стороннего действия мог бы его украсть. Обновлять: новый SHA из релизов действия.
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   aab:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
           java-version: 17
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.11.1
-      - uses: android-actions/setup-android@v3
+      # Сборка через ./gradlew (версия Gradle и её SHA-256 — в gradle/wrapper/gradle-wrapper.properties).
+      # setup-gradle v4 сам проверяет gradle-wrapper.jar по списку официальных контрольных сумм.
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
         with:
           packages: platform-tools
       - name: Install Android platform 36
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Check tag matches versionName
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          name=$(grep -oP 'versionName\s*=\s*"\K[^"]+' app/build.gradle.kts)
+          echo "Тег: $tag, versionName: $name"
+          if [ "$tag" != "$name" ]; then
+            echo "::error::Тег v$tag не совпадает с versionName $name в app/build.gradle.kts"
+            exit 1
+          fi
+
+      - name: Static release preflight
+        run: python3 tools/release_gate.py
+
+      - name: Unit tests and release lint
+        run: ./gradlew --no-daemon testReleaseUnitTest lintRelease
+
       - name: Decode upload keystore
         env:
           KEYSTORE_B64: ${{ secrets.METACHECK_KEYSTORE_B64 }}
         run: |
           if [ -z "$KEYSTORE_B64" ]; then
-            echo "Нет секрета METACHECK_KEYSTORE_B64: AAB без своего ключа Google Play не примет."
+            echo "::error::Нет секрета METACHECK_KEYSTORE_B64: AAB без своего ключа Google Play не примет."
             exit 1
           fi
           echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+
+      # Аудит, п. 26: без ключа лицензирования Play подпись покупок не проверяется и Pro можно подделать.
+      - name: Require Google Play public key for purchase signatures
+        run: |
+          python3 - <<'PY'
+          import base64, re, sys
+          src = open('app/src/main/java/com/example/metacheck/data/billing/PlayPublicKey.kt', encoding='utf-8').read()
+          m = re.search(r'const val BASE64 = "([^"]*)"', src)
+          key = (m.group(1) if m else '').strip()
+          try:
+              der = base64.b64decode(key, validate=False)
+          except Exception:
+              der = b''
+          if len(der) < 200 or der[0] != 0x30:
+              print('::error::PlayPublicKey.BASE64 пуст или не похож на ключ из Play Console (Монетизация → Лицензирование). См. RELEASE_TODO.md.')
+              sys.exit(1)
+          print(f'Ключ Play задан ({len(der)} байт).')
+          PY
+
+      # Карточка Play и политика называют MapTiler основным поставщиком карты (аудит, п. 19),
+      # а tile.openstreetmap.org по своим правилам не рассчитан на нагрузку от приложений.
+      # Поэтому релиз без ключа MapTiler не собирается.
+      - name: Require MapTiler key
+        env:
+          MAPTILER_KEY: ${{ secrets.METACHECK_MAPTILER_KEY }}
+        run: |
+          if [ -z "$MAPTILER_KEY" ]; then
+            echo "::error::Нет секрета METACHECK_MAPTILER_KEY. Карта в релизе ушла бы на серверы OpenStreetMap, а карточка Play и политика говорят о MapTiler. См. RELEASE_TODO.md."
+            exit 1
+          fi
+
+      # lintVitalRelease выполняется внутри bundleRelease автоматически, ничего не пропускаем.
       - name: Build signed AAB
         env:
           METACHECK_STORE_FILE: ${{ runner.temp }}/upload.jks
           METACHECK_STORE_PASSWORD: ${{ secrets.METACHECK_STORE_PASSWORD }}
           METACHECK_KEY_ALIAS: ${{ secrets.METACHECK_KEY_ALIAS }}
           METACHECK_KEY_PASSWORD: ${{ secrets.METACHECK_KEY_PASSWORD }}
-        run: gradle --no-daemon bundleRelease -x lintVitalRelease
+          # Обязателен для релиза (проверка выше).
+          METACHECK_MAPTILER_KEY: ${{ secrets.METACHECK_MAPTILER_KEY }}
+        run: ./gradlew --no-daemon bundleRelease
+
+      # Из AAB разрешения aapt2 не читает, поэтому проверяем итоговый манифест release-сборки.
+      - name: Check permissions of the release manifest
+        run: |
+          manifest=$(find app/build/intermediates -path '*merged_manifest*' -path '*release*' -name AndroidManifest.xml | head -n 1)
+          if [ -z "$manifest" ]; then
+            echo "::error::Не найден итоговый манифест release-сборки"
+            exit 1
+          fi
+          python3 tools/check_apk_permissions.py "$manifest"
+
+      - name: Remove keystore from runner
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload.jks"
+
       - name: Upload AAB and R8 mapping
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: MetaCheck-play-release
+          name: MetaCheck-play-release-${{ github.ref_name }}
           path: |
             app/build/outputs/bundle/release/*.aab
             app/build/outputs/mapping/release/mapping.txt
           if-no-files-found: error
+
+      - name: Upload test and lint reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: MetaCheck-release-reports-${{ github.ref_name }}
+          path: |
+            app/build/reports/tests/**
+            app/build/reports/lint-results-*.html
+          if-no-files-found: ignore

@@ -13,6 +13,8 @@ import com.example.metacheck.domain.repository.ExportRepository
 import com.example.metacheck.domain.usecase.CheckViaApiUseCase
 import com.example.metacheck.domain.usecase.ExportReportUseCase
 import com.example.metacheck.sampleReport
+import com.example.metacheck.domain.text.MetaTexts
+import com.example.metacheck.testutil.FakeTexts
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
@@ -34,13 +36,13 @@ private class FakeEntitlements(pro: Boolean) : EntitlementRepository {
 
 private class CountingExport : ExportRepository {
     var calls = 0
-    override suspend fun exportJson(report: MetaReport, target: String): Result<Unit> { calls++; return Result.success(Unit) }
-    override suspend fun exportPdf(report: MetaReport, target: String): Result<Unit> { calls++; return Result.success(Unit) }
+    override suspend fun exportJson(report: MetaReport, target: String, texts: MetaTexts): Result<Unit> { calls++; return Result.success(Unit) }
+    override suspend fun exportPdf(report: MetaReport, target: String, texts: MetaTexts): Result<Unit> { calls++; return Result.success(Unit) }
 }
 
 private class CountingApi : ApiRepository {
     var calls = 0
-    override suspend fun send(report: MetaReport): Result<ApiResult> { calls++; return Result.success(ApiResult(200, "ok")) }
+    override suspend fun send(report: MetaReport, texts: MetaTexts): Result<ApiResult> { calls++; return Result.success(ApiResult(200, "ok")) }
 }
 
 class ProTest {
@@ -49,8 +51,8 @@ class ProTest {
     fun exportIsBlockedWithoutPro() = runBlocking {
         val repo = CountingExport()
         val useCase = ExportReportUseCase(repo, FakeEntitlements(pro = false))
-        assertTrue(useCase.json(sampleReport(), "content://x").exceptionOrNull() is ProRequiredException)
-        assertTrue(useCase.pdf(sampleReport(), "content://x").exceptionOrNull() is ProRequiredException)
+        assertTrue(useCase.json(sampleReport(), "content://x", FakeTexts()).exceptionOrNull() is ProRequiredException)
+        assertTrue(useCase.pdf(sampleReport(), "content://x", FakeTexts()).exceptionOrNull() is ProRequiredException)
         assertEquals(0, repo.calls)
     }
 
@@ -58,15 +60,15 @@ class ProTest {
     fun exportWorksWithPro() = runBlocking {
         val repo = CountingExport()
         val useCase = ExportReportUseCase(repo, FakeEntitlements(pro = true))
-        assertTrue(useCase.json(sampleReport(), "content://x").isSuccess)
-        assertTrue(useCase.pdf(sampleReport(), "content://x").isSuccess)
+        assertTrue(useCase.json(sampleReport(), "content://x", FakeTexts()).isSuccess)
+        assertTrue(useCase.pdf(sampleReport(), "content://x", FakeTexts()).isSuccess)
         assertEquals(2, repo.calls)
     }
 
     @Test
     fun apiIsBlockedWithoutPro() = runBlocking {
         val repo = CountingApi()
-        val result = CheckViaApiUseCase(repo, FakeEntitlements(pro = false))(sampleReport())
+        val result = CheckViaApiUseCase(repo, FakeEntitlements(pro = false))(sampleReport(), FakeTexts())
         assertTrue(result.exceptionOrNull() is ProRequiredException)
         assertEquals(0, repo.calls)
     }
@@ -74,7 +76,7 @@ class ProTest {
     @Test
     fun apiWorksWithPro() = runBlocking {
         val repo = CountingApi()
-        val result = CheckViaApiUseCase(repo, FakeEntitlements(pro = true))(sampleReport())
+        val result = CheckViaApiUseCase(repo, FakeEntitlements(pro = true))(sampleReport(), FakeTexts())
         assertEquals(200, result.getOrThrow().statusCode)
         assertEquals(1, repo.calls)
     }
