@@ -399,6 +399,8 @@
     <string name="dash_history_disabled">Saving history is turned off in settings.</string>
     <string name="dash_history_ai_badge">AI TRACE</string>
     <string name="dash_history_delete">Delete %1$s</string>
+    <string name="dash_delete_title">Delete this report?</string>
+    <string name="dash_delete_text">The report will be removed from history. The photo itself is not affected.</string>
     <string name="dash_pro_active">PRO ACTIVE</string>
     <string name="dash_pro_title">METACHECK PRO</string>
     <string name="dash_pro_active_text">PDF/JSON export and extended history are available</string>

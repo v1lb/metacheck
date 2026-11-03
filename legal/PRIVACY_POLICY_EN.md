@@ -28,6 +28,7 @@ By default the app transmits nothing. Data is sent only after your own action:
   Tiles are requested by number, so the map provider can infer the approximate area of the point shown, and it also sees your IP address and the app name. The provider may use a content delivery network (CDN) that also processes your IP address. The image and its metadata are not sent. Downloaded tiles are cached on the device (up to 50 MB) and removed with the cache or the app.
 - **Address search.** If you tap "Find on map", the text you typed is handled by your phone's system geocoder (on many devices this is a Google service). The app itself does not store or forward the query.
 - **API check (optional).** If you turn it on in Settings, enter a server address and tap "Check via API", a text JSON report is sent to that address. It does not contain the image, and GPS coordinates are excluded unless you enable them separately. The server you choose receives the data; the MetaCheck developer does not.
+- **"Send without metadata".** If you choose this option, the app creates a cleaned copy of the photo and passes it to the app you selected in the Share window. The copy is kept temporarily in the MetaCheck cache and deleted within a day. The MetaCheck developer does not receive it.
 - **Purchases.** Pro is bought through Google Play, and Google processes payment data. The app only receives confirmation of the purchase.
 
 MapTiler, OpenStreetMap and Google servers may be located outside your country.
