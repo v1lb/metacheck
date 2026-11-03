@@ -193,12 +193,3 @@ object XmpExtractor {
             .replace("&amp;", "&")
             .take(500)
 }
-
-object C2paDetector {
-    private val JUMB = "jumb".ascii()
-    private val C2PA = "c2pa".ascii()
-
-    /** Грубая проверка: есть контейнер JUMBF и метка c2pa. Подпись не проверяется. */
-    fun looksPresent(data: ByteArray): Boolean =
-        data.indexOfSeq(JUMB) >= 0 && data.indexOfSeq(C2PA) >= 0
-}

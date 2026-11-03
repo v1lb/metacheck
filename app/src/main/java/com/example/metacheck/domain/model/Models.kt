@@ -74,7 +74,20 @@ enum class SignalKind {
     AI_MENTION_TEXT,
     /** args: значение DigitalSourceType */
     IPTC_AI_SOURCE,
+    /** Метка IPTC compositeWithTrainedAlgorithmicMedia: снимок дорисован или изменён ИИ. args: значение */
+    IPTC_AI_EDITED,
+    /** args: программа из манифеста (может быть пустой) */
     C2PA_PRESENT,
+    /** Манифест C2PA: изображение создано ИИ (trainedAlgorithmicMedia). args: программа (может быть пустой) */
+    C2PA_AI_CREATED,
+    /** Манифест C2PA: в изображение вносили правки ИИ (composite…). args: программа (может быть пустой) */
+    C2PA_AI_EDITED,
+    /** Параметры генерации вне PNG-блока parameters (EXIF UserComment, JSON NovelAI/Fooocus). args: поле */
+    GENERATION_PARAMS,
+    /** Имя файла как у копии из мессенджера: метаданные там стёрты при отправке. args: приложение */
+    MESSENGER_COPY,
+    /** Имя файла как у скриншота: метаданных исходного изображения в нём нет. */
+    SCREENSHOT,
     HAS_GPS,
     NO_METADATA,
     PARTIAL_SCAN,
@@ -99,6 +112,29 @@ data class Signal(
             SignalKind.AI_TOOL_FIELD, SignalKind.AI_MENTION_TEXT -> "${kind.name}:${args.firstOrNull()}"
             else -> kind.name
         }
+}
+
+/**
+ * Что удалось прочитать из Content Credentials (C2PA). Подпись не проверяется: это сведения из
+ * манифеста, а не криптографическое подтверждение.
+ * [parsed] = false: контейнер найден, но разобрать его не удалось.
+ * [generator]: программа, создавшая активный манифест (claim_generator), например «ChatGPT».
+ * [sourceTypes]: значения digitalSourceType из действий всех манифестов (последняя часть адреса IPTC).
+ * [aiAgents]: программы (softwareAgent) у действий с ИИ-источником.
+ */
+data class C2paFacts(
+    val parsed: Boolean,
+    val generator: String? = null,
+    val sourceTypes: Set<String> = emptySet(),
+    val aiAgents: List<String> = emptyList(),
+) {
+    val aiCreated: Boolean get() = sourceTypes.any { it.equals(TRAINED, ignoreCase = true) }
+    val aiEdited: Boolean get() = sourceTypes.any { it.equals(COMPOSITE_TRAINED, ignoreCase = true) }
+
+    companion object {
+        const val TRAINED = "trainedAlgorithmicMedia"
+        const val COMPOSITE_TRAINED = "compositeWithTrainedAlgorithmicMedia"
+    }
 }
 
 data class GpsPoint(val latitude: Double, val longitude: Double, val altitudeMeters: Double?)
