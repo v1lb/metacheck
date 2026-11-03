@@ -10,7 +10,7 @@ This is a guide derived from the app's code. Google Play's definitions of "colle
   History is stored encrypted; the API key is protected by Android Keystore.
 - Map: after the button press the app requests map tiles over HTTPS from MapTiler (if the build has the
   `METACHECK_MAPTILER_KEY` key), otherwise from the OpenStreetMap Foundation servers. The provider sees the IP address
-  and tile numbers (which reveal the approximate area of the point). The file and its metadata are not sent.
+  and tile numbers (the map opens at zoom 15–16, so they reveal the point to within a few hundred metres). The file and its metadata are not sent.
   Before submitting the form, check which provider the release uses: its name is shown on the "Show map" button.
 - Address search: the query text goes to the phone's system geocoder (on many devices a Google service).
 - JSON report to the user's server: optional, off by default; the user chooses the recipient.
@@ -20,13 +20,15 @@ This is a guide derived from the app's code. Google Play's definitions of "colle
 ## Suggested answers
 | Form question | Answer |
 |---|---|
-| Does the app collect or share user data? | Yes: approximate location (the area of the point when the map loads). Everything else stays on the device. |
-| Approximate location | Shared with a third party (MapTiler or OpenStreetMap, depending on the build), optional (on button press), purpose: app functionality. |
+| Does the app collect or share user data? | Yes: precise location (tiles at zoom 15–16 cover less than 3 km²). Everything else stays on the device. |
+| Account creation | The app has no accounts; no login with external accounts. |
+| Precise location | Collected (not shared: the map provider is a service provider), not ephemeral, optional (on button press), purpose: app functionality only. |
 | Photos and videos, files | Not collected (processed on the device only). |
 | Is data encrypted in transit? | Yes (HTTPS). |
-| Can users request data deletion? | The developer stores no data; the map cache is removed by clearing the cache or uninstalling the app. |
+| Can users request data deletion? | Left blank (optional): the developer stores no data; the map cache is removed by clearing the cache or uninstalling the app. |
 | Ads | No. |
-| App for children | No. |
+| Target age group | 18 and over only. |
+| Privacy policy URL | https://v1lb.github.io/legal-metacheck/PRIVACY_POLICY_EN.html |
 
 ## What to check in the Play help
 1. Whether a tile request triggered by a button press counts as "sharing" that must be declared (definitions of "collected" and "shared", exceptions for user-initiated actions).
