@@ -152,7 +152,7 @@ private val contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 10.
 @Composable
 private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: String?, onMetadata: () -> Unit) {
     val evidence = report.hasAiEvidence
-    val attention = !evidence && (report.file.truncated || report.signals.any { it.severity == Severity.CAUTION })
+    val attention = report.needsAiReview
     val color = when {
         evidence -> MaterialTheme.colorScheme.error
         attention -> if (MaterialTheme.colorScheme.background.red < .15f) Color(0xFFFFC875) else Color(0xFF7F4A00)
