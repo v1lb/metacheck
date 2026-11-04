@@ -159,6 +159,12 @@ data class MetaReport(
     val hasAiEvidence: Boolean get() = signals.any { it.severity == Severity.AI_EVIDENCE }
     /** Informational notes are not detections and must not inflate the scan metric. */
     val actionableSignalCount: Int get() = signals.count { it.severity != Severity.INFO }
+    /**
+     * The AI-label verdict is inconclusive: the file is truncated, or a caution signal says the metadata
+     * may be missing or mentions AI. GPS is a privacy warning, not an AI hint, so it does not count.
+     */
+    val needsAiReview: Boolean get() = !hasAiEvidence &&
+        (file.truncated || signals.any { it.severity == Severity.CAUTION && it.kind != SignalKind.HAS_GPS })
 }
 
 class UnsupportedFormatException : Exception("Unsupported file format")
