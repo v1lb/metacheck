@@ -49,7 +49,7 @@ com.example.metacheck
 ```
 
 ## Features
-- **Free:** analysis, all fields viewer, GPS Privacy Shield, cleaning and editing up to 75 photos per day (UTC),
+- **Free:** analysis, all fields viewer, GPS Privacy Shield, cleaning and editing up to 10 photos per day (UTC),
   the last 10 reports visible in history.
 - **Pro** (one-time purchase `pro_lifetime` or a license key): no daily limit, batch cleaning of up to
   50 photos, PDF/JSON export, 50 reports in history, sending a report to your own API.

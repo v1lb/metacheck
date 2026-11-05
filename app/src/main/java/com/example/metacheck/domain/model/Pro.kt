@@ -37,10 +37,12 @@ enum class PurchaseEvent {
     CANCELED,
     FAILED,
     /** Покупки изменились без действия пользователя (возврат, другой товар): только перечитать. */
-    UPDATED;
+    UPDATED,
+    /** Пользователь поддержал разработчика разовым платежом. Pro это не включает. */
+    TIP_COMPLETED;
 
     /** После этих событий нужно перечитать покупки у Play. */
-    val needsRefresh: Boolean get() = this != CANCELED && this != FAILED
+    val needsRefresh: Boolean get() = this != CANCELED && this != FAILED && this != TIP_COMPLETED
 }
 
 class ProRequiredException : Exception("Pro feature")

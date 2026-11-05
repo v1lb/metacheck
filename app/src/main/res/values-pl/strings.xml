@@ -577,6 +577,11 @@
     <string name="pro_msg_failed">Zakup nie został ukończony. Spróbuj ponownie później.</string>
     <string name="pro_msg_launch_failed">Nie udało się otworzyć zakupu. Sprawdź Google Play i połączenie z internetem.</string>
     <string name="pro_msg_key_accepted">Klucz zaakceptowany</string>
+    <string name="pro_limit_reached">Wyczyszczono dziś %1$d zdjęć. Limit odnowi się jutro albo przejdź na Pro bez limitów.</string>
+    <string name="tip_title">Wesprzyj twórcę</string>
+    <string name="tip_text">MetaCheck tworzy jeden programista, bez reklam i śledzenia. Niewielka jednorazowa płatność w Google Play niczego nie odblokowuje, po prostu pomaga rozwijać aplikację.</string>
+    <string name="tip_button">Wesprzyj · %1$s</string>
+    <string name="tip_thanks">Dziękujemy za wsparcie!</string>
 
     <!-- master_17_gps_map.py -->
     <string name="gps_shield_eyebrow">GPS w pliku</string>

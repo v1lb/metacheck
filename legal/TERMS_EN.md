@@ -5,7 +5,7 @@ lang: en
 
 # MetaCheck Terms of Use
 
-**Effective date:** 2026-11-03
+**Effective date:** 2026-11-05
 **Developer:** Puwer Studio
 **Contact:** werk9886@gmail.com
 
@@ -24,7 +24,7 @@ You choose the images and where results are saved. You are responsible for havin
 The app removes known metadata fields in a new copy. Re-saving may change quality, size, format and colour data, and animation or special blocks may be lost. We do not guarantee that everything that could identify you or the circumstances of the shot is removed: the image itself, watermarks, sensor characteristics and the file name may reveal it. If privacy is critical, verify the final file with an independent tool before publishing.
 
 ## 5. Free version and Pro
-Some features are free with limits (at the time of publication, metadata cleaning is limited to 75 photos per day). Additional features are unlocked by a one-time Pro purchase through Google Play; there is no subscription. The feature set, limits and price are shown in the app and on the Google Play page and may change in future versions. A purchased Pro is not revoked without cause. Do not try to bypass free-version limits or purchase checks.
+Some features are free with limits (at the time of publication, metadata cleaning is limited to 10 photos per day). Additional features are unlocked by a one-time Pro purchase through Google Play; there is no subscription. The feature set, limits and price are shown in the app and on the Google Play page and may change in future versions. A purchased Pro is not revoked without cause. Do not try to bypass free-version limits or purchase checks. The optional "Support the developer" payment is a voluntary contribution: it does not unlock any features.
 
 ## 6. Payments and refunds
 Payments are processed by Google Play. Cancellation and refund requests are made through Google Play and handled under its rules and applicable law. The developer does not receive payment details and cannot promise a refund in every case. These terms do not limit mandatory consumer rights.

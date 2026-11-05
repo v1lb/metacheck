@@ -571,6 +571,11 @@
     <string name="pro_msg_failed">Pembelian tidak selesai. Coba lagi nanti.</string>
     <string name="pro_msg_launch_failed">Tidak dapat membuka pembelian. Periksa Google Play dan koneksi internet Anda.</string>
     <string name="pro_msg_key_accepted">Kunci diterima</string>
+    <string name="pro_limit_reached">Hari ini Anda telah membersihkan %1$d foto. Batas diatur ulang besok, atau dapatkan Pro tanpa batas.</string>
+    <string name="tip_title">Dukung pengembang</string>
+    <string name="tip_text">MetaCheck dibuat oleh satu pengembang, tanpa iklan atau pelacakan. Pembayaran kecil sekali melalui Google Play tidak membuka fitur apa pun, hanya membantu aplikasi berkembang.</string>
+    <string name="tip_button">Dukung · %1$s</string>
+    <string name="tip_thanks">Terima kasih atas dukungan Anda!</string>
 
     <!-- master_17_gps_map.py -->
     <string name="gps_shield_eyebrow">GPS di file</string>

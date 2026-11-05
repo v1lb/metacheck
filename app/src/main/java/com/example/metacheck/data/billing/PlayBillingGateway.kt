@@ -7,6 +7,7 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -45,6 +46,11 @@ class PlayBillingGateway(
 
     @Volatile
     private var details: ProductDetails? = null
+    @Volatile
+    private var tipDetails: ProductDetails? = null
+    /** Какое окно покупки открыто последним: ответ ITEM_ALREADY_OWNED не говорит, о каком товаре речь. */
+    @Volatile
+    private var lastLaunchWasTip = false
     private val connectLock = Mutex()
 
     private val client: BillingClient = BillingClient.newBuilder(context.applicationContext)
@@ -56,6 +62,8 @@ class PlayBillingGateway(
     private fun onPurchasesUpdated(result: BillingResult, purchases: List<Purchase>?) {
         val event = when (result.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
+                val tips = purchases.orEmpty().filter { it.products.contains(TIP_PRODUCT_ID) && isGenuine(it) }
+                tips.forEach(::consumeIfPurchased)
                 val all = purchases.orEmpty().filter { it.products.contains(PRODUCT_ID) }
                 val ours = all.filter(::isGenuine)
                 ours.forEach { acknowledgeIfNeeded(it) }
@@ -64,11 +72,14 @@ class PlayBillingGateway(
                     ours.isEmpty() && all.isNotEmpty() -> PurchaseEvent.FAILED
                     ours.any { it.purchaseState == Purchase.PurchaseState.PURCHASED } -> PurchaseEvent.COMPLETED
                     ours.any { it.purchaseState == Purchase.PurchaseState.PENDING } -> PurchaseEvent.PENDING
+                    tips.any { it.purchaseState == Purchase.PurchaseState.PURCHASED } -> PurchaseEvent.TIP_COMPLETED
                     else -> PurchaseEvent.UPDATED
                 }
             }
             BillingClient.BillingResponseCode.USER_CANCELED -> PurchaseEvent.CANCELED
-            BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> PurchaseEvent.ALREADY_OWNED
+            // Неизрасходованный платёж поддержки: расходуем при следующей проверке, Pro тут ни при чём.
+            BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED ->
+                if (lastLaunchWasTip) PurchaseEvent.FAILED else PurchaseEvent.ALREADY_OWNED
             else -> PurchaseEvent.FAILED
         }
         onPurchaseUpdate?.invoke(event)
@@ -84,6 +95,8 @@ class PlayBillingGateway(
                     if (result.responseCode != BillingClient.BillingResponseCode.OK) {
                         cont.resume(null)
                     } else {
+                        // Платёж поддержки, который не удалось израсходовать раньше, иначе его нельзя купить снова.
+                        purchases.filter { it.products.contains(TIP_PRODUCT_ID) && isGenuine(it) }.forEach(::consumeIfPurchased)
                         // Покупки с неверной подписью не считаются: ни Pro, ни подтверждения.
                         val ours = purchases.filter { it.products.contains(PRODUCT_ID) && isGenuine(it) }
                         // Повторное подтверждение при каждой проверке: без него через 3 дня Google вернёт деньги.
@@ -129,14 +142,69 @@ class PlayBillingGateway(
         }
     }
 
-    override fun launchPurchase(activity: Activity): Boolean {
-        val product = details ?: return false
+    override suspend fun tipPriceText(): String? = withContext(Dispatchers.Main.immediate) {
+        tipDetails?.let { return@withContext it.oneTimePurchaseOfferDetails?.formattedPrice }
+        if (!ensureConnected()) return@withContext null
+        val found = queryDetails(TIP_PRODUCT_ID)
+        if (found != null) tipDetails = found
+        found?.oneTimePurchaseOfferDetails?.formattedPrice
+    }
+
+    override fun launchTip(activity: Activity): Boolean {
+        val product = tipDetails ?: return false
+        lastLaunchWasTip = true
+        return launchFlow(activity, product)
+    }
+
+    private suspend fun queryDetails(productId: String): ProductDetails? {
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(
+                listOf(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(productId)
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                ),
+            )
+            .build()
+        return withTimeoutOrNull(BILLING_TIMEOUT_MS) {
+            suspendCancellableCoroutine<ProductDetails?> { cont ->
+                client.queryProductDetailsAsync(params) { result, queryResult ->
+                    if (!cont.isActive) return@queryProductDetailsAsync
+                    cont.resume(
+                        if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                            queryResult.productDetailsList.firstOrNull()
+                        } else {
+                            null
+                        },
+                    )
+                }
+            }
+        }
+    }
+
+    private fun launchFlow(activity: Activity, product: ProductDetails): Boolean {
         val flow = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(
                 listOf(BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(product).build()),
             )
             .build()
         return client.launchBillingFlow(activity, flow).responseCode == BillingClient.BillingResponseCode.OK
+    }
+
+    /** Платёж поддержки расходуется сразу: его можно повторить, и он ничего не включает. */
+    private fun consumeIfPurchased(purchase: Purchase) {
+        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+            client.consumeAsync(ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()) { _, _ ->
+                /* при ошибке повторим на следующей проверке покупок (onResume) */
+            }
+        }
+    }
+
+    override fun launchPurchase(activity: Activity): Boolean {
+        val product = details ?: return false
+        lastLaunchWasTip = false
+        return launchFlow(activity, product)
     }
 
     private fun isGenuine(purchase: Purchase): Boolean =
@@ -181,5 +249,12 @@ class PlayBillingGateway(
          * и задайте цену. Пока товара нет, покупка в приложении недоступна.
          */
         const val PRODUCT_ID = "pro_lifetime"
+
+        /**
+         * Разовый расходуемый платёж «Поддержать разработчика».
+         * [ТРЕБУЕТСЯ ВЫ] Создайте в Play Console товар `support_developer` (например, 1,99 €).
+         * Пока товара нет, кнопка поддержки в настройках не показывается.
+         */
+        const val TIP_PRODUCT_ID = "support_developer"
     }
 }

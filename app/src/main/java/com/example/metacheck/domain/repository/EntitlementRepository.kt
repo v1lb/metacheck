@@ -30,6 +30,10 @@ interface EntitlementRepository {
     fun launchPurchase(activity: Activity): Boolean
     suspend fun redeem(token: String): Result<LicenseInfo>
     fun removeLicense()
+
+    /** Цена платежа «Поддержать разработчика»; null, если товар недоступен. */
+    suspend fun tipPriceText(): String? = null
+    fun launchTip(activity: Activity): Boolean = false
 }
 
 /** Тонкий слой над Google Play Billing, чтобы остальной код не зависел от библиотеки. */
@@ -38,6 +42,8 @@ interface BillingGateway {
     suspend fun queryPurchases(): PurchaseSnapshot?
     suspend fun priceText(): String?
     fun launchPurchase(activity: Activity): Boolean
+    suspend fun tipPriceText(): String? = null
+    fun launchTip(activity: Activity): Boolean = false
 
     /** Результат окна покупки и обновления покупок от Play. Вызывается в главном потоке. */
     var onPurchaseUpdate: ((PurchaseEvent) -> Unit)?

@@ -41,7 +41,7 @@ ETIQUETAS DE IA EN EL ARCHIVO
 • Solo se revisan las etiquetas dentro del archivo; la imagen en sí no se analiza. Las redes sociales y las apps de mensajería eliminan las etiquetas, así que en esas imágenes la app indica con honestidad que no hay datos. La ausencia de etiquetas no prueba que una foto sea real.
 
 GRATIS Y PRO
-Gratis: análisis, visor de metadatos, índice de privacidad, GPS Privacy Shield, limpieza y edición de hasta 75 fotos al día, historial de hasta 10 informes.
+Gratis: análisis, visor de metadatos, índice de privacidad, GPS Privacy Shield, limpieza y edición de hasta 10 fotos al día, historial de hasta 10 informes.
 Pro (compra única, sin suscripción): sin límite diario, limpieza por lotes de hasta 50 fotos, exportación PDF y JSON, historial de hasta 50 informes, envío del informe a tu propia API.
 
 PRIVADO POR DISEÑO
@@ -96,7 +96,7 @@ RÓTULOS DE IA NO ARQUIVO
 • Apenas os rótulos dentro do arquivo são verificados; a imagem em si não é analisada. Redes sociais e mensageiros removem os rótulos, então nessas imagens o app informa honestamente que não há dados. A ausência de rótulos não prova que uma foto é real.
 
 GRÁTIS E PRO
-Grátis: análise, visualizador de metadados, índice de privacidade, GPS Privacy Shield, limpeza e edição de até 75 fotos por dia, histórico de até 10 relatórios.
+Grátis: análise, visualizador de metadados, índice de privacidade, GPS Privacy Shield, limpeza e edição de até 10 fotos por dia, histórico de até 10 relatórios.
 Pro (compra única, sem assinatura): sem limite diário, limpeza em lote de até 50 fotos, exportação em PDF e JSON, histórico de até 50 relatórios, envio do relatório para sua própria API.
 
 PRIVADO DESDE A CONCEPÇÃO
@@ -151,7 +151,7 @@ KI-KENNZEICHNUNGEN IN DER DATEI
 • Geprüft werden nur Kennzeichnungen in der Datei; das Bild selbst wird nicht analysiert. Soziale Netzwerke und Messenger entfernen Kennzeichnungen, daher sagt die App bei solchen Bildern ehrlich, dass keine Daten vorliegen. Fehlende Kennzeichnungen beweisen nicht, dass ein Foto echt ist.
 
 KOSTENLOS UND PRO
-Kostenlos: Analyse, Metadaten-Anzeige, Datenschutzwert, GPS Privacy Shield, Bereinigen und Bearbeiten von bis zu 75 Fotos pro Tag, Verlauf mit bis zu 10 Berichten.
+Kostenlos: Analyse, Metadaten-Anzeige, Datenschutzwert, GPS Privacy Shield, Bereinigen und Bearbeiten von bis zu 10 Fotos pro Tag, Verlauf mit bis zu 10 Berichten.
 Pro (Einmalkauf, kein Abo): kein Tageslimit, Stapelbereinigung von bis zu 50 Fotos, PDF- und JSON-Export, Verlauf mit bis zu 50 Berichten, Senden des Berichts an deine eigene API.
 
 PRIVAT VON GRUND AUF
@@ -206,7 +206,7 @@ TOUTES LES MÉTADONNÉES
 • Seules les étiquettes contenues dans le fichier sont vérifiées ; l’image elle-même n’est pas analysée. Les réseaux sociaux et les messageries suppriment les étiquettes : pour ces images, l’application indique honnêtement qu’il n’y a pas de données. L’absence d’étiquette ne prouve pas qu’une photo est réelle.
 
 GRATUIT ET PRO
-Gratuit : analyse, visionneuse de métadonnées, score de confidentialité, GPS Privacy Shield, nettoyage et modification de jusqu’à 75 photos par jour, historique de jusqu’à 10 rapports.
+Gratuit : analyse, visionneuse de métadonnées, score de confidentialité, GPS Privacy Shield, nettoyage et modification de jusqu’à 10 photos par jour, historique de jusqu’à 10 rapports.
 Pro (achat unique, sans abonnement) : sans limite quotidienne, nettoyage par lot de jusqu’à 50 photos, export PDF et JSON, historique de jusqu’à 50 rapports, envoi du rapport vers votre propre API.
 
 PRIVÉ PAR CONCEPTION
@@ -261,7 +261,7 @@ ETICHETTE IA NEL FILE
 • Vengono controllate solo le etichette nel file; l’immagine in sé non viene analizzata. Social network e app di messaggistica rimuovono le etichette, quindi per queste immagini l’app dice onestamente che non ci sono dati. L’assenza di etichette non prova che una foto sia reale.
 
 GRATIS E PRO
-Gratis: analisi, visualizzatore di metadati, punteggio privacy, GPS Privacy Shield, pulizia e modifica fino a 75 foto al giorno, cronologia fino a 10 report.
+Gratis: analisi, visualizzatore di metadati, punteggio privacy, GPS Privacy Shield, pulizia e modifica fino a 10 foto al giorno, cronologia fino a 10 report.
 Pro (acquisto una tantum, nessun abbonamento): nessun limite giornaliero, pulizia in batch fino a 50 foto, esportazione PDF e JSON, cronologia fino a 50 report, invio del report alla tua API.
 
 PRIVATO PER DESIGN
@@ -316,7 +316,7 @@ MetaCheck: видалення EXIF, GPS
 • Перевіряються лише мітки всередині файлу; саме зображення не аналізується. Соцмережі й месенджери видаляють мітки, тож для таких зображень застосунок чесно повідомляє, що даних немає. Відсутність міток не доводить, що фото справжнє.
 
 БЕЗКОШТОВНО І PRO
-Безкоштовно: аналіз, перегляд метаданих, індекс приватності, GPS Privacy Shield, очищення й редагування до 75 фото на день, історія до 10 звітів.
+Безкоштовно: аналіз, перегляд метаданих, індекс приватності, GPS Privacy Shield, очищення й редагування до 10 фото на день, історія до 10 звітів.
 Pro (одноразова покупка, без підписки): без денного ліміту, пакетне очищення до 50 фото, експорт PDF і JSON, історія до 50 звітів, надсилання звіту у ваш власний API.
 
 ПРИВАТНІСТЬ ЗА ЗАДУМОМ
@@ -371,7 +371,7 @@ ETYKIETY AI W PLIKU
 • Sprawdzane są tylko etykiety w pliku; sam obraz nie jest analizowany. Serwisy społecznościowe i komunikatory usuwają etykiety, więc w takich przypadkach aplikacja uczciwie informuje, że brak danych. Brak etykiet nie dowodzi, że zdjęcie jest prawdziwe.
 
 ZA DARMO I PRO
-Za darmo: analiza, podgląd metadanych, wskaźnik prywatności, GPS Privacy Shield, czyszczenie i edycja do 75 zdjęć dziennie, historia do 10 raportów.
+Za darmo: analiza, podgląd metadanych, wskaźnik prywatności, GPS Privacy Shield, czyszczenie i edycja do 10 zdjęć dziennie, historia do 10 raportów.
 Pro (jednorazowy zakup, bez subskrypcji): bez dziennego limitu, czyszczenie wsadowe do 50 zdjęć, eksport PDF i JSON, historia do 50 raportów, wysyłanie raportu do własnego API.
 
 PRYWATNOŚĆ OD PODSTAW
@@ -426,7 +426,7 @@ DOSYADAKİ YAPAY ZEKÂ ETİKETLERİ
 • Yalnızca dosyanın içindeki etiketler kontrol edilir; görüntünün kendisi analiz edilmez. Sosyal ağlar ve mesajlaşma uygulamaları etiketleri siler; bu tür görüntülerde uygulama dürüstçe veri olmadığını söyler. Etiketlerin olmaması fotoğrafın gerçek olduğunu kanıtlamaz.
 
 ÜCRETSİZ VE PRO
-Ücretsiz: analiz, meta veri görüntüleyici, gizlilik puanı, GPS Privacy Shield, günde en fazla 75 fotoğrafı temizleme ve düzenleme, en fazla 10 raporluk geçmiş.
+Ücretsiz: analiz, meta veri görüntüleyici, gizlilik puanı, GPS Privacy Shield, günde en fazla 10 fotoğrafı temizleme ve düzenleme, en fazla 10 raporluk geçmiş.
 Pro (tek seferlik satın alma, abonelik yok): günlük sınır yok, en fazla 50 fotoğrafı toplu temizleme, PDF ve JSON dışa aktarma, en fazla 50 raporluk geçmiş, raporu kendi API’nize gönderme.
 
 TASARIMI GEREĞİ GİZLİ
@@ -481,7 +481,7 @@ LABEL AI DI DALAM FILE
 • Hanya label di dalam file yang diperiksa; gambarnya sendiri tidak dianalisis. Media sosial dan aplikasi pesan menghapus label, jadi untuk gambar seperti itu aplikasi dengan jujur menyatakan tidak ada data. Tidak adanya label tidak membuktikan foto itu asli.
 
 GRATIS DAN PRO
-Gratis: analisis, penampil metadata, skor privasi, GPS Privacy Shield, pembersihan dan edit hingga 75 foto per hari, riwayat hingga 10 laporan.
+Gratis: analisis, penampil metadata, skor privasi, GPS Privacy Shield, pembersihan dan edit hingga 10 foto per hari, riwayat hingga 10 laporan.
 Pro (pembelian sekali, tanpa langganan): tanpa batas harian, pembersihan massal hingga 50 foto, ekspor PDF dan JSON, riwayat hingga 50 laporan, kirim laporan ke API Anda sendiri.
 
 PRIVAT SEJAK AWAL
@@ -536,7 +536,7 @@ MetaCheck：EXIF・GPSを削除
 • 確認するのはファイル内のラベルのみで、画像そのものは分析しません。SNSやメッセージアプリはラベルを削除するため、そうした画像ではデータがないことを正直に表示します。ラベルがないことは、写真が本物である証明にはなりません。
 
 無料版とPro
-無料：分析、メタデータビューアー、プライバシースコア、GPS Privacy Shield、1日75枚までのクリーニングと編集、最大10件の履歴。
+無料：分析、メタデータビューアー、プライバシースコア、GPS Privacy Shield、1日10枚までのクリーニングと編集、最大10件の履歴。
 Pro（買い切り、サブスクリプションなし）：1日の上限なし、最大50枚の一括クリーニング、PDF・JSONの書き出し、最大50件の履歴、独自APIへのレポート送信。
 
 プライバシー重視の設計
@@ -591,7 +591,7 @@ MetaCheck: EXIF·GPS 제거
 • 파일 안의 라벨만 확인하며 이미지 자체는 분석하지 않습니다. SNS와 메신저는 라벨을 제거하므로 이런 이미지에서는 데이터가 없다고 솔직하게 알려줍니다. 라벨이 없다고 사진이 진짜라는 뜻은 아닙니다.
 
 무료와 Pro
-무료: 분석, 메타데이터 뷰어, 개인정보 점수, GPS Privacy Shield, 하루 최대 75장 정리·편집, 최대 10개 보고서 기록.
+무료: 분석, 메타데이터 뷰어, 개인정보 점수, GPS Privacy Shield, 하루 최대 10장 정리·편집, 최대 10개 보고서 기록.
 Pro(1회 구매, 구독 없음): 하루 제한 없음, 최대 50장 일괄 정리, PDF·JSON 내보내기, 최대 50개 보고서 기록, 나만의 API로 보고서 전송.
 
 설계부터 개인정보 보호
@@ -646,7 +646,7 @@ MetaCheck：清除 EXIF 和 GPS
 • 只检查文件中的标签，不分析图像本身。社交网络和即时通讯应用会删除标签，因此对这类图像，应用会如实说明没有数据。没有标签并不能证明照片是真实的。
 
 免费版和 Pro
-免费：分析、元数据查看器、隐私评分、GPS Privacy Shield，每天最多清理和编辑 75 张照片，最多保留 10 份报告记录。
+免费：分析、元数据查看器、隐私评分、GPS Privacy Shield，每天最多清理和编辑 10 张照片，最多保留 10 份报告记录。
 Pro（一次性购买，无需订阅）：无每日上限，批量清理最多 50 张照片，导出 PDF 和 JSON，最多保留 50 份报告记录，可将报告发送到自有 API。
 
 隐私优先的设计

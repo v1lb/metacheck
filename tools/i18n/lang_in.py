@@ -616,4 +616,9 @@ T = {
     'xmp_modify_date': 'Diubah (XMP)',
     'xmp_rights': 'Hak',
     'xmp_title': 'Judul',
+    'pro_limit_reached': 'Hari ini Anda telah membersihkan %1$d foto. Batas diatur ulang besok, atau dapatkan Pro tanpa batas.',
+    'tip_title': 'Dukung pengembang',
+    'tip_text': 'MetaCheck dibuat oleh satu pengembang, tanpa iklan atau pelacakan. Pembayaran kecil sekali melalui Google Play tidak membuka fitur apa pun, hanya membantu aplikasi berkembang.',
+    'tip_button': 'Dukung · %1$s',
+    'tip_thanks': 'Terima kasih atas dukungan Anda!',
 }
