@@ -146,10 +146,7 @@ fun OnboardingFlow(prefs: UiPreferences) {
                             Text(stringResource(R.string.onboarding_language_text),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
-                            AppLanguage.entries.forEach { option ->
-                                SelectTile(stringResource(AppLocales.nameRes(option)), languageDetail(option),
-                                    option == language) { AppLocales.apply(option) }
-                            }
+                            LanguagePicker(language, { AppLocales.apply(it) })
                             NeonButton(stringResource(R.string.onboarding_continue), { step = 2 }, Modifier.fillMaxWidth())
                             CyberOutlineButton(stringResource(R.string.onboarding_skip), ::skip, Modifier.fillMaxWidth())
                         }
@@ -189,14 +186,6 @@ fun OnboardingFlow(prefs: UiPreferences) {
 
 private const val STEPS = 3
 
-/** Подпись под названием языка: для «Как в системе» показываем, какой язык у устройства сейчас. */
-@Composable
-private fun languageDetail(option: AppLanguage): String = when (option) {
-    AppLanguage.SYSTEM -> stringResource(R.string.onboarding_language_system_detail,
-        AppLocales.nativeName(AppLocales.systemLocale()))
-    else -> option.tag.orEmpty().uppercase(Locale.ROOT)
-}
-
 @Composable
 private fun NeonMark() {
     val transition = rememberInfiniteTransition(label = "logo-glow")
@@ -207,28 +196,6 @@ private fun NeonMark() {
         RoundedCornerShape(50)), contentAlignment = Alignment.Center) {
         Icon(Icons.Filled.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(56.dp))
-    }
-}
-
-@Composable
-private fun SelectTile(label: String, description: String, selected: Boolean, onClick: () -> Unit) {
-    val accent = MaterialTheme.colorScheme.primary
-    val shape = RoundedCornerShape(20.dp)
-    Row(Modifier.fillMaxWidth().clip(shape)
-        .border(BorderStroke(if (selected) 2.dp else 1.dp,
-            if (selected) accent else MaterialTheme.colorScheme.outline.copy(alpha = .5f)), shape)
-        .background(MaterialTheme.colorScheme.surface.copy(alpha = .82f))
-        .clickable(onClick = onClick).padding(20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(label, style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface)
-            Text(description, style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Icon(if (selected) Icons.Filled.RadioButtonChecked else Icons.Filled.RadioButtonUnchecked,
-            contentDescription = null, tint = accent)
     }
 }
 

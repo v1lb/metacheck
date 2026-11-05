@@ -30,8 +30,20 @@ object AppLocales {
     @StringRes
     fun nameRes(language: AppLanguage): Int = when (language) {
         AppLanguage.SYSTEM -> R.string.appearance_language_system
-        AppLanguage.RU -> R.string.language_name_ru
         AppLanguage.EN -> R.string.language_name_en
+        AppLanguage.RU -> R.string.language_name_ru
+        AppLanguage.ES -> R.string.language_name_es
+        AppLanguage.PT_BR -> R.string.language_name_pt_br
+        AppLanguage.DE -> R.string.language_name_de
+        AppLanguage.FR -> R.string.language_name_fr
+        AppLanguage.IT -> R.string.language_name_it
+        AppLanguage.UK -> R.string.language_name_uk
+        AppLanguage.PL -> R.string.language_name_pl
+        AppLanguage.TR -> R.string.language_name_tr
+        AppLanguage.ID -> R.string.language_name_id
+        AppLanguage.JA -> R.string.language_name_ja
+        AppLanguage.KO -> R.string.language_name_ko
+        AppLanguage.ZH_CN -> R.string.language_name_zh_cn
     }
 
     /** Язык устройства, а не приложения: Resources.getSystem() не видит переопределение AppCompat. */

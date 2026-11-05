@@ -10,6 +10,8 @@
                Для plurals вместо строки словарь {"one": ..., "few": ..., "other": ...}.
   lang_<tag>.py  дополнительный язык: словарь T = {key: текст или словарь plurals}
                → values-<tag>/strings.xml. Должен переводить все переводимые ключи.
+               <tag> — квалификатор Android: es, pt-rBR, zh-rCN, in (индонезийский) и т. п.
+               Переводы без проверки носителем языка: правки присылайте в lang_<tag>.py.
 
 Запуск:
   python3 tools/i18n/gen.py            записать XML
@@ -116,7 +118,8 @@ def validate(entries, extra):
                 if not isinstance(forms, dict):
                     errors.append(f'{lang}: {key} must be plurals')
                     continue
-                need = PLURAL_FORMS.get(lang, {'other'})
+                base_lang = {'in': 'id'}.get(lang.split('-')[0], lang.split('-')[0])
+                need = PLURAL_FORMS.get(base_lang, {'other'})
                 if need - set(forms):
                     errors.append(f'{lang}: plural {key} missing {sorted(need - set(forms))}')
                 for text in forms.values():

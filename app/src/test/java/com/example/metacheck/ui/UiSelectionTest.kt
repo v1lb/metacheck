@@ -19,7 +19,12 @@ class UiSelectionTest {
         assertEquals(AppLanguage.EN, AppLanguage.fromTags("en-GB"))
         assertEquals(AppLanguage.EN, AppLanguage.fromTags(" EN_us "))
         // Язык без перевода: интерфейс всё равно покажет values/, честнее считать это «как в системе».
-        assertEquals(AppLanguage.SYSTEM, AppLanguage.fromTags("de-DE"))
+        assertEquals(AppLanguage.SYSTEM, AppLanguage.fromTags("ar-EG"))
+        assertEquals(AppLanguage.DE, AppLanguage.fromTags("de-AT"))
+        assertEquals(AppLanguage.PT_BR, AppLanguage.fromTags("pt-PT"))
+        assertEquals(AppLanguage.PT_BR, AppLanguage.fromTags("pt_BR"))
+        assertEquals(AppLanguage.ZH_CN, AppLanguage.fromTags("zh-CN,en"))
+        assertEquals(AppLanguage.ID, AppLanguage.fromTags("in-ID"))
     }
     @Test fun everyExplicitLanguageHasATag() {
         AppLanguage.entries.filter { it != AppLanguage.SYSTEM }.forEach {

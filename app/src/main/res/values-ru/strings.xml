@@ -272,7 +272,7 @@
     <string name="result_tab_map">Карта</string>
     <string name="result_eyebrow_report">Отчёт · на этом устройстве</string>
     <string name="result_badge_local">На устройстве</string>
-    <string name="result_no_gps">В этом файле нет читаемых GPS-координат. Если вы уверены, что они были, выберите оригинал фото кнопкой «Выбрать фотографию» и разрешите доступ к геометкам.</string>
+    <string name="result_no_gps">В этом файле нет читаемых GPS-координат. Если вы уверены, что они были, выберите оригинал фото кнопкой «Проверить фото» и разрешите доступ к геометкам.</string>
     <string name="result_eyebrow_engine">Метки ИИ в метаданных</string>
     <string name="result_verdict_ai">Обнаружены признаки ИИ</string>
     <string name="result_verdict_attention">Нужна дополнительная проверка</string>

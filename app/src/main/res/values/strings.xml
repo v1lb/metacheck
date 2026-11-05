@@ -271,7 +271,7 @@
     <string name="result_tab_map">Map</string>
     <string name="result_eyebrow_report">Report · on this device</string>
     <string name="result_badge_local">On device</string>
-    <string name="result_no_gps">This file has no readable GPS coordinates. If you are sure it had them, choose the original photo with “Choose photo” and allow access to photo locations.</string>
+    <string name="result_no_gps">This file has no readable GPS coordinates. If you are sure it had them, choose the original photo with “Check a photo” and allow access to photo locations.</string>
     <string name="result_eyebrow_engine">AI labels in metadata</string>
     <string name="result_verdict_ai">AI indicators found</string>
     <string name="result_verdict_attention">Further checking needed</string>
@@ -535,6 +535,18 @@
     <string name="appearance_save_failed">Could not save the setting</string>
     <string name="language_name_ru" translatable="false">Русский</string>
     <string name="language_name_en" translatable="false">English</string>
+    <string name="language_name_es" translatable="false">Español</string>
+    <string name="language_name_pt_br" translatable="false">Português (Brasil)</string>
+    <string name="language_name_de" translatable="false">Deutsch</string>
+    <string name="language_name_fr" translatable="false">Français</string>
+    <string name="language_name_it" translatable="false">Italiano</string>
+    <string name="language_name_uk" translatable="false">Українська</string>
+    <string name="language_name_pl" translatable="false">Polski</string>
+    <string name="language_name_tr" translatable="false">Türkçe</string>
+    <string name="language_name_id" translatable="false">Bahasa Indonesia</string>
+    <string name="language_name_ja" translatable="false">日本語</string>
+    <string name="language_name_ko" translatable="false">한국어</string>
+    <string name="language_name_zh_cn" translatable="false">简体中文</string>
 
     <!-- master_15_onboarding.py -->
     <string name="onboarding_step" translatable="false">%1$02d / %2$02d</string>
