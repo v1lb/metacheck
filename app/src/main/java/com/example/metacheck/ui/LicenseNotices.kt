@@ -10,7 +10,8 @@ AndroidX (Core KTX 1.17.0, AppCompat 1.7.1, Lifecycle 2.9.2, Activity 1.10.1, Ex
 Jetpack Compose (BOM 2025.08.00): Apache License 2.0
 Kotlin Coroutines 1.10.2: Apache License 2.0
 OkHttp 4.12.0 and Okio: Apache License 2.0
-Google Play Billing Library 8.0.0: Android Software Development Kit License"""
+Google Play Billing Library 8.0.0: Android Software Development Kit License
+Google Play In-App Review 2.0.1: Android Software Development Kit License"""
 
     const val LICENSE_LINKS = """Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0
 Android SDK License: https://developer.android.com/studio/terms"""

@@ -30,6 +30,14 @@ class ProViewModel(private val repository: EntitlementRepository) : ViewModel() 
     private val _price = MutableStateFlow<String?>(null)
     val price: StateFlow<String?> = _price.asStateFlow()
 
+    private val _tipPrice = MutableStateFlow<String?>(null)
+    /** Цена «Поддержать разработчика». null: товар не создан в Play Console или Play недоступен, кнопку не показываем. */
+    val tipPrice: StateFlow<String?> = _tipPrice.asStateFlow()
+
+    /** Окно Pro открыто из-за исчерпанного дневного лимита: показываем это первой строкой. */
+    private val _limitReached = MutableStateFlow(false)
+    val limitReached: StateFlow<Boolean> = _limitReached.asStateFlow()
+
     private val _info = MutableStateFlow<UiText?>(null)
     val info: StateFlow<UiText?> = _info.asStateFlow()
 
@@ -66,10 +74,28 @@ class ProViewModel(private val repository: EntitlementRepository) : ViewModel() 
         PurchaseEvent.PENDING -> UiText.Res(R.string.pro_payment_pending)
         PurchaseEvent.ALREADY_OWNED -> UiText.Res(R.string.pro_msg_restored)
         PurchaseEvent.FAILED -> UiText.Res(R.string.pro_msg_failed)
+        PurchaseEvent.TIP_COMPLETED -> UiText.Res(R.string.tip_thanks)
         PurchaseEvent.CANCELED, PurchaseEvent.UPDATED -> null
     }
 
+    fun loadTipPrice() {
+        viewModelScope.launch {
+            _tipPrice.value = try { repository.tipPriceText() } catch (e: CancellationException) { throw e } catch (_: Exception) { null }
+        }
+    }
+
+    fun tip(activity: Activity) {
+        if (!repository.launchTip(activity)) _message.value = UiText.Res(R.string.pro_msg_launch_failed)
+    }
+
+    /** Дневной лимит бесплатной очистки исчерпан: предлагаем Pro, без давления. */
+    fun openPaywallForLimit() {
+        openPaywall()
+        _limitReached.value = true
+    }
+
     fun openPaywall() {
+        _limitReached.value = false
         _info.value = null
         _paywallVisible.value = true
         viewModelScope.launch {

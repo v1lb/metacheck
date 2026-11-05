@@ -571,6 +571,11 @@
     <string name="pro_msg_failed">구매가 완료되지 않았습니다. 나중에 다시 시도하세요.</string>
     <string name="pro_msg_launch_failed">구매 화면을 열 수 없습니다. Google Play와 인터넷 연결을 확인하세요.</string>
     <string name="pro_msg_key_accepted">키가 승인되었습니다</string>
+    <string name="pro_limit_reached">오늘 사진 %1$d장을 정리했습니다. 한도는 내일 초기화되며, Pro는 제한이 없습니다.</string>
+    <string name="tip_title">개발자 응원하기</string>
+    <string name="tip_text">MetaCheck는 광고나 추적 없이 개발자 한 명이 만들고 있습니다. Google Play를 통한 소액 1회 결제로 잠금 해제되는 기능은 없지만, 앱 발전에 도움이 됩니다.</string>
+    <string name="tip_button">응원하기 · %1$s</string>
+    <string name="tip_thanks">응원해 주셔서 감사합니다!</string>
 
     <!-- master_17_gps_map.py -->
     <string name="gps_shield_eyebrow">파일의 GPS</string>

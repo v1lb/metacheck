@@ -575,6 +575,11 @@
     <string name="pro_msg_failed">A compra não foi concluída. Tente novamente mais tarde.</string>
     <string name="pro_msg_launch_failed">Não foi possível abrir a compra. Verifique o Google Play e sua conexão com a internet.</string>
     <string name="pro_msg_key_accepted">Chave aceita</string>
+    <string name="pro_limit_reached">Hoje você limpou %1$d fotos. O limite reinicia amanhã, ou adquira o Pro sem limites.</string>
+    <string name="tip_title">Apoiar o desenvolvedor</string>
+    <string name="tip_text">O MetaCheck é feito por um único desenvolvedor, sem anúncios nem rastreamento. Um pequeno pagamento único pelo Google Play não libera nada: só ajuda o app a crescer.</string>
+    <string name="tip_button">Apoiar · %1$s</string>
+    <string name="tip_thanks">Obrigado pelo apoio!</string>
 
     <!-- master_17_gps_map.py -->
     <string name="gps_shield_eyebrow">GPS no arquivo</string>

@@ -82,7 +82,7 @@ class MetadataStudioViewModel(
             val target = withContext(Dispatchers.IO) { copies.newTarget(source) }
             studio.strip(source, target.uri.toString()).fold(
                 onSuccess = {
-                    if (it.verified) _shareReady.value = target
+                    if (it.verified) { _shareReady.value = target; AppPrompts.cleanSucceeded() }
                     else { copies.discard(target); _message.value = UiText.Res(R.string.share_not_verified) }
                 },
                 onFailure = { copies.discard(target); _message.value = failMessage(it) },
@@ -194,6 +194,16 @@ class MetadataStudioViewModel(
         verified: Boolean,
         downscaled: Boolean,
         extra: UiText? = null,
+    ): UiText {
+        if (verified) AppPrompts.cleanSucceeded()
+        return successMessageText(title, verified, downscaled, extra)
+    }
+
+    private fun successMessageText(
+        @androidx.annotation.StringRes title: Int,
+        verified: Boolean,
+        downscaled: Boolean,
+        extra: UiText?,
     ): UiText = UiText.Joined(
         listOfNotNull(
             UiText.Res(title),
@@ -204,7 +214,10 @@ class MetadataStudioViewModel(
         separator = " ",
     )
 
-    private fun failMessage(error: Throwable): UiText = ErrorTexts.operationFailed(error)
+    private fun failMessage(error: Throwable): UiText {
+        if (error is com.example.metacheck.domain.metadata.DailyLimitReachedException) AppPrompts.dailyLimitReached()
+        return ErrorTexts.operationFailed(error)
+    }
 
     companion object {
         /** Пустой файл, созданный диалогом, остаётся у пользователя: удалять его без операции не будем. */

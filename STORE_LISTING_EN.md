@@ -35,7 +35,7 @@ AI LABELS IN THE FILE
 • Only labels inside the file are checked; the picture itself is not analyzed. Social networks and messengers strip labels, so for such images the app honestly says there is no data. Missing labels do not prove a photo is real.
 
 FREE AND PRO
-Free: analysis, metadata viewer, privacy score, GPS Privacy Shield, cleaning and editing up to 75 photos per day, a history of up to 10 reports.
+Free: analysis, metadata viewer, privacy score, GPS Privacy Shield, cleaning and editing up to 10 photos per day, a history of up to 10 reports.
 Pro (one-time purchase, no subscription): no daily limit, batch cleaning of up to 50 photos, PDF and JSON export, a history of up to 50 reports, sending a report to your own API.
 
 PRIVATE BY DESIGN

@@ -573,6 +573,11 @@
     <string name="pro_msg_failed">Satın alma tamamlanmadı. Lütfen daha sonra tekrar deneyin.</string>
     <string name="pro_msg_launch_failed">Satın alma açılamadı. Google Play’i ve internet bağlantınızı kontrol edin.</string>
     <string name="pro_msg_key_accepted">Anahtar kabul edildi</string>
+    <string name="pro_limit_reached">Bugün %1$d fotoğraf temizlediniz. Sınır yarın sıfırlanır ya da sınırsız Pro’ya geçin.</string>
+    <string name="tip_title">Geliştiriciyi destekle</string>
+    <string name="tip_text">MetaCheck’i reklamsız ve izleme olmadan tek bir geliştirici yapıyor. Google Play üzerinden küçük, tek seferlik bir ödeme hiçbir şeyin kilidini açmaz; yalnızca uygulamanın gelişmesine yardımcı olur.</string>
+    <string name="tip_button">Destekle · %1$s</string>
+    <string name="tip_thanks">Desteğiniz için teşekkürler!</string>
 
     <!-- master_17_gps_map.py -->
     <string name="gps_shield_eyebrow">Dosyada GPS</string>

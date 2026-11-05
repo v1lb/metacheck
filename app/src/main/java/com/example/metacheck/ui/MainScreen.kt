@@ -399,6 +399,13 @@ fun MainScreen(
         }
     }
 
+    val promptActivity = LocalContext.current.findActivity()
+    LaunchedEffect(Unit) {
+        AppPrompts.paywall.collect { if (!entitlement.isPro) proVm.openPaywallForLimit() }
+    }
+    LaunchedEffect(promptActivity) {
+        AppPrompts.review.collect { promptActivity?.let(ReviewPrompt::onCleanSucceeded) }
+    }
     LaunchedEffect(entitlement.isPro, paywallVisible) {
         if (entitlement.isPro && paywallVisible) proVm.dismissPaywall()
     }

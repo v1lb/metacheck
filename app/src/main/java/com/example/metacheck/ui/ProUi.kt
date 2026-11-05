@@ -43,6 +43,7 @@ fun PaywallDialog(vm: ProViewModel) {
     val price by vm.price.collectAsStateWithLifecycle()
     val info by vm.info.collectAsStateWithLifecycle()
     val entitlement by vm.entitlement.collectAsStateWithLifecycle()
+    val limitReached by vm.limitReached.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var keyInput by remember { mutableStateOf("") }
 
@@ -57,6 +58,10 @@ fun PaywallDialog(vm: ProViewModel) {
             // Прокрутка: на маленьком экране с открытой клавиатурой (поле ключа) текст и кнопки обрезались.
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 CyberEyebrow(stringResource(R.string.pro_eyebrow), color = MaterialTheme.colorScheme.primary)
+                if (limitReached) {
+                    Text(stringResource(R.string.pro_limit_reached, DailyCleanQuota.FREE_DAILY_LIMIT),
+                        style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                }
                 Text(stringResource(R.string.pro_free_features, DailyCleanQuota.FREE_DAILY_LIMIT))
                 Text(stringResource(R.string.pro_pro_features))
                 Text(stringResource(R.string.pro_one_time),
@@ -116,7 +121,7 @@ fun proStatusText(e: Entitlement): String = when (e.source) {
     }
 }
 
-private tailrec fun Context.findActivity(): Activity? = when (this) {
+internal tailrec fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this
     is ContextWrapper -> baseContext.findActivity()
     else -> null

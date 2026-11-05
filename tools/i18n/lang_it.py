@@ -617,4 +617,9 @@ T = {
     'xmp_modify_date': 'Modificato (XMP)',
     'xmp_rights': 'Diritti',
     'xmp_title': 'Titolo',
+    'pro_limit_reached': 'Oggi hai pulito %1$d foto. Il limite si azzera domani, oppure passa a Pro senza limiti.',
+    'tip_title': 'Sostieni lo sviluppatore',
+    'tip_text': 'MetaCheck è creato da un solo sviluppatore, senza pubblicità né tracciamento. Un piccolo pagamento una tantum tramite Google Play non sblocca nulla: aiuta solo l’app a crescere.',
+    'tip_button': 'Sostieni · %1$s',
+    'tip_thanks': 'Grazie per il tuo supporto!',
 }

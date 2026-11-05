@@ -15,6 +15,7 @@ Versions follow `gradle/libs.versions.toml` (the app shows the same list: About 
 | Kotlin Coroutines | 1.10.2 | Apache License 2.0 |
 | OkHttp (and Okio) | 4.12.0 | Apache License 2.0 |
 | Google Play Billing Library | 8.0.0 | Android SDK license (Google), see https://developer.android.com/studio/terms |
+| Google Play In-App Review | 2.0.1 | Android SDK license (Google), see https://developer.android.com/studio/terms |
 
 Apache License 2.0 text: https://www.apache.org/licenses/LICENSE-2.0
 

@@ -133,6 +133,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.okhttp)
     implementation(libs.billing)
+    implementation(libs.play.review)
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
