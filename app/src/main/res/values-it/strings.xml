@@ -9,6 +9,7 @@
     <string name="section_dates">Date</string>
     <string name="section_gps">Geolocalizzazione EXIF</string>
     <string name="section_authorship">Software e autore</string>
+    <string name="section_container">Tag del contenitore video</string>
     <string name="exif_make">Produttore</string>
     <string name="exif_model">Modello</string>
     <string name="exif_lens_make">Produttore obiettivo</string>
@@ -104,6 +105,12 @@
     <string name="group_exif">EXIF tecnico</string>
     <string name="group_xmp">XMP / IPTC</string>
     <string name="group_png">PNG / testo</string>
+    <string name="group_video">Video</string>
+    <string name="label_video_duration">Durata</string>
+    <string name="label_video_codec">Codec video</string>
+    <string name="label_video_created">Creato (UTC)</string>
+    <string name="label_video_location">Luogo di ripresa (ISO 6709)</string>
+    <string name="label_video_title">Titolo</string>
     <string name="catalog_file_section">File</string>
     <string name="catalog_coordinates_section">Coordinate</string>
     <string name="field_name">Nome</string>
@@ -198,6 +205,8 @@
     <string name="failure_overwrite_edit_jpeg_only">La modifica EXIF con sovrascrittura è supportata per JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">La sovrascrittura durante la pulizia supporta solo JPEG e PNG: salva gli altri formati come nuova copia</string>
     <string name="failure_wipe_gps_jpeg_png_only">La rimozione del GPS supporta JPEG e PNG</string>
+    <string name="failure_video_unsupported">Questo video non può essere pulito senza ricodifica: la struttura del file non è supportata (file frammentato, crittografato o danneggiato)</string>
+    <string name="failure_not_enough_space">Spazio libero insufficiente sul dispositivo per la copia pulita</string>
     <string name="failure_decode_failed">Impossibile leggere i pixel. Prova un’altra immagine</string>
     <string name="failure_encode_failed">Codifica dell’immagine non riuscita</string>
     <string name="failure_out_of_memory">Memoria insufficiente per elaborare l’immagine</string>
@@ -372,8 +381,8 @@
     <string name="dash_eyebrow_secure">Controllo privacy delle foto</string>
     <string name="dash_title">Cosa rivela la tua foto?</string>
     <string name="dash_subtitle">Posizione, fotocamera, autore ed etichette IA nascosti nel file. Controllali e rimuovili prima di inviare.</string>
-    <string name="dash_scan_hint">Scegli il JPEG, PNG o HEIC originale: uno screenshot ha già perso parte dei dati.</string>
-    <string name="dash_choose_photo">Controlla una foto</string>
+    <string name="dash_scan_hint">Scegli il JPEG, PNG o HEIC originale o un video MP4/MOV: uno screenshot ha già perso parte dei dati.</string>
+    <string name="dash_choose_photo">Controlla una foto o un video</string>
     <string name="dash_camera">Fotocamera</string>
     <string name="dash_clipboard">Appunti</string>
     <string name="dash_eyebrow_studio">Studio metadati</string>
@@ -556,8 +565,8 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">GRATIS  →  PRO</string>
-    <string name="pro_free_features">Gratis: scansione e GPS Privacy Shield, visualizzatore EXIF, modifica e pulizia fino a %1$d foto al giorno (UTC), 10 report in cronologia.</string>
-    <string name="pro_pro_features">Pro: pulizia e modifica illimitate, elaborazione in batch fino a 50 foto, PDF/JSON, 50 report, API.</string>
+    <string name="pro_free_features">Gratis: scansione di foto e video e GPS Privacy Shield, visualizzatore EXIF, modifica e pulizia fino a %1$d foto al giorno (UTC), 10 report in cronologia.</string>
+    <string name="pro_pro_features">Pro: pulizia e modifica illimitate, pulizia dei video (MP4, MOV) senza ricodifica, elaborazione in batch fino a 50 foto, PDF/JSON, 50 report, API.</string>
     <string name="pro_one_time">Acquisto una tantum tramite Google Play, nessun abbonamento.</string>
     <string name="pro_key_label">Chiave Pro, se ne hai una</string>
     <string name="pro_key_apply">Applica chiave</string>
@@ -585,11 +594,15 @@
     <string name="gps_shield_eyebrow">GPS nel file</string>
     <string name="gps_shield_title_point">Il luogo dello scatto è salvato nella foto</string>
     <string name="gps_shield_title_tags">Trovati tag di posizione nella foto</string>
+    <string name="gps_shield_title_point_video">Il luogo delle riprese è salvato nel video</string>
+    <string name="gps_shield_title_tags_video">Trovati tag di posizione nel video</string>
     <string name="gps_shield_text_point">Se condividi l’originale senza pulirlo, chi lo riceve potrebbe vedere le coordinate del luogo dello scatto.</string>
     <string name="gps_shield_text_tags">I metadati contengono informazioni sulla posizione, ma non è stato possibile leggere le coordinate esatte.</string>
     <string name="gps_shield_not_tracking">Ciò non significa che tu sia tracciato. Il rischio nasce quando condividi un file con tag di posizione.</string>
     <string name="gps_shield_advice">Prima di condividere è meglio creare una copia senza GPS: un modo semplice per proteggere la tua posizione.</string>
     <string name="gps_shield_action">Proteggi la foto · rimuovi il GPS</string>
+    <string name="gps_shield_action_video">Proteggi il video · rimuovi i metadati</string>
+    <string name="gps_shield_action_note_video">Il video viene copiato senza ricodifica, la qualità resta la stessa. L’originale non cambia. La pulizia dei video è una funzione Pro.</string>
     <string name="gps_shield_action_note">Dopo il tocco, scegli dove salvare la nuova copia. L’originale resta invariato. Condividi la copia. Gratis: fino a %1$d foto al giorno.</string>
     <string name="gps_shield_open_original">Per rimuovere i tag di posizione, apri la foto JPEG/PNG originale: un report salvato non contiene la foto.</string>
     <string name="gps_shield_coordinates">Coordinate nel file originale</string>
@@ -628,7 +641,7 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Privacy</string>
-    <string name="privacy_title">Cosa rivela questa foto</string>
+    <string name="privacy_title">Cosa rivela questo file</string>
     <string name="privacy_hint">Chiunque riceva il file originale può vederlo.</string>
     <string name="privacy_none_text">Nessuna posizione, nome o numero di serie del dispositivo nei metadati.</string>
     <string name="privacy_level_none">Niente di personale</string>
@@ -651,7 +664,7 @@
     <string name="privacy_clean_share">Pulisci e condividi</string>
     <string name="privacy_clean_save">Pulisci e salva una copia</string>
     <string name="share_target_label">Invia senza metadati</string>
-    <string name="share_chooser_title">Invia la foto pulita</string>
-    <string name="share_no_app">Nessuna app trovata per condividere la foto</string>
+    <string name="share_chooser_title">Invia la copia pulita</string>
+    <string name="share_no_app">Nessuna app trovata per condividere il file</string>
     <string name="share_not_verified">Non è stato possibile verificare la copia pulita, quindi non è stata condivisa</string>
 </resources>

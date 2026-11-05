@@ -114,7 +114,8 @@ class MainActivity : AppCompatActivity() {
 
     /** Приём «Поделиться». Тип проверяем сами, а схему URI (только content://) проверяет репозиторий. */
     private fun handleSharedImage(intent: Intent?) {
-        if (intent?.action != Intent.ACTION_SEND || intent.type?.startsWith("image/") != true) return
+        val type = intent?.type.orEmpty()
+        if (intent?.action != Intent.ACTION_SEND || !(type.startsWith("image/") || type.startsWith("video/"))) return
         val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java) ?: return
         // Второй пункт в меню «Поделиться» (activity-alias): сразу очистить и переслать дальше.
         // Для него разрешение не нужно: всё равно удаляется всё, а лишний диалог сломал бы «одно касание».

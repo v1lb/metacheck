@@ -11,7 +11,14 @@ enum class ImageFormat(val label: String) {
     GIF("GIF"),
     HEIC("HEIC/HEIF"),
     AVIF("AVIF"),
+    /** Видео ISO BMFF (MP4, M4V, 3GP). */
+    MP4("MP4"),
+    /** Видео QuickTime (MOV), так снимает iPhone. */
+    MOV("MOV"),
     UNKNOWN("unknown"),
+    ;
+
+    val isVideo: Boolean get() = this == MP4 || this == MOV
 }
 
 /**
@@ -51,7 +58,11 @@ data class MetaItem(
 )
 
 /** Смысловой раздел EXIF. Заголовок раздела локализует интерфейс по ключу. */
-enum class SectionKey { CAMERA, EXPOSURE, IMAGE, DATES, GPS, AUTHORSHIP }
+enum class SectionKey {
+    CAMERA, EXPOSURE, IMAGE, DATES, GPS, AUTHORSHIP,
+    /** Прочие теги контейнера видео (QuickTime/MP4): подпись — техническое имя тега. */
+    CONTAINER,
+}
 
 data class MetaSection(val title: String, val items: List<MetaItem>, val key: SectionKey? = null)
 

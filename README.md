@@ -63,6 +63,11 @@ com.example.metacheck
   that cleans the photo and passes it on in one step.
 - GPS removal from JPEG without re-encoding; tag editing for JPEG EXIF only; overwriting the original only
   after a verified external backup.
+- Videos (MP4, MOV, 3GP): the app reads moov/udta, mdta keys (iPhone, Android), 3GPP loci, XMP and C2PA without
+  third-party libraries. Cleaning is Pro only and does not re-encode: udta/meta/uuid boxes and every track except
+  video and audio are removed (the data of removed tracks, such as timecode or GPS telemetry, is zeroed in mdat),
+  creation times are zeroed, chunk offsets are recomputed. The result is checked as a byte stream before it is
+  written and read back after. Fragmented and encrypted files are refused (`data/video/Mp4Cleaner.kt`).
 
 ## Privacy and security
 - Permissions: `INTERNET` (map on button press, optional API), `ACCESS_MEDIA_LOCATION` (GPS from photos),

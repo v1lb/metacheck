@@ -5,15 +5,15 @@ lang: en
 
 # MetaCheck Privacy Policy
 
-**Effective date:** 2026-11-03
+**Effective date:** 2026-11-06
 **Developer:** Puwer Studio
 **Contact:** werk9886@gmail.com
 
 ## 1. In short
-MetaCheck shows image metadata (EXIF, GPS, XMP, PNG text chunks, Content Credentials), looks for signs of AI generation in it, and lets you save a copy with cleaned metadata. The analysis runs on your device. The developer has no servers that the app sends your images, metadata or history to. The app has no user accounts, ads or analytics.
+MetaCheck shows the metadata of photos and videos (EXIF, GPS, XMP, PNG text chunks, MP4/MOV container tags, Content Credentials), looks for signs of AI generation in it, and lets you save a copy with cleaned metadata. The analysis runs on your device. The developer has no servers that the app sends your images, metadata or history to. The app has no user accounts, ads or analytics.
 
 ## 2. What is stored on your device
-- **Images.** Images you choose (from the system file picker, via Share, or from a camera shot) are processed on the device. The app does not upload them. Camera shots are kept temporarily in the app cache and deleted automatically.
+- **Photos and videos.** Files you choose (from the system file picker, via Share, or from a camera shot) are processed on the device. The app does not upload them. Camera shots are kept temporarily in the app cache and deleted automatically.
 - **Report history.** If history is on, reports are stored only on the device, encrypted. They may contain file metadata, including GPS coordinates. You can turn history off and clear it in Settings.
 - **Settings and API keys.** Stored locally. API keys are encrypted with Android Keystore.
 - **File copies.** Cleaned copies are saved where you choose in the system dialog. The original file is not changed by default.
@@ -28,14 +28,14 @@ By default the app transmits nothing. Data is sent only after your own action:
   Tiles are requested by number, so the map provider can determine the location of the point shown to within a few hundred metres (the map opens at street level), which Google Play treats as precise location, and it also sees your IP address and the app name. The provider may use a content delivery network (CDN) that also processes your IP address. The image and its metadata are not sent. Downloaded tiles are cached on the device (up to 50 MB) and removed with the cache or the app.
 - **Address search.** If you tap "Find on map", the text you typed is handled by your phone's system geocoder (on many devices this is a Google service). The app itself does not store or forward the query.
 - **API check (optional).** If you turn it on in Settings, enter a server address and tap "Check via API", a text JSON report is sent to that address. It does not contain the image, and GPS coordinates are excluded unless you enable them separately. The server you choose receives the data; the MetaCheck developer does not.
-- **"Send without metadata".** If you choose this option, the app creates a cleaned copy of the photo and passes it to the app you selected in the Share window. The copy is kept temporarily in the MetaCheck cache and deleted within a day. The MetaCheck developer does not receive it.
+- **"Send without metadata".** If you choose this option, the app creates a cleaned copy of the photo or video and passes it to the app you selected in the Share window. The copy is kept temporarily in the MetaCheck cache and deleted within a day. The MetaCheck developer does not receive it.
 - **Purchases.** Pro is bought through Google Play, and Google processes payment data. The app only receives confirmation of the purchase.
 
 MapTiler, OpenStreetMap and Google servers may be located outside your country.
 
 ## 4. Android permissions
 - **Internet and network state** — only to load the map when you press the button, to send an optional report to your address, and to check whether a network is available.
-- **Access to location in media (ACCESS_MEDIA_LOCATION)** — to read the coordinates stored in your photos. Coordinates are processed on the device.
+- **Access to location in media (ACCESS_MEDIA_LOCATION)** — to read the coordinates stored in your photos and videos. Coordinates are processed on the device.
 - **Google Play billing (BILLING)** — to make and verify the Pro purchase.
 
 The app does not request direct access to your gallery, camera, shared storage or Wi-Fi: files are chosen and saved through system dialogs, and photos are taken by your phone's camera app. If a library the app uses declares such permissions, they are removed at build time.

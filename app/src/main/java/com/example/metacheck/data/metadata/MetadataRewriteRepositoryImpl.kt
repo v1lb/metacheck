@@ -20,6 +20,13 @@ import com.example.metacheck.domain.metadata.BatchProgress
 import com.example.metacheck.domain.metadata.MetadataPatch
 import com.example.metacheck.domain.metadata.MetadataRewriteRepository
 import com.example.metacheck.domain.metadata.MetadataWriteResult
+import com.example.metacheck.data.parser.ImageFormatDetector
+import com.example.metacheck.data.video.Mp4Cleaner
+import com.example.metacheck.data.video.Mp4FormatException
+import com.example.metacheck.data.video.VideoFiles
+import java.io.BufferedOutputStream
+import java.security.DigestOutputStream
+import java.security.MessageDigest
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
@@ -190,6 +197,79 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             progress(report)
         }
         report.copy(running = false, current = "").also(progress)
+    }
+
+    override suspend fun isVideo(source: String): Boolean = withContext(Dispatchers.IO) {
+        ImageFormatDetector.detect(VideoFiles.head(resolver, checkedUri(source))).isVideo
+    }
+
+    /**
+     * Видео не копируется во временный файл (оно может весить гигабайты): очищенный файл проверяется
+     * до записи как поток байтов, затем пишется сразу в место назначения и перечитывается для сверки.
+     */
+    override suspend fun stripVideoCopy(source: String, destination: String): MetadataWriteResult = withContext(Dispatchers.IO) {
+        val src = checkedUri(source); val dst = checkedUri(destination)
+        ensure(src != dst, FailureCode.SAME_AS_SOURCE)
+        val job = coroutineContext
+        VideoFiles.open(resolver, src, context.cacheDir).use { opened ->
+            val plan = try { Mp4Cleaner.plan(opened.source) } catch (e: Mp4FormatException) {
+                throw AppFailure(FailureCode.VIDEO_UNSUPPORTED, cause = e)
+            }
+            ensure(Mp4Cleaner.isClean(Mp4Cleaner.output(plan)), FailureCode.CLEAN_CHECK_FAILED)
+            if (dst.authority == "${context.packageName}.fileprovider" &&
+                context.cacheDir.usableSpace < plan.outputBytes + SPACE_RESERVE) {
+                throw AppFailure(FailureCode.NOT_ENOUGH_SPACE)
+            }
+            val digest = MessageDigest.getInstance("SHA-256")
+            try {
+                openVideoOutput(dst).use { raw ->
+                    val out = DigestOutputStream(BufferedOutputStream(raw, 1 shl 20), digest)
+                    Mp4Cleaner.write(plan, out) { job.ensureActive() }
+                    out.flush()
+                    (raw as? FileOutputStream)?.fd?.sync()
+                }
+            } catch (e: Exception) {
+                truncate(dst)
+                if (e is IOException && e !is AppFailure && context.cacheDir.usableSpace < SPACE_RESERVE) throw AppFailure(FailureCode.NOT_ENOUGH_SPACE, cause = e)
+                throw e
+            }
+            val expected = digest.digest()
+            val saved = runCatching {
+                resolver.openInputStream(dst)?.use { input ->
+                    val check = MessageDigest.getInstance("SHA-256")
+                    val buffer = ByteArray(1 shl 20)
+                    var total = 0L
+                    while (true) {
+                        job.ensureActive()
+                        val n = input.read(buffer)
+                        if (n < 0) break
+                        check.update(buffer, 0, n); total += n
+                    }
+                    total == plan.outputBytes && check.digest().contentEquals(expected)
+                } ?: false
+            }.getOrDefault(false)
+            if (!saved) {
+                truncate(dst)
+                throw AppFailure(FailureCode.SAVED_FILE_UNVERIFIED)
+            }
+            val label = ImageFormatDetector.detect(VideoFiles.head(resolver, src)).label
+            MetadataWriteResult(plan.outputBytes, false, label, verified = true)
+        }
+    }
+
+    private fun openVideoOutput(uri: Uri): java.io.OutputStream {
+        val descriptor = runCatching { resolver.openFileDescriptor(uri, "rwt") }.getOrNull()
+        if (descriptor != null) {
+            return object : FileOutputStream(descriptor.fileDescriptor) {
+                override fun close() { try { super.close() } finally { descriptor.close() } }
+            }
+        }
+        return resolver.openOutputStream(uri, "wt") ?: throw AppFailure(FailureCode.CANNOT_OPEN_OUTPUT)
+    }
+
+    /** Непроверенная копия не должна остаться у пользователя: обрезаем её до нуля. */
+    private fun truncate(uri: Uri) {
+        runCatching { resolver.openFileDescriptor(uri, "rwt")?.close() }
     }
 
     private fun checkedUri(value: String): Uri = Uri.parse(value).also {
@@ -417,6 +497,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
 
     companion object {
         private const val MAX_SOURCE_BYTES = 80L * 1024L * 1024L
+        private const val SPACE_RESERVE = 32L * 1024L * 1024L
         private const val MAX_PIXELS = 16_000_000L
         private val GPS_TAGS = listOf(
             ExifInterface.TAG_GPS_VERSION_ID,
