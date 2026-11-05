@@ -1,7 +1,7 @@
 # Индекс приватности и «Очистить и отправить».
 S = [
     ("privacy_eyebrow", "Privacy", "Приватность"),
-    ("privacy_title", "What this photo reveals", "Что раскрывает это фото"),
+    ("privacy_title", "What this file reveals", "Что раскрывает этот файл"),
     ("privacy_hint", "Anyone you send the original file to can see this.",
      "Это увидит любой, кому вы отправите оригинал файла."),
     ("privacy_none_text", "No location, names or device serial numbers in the metadata.",
@@ -26,8 +26,8 @@ S = [
     ("privacy_clean_share", "Clean and share", "Очистить и отправить"),
     ("privacy_clean_save", "Clean and save a copy", "Очистить и сохранить копию"),
     ("share_target_label", "Send without metadata", "Отправить без метаданных"),
-    ("share_chooser_title", "Send the cleaned photo", "Отправить очищенное фото"),
-    ("share_no_app", "No app found to share the photo", "Не найдено приложение, чтобы отправить фото"),
+    ("share_chooser_title", "Send the cleaned copy", "Отправить очищенную копию"),
+    ("share_no_app", "No app found to share the file", "Не найдено приложение, чтобы отправить файл"),
     ("share_not_verified", "The cleaned copy could not be verified, so it was not shared",
      "Очищенную копию не удалось проверить, поэтому она не отправлена"),
 ]

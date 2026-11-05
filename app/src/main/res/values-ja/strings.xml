@@ -9,6 +9,7 @@
     <string name="section_dates">日付</string>
     <string name="section_gps">EXIF位置情報</string>
     <string name="section_authorship">ソフトウェアと作成者</string>
+    <string name="section_container">動画コンテナのタグ</string>
     <string name="exif_make">メーカー</string>
     <string name="exif_model">モデル</string>
     <string name="exif_lens_make">レンズメーカー</string>
@@ -104,6 +105,12 @@
     <string name="group_exif">技術的なEXIF</string>
     <string name="group_xmp">XMP / IPTC</string>
     <string name="group_png">PNG / テキスト</string>
+    <string name="group_video">動画</string>
+    <string name="label_video_duration">再生時間</string>
+    <string name="label_video_codec">動画コーデック</string>
+    <string name="label_video_created">作成日時（UTC）</string>
+    <string name="label_video_location">撮影場所（ISO 6709）</string>
+    <string name="label_video_title">タイトル</string>
     <string name="catalog_file_section">ファイル</string>
     <string name="catalog_coordinates_section">座標</string>
     <string name="field_name">名前</string>
@@ -198,6 +205,8 @@
     <string name="failure_overwrite_edit_jpeg_only">上書きによるEXIF編集はJPEGに対応しています</string>
     <string name="failure_overwrite_strip_jpeg_png_only">クリーニング時の上書きはJPEGとPNGのみ対応しています。その他の形式は新しいコピーとして保存してください</string>
     <string name="failure_wipe_gps_jpeg_png_only">GPSの削除はJPEGとPNGに対応しています</string>
+    <string name="failure_video_unsupported">この動画は再エンコードなしではクリーニングできません。ファイル構造に対応していません（断片化、暗号化、または破損したファイル）</string>
+    <string name="failure_not_enough_space">クリーニングしたコピーを保存する空き容量が端末にありません</string>
     <string name="failure_decode_failed">ピクセルを読み取れませんでした。別の画像をお試しください</string>
     <string name="failure_encode_failed">画像のエンコードに失敗しました</string>
     <string name="failure_out_of_memory">画像を処理するためのメモリが不足しています</string>
@@ -368,8 +377,8 @@
     <string name="dash_eyebrow_secure">写真のプライバシーチェック</string>
     <string name="dash_title">その写真、何がバレる？</string>
     <string name="dash_subtitle">撮影場所、カメラ、作成者、AIラベルがファイルに隠れています。送信前に確認して削除しましょう。</string>
-    <string name="dash_scan_hint">元のJPEG、PNG、HEICを選んでください。スクリーンショットではデータの一部がすでに失われています。</string>
-    <string name="dash_choose_photo">写真をチェック</string>
+    <string name="dash_scan_hint">元のJPEG、PNG、HEIC、またはMP4/MOV動画を選んでください。スクリーンショットではデータの一部がすでに失われています。</string>
+    <string name="dash_choose_photo">写真・動画をチェック</string>
     <string name="dash_camera">カメラ</string>
     <string name="dash_clipboard">クリップボード</string>
     <string name="dash_eyebrow_studio">メタデータスタジオ</string>
@@ -552,8 +561,8 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">無料  →  PRO</string>
-    <string name="pro_free_features">無料：スキャンとGPS Privacy Shield、EXIFビューアー、1日 %1$d 枚までの編集とクリーニング（UTC）、履歴10件。</string>
-    <string name="pro_pro_features">Pro：無制限のクリーニングと編集、最大50枚の一括処理、PDF/JSON、50件のレポート、API。</string>
+    <string name="pro_free_features">無料：写真・動画のスキャンとGPS Privacy Shield、EXIFビューアー、1日 %1$d 枚までの写真の編集とクリーニング（UTC）、履歴10件。</string>
+    <string name="pro_pro_features">Pro：無制限のクリーニングと編集、再エンコードなしの動画クリーニング（MP4、MOV）、最大50枚の一括処理、PDF/JSON、50件のレポート、API。</string>
     <string name="pro_one_time">Google Playでの買い切り。サブスクリプションではありません。</string>
     <string name="pro_key_label">Proキー（お持ちの場合）</string>
     <string name="pro_key_apply">キーを適用</string>
@@ -581,11 +590,15 @@
     <string name="gps_shield_eyebrow">ファイル内のGPS</string>
     <string name="gps_shield_title_point">撮影場所が写真に保存されています</string>
     <string name="gps_shield_title_tags">写真に位置情報タグがあります</string>
+    <string name="gps_shield_title_point_video">撮影場所が動画に保存されています</string>
+    <string name="gps_shield_title_tags_video">動画に位置情報タグが見つかりました</string>
     <string name="gps_shield_text_point">クリーニングせずに元の写真を共有すると、受信者に撮影場所の座標が見える場合があります。</string>
     <string name="gps_shield_text_tags">メタデータに位置情報がありますが、正確な座標は読み取れませんでした。</string>
     <string name="gps_shield_not_tracking">追跡されているという意味ではありません。位置情報タグ付きのファイルを共有したときにリスクが生じます。</string>
     <string name="gps_shield_advice">共有する前に、GPSなしのコピーを作るのがおすすめです。位置情報を守る簡単な方法です。</string>
     <string name="gps_shield_action">写真を保護 · GPSを削除</string>
+    <string name="gps_shield_action_video">動画を保護 · メタデータを削除</string>
+    <string name="gps_shield_action_note_video">動画は再エンコードせずにコピーされるため、画質は変わりません。元のファイルはそのままです。動画のクリーニングはPro機能です。</string>
     <string name="gps_shield_action_note">タップしたら新しいコピーの保存先を選びます。元のファイルは変更されません。共有するのはコピーです。無料：1日 %1$d 枚まで。</string>
     <string name="gps_shield_open_original">位置情報タグを削除するには、元のJPEG/PNG写真を開いてください。保存されたレポートには写真そのものは含まれていません。</string>
     <string name="gps_shield_coordinates">元ファイルの座標</string>
@@ -624,7 +637,7 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">プライバシー</string>
-    <string name="privacy_title">この写真からわかること</string>
+    <string name="privacy_title">このファイルからわかること</string>
     <string name="privacy_hint">元のファイルを送った相手は誰でもこれを見られます。</string>
     <string name="privacy_none_text">メタデータに位置情報、名前、端末のシリアル番号はありません。</string>
     <string name="privacy_level_none">個人情報なし</string>
@@ -647,7 +660,7 @@
     <string name="privacy_clean_share">クリーニングして共有</string>
     <string name="privacy_clean_save">クリーニングしてコピーを保存</string>
     <string name="share_target_label">メタデータなしで送信</string>
-    <string name="share_chooser_title">クリーニングした写真を送信</string>
-    <string name="share_no_app">写真を共有できるアプリが見つかりません</string>
+    <string name="share_chooser_title">クリーニングしたコピーを送信</string>
+    <string name="share_no_app">ファイルを共有できるアプリが見つかりません</string>
     <string name="share_not_verified">クリーニングしたコピーを確認できなかったため、共有しませんでした</string>
 </resources>

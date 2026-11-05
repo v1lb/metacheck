@@ -9,6 +9,7 @@
     <string name="section_dates">Datum</string>
     <string name="section_gps">EXIF-Standort</string>
     <string name="section_authorship">Software und Urheber</string>
+    <string name="section_container">Tags des Videocontainers</string>
     <string name="exif_make">Hersteller</string>
     <string name="exif_model">Modell</string>
     <string name="exif_lens_make">Objektivhersteller</string>
@@ -104,6 +105,12 @@
     <string name="group_exif">Technische EXIF-Daten</string>
     <string name="group_xmp">XMP / IPTC</string>
     <string name="group_png">PNG / Text</string>
+    <string name="group_video">Video</string>
+    <string name="label_video_duration">Dauer</string>
+    <string name="label_video_codec">Videocodec</string>
+    <string name="label_video_created">Erstellt (UTC)</string>
+    <string name="label_video_location">Aufnahmeort (ISO 6709)</string>
+    <string name="label_video_title">Titel</string>
     <string name="catalog_file_section">Datei</string>
     <string name="catalog_coordinates_section">Koordinaten</string>
     <string name="field_name">Name</string>
@@ -198,6 +205,8 @@
     <string name="failure_overwrite_edit_jpeg_only">Das Bearbeiten von EXIF mit Überschreiben wird für JPEG unterstützt</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Überschreiben beim Bereinigen unterstützt nur JPEG und PNG: Speichere andere Formate als neue Kopie</string>
     <string name="failure_wipe_gps_jpeg_png_only">Das Entfernen von GPS unterstützt JPEG und PNG</string>
+    <string name="failure_video_unsupported">Dieses Video kann nicht ohne Neukodierung bereinigt werden: Die Dateistruktur wird nicht unterstützt (fragmentierte, verschlüsselte oder beschädigte Datei)</string>
+    <string name="failure_not_enough_space">Nicht genug freier Speicher auf dem Gerät für die bereinigte Kopie</string>
     <string name="failure_decode_failed">Die Pixel konnten nicht gelesen werden. Versuche ein anderes Bild</string>
     <string name="failure_encode_failed">Bildkodierung fehlgeschlagen</string>
     <string name="failure_out_of_memory">Nicht genug Speicher, um das Bild zu verarbeiten</string>
@@ -370,8 +379,8 @@
     <string name="dash_eyebrow_secure">Foto-Datenschutzprüfung</string>
     <string name="dash_title">Was verrät dein Foto?</string>
     <string name="dash_subtitle">Standort, Kamera, Urheber und KI-Kennzeichnungen sind in der Datei versteckt. Prüfe und entferne sie vor dem Senden.</string>
-    <string name="dash_scan_hint">Wähle das Original-JPEG, -PNG oder -HEIC: Ein Screenshot hat bereits einen Teil der Daten verloren.</string>
-    <string name="dash_choose_photo">Foto prüfen</string>
+    <string name="dash_scan_hint">Wähle das Original-JPEG, -PNG, -HEIC oder ein MP4/MOV-Video: Ein Screenshot hat bereits einen Teil der Daten verloren.</string>
+    <string name="dash_choose_photo">Foto oder Video prüfen</string>
     <string name="dash_camera">Kamera</string>
     <string name="dash_clipboard">Zwischenablage</string>
     <string name="dash_eyebrow_studio">Metadaten-Studio</string>
@@ -554,8 +563,8 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">KOSTENLOS  →  PRO</string>
-    <string name="pro_free_features">Kostenlos: Scannen und GPS Privacy Shield, EXIF-Anzeige, Bearbeiten und Bereinigen von bis zu %1$d Fotos pro Tag (UTC), 10 Berichte im Verlauf.</string>
-    <string name="pro_pro_features">Pro: unbegrenztes Bereinigen und Bearbeiten, Stapelverarbeitung von bis zu 50 Fotos, PDF/JSON, 50 Berichte, API.</string>
+    <string name="pro_free_features">Kostenlos: Scannen von Fotos und Videos und GPS Privacy Shield, EXIF-Anzeige, Bearbeiten und Bereinigen von bis zu %1$d Fotos pro Tag (UTC), 10 Berichte im Verlauf.</string>
+    <string name="pro_pro_features">Pro: unbegrenztes Bereinigen und Bearbeiten, Videobereinigung (MP4, MOV) ohne Neukodierung, Stapelverarbeitung von bis zu 50 Fotos, PDF/JSON, 50 Berichte, API.</string>
     <string name="pro_one_time">Einmaliger Kauf über Google Play, kein Abo.</string>
     <string name="pro_key_label">Pro-Schlüssel, falls vorhanden</string>
     <string name="pro_key_apply">Schlüssel anwenden</string>
@@ -583,11 +592,15 @@
     <string name="gps_shield_eyebrow">GPS in der Datei</string>
     <string name="gps_shield_title_point">Der Aufnahmeort ist im Foto gespeichert</string>
     <string name="gps_shield_title_tags">Standort-Tags im Foto gefunden</string>
+    <string name="gps_shield_title_point_video">Der Aufnahmeort ist im Video gespeichert</string>
+    <string name="gps_shield_title_tags_video">Standort-Tags im Video gefunden</string>
     <string name="gps_shield_text_point">Wenn du das Original ohne Bereinigung teilst, kann der Empfänger die Koordinaten des Aufnahmeorts sehen.</string>
     <string name="gps_shield_text_tags">Die Metadaten enthalten Standortangaben, aber die genauen Koordinaten konnten nicht gelesen werden.</string>
     <string name="gps_shield_not_tracking">Das bedeutet nicht, dass du verfolgt wirst. Das Risiko entsteht, wenn du eine Datei mit Standort-Tags teilst.</string>
     <string name="gps_shield_advice">Vor dem Teilen erstellst du am besten eine Kopie ohne GPS: ein einfacher Weg, deinen Standort zu schützen.</string>
     <string name="gps_shield_action">Foto schützen · GPS entfernen</string>
+    <string name="gps_shield_action_video">Video schützen · Metadaten entfernen</string>
+    <string name="gps_shield_action_note_video">Das Video wird ohne Neukodierung kopiert, die Qualität bleibt gleich. Das Original bleibt unverändert. Die Videobereinigung ist eine Pro-Funktion.</string>
     <string name="gps_shield_action_note">Wähle nach dem Tippen, wo die neue Kopie gespeichert wird. Das Original bleibt unverändert. Teile die Kopie. Kostenlos: bis zu %1$d Fotos pro Tag.</string>
     <string name="gps_shield_open_original">Um Standort-Tags zu entfernen, öffne das Original-JPEG/-PNG: Ein gespeicherter Bericht enthält das Foto selbst nicht.</string>
     <string name="gps_shield_coordinates">Koordinaten in der Originaldatei</string>
@@ -626,7 +639,7 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Datenschutz</string>
-    <string name="privacy_title">Was dieses Foto verrät</string>
+    <string name="privacy_title">Was diese Datei verrät</string>
     <string name="privacy_hint">Jeder, dem du die Originaldatei schickst, kann das sehen.</string>
     <string name="privacy_none_text">Keine Standortdaten, Namen oder Geräteseriennummern in den Metadaten.</string>
     <string name="privacy_level_none">Nichts Persönliches</string>
@@ -649,7 +662,7 @@
     <string name="privacy_clean_share">Bereinigen und teilen</string>
     <string name="privacy_clean_save">Bereinigen und Kopie speichern</string>
     <string name="share_target_label">Ohne Metadaten senden</string>
-    <string name="share_chooser_title">Bereinigtes Foto senden</string>
-    <string name="share_no_app">Keine App zum Teilen des Fotos gefunden</string>
+    <string name="share_chooser_title">Bereinigte Kopie senden</string>
+    <string name="share_no_app">Keine App zum Teilen der Datei gefunden</string>
     <string name="share_not_verified">Die bereinigte Kopie konnte nicht geprüft werden und wurde daher nicht geteilt</string>
 </resources>

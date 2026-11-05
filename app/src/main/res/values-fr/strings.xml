@@ -9,6 +9,7 @@
     <string name="section_dates">Dates</string>
     <string name="section_gps">Géolocalisation EXIF</string>
     <string name="section_authorship">Logiciel et auteur</string>
+    <string name="section_container">Balises du conteneur vidéo</string>
     <string name="exif_make">Fabricant</string>
     <string name="exif_model">Modèle</string>
     <string name="exif_lens_make">Fabricant de l’objectif</string>
@@ -104,6 +105,12 @@
     <string name="group_exif">EXIF technique</string>
     <string name="group_xmp">XMP / IPTC</string>
     <string name="group_png">PNG / texte</string>
+    <string name="group_video">Vidéo</string>
+    <string name="label_video_duration">Durée</string>
+    <string name="label_video_codec">Codec vidéo</string>
+    <string name="label_video_created">Créée (UTC)</string>
+    <string name="label_video_location">Lieu de prise de vue (ISO 6709)</string>
+    <string name="label_video_title">Titre</string>
     <string name="catalog_file_section">Fichier</string>
     <string name="catalog_coordinates_section">Coordonnées</string>
     <string name="field_name">Nom</string>
@@ -198,6 +205,8 @@
     <string name="failure_overwrite_edit_jpeg_only">La modification EXIF avec écrasement est prise en charge pour JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">L’écrasement lors du nettoyage ne prend en charge que JPEG et PNG : enregistrez les autres formats en nouvelle copie</string>
     <string name="failure_wipe_gps_jpeg_png_only">La suppression du GPS prend en charge JPEG et PNG</string>
+    <string name="failure_video_unsupported">Impossible de nettoyer cette vidéo sans réencodage : la structure du fichier n’est pas prise en charge (fichier fragmenté, chiffré ou endommagé)</string>
+    <string name="failure_not_enough_space">Espace libre insuffisant sur l’appareil pour la copie nettoyée</string>
     <string name="failure_decode_failed">Impossible de lire les pixels. Essayez une autre image</string>
     <string name="failure_encode_failed">Échec de l’encodage de l’image</string>
     <string name="failure_out_of_memory">Mémoire insuffisante pour traiter l’image</string>
@@ -372,8 +381,8 @@
     <string name="dash_eyebrow_secure">Vérification de la confidentialité des photos</string>
     <string name="dash_title">Que révèle votre photo ?</string>
     <string name="dash_subtitle">Position, appareil, auteur et étiquettes IA cachés dans le fichier. Vérifiez-les et supprimez-les avant d’envoyer.</string>
-    <string name="dash_scan_hint">Choisissez le JPEG, PNG ou HEIC d’origine : une capture d’écran a déjà perdu une partie des données.</string>
-    <string name="dash_choose_photo">Vérifier une photo</string>
+    <string name="dash_scan_hint">Choisissez le JPEG, PNG ou HEIC d’origine ou une vidéo MP4/MOV : une capture d’écran a déjà perdu une partie des données.</string>
+    <string name="dash_choose_photo">Vérifier une photo ou une vidéo</string>
     <string name="dash_camera">Appareil photo</string>
     <string name="dash_clipboard">Presse-papiers</string>
     <string name="dash_eyebrow_studio">Studio de métadonnées</string>
@@ -556,8 +565,8 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">GRATUIT  →  PRO</string>
-    <string name="pro_free_features">Gratuit : analyse et GPS Privacy Shield, visionneuse EXIF, modification et nettoyage de jusqu’à %1$d photos par jour (UTC), 10 rapports dans l’historique.</string>
-    <string name="pro_pro_features">Pro : nettoyage et modification illimités, traitement par lot jusqu’à 50 photos, PDF/JSON, 50 rapports, API.</string>
+    <string name="pro_free_features">Gratuit : analyse des photos et vidéos et GPS Privacy Shield, visionneuse EXIF, modification et nettoyage de jusqu’à %1$d photos par jour (UTC), 10 rapports dans l’historique.</string>
+    <string name="pro_pro_features">Pro : nettoyage et modification illimités, nettoyage des vidéos (MP4, MOV) sans réencodage, traitement par lot jusqu’à 50 photos, PDF/JSON, 50 rapports, API.</string>
     <string name="pro_one_time">Achat unique via Google Play, sans abonnement.</string>
     <string name="pro_key_label">Clé Pro, si vous en avez une</string>
     <string name="pro_key_apply">Appliquer la clé</string>
@@ -585,11 +594,15 @@
     <string name="gps_shield_eyebrow">GPS dans le fichier</string>
     <string name="gps_shield_title_point">Le lieu de prise de vue est enregistré dans la photo</string>
     <string name="gps_shield_title_tags">Balises de localisation trouvées dans la photo</string>
+    <string name="gps_shield_title_point_video">Le lieu de tournage est enregistré dans la vidéo</string>
+    <string name="gps_shield_title_tags_video">Balises de localisation trouvées dans la vidéo</string>
     <string name="gps_shield_text_point">Si vous partagez l’original sans le nettoyer, le destinataire pourra voir les coordonnées du lieu de prise de vue.</string>
     <string name="gps_shield_text_tags">Les métadonnées contiennent des informations de localisation, mais les coordonnées exactes n’ont pas pu être lues.</string>
     <string name="gps_shield_not_tracking">Cela ne veut pas dire que vous êtes suivi. Le risque apparaît quand vous partagez un fichier avec des balises de localisation.</string>
     <string name="gps_shield_advice">Avant de partager, mieux vaut créer une copie sans GPS : un moyen simple de protéger votre position.</string>
     <string name="gps_shield_action">Protéger la photo · supprimer le GPS</string>
+    <string name="gps_shield_action_video">Protéger la vidéo · supprimer les métadonnées</string>
+    <string name="gps_shield_action_note_video">La vidéo est copiée sans réencodage : la qualité reste la même. L’original n’est pas modifié. Le nettoyage des vidéos est une fonction Pro.</string>
     <string name="gps_shield_action_note">Après avoir appuyé, choisissez où enregistrer la nouvelle copie. L’original reste inchangé. Partagez la copie. Gratuit : jusqu’à %1$d photos par jour.</string>
     <string name="gps_shield_open_original">Pour supprimer les balises de localisation, ouvrez la photo JPEG/PNG d’origine : un rapport enregistré ne contient pas la photo.</string>
     <string name="gps_shield_coordinates">Coordonnées dans le fichier d’origine</string>
@@ -628,7 +641,7 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Confidentialité</string>
-    <string name="privacy_title">Ce que révèle cette photo</string>
+    <string name="privacy_title">Ce que révèle ce fichier</string>
     <string name="privacy_hint">Toute personne à qui vous envoyez le fichier d’origine peut voir ceci.</string>
     <string name="privacy_none_text">Aucune position, aucun nom ni numéro de série d’appareil dans les métadonnées.</string>
     <string name="privacy_level_none">Rien de personnel</string>
@@ -651,7 +664,7 @@
     <string name="privacy_clean_share">Nettoyer et partager</string>
     <string name="privacy_clean_save">Nettoyer et enregistrer une copie</string>
     <string name="share_target_label">Envoyer sans métadonnées</string>
-    <string name="share_chooser_title">Envoyer la photo nettoyée</string>
-    <string name="share_no_app">Aucune application trouvée pour partager la photo</string>
+    <string name="share_chooser_title">Envoyer la copie nettoyée</string>
+    <string name="share_no_app">Aucune application trouvée pour partager le fichier</string>
     <string name="share_not_verified">La copie nettoyée n’a pas pu être vérifiée, elle n’a donc pas été partagée</string>
 </resources>

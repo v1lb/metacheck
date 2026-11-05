@@ -25,6 +25,9 @@ enum class FailureCode {
     OVERWRITE_EDIT_JPEG_ONLY,
     OVERWRITE_STRIP_JPEG_PNG_ONLY,
     WIPE_GPS_JPEG_PNG_ONLY,
+    /** Видео с такой структурой (фрагментированное, зашифрованное, повреждённое) не очищается без пережатия. */
+    VIDEO_UNSUPPORTED,
+    NOT_ENOUGH_SPACE,
 
     // Обработка
     DECODE_FAILED,
