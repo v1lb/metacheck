@@ -77,9 +77,10 @@ class PlayBillingGateway(
                 }
             }
             BillingClient.BillingResponseCode.USER_CANCELED -> PurchaseEvent.CANCELED
-            // Неизрасходованный платёж поддержки: расходуем при следующей проверке, Pro тут ни при чём.
+            // Неизрасходованный платёж поддержки, Pro тут ни при чём: UPDATED запускает проверку покупок,
+            // она израсходует старый платёж, и поддержать можно будет снова.
             BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED ->
-                if (lastLaunchWasTip) PurchaseEvent.FAILED else PurchaseEvent.ALREADY_OWNED
+                if (lastLaunchWasTip) PurchaseEvent.UPDATED else PurchaseEvent.ALREADY_OWNED
             else -> PurchaseEvent.FAILED
         }
         onPurchaseUpdate?.invoke(event)
