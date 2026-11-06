@@ -9,6 +9,7 @@
     <string name="section_dates">日期</string>
     <string name="section_gps">EXIF 地理位置</string>
     <string name="section_authorship">软件和作者</string>
+    <string name="section_container">视频容器标签</string>
     <string name="exif_make">制造商</string>
     <string name="exif_model">型号</string>
     <string name="exif_lens_make">镜头制造商</string>
@@ -104,6 +105,12 @@
     <string name="group_exif">技术 EXIF</string>
     <string name="group_xmp">XMP / IPTC</string>
     <string name="group_png">PNG / 文本</string>
+    <string name="group_video">视频</string>
+    <string name="label_video_duration">时长</string>
+    <string name="label_video_codec">视频编码</string>
+    <string name="label_video_created">创建时间（UTC）</string>
+    <string name="label_video_location">拍摄地点（ISO 6709）</string>
+    <string name="label_video_title">标题</string>
     <string name="catalog_file_section">文件</string>
     <string name="catalog_coordinates_section">坐标</string>
     <string name="field_name">名称</string>
@@ -198,6 +205,8 @@
     <string name="failure_overwrite_edit_jpeg_only">覆盖方式编辑 EXIF 仅支持 JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">清理时覆盖仅支持 JPEG 和 PNG：其他格式请另存为新副本</string>
     <string name="failure_wipe_gps_jpeg_png_only">移除 GPS 支持 JPEG 和 PNG</string>
+    <string name="failure_video_unsupported">无法在不重新编码的情况下清理此视频：不支持该文件结构（分段、加密或损坏的文件）</string>
+    <string name="failure_not_enough_space">设备可用空间不足，无法保存清理后的副本</string>
     <string name="failure_decode_failed">无法读取像素。请尝试其他图像</string>
     <string name="failure_encode_failed">图像编码失败</string>
     <string name="failure_out_of_memory">内存不足，无法处理图像</string>
@@ -368,8 +377,8 @@
     <string name="dash_eyebrow_secure">照片隐私检查</string>
     <string name="dash_title">你的照片会泄露什么？</string>
     <string name="dash_subtitle">文件中隐藏着位置、相机、作者和 AI 标签。发送前检查并移除它们。</string>
-    <string name="dash_scan_hint">请选择原始 JPEG、PNG 或 HEIC：屏幕截图已丢失部分数据。</string>
-    <string name="dash_choose_photo">检查照片</string>
+    <string name="dash_scan_hint">请选择原始 JPEG、PNG、HEIC 或 MP4/MOV 视频：屏幕截图已丢失部分数据。</string>
+    <string name="dash_choose_photo">检查照片或视频</string>
     <string name="dash_camera">相机</string>
     <string name="dash_clipboard">剪贴板</string>
     <string name="dash_eyebrow_studio">元数据工作室</string>
@@ -552,8 +561,8 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">免费  →  PRO</string>
-    <string name="pro_free_features">免费：扫描和 GPS Privacy Shield、EXIF 查看器，每天最多编辑和清理 %1$d 张照片（UTC），历史记录 10 份。</string>
-    <string name="pro_pro_features">Pro：无限清理和编辑，批量处理最多 50 张照片，PDF/JSON，50 份报告，API。</string>
+    <string name="pro_free_features">免费：扫描照片和视频及 GPS Privacy Shield、EXIF 查看器，每天最多编辑和清理 %1$d 张照片（UTC），历史记录 10 份。</string>
+    <string name="pro_pro_features">Pro：无限清理和编辑，不重新编码清理视频（MP4、MOV），批量处理最多 50 张照片，PDF/JSON，50 份报告，API。</string>
     <string name="pro_one_time">通过 Google Play 一次性购买，无需订阅。</string>
     <string name="pro_key_label">Pro 密钥（如有）</string>
     <string name="pro_key_apply">应用密钥</string>
@@ -581,11 +590,15 @@
     <string name="gps_shield_eyebrow">文件中的 GPS</string>
     <string name="gps_shield_title_point">照片中保存了拍摄地点</string>
     <string name="gps_shield_title_tags">在照片中发现位置标签</string>
+    <string name="gps_shield_title_point_video">视频中保存了拍摄地点</string>
+    <string name="gps_shield_title_tags_video">在视频中发现位置标签</string>
     <string name="gps_shield_text_point">如果不清理就分享原图，接收者可能看到拍摄地点的坐标。</string>
     <string name="gps_shield_text_tags">元数据包含位置信息，但无法读取精确坐标。</string>
     <string name="gps_shield_not_tracking">这并不意味着您正被追踪。风险出现在您分享带有位置标签的文件时。</string>
     <string name="gps_shield_advice">分享前最好创建一份不含 GPS 的副本：这是保护位置的简单方法。</string>
     <string name="gps_shield_action">保护照片 · 移除 GPS</string>
+    <string name="gps_shield_action_video">保护视频 · 移除元数据</string>
+    <string name="gps_shield_action_note_video">视频不经重新编码直接复制，画质保持不变。原文件不会改变。清理视频是 Pro 功能。</string>
     <string name="gps_shield_action_note">点按后选择新副本的保存位置。原文件保持不变。请分享副本。免费：每天最多 %1$d 张照片。</string>
     <string name="gps_shield_open_original">要移除位置标签，请打开原始 JPEG/PNG 照片：已保存的报告不包含照片本身。</string>
     <string name="gps_shield_coordinates">原始文件中的坐标</string>
@@ -624,7 +637,7 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">隐私</string>
-    <string name="privacy_title">这张照片泄露了什么</string>
+    <string name="privacy_title">这个文件泄露了什么</string>
     <string name="privacy_hint">任何收到原始文件的人都能看到这些信息。</string>
     <string name="privacy_none_text">元数据中没有位置、姓名或设备序列号。</string>
     <string name="privacy_level_none">无个人信息</string>
@@ -647,7 +660,7 @@
     <string name="privacy_clean_share">清理并分享</string>
     <string name="privacy_clean_save">清理并保存副本</string>
     <string name="share_target_label">无元数据发送</string>
-    <string name="share_chooser_title">发送清理后的照片</string>
-    <string name="share_no_app">未找到可分享照片的应用</string>
+    <string name="share_chooser_title">发送清理后的副本</string>
+    <string name="share_no_app">未找到可分享文件的应用</string>
     <string name="share_not_verified">无法验证清理后的副本，因此未分享</string>
 </resources>

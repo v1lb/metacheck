@@ -13,10 +13,16 @@ object AppPrompts {
     private val _paywall = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val paywall: SharedFlow<Unit> = _paywall.asSharedFlow()
 
+    /** Функция только для Pro (очистка видео): обычное окно Pro без пометки о лимите. */
+    private val _pro = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val pro: SharedFlow<Unit> = _pro.asSharedFlow()
+
     private val _review = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val review: SharedFlow<Unit> = _review.asSharedFlow()
 
     fun dailyLimitReached() { _paywall.tryEmit(Unit) }
+
+    fun proRequired() { _pro.tryEmit(Unit) }
 
     fun cleanSucceeded() { _review.tryEmit(Unit) }
 }

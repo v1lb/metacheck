@@ -26,6 +26,13 @@ interface MetadataRewriteRepository {
         destinationTree: String,
         progress: (BatchProgress) -> Unit,
     ): BatchProgress
+
+    /** true: источник — видео MP4/MOV (по сигнатуре файла, не по MIME). */
+    suspend fun isVideo(source: String): Boolean = false
+
+    /** Очищенная копия видео без пережатия. */
+    suspend fun stripVideoCopy(source: String, destination: String): MetadataWriteResult =
+        throw UnsupportedOperationException("video")
 }
 
 /**
@@ -72,12 +79,22 @@ class MetadataStudioUseCase(
             }
         }
 
-    suspend fun strip(source: String, destination: String): Result<MetadataWriteResult> = limitedWrite {
-        repository.stripCopy(source, destination)
-    }
+    suspend fun strip(source: String, destination: String): Result<MetadataWriteResult> =
+        if (isVideo(source)) stripVideo(source, destination) else limitedWrite { repository.stripCopy(source, destination) }
 
-    suspend fun wipeGps(source: String, destination: String): Result<MetadataWriteResult> = limitedWrite {
-        repository.wipeGpsCopy(source, destination)
+    /** У видео отдельного удаления GPS нет: очистка убирает и место съёмки, и остальные теги. */
+    suspend fun wipeGps(source: String, destination: String): Result<MetadataWriteResult> =
+        if (isVideo(source)) stripVideo(source, destination) else limitedWrite { repository.wipeGpsCopy(source, destination) }
+
+    private suspend fun isVideo(source: String): Boolean =
+        try { repository.isVideo(source) } catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (_: Exception) { false }
+
+    /** Очистка видео — функция Pro; в дневной лимит бесплатных очисток фото не входит. */
+    private suspend fun stripVideo(source: String, destination: String): Result<MetadataWriteResult> = runCatchingCancellable {
+        lock.withLock {
+            if (!entitlements.current().isPro) throw ProRequiredException()
+            repository.stripVideoCopy(source, destination)
+        }
     }
 
     suspend fun edit(source: String, destination: String, patch: MetadataPatch): Result<MetadataWriteResult> = limitedWrite {

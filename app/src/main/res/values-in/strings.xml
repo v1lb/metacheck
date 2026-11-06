@@ -9,6 +9,7 @@
     <string name="section_dates">Tanggal</string>
     <string name="section_gps">Geolokasi EXIF</string>
     <string name="section_authorship">Perangkat lunak dan pembuat</string>
+    <string name="section_container">Tag kontainer video</string>
     <string name="exif_make">Merek</string>
     <string name="exif_model">Model</string>
     <string name="exif_lens_make">Merek lensa</string>
@@ -104,6 +105,12 @@
     <string name="group_exif">EXIF teknis</string>
     <string name="group_xmp">XMP / IPTC</string>
     <string name="group_png">PNG / teks</string>
+    <string name="group_video">Video</string>
+    <string name="label_video_duration">Durasi</string>
+    <string name="label_video_codec">Codec video</string>
+    <string name="label_video_created">Dibuat (UTC)</string>
+    <string name="label_video_location">Lokasi perekaman (ISO 6709)</string>
+    <string name="label_video_title">Judul</string>
     <string name="catalog_file_section">File</string>
     <string name="catalog_coordinates_section">Koordinat</string>
     <string name="field_name">Nama</string>
@@ -198,6 +205,8 @@
     <string name="failure_overwrite_edit_jpeg_only">Mengedit EXIF dengan penimpaan didukung untuk JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Penimpaan saat pembersihan hanya mendukung JPEG dan PNG: simpan format lain sebagai salinan baru</string>
     <string name="failure_wipe_gps_jpeg_png_only">Penghapusan GPS mendukung JPEG dan PNG</string>
+    <string name="failure_video_unsupported">Video ini tidak dapat dibersihkan tanpa encode ulang: struktur file tidak didukung (file terfragmentasi, terenkripsi, atau rusak)</string>
+    <string name="failure_not_enough_space">Ruang kosong di perangkat tidak cukup untuk salinan yang dibersihkan</string>
     <string name="failure_decode_failed">Tidak dapat membaca piksel. Coba gambar lain</string>
     <string name="failure_encode_failed">Encoding gambar gagal</string>
     <string name="failure_out_of_memory">Memori tidak cukup untuk memproses gambar</string>
@@ -368,8 +377,8 @@
     <string name="dash_eyebrow_secure">Pemeriksaan privasi foto</string>
     <string name="dash_title">Apa yang diungkap foto Anda?</string>
     <string name="dash_subtitle">Lokasi, kamera, pembuat, dan label AI tersembunyi di dalam file. Periksa dan hapus sebelum mengirim.</string>
-    <string name="dash_scan_hint">Pilih JPEG, PNG, atau HEIC asli: tangkapan layar sudah kehilangan sebagian data.</string>
-    <string name="dash_choose_photo">Periksa foto</string>
+    <string name="dash_scan_hint">Pilih JPEG, PNG, HEIC asli, atau video MP4/MOV: tangkapan layar sudah kehilangan sebagian data.</string>
+    <string name="dash_choose_photo">Periksa foto atau video</string>
     <string name="dash_camera">Kamera</string>
     <string name="dash_clipboard">Papan klip</string>
     <string name="dash_eyebrow_studio">Studio metadata</string>
@@ -552,8 +561,8 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">GRATIS  →  PRO</string>
-    <string name="pro_free_features">Gratis: pemindaian dan GPS Privacy Shield, penampil EXIF, edit dan pembersihan hingga %1$d foto per hari (UTC), 10 laporan di riwayat.</string>
-    <string name="pro_pro_features">Pro: pembersihan dan edit tanpa batas, pemrosesan massal hingga 50 foto, PDF/JSON, 50 laporan, API.</string>
+    <string name="pro_free_features">Gratis: pemindaian foto dan video serta GPS Privacy Shield, penampil EXIF, edit dan pembersihan hingga %1$d foto per hari (UTC), 10 laporan di riwayat.</string>
+    <string name="pro_pro_features">Pro: pembersihan dan edit tanpa batas, pembersihan video (MP4, MOV) tanpa encode ulang, pemrosesan massal hingga 50 foto, PDF/JSON, 50 laporan, API.</string>
     <string name="pro_one_time">Pembelian sekali melalui Google Play, tanpa langganan.</string>
     <string name="pro_key_label">Kunci Pro, jika Anda punya</string>
     <string name="pro_key_apply">Terapkan kunci</string>
@@ -581,11 +590,15 @@
     <string name="gps_shield_eyebrow">GPS di file</string>
     <string name="gps_shield_title_point">Lokasi pengambilan tersimpan di foto</string>
     <string name="gps_shield_title_tags">Tag lokasi ditemukan di foto</string>
+    <string name="gps_shield_title_point_video">Lokasi perekaman tersimpan di video</string>
+    <string name="gps_shield_title_tags_video">Tag lokasi ditemukan di video</string>
     <string name="gps_shield_text_point">Jika Anda membagikan file asli tanpa membersihkannya, penerima dapat melihat koordinat lokasi pengambilan.</string>
     <string name="gps_shield_text_tags">Metadata berisi informasi lokasi, tetapi koordinat pastinya tidak dapat dibaca.</string>
     <string name="gps_shield_not_tracking">Ini tidak berarti Anda sedang dilacak. Risiko muncul saat Anda membagikan file dengan tag lokasi.</string>
     <string name="gps_shield_advice">Sebelum membagikan, sebaiknya buat salinan tanpa GPS: cara mudah melindungi lokasi Anda.</string>
     <string name="gps_shield_action">Lindungi foto · hapus GPS</string>
+    <string name="gps_shield_action_video">Lindungi video · hapus metadata</string>
+    <string name="gps_shield_action_note_video">Video disalin tanpa encode ulang, jadi kualitasnya tetap sama. File asli tidak berubah. Pembersihan video adalah fitur Pro.</string>
     <string name="gps_shield_action_note">Setelah mengetuk, pilih tempat menyimpan salinan baru. File asli tetap sama. Bagikan salinannya. Gratis: hingga %1$d foto per hari.</string>
     <string name="gps_shield_open_original">Untuk menghapus tag lokasi, buka foto JPEG/PNG asli: laporan yang disimpan tidak berisi fotonya.</string>
     <string name="gps_shield_coordinates">Koordinat di file asli</string>
@@ -624,7 +637,7 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Privasi</string>
-    <string name="privacy_title">Apa yang diungkap foto ini</string>
+    <string name="privacy_title">Apa yang diungkap file ini</string>
     <string name="privacy_hint">Siapa pun yang Anda kirimi file asli dapat melihat ini.</string>
     <string name="privacy_none_text">Tidak ada lokasi, nama, atau nomor seri perangkat di metadata.</string>
     <string name="privacy_level_none">Tidak ada data pribadi</string>
@@ -647,7 +660,7 @@
     <string name="privacy_clean_share">Bersihkan dan bagikan</string>
     <string name="privacy_clean_save">Bersihkan dan simpan salinan</string>
     <string name="share_target_label">Kirim tanpa metadata</string>
-    <string name="share_chooser_title">Kirim foto yang sudah dibersihkan</string>
-    <string name="share_no_app">Tidak ada aplikasi untuk membagikan foto</string>
+    <string name="share_chooser_title">Kirim salinan yang sudah dibersihkan</string>
+    <string name="share_no_app">Tidak ada aplikasi untuk membagikan file</string>
     <string name="share_not_verified">Salinan bersih tidak dapat diverifikasi, jadi tidak dibagikan</string>
 </resources>

@@ -54,7 +54,7 @@ private val softText = Color(0xFFE2E8F0)
  * Nothing is sent to a map service from this panel.
  */
 @Composable
-fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean = false) {
+fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean = false, video: Boolean = false) {
     val wave = rememberInfiniteTransition(label = "gps-shield")
     val glow by wave.animateFloat(
         initialValue = .40f,
@@ -81,7 +81,13 @@ fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean 
         }
 
         Text(
-            stringResource(if (gps != null) R.string.gps_shield_title_point else R.string.gps_shield_title_tags),
+            stringResource(
+                when {
+                    video -> if (gps != null) R.string.gps_shield_title_point_video else R.string.gps_shield_title_tags_video
+                    gps != null -> R.string.gps_shield_title_point
+                    else -> R.string.gps_shield_title_tags
+                },
+            ),
             color = Color.White,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.ExtraBold,
@@ -120,13 +126,14 @@ fun GpsPrivacyAlert(gps: GpsPoint?, onWipe: (() -> Unit)?, partialTags: Boolean 
                     .padding(5.dp),
             ) {
                 NeonButton(
-                    stringResource(R.string.gps_shield_action),
+                    stringResource(if (video) R.string.gps_shield_action_video else R.string.gps_shield_action),
                     onWipe,
                     Modifier.fillMaxWidth().testTag("gps_wipe_action"),
                 )
             }
             Text(
-                stringResource(R.string.gps_shield_action_note, DailyCleanQuota.FREE_DAILY_LIMIT),
+                if (video) stringResource(R.string.gps_shield_action_note_video)
+                else stringResource(R.string.gps_shield_action_note, DailyCleanQuota.FREE_DAILY_LIMIT),
                 color = softText,
                 style = MaterialTheme.typography.bodySmall,
             )

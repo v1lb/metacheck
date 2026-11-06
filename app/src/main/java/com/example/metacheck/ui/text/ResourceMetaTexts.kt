@@ -10,6 +10,7 @@ import androidx.exifinterface.media.ExifInterface
 import com.example.metacheck.R
 import com.example.metacheck.data.parser.ExifReader
 import com.example.metacheck.data.parser.XmpExtractor
+import com.example.metacheck.data.video.Mp4MetadataReader
 import com.example.metacheck.domain.analysis.SignalEngine
 import com.example.metacheck.domain.analysis.SignalEngine.C2PA_UNREADABLE
 import com.example.metacheck.domain.metadata.MetadataGroup
@@ -75,6 +76,7 @@ class ResourceMetaTexts(private val context: Context) : MetaTexts {
         SectionKey.DATES -> s(R.string.section_dates)
         SectionKey.GPS -> s(R.string.section_gps)
         SectionKey.AUTHORSHIP -> s(R.string.section_authorship)
+        SectionKey.CONTAINER -> s(R.string.section_container)
         null -> section.title
     }
 
@@ -199,6 +201,7 @@ class ResourceMetaTexts(private val context: Context) : MetaTexts {
             MetadataGroup.EXIF -> R.string.group_exif
             MetadataGroup.XMP -> R.string.group_xmp
             MetadataGroup.PNG -> R.string.group_png
+            MetadataGroup.VIDEO -> R.string.group_video
         }
 
         private fun exif(tag: String) = ExifReader.KEY_PREFIX + tag
@@ -279,6 +282,12 @@ class ResourceMetaTexts(private val context: Context) : MetaTexts {
             xmp("exif:GPSAltitude") to R.string.xmp_gps_altitude,
             xmp(SignalEngine.KEY_DIGITAL_SOURCE_TYPE) to R.string.xmp_digital_source_type,
             XmpExtractor.KEY_HISTORY_AGENTS to R.string.xmp_history_agents,
+
+            Mp4MetadataReader.KEY_DURATION to R.string.label_video_duration,
+            Mp4MetadataReader.KEY_CODEC to R.string.label_video_codec,
+            Mp4MetadataReader.KEY_CREATED to R.string.label_video_created,
+            Mp4MetadataReader.KEY_LOCATION to R.string.label_video_location,
+            Mp4MetadataReader.KEY_TITLE to R.string.label_video_title,
         )
     }
 }
