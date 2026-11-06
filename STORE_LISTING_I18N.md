@@ -42,7 +42,7 @@ ETIQUETAS DE IA EN EL ARCHIVO
 
 GRATIS Y PRO
 Gratis: análisis, visor de metadatos, índice de privacidad, GPS Privacy Shield, limpieza y edición de hasta 10 fotos al día, historial de hasta 10 informes.
-Pro (compra única, sin suscripción): sin límite diario, limpieza por lotes de hasta 50 fotos, exportación PDF y JSON, historial de hasta 50 informes, envío del informe a tu propia API.
+Pro (compra única, sin suscripción): sin límite diario, limpieza de vídeos (MP4, MOV) sin recodificar, limpieza por lotes de hasta 50 fotos, exportación PDF y JSON, historial de hasta 50 informes, envío del informe a tu propia API.
 
 PRIVADO POR DISEÑO
 • El análisis se hace en tu dispositivo. Las imágenes nunca se suben.
@@ -97,7 +97,7 @@ RÓTULOS DE IA NO ARQUIVO
 
 GRÁTIS E PRO
 Grátis: análise, visualizador de metadados, índice de privacidade, GPS Privacy Shield, limpeza e edição de até 10 fotos por dia, histórico de até 10 relatórios.
-Pro (compra única, sem assinatura): sem limite diário, limpeza em lote de até 50 fotos, exportação em PDF e JSON, histórico de até 50 relatórios, envio do relatório para sua própria API.
+Pro (compra única, sem assinatura): sem limite diário, limpeza de vídeos (MP4, MOV) sem recodificação, limpeza em lote de até 50 fotos, exportação em PDF e JSON, histórico de até 50 relatórios, envio do relatório para sua própria API.
 
 PRIVADO DESDE A CONCEPÇÃO
 • A análise acontece no seu aparelho. As imagens nunca são enviadas.
@@ -152,7 +152,7 @@ KI-KENNZEICHNUNGEN IN DER DATEI
 
 KOSTENLOS UND PRO
 Kostenlos: Analyse, Metadaten-Anzeige, Datenschutzwert, GPS Privacy Shield, Bereinigen und Bearbeiten von bis zu 10 Fotos pro Tag, Verlauf mit bis zu 10 Berichten.
-Pro (Einmalkauf, kein Abo): kein Tageslimit, Stapelbereinigung von bis zu 50 Fotos, PDF- und JSON-Export, Verlauf mit bis zu 50 Berichten, Senden des Berichts an deine eigene API.
+Pro (Einmalkauf, kein Abo): kein Tageslimit, Videobereinigung (MP4, MOV) ohne Neukodierung, Stapelbereinigung von bis zu 50 Fotos, PDF- und JSON-Export, Verlauf mit bis zu 50 Berichten, Senden des Berichts an deine eigene API.
 
 PRIVAT VON GRUND AUF
 • Die Analyse läuft auf deinem Gerät. Bilder werden nie hochgeladen.
@@ -207,7 +207,7 @@ TOUTES LES MÉTADONNÉES
 
 GRATUIT ET PRO
 Gratuit : analyse, visionneuse de métadonnées, score de confidentialité, GPS Privacy Shield, nettoyage et modification de jusqu’à 10 photos par jour, historique de jusqu’à 10 rapports.
-Pro (achat unique, sans abonnement) : sans limite quotidienne, nettoyage par lot de jusqu’à 50 photos, export PDF et JSON, historique de jusqu’à 50 rapports, envoi du rapport vers votre propre API.
+Pro (achat unique, sans abonnement) : sans limite quotidienne, nettoyage des vidéos (MP4, MOV) sans réencodage, nettoyage par lot de jusqu’à 50 photos, export PDF et JSON, historique de jusqu’à 50 rapports, envoi du rapport vers votre propre API.
 
 PRIVÉ PAR CONCEPTION
 • L’analyse se fait sur votre appareil. Les images ne sont jamais envoyées.
@@ -262,7 +262,7 @@ ETICHETTE IA NEL FILE
 
 GRATIS E PRO
 Gratis: analisi, visualizzatore di metadati, punteggio privacy, GPS Privacy Shield, pulizia e modifica fino a 10 foto al giorno, cronologia fino a 10 report.
-Pro (acquisto una tantum, nessun abbonamento): nessun limite giornaliero, pulizia in batch fino a 50 foto, esportazione PDF e JSON, cronologia fino a 50 report, invio del report alla tua API.
+Pro (acquisto una tantum, nessun abbonamento): nessun limite giornaliero, pulizia dei video (MP4, MOV) senza ricodifica, pulizia in batch fino a 50 foto, esportazione PDF e JSON, cronologia fino a 50 report, invio del report alla tua API.
 
 PRIVATO PER DESIGN
 • L’analisi avviene sul tuo dispositivo. Le immagini non vengono mai caricate.
@@ -317,7 +317,7 @@ MetaCheck: видалення EXIF, GPS
 
 БЕЗКОШТОВНО І PRO
 Безкоштовно: аналіз, перегляд метаданих, індекс приватності, GPS Privacy Shield, очищення й редагування до 10 фото на день, історія до 10 звітів.
-Pro (одноразова покупка, без підписки): без денного ліміту, пакетне очищення до 50 фото, експорт PDF і JSON, історія до 50 звітів, надсилання звіту у ваш власний API.
+Pro (одноразова покупка, без підписки): без денного ліміту, очищення відео (MP4, MOV) без перекодування, пакетне очищення до 50 фото, експорт PDF і JSON, історія до 50 звітів, надсилання звіту у ваш власний API.
 
 ПРИВАТНІСТЬ ЗА ЗАДУМОМ
 • Аналіз виконується на вашому пристрої. Зображення ніколи не завантажуються в мережу.
@@ -372,7 +372,7 @@ ETYKIETY AI W PLIKU
 
 ZA DARMO I PRO
 Za darmo: analiza, podgląd metadanych, wskaźnik prywatności, GPS Privacy Shield, czyszczenie i edycja do 10 zdjęć dziennie, historia do 10 raportów.
-Pro (jednorazowy zakup, bez subskrypcji): bez dziennego limitu, czyszczenie wsadowe do 50 zdjęć, eksport PDF i JSON, historia do 50 raportów, wysyłanie raportu do własnego API.
+Pro (jednorazowy zakup, bez subskrypcji): bez dziennego limitu, czyszczenie filmów (MP4, MOV) bez ponownego kodowania, czyszczenie wsadowe do 50 zdjęć, eksport PDF i JSON, historia do 50 raportów, wysyłanie raportu do własnego API.
 
 PRYWATNOŚĆ OD PODSTAW
 • Analiza odbywa się na Twoim urządzeniu. Obrazy nigdy nie są przesyłane.
@@ -427,7 +427,7 @@ DOSYADAKİ YAPAY ZEKÂ ETİKETLERİ
 
 ÜCRETSİZ VE PRO
 Ücretsiz: analiz, meta veri görüntüleyici, gizlilik puanı, GPS Privacy Shield, günde en fazla 10 fotoğrafı temizleme ve düzenleme, en fazla 10 raporluk geçmiş.
-Pro (tek seferlik satın alma, abonelik yok): günlük sınır yok, en fazla 50 fotoğrafı toplu temizleme, PDF ve JSON dışa aktarma, en fazla 50 raporluk geçmiş, raporu kendi API’nize gönderme.
+Pro (tek seferlik satın alma, abonelik yok): günlük sınır yok, yeniden kodlamadan video temizleme (MP4, MOV), en fazla 50 fotoğrafı toplu temizleme, PDF ve JSON dışa aktarma, en fazla 50 raporluk geçmiş, raporu kendi API’nize gönderme.
 
 TASARIMI GEREĞİ GİZLİ
 • Analiz cihazınızda yapılır. Görüntüler asla yüklenmez.
@@ -482,7 +482,7 @@ LABEL AI DI DALAM FILE
 
 GRATIS DAN PRO
 Gratis: analisis, penampil metadata, skor privasi, GPS Privacy Shield, pembersihan dan edit hingga 10 foto per hari, riwayat hingga 10 laporan.
-Pro (pembelian sekali, tanpa langganan): tanpa batas harian, pembersihan massal hingga 50 foto, ekspor PDF dan JSON, riwayat hingga 50 laporan, kirim laporan ke API Anda sendiri.
+Pro (pembelian sekali, tanpa langganan): tanpa batas harian, pembersihan video (MP4, MOV) tanpa encode ulang, pembersihan massal hingga 50 foto, ekspor PDF dan JSON, riwayat hingga 50 laporan, kirim laporan ke API Anda sendiri.
 
 PRIVAT SEJAK AWAL
 • Analisis berjalan di perangkat Anda. Gambar tidak pernah diunggah.
@@ -537,7 +537,7 @@ MetaCheck：EXIF・GPSを削除
 
 無料版とPro
 無料：分析、メタデータビューアー、プライバシースコア、GPS Privacy Shield、1日10枚までのクリーニングと編集、最大10件の履歴。
-Pro（買い切り、サブスクリプションなし）：1日の上限なし、最大50枚の一括クリーニング、PDF・JSONの書き出し、最大50件の履歴、独自APIへのレポート送信。
+Pro（買い切り、サブスクリプションなし）：1日の上限なし、再エンコードなしの動画クリーニング（MP4、MOV）、最大50枚の一括クリーニング、PDF・JSONの書き出し、最大50件の履歴、独自APIへのレポート送信。
 
 プライバシー重視の設計
 • 分析は端末上で行われます。画像がアップロードされることはありません。
@@ -592,7 +592,7 @@ MetaCheck: EXIF·GPS 제거
 
 무료와 Pro
 무료: 분석, 메타데이터 뷰어, 개인정보 점수, GPS Privacy Shield, 하루 최대 10장 정리·편집, 최대 10개 보고서 기록.
-Pro(1회 구매, 구독 없음): 하루 제한 없음, 최대 50장 일괄 정리, PDF·JSON 내보내기, 최대 50개 보고서 기록, 나만의 API로 보고서 전송.
+Pro(1회 구매, 구독 없음): 하루 제한 없음, 재인코딩 없는 동영상 정리(MP4, MOV), 최대 50장 일괄 정리, PDF·JSON 내보내기, 최대 50개 보고서 기록, 나만의 API로 보고서 전송.
 
 설계부터 개인정보 보호
 • 분석은 기기에서 이루어집니다. 이미지는 업로드되지 않습니다.
@@ -647,7 +647,7 @@ MetaCheck：清除 EXIF 和 GPS
 
 免费版和 Pro
 免费：分析、元数据查看器、隐私评分、GPS Privacy Shield，每天最多清理和编辑 10 张照片，最多保留 10 份报告记录。
-Pro（一次性购买，无需订阅）：无每日上限，批量清理最多 50 张照片，导出 PDF 和 JSON，最多保留 50 份报告记录，可将报告发送到自有 API。
+Pro（一次性购买，无需订阅）：无每日上限，不重新编码清理视频（MP4、MOV），批量清理最多 50 张照片，导出 PDF 和 JSON，最多保留 50 份报告记录，可将报告发送到自有 API。
 
 隐私优先的设计
 • 分析在你的设备上完成，图像绝不会上传。

@@ -244,6 +244,16 @@ fun MainScreen(
         pendingStripSource = null
         if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
     }
+    val saveMp4 = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("video/mp4")) { uri ->
+        val original = pendingStripSource
+        pendingStripSource = null
+        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
+    }
+    val saveMov = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("video/quicktime")) { uri ->
+        val original = pendingStripSource
+        pendingStripSource = null
+        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
+    }
     val saveGpsJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
         val original = pendingWipeSource
         pendingWipeSource = null
@@ -343,24 +353,34 @@ fun MainScreen(
                 else when (val s = current.ui) {
                     UiState.Idle -> Dashboard(
                         history = history, historyEnabled = settings.saveHistory, isPro = entitlement.isPro,
-                        onPick = { pick.launch(arrayOf("image/*")) },
+                        onPick = { pick.launch(PICK_TYPES) },
                         onCamera = ::launchCamera, onClipboard = ::pasteImage,
                         onOpen = viewModel::openFromHistory, onDelete = viewModel::deleteFromHistory,
                         onCsv = { saveCsv.launch("metacheck-history.csv") },
                         onUpgrade = proVm::openPaywall, onStudio = { showStudio = true },
                     )
                     UiState.Loading -> LoadingScreen()
-                    is UiState.Failed -> ErrorScreen(s.message, { pick.launch(arrayOf("image/*")) }, viewModel::close)
+                    is UiState.Failed -> ErrorScreen(s.message, { pick.launch(PICK_TYPES) }, viewModel::close)
                     is UiState.Done -> {
                         val name = suggestedName(s.report.file.name)
                         val format = CleanFormat.outputFor(s.report.file.format)
+                        val video = s.report.file.format.isVideo
+                        // Видео: очистка только в Pro, без пережатия, в исходном контейнере.
+                        val cleanVideo: (() -> Unit)? = if (s.source == null || !video) null else {
+                            videoClean@{
+                                if (!entitlement.isPro) { proVm.openPaywall(); return@videoClean }
+                                if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@videoClean }
+                                pendingStripSource = s.source
+                                if (format.extension == "mov") saveMov.launch("$name-clean.mov") else saveMp4.launch("$name-clean.mp4")
+                            }
+                        }
                         ResultView(
                             report = s.report,
                             sourceUri = s.source,
                             actions = ResultActions(
                                 onCsv = { saveMetadataCsv.launch("$name-metadata.csv") },
-                                onEdit = if (s.source == null) null else { { if (entitlement.isPro) showStudio = true else proVm.openPaywall() } },
-                                onWipeGps = if (s.source == null || !GpsPrivacy.hasLocationMarkers(s.report) ||
+                                onEdit = if (s.source == null || video) null else { { if (entitlement.isPro) showStudio = true else proVm.openPaywall() } },
+                                onWipeGps = if (video) cleanVideo.takeIf { GpsPrivacy.hasLocationMarkers(s.report) } else if (s.source == null || !GpsPrivacy.hasLocationMarkers(s.report) ||
                                     s.report.file.format !in setOf(ImageFormat.JPEG, ImageFormat.PNG)) null else {
                                     wipe@{
                                         if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@wipe }
@@ -379,7 +399,7 @@ fun MainScreen(
                                 },
                                 onJson = { if (entitlement.isPro) saveJson.launch("$name-metacheck.json") else proVm.openPaywall() },
                                 onPdf = { if (entitlement.isPro) savePdf.launch("$name-metacheck.pdf") else proVm.openPaywall() },
-                                onClean = if (s.source == null) null else {
+                                onClean = if (video) cleanVideo else if (s.source == null) null else {
                                     clean@{
                                         if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@clean }
                                         pendingStripSource = s.source
@@ -389,6 +409,7 @@ fun MainScreen(
                                 },
                                 onCleanShare = if (s.source == null) null else {
                                     share@{
+                                        if (video && !entitlement.isPro) { proVm.openPaywall(); return@share }
                                         if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@share }
                                         studioVm.cleanAndShare(s.source)
                                     }
@@ -408,6 +429,9 @@ fun MainScreen(
     val promptActivity = LocalContext.current.findActivity()
     LaunchedEffect(Unit) {
         AppPrompts.paywall.collect { if (!entitlement.isPro) proVm.openPaywallForLimit() }
+    }
+    LaunchedEffect(Unit) {
+        AppPrompts.pro.collect { if (!entitlement.isPro) proVm.openPaywall() }
     }
     LaunchedEffect(promptActivity) {
         AppPrompts.review.collect { promptActivity?.let(ReviewPrompt::recordClean) }
@@ -728,3 +752,6 @@ private fun screenTransition(from: ScreenKind, to: ScreenKind): ContentTransform
         (slideOutHorizontally(tween(260, easing = easing)) { width -> -direction * width / 8 } +
             fadeOut(tween(180, easing = easing)))
 }
+
+/** Что можно выбрать для проверки: фото и видео (MP4/MOV; прочие видео отклонит проверка сигнатуры). */
+private val PICK_TYPES = arrayOf("image/*", "video/*")

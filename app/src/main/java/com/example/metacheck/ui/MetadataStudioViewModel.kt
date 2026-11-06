@@ -216,6 +216,7 @@ class MetadataStudioViewModel(
 
     private fun failMessage(error: Throwable): UiText {
         if (error is com.example.metacheck.domain.metadata.DailyLimitReachedException) AppPrompts.dailyLimitReached()
+        if (error is com.example.metacheck.domain.model.ProRequiredException) AppPrompts.proRequired()
         return ErrorTexts.operationFailed(error)
     }
 

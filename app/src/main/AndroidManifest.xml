@@ -47,16 +47,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- «Поделиться» из галереи и мессенджеров. Принимаем только изображения. -->
+            <!-- «Поделиться» из галереи и мессенджеров. Принимаем изображения и видео. -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
             </intent-filter>
         </activity>
 
         <!--
-            «Отправить без метаданных» в меню «Поделиться»: то же окно приложения, но фото сразу очищается
+            «Отправить без метаданных» в меню «Поделиться»: то же окно приложения, но фото или видео сразу очищается
             и пересылается дальше (MainActivity.handleSharedImage различает вход по имени alias).
         -->
         <activity-alias
@@ -68,6 +69,7 @@
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
             </intent-filter>
         </activity-alias>
 

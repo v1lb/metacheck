@@ -9,6 +9,7 @@
     <string name="section_dates">Даты</string>
     <string name="section_gps">Геолокация EXIF</string>
     <string name="section_authorship">Программа и авторство</string>
+    <string name="section_container">Теги контейнера видео</string>
     <string name="exif_make">Производитель</string>
     <string name="exif_model">Модель</string>
     <string name="exif_lens_make">Производитель объектива</string>
@@ -104,6 +105,12 @@
     <string name="group_exif">Технические EXIF</string>
     <string name="group_xmp">XMP / IPTC</string>
     <string name="group_png">PNG / текст</string>
+    <string name="group_video">Видео</string>
+    <string name="label_video_duration">Длительность</string>
+    <string name="label_video_codec">Видеокодек</string>
+    <string name="label_video_created">Создано (UTC)</string>
+    <string name="label_video_location">Место съёмки (ISO 6709)</string>
+    <string name="label_video_title">Название</string>
     <string name="catalog_file_section">Файл</string>
     <string name="catalog_coordinates_section">Координаты</string>
     <string name="field_name">Имя</string>
@@ -198,6 +205,8 @@
     <string name="failure_overwrite_edit_jpeg_only">Редактирование EXIF с перезаписью поддерживается для JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Перезапись при очистке поддерживает только JPEG и PNG: другие форматы сохраняйте как новую копию</string>
     <string name="failure_wipe_gps_jpeg_png_only">Удаление GPS поддерживает JPEG и PNG</string>
+    <string name="failure_video_unsupported">Это видео нельзя очистить без пережатия: структура файла не поддерживается (фрагментированный, зашифрованный или повреждённый файл)</string>
+    <string name="failure_not_enough_space">На устройстве недостаточно места для очищенной копии</string>
     <string name="failure_decode_failed">Не удалось прочитать пиксели. Попробуйте другое изображение</string>
     <string name="failure_encode_failed">Кодирование изображения не удалось</string>
     <string name="failure_out_of_memory">Недостаточно памяти для обработки изображения</string>
@@ -374,8 +383,8 @@
     <string name="dash_eyebrow_secure">Проверка приватности фото</string>
     <string name="dash_title">Что выдаёт ваше фото?</string>
     <string name="dash_subtitle">Место съёмки, камера, автор и метки ИИ внутри файла. Проверьте и удалите их до отправки.</string>
-    <string name="dash_scan_hint">Выбирайте исходный JPEG, PNG или HEIC: в скриншоте часть данных уже потеряна.</string>
-    <string name="dash_choose_photo">Проверить фото</string>
+    <string name="dash_scan_hint">Выбирайте исходный JPEG, PNG, HEIC или видео MP4/MOV: в скриншоте часть данных уже потеряна.</string>
+    <string name="dash_choose_photo">Проверить фото или видео</string>
     <string name="dash_camera">Камера</string>
     <string name="dash_clipboard">Буфер</string>
     <string name="dash_eyebrow_studio">Студия метаданных</string>
@@ -558,8 +567,8 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">FREE  →  PRO</string>
-    <string name="pro_free_features">Free: анализ и GPS Privacy Shield, просмотр EXIF, правка и очистка до %1$d фото в сутки (UTC), 10 отчётов в истории.</string>
-    <string name="pro_pro_features">Pro: безлимитная очистка и правка, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API.</string>
+    <string name="pro_free_features">Free: анализ фото и видео и GPS Privacy Shield, просмотр EXIF, правка и очистка до %1$d фото в сутки (UTC), 10 отчётов в истории.</string>
+    <string name="pro_pro_features">Pro: безлимитная очистка и правка, очистка видео (MP4, MOV) без пережатия, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API.</string>
     <string name="pro_one_time">Разовая покупка через Google Play, без подписки.</string>
     <string name="pro_key_label">Ключ Pro, если он у вас есть</string>
     <string name="pro_key_apply">Применить ключ</string>
@@ -587,11 +596,15 @@
     <string name="gps_shield_eyebrow">GPS в файле</string>
     <string name="gps_shield_title_point">Место съёмки сохранено в фото</string>
     <string name="gps_shield_title_tags">В фотографии найдены геометки</string>
+    <string name="gps_shield_title_point_video">Место съёмки сохранено в видео</string>
+    <string name="gps_shield_title_tags_video">В видео найдены геометки</string>
     <string name="gps_shield_text_point">Если отправить оригинал без очистки, получатель может увидеть координаты места съёмки.</string>
     <string name="gps_shield_text_tags">В метаданных найдены сведения о местоположении, но точные координаты прочитать не удалось.</string>
     <string name="gps_shield_not_tracking">Это не означает, что за вами следят. Риск возникает, если передать файл с геометками.</string>
     <string name="gps_shield_advice">Перед отправкой лучше создать копию без GPS: это простой способ защитить своё местоположение.</string>
     <string name="gps_shield_action">Защитить фото · удалить GPS</string>
+    <string name="gps_shield_action_video">Защитить видео · удалить метаданные</string>
+    <string name="gps_shield_action_note_video">Видео копируется без пережатия, качество не меняется. Оригинал останется прежним. Очистка видео доступна в Pro.</string>
     <string name="gps_shield_action_note">После нажатия выберите место для новой копии. Оригинал не изменится. Отправляйте именно копию. Free: до %1$d фото в сутки.</string>
     <string name="gps_shield_open_original">Чтобы убрать геометки, откройте исходную фотографию JPEG/PNG: сохранённый отчёт не содержит самого фото.</string>
     <string name="gps_shield_coordinates">Координаты в исходном файле</string>
@@ -630,7 +643,7 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Приватность</string>
-    <string name="privacy_title">Что раскрывает это фото</string>
+    <string name="privacy_title">Что раскрывает этот файл</string>
     <string name="privacy_hint">Это увидит любой, кому вы отправите оригинал файла.</string>
     <string name="privacy_none_text">В метаданных нет координат, имён и серийных номеров устройства.</string>
     <string name="privacy_level_none">Ничего личного</string>
@@ -653,7 +666,7 @@
     <string name="privacy_clean_share">Очистить и отправить</string>
     <string name="privacy_clean_save">Очистить и сохранить копию</string>
     <string name="share_target_label">Отправить без метаданных</string>
-    <string name="share_chooser_title">Отправить очищенное фото</string>
-    <string name="share_no_app">Не найдено приложение, чтобы отправить фото</string>
+    <string name="share_chooser_title">Отправить очищенную копию</string>
+    <string name="share_no_app">Не найдено приложение, чтобы отправить файл</string>
     <string name="share_not_verified">Очищенную копию не удалось проверить, поэтому она не отправлена</string>
 </resources>
