@@ -271,7 +271,7 @@
     <string name="result_tab_map">Map</string>
     <string name="result_eyebrow_report">Report · on this device</string>
     <string name="result_badge_local">On device</string>
-    <string name="result_no_gps">This file has no readable GPS coordinates. If you are sure it had them, choose the original photo with “Choose photo” and allow access to photo locations.</string>
+    <string name="result_no_gps">This file has no readable GPS coordinates. If you are sure it had them, choose the original photo with “Check a photo” and allow access to photo locations.</string>
     <string name="result_eyebrow_engine">AI labels in metadata</string>
     <string name="result_verdict_ai">AI indicators found</string>
     <string name="result_verdict_attention">Further checking needed</string>
@@ -535,6 +535,18 @@
     <string name="appearance_save_failed">Could not save the setting</string>
     <string name="language_name_ru" translatable="false">Русский</string>
     <string name="language_name_en" translatable="false">English</string>
+    <string name="language_name_es" translatable="false">Español</string>
+    <string name="language_name_pt_br" translatable="false">Português (Brasil)</string>
+    <string name="language_name_de" translatable="false">Deutsch</string>
+    <string name="language_name_fr" translatable="false">Français</string>
+    <string name="language_name_it" translatable="false">Italiano</string>
+    <string name="language_name_uk" translatable="false">Українська</string>
+    <string name="language_name_pl" translatable="false">Polski</string>
+    <string name="language_name_tr" translatable="false">Türkçe</string>
+    <string name="language_name_id" translatable="false">Bahasa Indonesia</string>
+    <string name="language_name_ja" translatable="false">日本語</string>
+    <string name="language_name_ko" translatable="false">한국어</string>
+    <string name="language_name_zh_cn" translatable="false">简体中文</string>
 
     <!-- master_15_onboarding.py -->
     <string name="onboarding_step" translatable="false">%1$02d / %2$02d</string>
@@ -577,6 +589,11 @@
     <string name="pro_msg_failed">The purchase was not completed. Please try again later.</string>
     <string name="pro_msg_launch_failed">Could not open the purchase. Check Google Play and your internet connection.</string>
     <string name="pro_msg_key_accepted">Key accepted</string>
+    <string name="pro_limit_reached">You have cleaned %1$d photos today. The limit resets tomorrow, or get Pro with no limits.</string>
+    <string name="tip_title">Support the developer</string>
+    <string name="tip_text">MetaCheck is made by one developer, with no ads or tracking. A small one-time payment through Google Play does not unlock anything, it just helps the app grow.</string>
+    <string name="tip_button">Support · %1$s</string>
+    <string name="tip_thanks">Thank you for your support!</string>
 
     <!-- master_17_gps_map.py -->
     <string name="gps_shield_eyebrow">GPS in the file</string>
@@ -592,7 +609,7 @@
     <string name="gps_shield_coordinates">Coordinates in the original file</string>
     <string name="gps_shield_partial">The point cannot be shown on the map: the GPS data is incomplete or stored in XMP/PNG.</string>
     <string name="map_off">Map is off · nothing is sent</string>
-    <string name="map_consent">To show the point on a map, the app will download map tiles from %1$s servers. The servers will see your IP address and the approximate area of the point. The photo and its metadata are not sent.</string>
+    <string name="map_consent">To show the point on a map, the app will download map tiles from %1$s servers. The servers will see your IP address and where the point is, to within a few hundred metres. The photo and its metadata are not sent.</string>
     <string name="map_show">Show map (request to %1$s)</string>
     <string name="map_enable_first">To pick new coordinates on the map, turn the map on first.</string>
     <string name="map_live_eyebrow">Map · pick a point</string>

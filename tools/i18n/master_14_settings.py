@@ -76,4 +76,16 @@ S = [
 
     ("language_name_ru", "Русский", None),
     ("language_name_en", "English", None),
+    ("language_name_es", "Español", None),
+    ("language_name_pt_br", "Português (Brasil)", None),
+    ("language_name_de", "Deutsch", None),
+    ("language_name_fr", "Français", None),
+    ("language_name_it", "Italiano", None),
+    ("language_name_uk", "Українська", None),
+    ("language_name_pl", "Polski", None),
+    ("language_name_tr", "Türkçe", None),
+    ("language_name_id", "Bahasa Indonesia", None),
+    ("language_name_ja", "日本語", None),
+    ("language_name_ko", "한국어", None),
+    ("language_name_zh_cn", "简体中文", None),
 ]

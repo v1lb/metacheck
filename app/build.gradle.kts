@@ -25,8 +25,8 @@ android {
         applicationId = "dev.metacheck.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 20601
-        versionName = "2.6.1"
+        versionCode = 20602
+        versionName = "2.6.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // Ключ MapTiler для карты (аудит, п. 10). Пусто -> тайлы OpenStreetMap по Tile Usage Policy.
@@ -133,6 +133,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.okhttp)
     implementation(libs.billing)
+    implementation(libs.play.review)
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)

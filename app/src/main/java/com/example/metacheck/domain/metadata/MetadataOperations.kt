@@ -41,7 +41,7 @@ interface DailyCleanQuota {
     fun recordSuccess(): Boolean
 
     companion object {
-        const val FREE_DAILY_LIMIT = 75
+        const val FREE_DAILY_LIMIT = 10
     }
 }
 

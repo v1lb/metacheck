@@ -78,7 +78,7 @@ Check photo selection, all tabs and a PNG with Stable Diffusion metadata.
      (off by default, only on an explicit button press). Describe it in the form and in the privacy policy,
      checking the wording against the Google Play help. Images are not sent; history and keys stay encrypted on the device.
      Map: after the button press, the map provider (MapTiler, OpenStreetMap in builds without a key) receives the IP
-     address and tile numbers, which reveal the approximate area of the point. Ready answers: `DATA_SAFETY.md`.
+     address and tile numbers, which reveal where the point is to within a few hundred metres. Ready answers: `DATA_SAFETY.md`.
    - **Content rating**, **target audience**, **ads** (none), **app access** (no login needed).
 4. **Testing → Internal:** create a release, upload the `.aab`, add testers by email, send for review.
 5. New personal developer accounts may be required to run closed testing with a group of testers

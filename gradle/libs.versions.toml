@@ -40,6 +40,7 @@ compose-material3 = { module = "androidx.compose.material3:material3" }
 # material3 1.4+ больше не тянет иконки транзитивно: подключаем явно (Icons.Filled.*, AutoMirrored).
 compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 # Полный набор иконок Material (камера, буфер, щит и т. д.). В release R8 оставляет только используемые.
+play-review = { module = "com.google.android.play:review", version = "2.0.1" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }

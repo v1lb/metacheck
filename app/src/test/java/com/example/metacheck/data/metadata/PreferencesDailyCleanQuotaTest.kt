@@ -1,5 +1,7 @@
 package com.example.metacheck.data.metadata
 
+import com.example.metacheck.domain.metadata.DailyCleanQuota
+
 import com.example.metacheck.data.crypto.Crypto
 import com.example.metacheck.testutil.FakePrefs
 import org.junit.Assert.assertEquals
@@ -55,7 +57,7 @@ class PreferencesDailyCleanQuotaTest {
     @Test fun corruptedRecord_isDiscarded_notPermanentLockout() {
         val prefs = FakePrefs().apply { edit().putString("encrypted_record", "@@@not-base64@@@").apply() }
         val q = PreferencesDailyCleanQuota(prefs, SwitchableCrypto(), MutableClock(day1))
-        assertEquals(0, q.usedToday())                // раньше: 75, навсегда
+        assertEquals(0, q.usedToday())                // раньше: лимит, навсегда
         assertTrue(q.recordSuccess())
         assertEquals(1, q.usedToday())
     }
@@ -86,7 +88,7 @@ class PreferencesDailyCleanQuotaTest {
     @Test fun clockMovedBack_doesNotBlock() {
         val prefs = FakePrefs(); val crypto = SwitchableCrypto()
         val future = MutableClock(Instant.parse("2027-01-01T10:00:00Z"))
-        repeat(75) { PreferencesDailyCleanQuota(prefs, crypto, future).recordSuccess() }
+        repeat(DailyCleanQuota.FREE_DAILY_LIMIT) { PreferencesDailyCleanQuota(prefs, crypto, future).recordSuccess() }
 
         val now = PreferencesDailyCleanQuota(prefs, crypto, MutableClock(day1))
         assertEquals(0, now.usedToday())
@@ -95,15 +97,15 @@ class PreferencesDailyCleanQuotaTest {
     @Test fun countIsCappedAtLimit() {
         val q = PreferencesDailyCleanQuota(FakePrefs(), SwitchableCrypto(), MutableClock(day1))
         repeat(80) { q.recordSuccess() }
-        assertEquals(75, q.usedToday())
+        assertEquals(DailyCleanQuota.FREE_DAILY_LIMIT, q.usedToday())
     }
 
     @Test fun legacyRecordFormatIsReadable() {
         // Формат v2.6: base64(encrypt("<epochDay>:<count>")), android.util.Base64.NO_WRAP == java Base64.
         val crypto = SwitchableCrypto()
-        val legacy = Base64.getEncoder().encodeToString(crypto.encrypt("${20394}:12".toByteArray()))
+        val legacy = Base64.getEncoder().encodeToString(crypto.encrypt("${20394}:7".toByteArray()))
         val prefs = FakePrefs().apply { edit().putString("encrypted_record", legacy).apply() }
         val q = PreferencesDailyCleanQuota(prefs, crypto, MutableClock(Instant.parse("2025-11-02T10:00:00Z")))
-        assertEquals(12, q.usedToday())
+        assertEquals(7, q.usedToday())
     }
 }
