@@ -278,7 +278,6 @@
     <string name="result_tab_analysis">Análisis</string>
     <string name="result_tab_metadata">Metadatos</string>
     <string name="result_tab_map">Mapa</string>
-    <string name="result_eyebrow_report">Informe · en este dispositivo</string>
     <string name="result_badge_local">En el dispositivo</string>
     <string name="result_no_gps">Este archivo no tiene coordenadas GPS legibles. Si estás seguro de que las tenía, elige la foto original con “Comprobar foto” y permite el acceso a la ubicación de las fotos.</string>
     <string name="result_eyebrow_engine">Etiquetas de IA en los metadatos</string>
@@ -303,7 +302,6 @@
     <string name="result_preview_description">Imagen en revisión: %1$s</string>
     <string name="result_preview_not_stored">La foto no se guarda en el historial</string>
     <string name="result_preview_unavailable">Vista previa no disponible</string>
-    <string name="result_eyebrow_preview">Vista previa</string>
     <string name="signal_eyebrow_ai">Indicio de IA</string>
     <string name="signal_eyebrow_caution">Atención</string>
     <string name="signal_eyebrow_info">Nota</string>
@@ -315,7 +313,6 @@
     <string name="result_map_privacy_note">El mapa solo se carga cuando pulsas su botón. “Abrir en mapas” pasa las coordenadas a la app externa que elijas.</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">Todos los metadatos</string>
     <string name="viewer_title">Metadatos del archivo</string>
     <plurals name="viewer_field_count">
         <item quantity="one">%1$d campo · visto directamente en el dispositivo</item>
@@ -378,7 +375,6 @@
     <string name="main_api_dialog_title">API externa</string>
     <string name="main_api_waiting">Esperando la respuesta del servidor…</string>
     <string name="main_api_empty_response">Respuesta vacía</string>
-    <string name="dash_eyebrow_secure">Comprobación de privacidad de fotos</string>
     <string name="dash_title">¿Qué revela tu foto?</string>
     <string name="dash_subtitle">Ubicación, cámara, autor y etiquetas de IA ocultos en el archivo. Revísalos y elimínalos antes de enviar.</string>
     <string name="dash_scan_hint">Elige el JPEG, PNG o HEIC original o un vídeo MP4/MOV: una captura de pantalla ya perdió parte de los datos.</string>
@@ -599,13 +595,11 @@
     <string name="gps_shield_text_point">Si compartes el original sin limpiarlo, quien lo reciba podría ver las coordenadas de donde se tomó.</string>
     <string name="gps_shield_text_tags">Los metadatos contienen información de ubicación, pero no se pudieron leer las coordenadas exactas.</string>
     <string name="gps_shield_not_tracking">Esto no significa que te estén rastreando. El riesgo aparece cuando compartes un archivo con etiquetas de ubicación.</string>
-    <string name="gps_shield_advice">Antes de compartir, conviene crear una copia sin GPS: una forma sencilla de proteger tu ubicación.</string>
     <string name="gps_shield_action">Proteger la foto · eliminar GPS</string>
     <string name="gps_shield_action_video">Proteger el vídeo · eliminar metadatos</string>
     <string name="gps_shield_action_note_video">El vídeo se copia sin recodificar, así que la calidad no cambia. El original no se modifica. La limpieza de vídeos es una función Pro.</string>
     <string name="gps_shield_action_note">Después de tocar, elige dónde guardar la copia nueva. El original no cambia. Comparte la copia. Gratis: hasta %1$d fotos al día.</string>
     <string name="gps_shield_open_original">Para eliminar las etiquetas de ubicación, abre la foto JPEG/PNG original: un informe guardado no contiene la foto.</string>
-    <string name="gps_shield_coordinates">Coordenadas en el archivo original</string>
     <string name="gps_shield_partial">El punto no se puede mostrar en el mapa: los datos GPS están incompletos o guardados en XMP/PNG.</string>
     <string name="map_off">Mapa desactivado · no se envía nada</string>
     <string name="map_consent">Para mostrar el punto en un mapa, la app descargará fragmentos del mapa desde los servidores de %1$s. Los servidores verán tu dirección IP y dónde está el punto, con una precisión de unos cientos de metros. La foto y sus metadatos no se envían.</string>
@@ -640,7 +634,14 @@
     <string name="licenses_map_tiles">Los fragmentos del mapa los sirve MapTiler (© MapTiler) cuando está configurado; si no, los servidores de la OpenStreetMap Foundation.</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">Privacidad</string>
+    <string name="stamp_reveals">EL ARCHIVO REVELA</string>
+    <plurals name="stamp_facts">
+        <item quantity="one">%1$d DATO</item>
+        <item quantity="other">%1$d DATOS</item>
+    </plurals>
+    <string name="stamp_nothing">NADA</string>
+    <string name="history_badge_reveals">REVELA %1$d</string>
+    <string name="history_badge_clean">LIMPIO</string>
     <string name="privacy_title">Qué revela este archivo</string>
     <string name="privacy_hint">Cualquiera a quien envíes el archivo original puede verlo.</string>
     <string name="privacy_none_text">No hay ubicación, nombres ni números de serie del dispositivo en los metadatos.</string>

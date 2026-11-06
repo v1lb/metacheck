@@ -11,10 +11,12 @@ Jetpack Compose (BOM 2025.08.00): Apache License 2.0
 Kotlin Coroutines 1.10.2: Apache License 2.0
 OkHttp 4.12.0 and Okio: Apache License 2.0
 Google Play Billing Library 8.0.0: Android Software Development Kit License
-Google Play In-App Review 2.0.1: Android Software Development Kit License"""
+Google Play In-App Review 2.0.1: Android Software Development Kit License
+IBM Plex Sans, IBM Plex Mono (fonts, © 2017 IBM Corp.): SIL Open Font License 1.1"""
 
     const val LICENSE_LINKS = """Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0
-Android SDK License: https://developer.android.com/studio/terms"""
+Android SDK License: https://developer.android.com/studio/terms
+SIL Open Font License 1.1: https://openfontlicense.org"""
 
     const val OSM_COPYRIGHT_URL = "https://www.openstreetmap.org/copyright"
 

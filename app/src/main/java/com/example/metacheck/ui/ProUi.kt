@@ -21,7 +21,6 @@ import com.example.metacheck.R
 import com.example.metacheck.domain.metadata.DailyCleanQuota
 import com.example.metacheck.ui.text.asString
 import androidx.compose.material3.TextButton
-import com.example.metacheck.ui.theme.CyberPalette
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +51,7 @@ fun PaywallDialog(vm: ProViewModel) {
         containerColor = MaterialTheme.colorScheme.surface,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         textContentColor = MaterialTheme.colorScheme.onSurface,
-        shape = RoundedCornerShape(26.dp),
+        shape = RoundedCornerShape(8.dp),
         title = { Text(stringResource(R.string.pro_title), color = MaterialTheme.colorScheme.onSurface) },
         text = {
             // Прокрутка: на маленьком экране с открытой клавиатурой (поле ключа) текст и кнопки обрезались.

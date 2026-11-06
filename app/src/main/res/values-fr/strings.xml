@@ -278,7 +278,6 @@
     <string name="result_tab_analysis">Analyse</string>
     <string name="result_tab_metadata">Métadonnées</string>
     <string name="result_tab_map">Carte</string>
-    <string name="result_eyebrow_report">Rapport · sur cet appareil</string>
     <string name="result_badge_local">Sur l’appareil</string>
     <string name="result_no_gps">Ce fichier ne contient pas de coordonnées GPS lisibles. Si vous êtes sûr qu’il en avait, choisissez la photo d’origine avec « Vérifier une photo » et autorisez l’accès à la position des photos.</string>
     <string name="result_eyebrow_engine">Étiquettes IA dans les métadonnées</string>
@@ -303,7 +302,6 @@
     <string name="result_preview_description">Image vérifiée : %1$s</string>
     <string name="result_preview_not_stored">La photo n’est pas conservée dans l’historique</string>
     <string name="result_preview_unavailable">Aperçu indisponible</string>
-    <string name="result_eyebrow_preview">Aperçu</string>
     <string name="signal_eyebrow_ai">Indice d’IA</string>
     <string name="signal_eyebrow_caution">Attention</string>
     <string name="signal_eyebrow_info">Remarque</string>
@@ -315,7 +313,6 @@
     <string name="result_map_privacy_note">La carte se charge uniquement quand vous appuyez sur son bouton. « Ouvrir dans Plans » transmet les coordonnées à l’application externe de votre choix.</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">Toutes les métadonnées</string>
     <string name="viewer_title">Métadonnées du fichier</string>
     <plurals name="viewer_field_count">
         <item quantity="one">%1$d champ · affiché directement sur l’appareil</item>
@@ -378,7 +375,6 @@
     <string name="main_api_dialog_title">API externe</string>
     <string name="main_api_waiting">En attente de la réponse du serveur…</string>
     <string name="main_api_empty_response">Réponse vide</string>
-    <string name="dash_eyebrow_secure">Vérification de la confidentialité des photos</string>
     <string name="dash_title">Que révèle votre photo ?</string>
     <string name="dash_subtitle">Position, appareil, auteur et étiquettes IA cachés dans le fichier. Vérifiez-les et supprimez-les avant d’envoyer.</string>
     <string name="dash_scan_hint">Choisissez le JPEG, PNG ou HEIC d’origine ou une vidéo MP4/MOV : une capture d’écran a déjà perdu une partie des données.</string>
@@ -599,13 +595,11 @@
     <string name="gps_shield_text_point">Si vous partagez l’original sans le nettoyer, le destinataire pourra voir les coordonnées du lieu de prise de vue.</string>
     <string name="gps_shield_text_tags">Les métadonnées contiennent des informations de localisation, mais les coordonnées exactes n’ont pas pu être lues.</string>
     <string name="gps_shield_not_tracking">Cela ne veut pas dire que vous êtes suivi. Le risque apparaît quand vous partagez un fichier avec des balises de localisation.</string>
-    <string name="gps_shield_advice">Avant de partager, mieux vaut créer une copie sans GPS : un moyen simple de protéger votre position.</string>
     <string name="gps_shield_action">Protéger la photo · supprimer le GPS</string>
     <string name="gps_shield_action_video">Protéger la vidéo · supprimer les métadonnées</string>
     <string name="gps_shield_action_note_video">La vidéo est copiée sans réencodage : la qualité reste la même. L’original n’est pas modifié. Le nettoyage des vidéos est une fonction Pro.</string>
     <string name="gps_shield_action_note">Après avoir appuyé, choisissez où enregistrer la nouvelle copie. L’original reste inchangé. Partagez la copie. Gratuit : jusqu’à %1$d photos par jour.</string>
     <string name="gps_shield_open_original">Pour supprimer les balises de localisation, ouvrez la photo JPEG/PNG d’origine : un rapport enregistré ne contient pas la photo.</string>
-    <string name="gps_shield_coordinates">Coordonnées dans le fichier d’origine</string>
     <string name="gps_shield_partial">Le point ne peut pas être affiché sur la carte : les données GPS sont incomplètes ou stockées en XMP/PNG.</string>
     <string name="map_off">Carte désactivée · rien n’est envoyé</string>
     <string name="map_consent">Pour afficher le point sur une carte, l’application téléchargera des tuiles depuis les serveurs de %1$s. Ces serveurs verront votre adresse IP et l’emplacement du point, à quelques centaines de mètres près. La photo et ses métadonnées ne sont pas envoyées.</string>
@@ -640,7 +634,14 @@
     <string name="licenses_map_tiles">Les tuiles sont fournies par MapTiler (© MapTiler) lorsqu’il est configuré, sinon par les serveurs de la OpenStreetMap Foundation.</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">Confidentialité</string>
+    <string name="stamp_reveals">LE FICHIER RÉVÈLE</string>
+    <plurals name="stamp_facts">
+        <item quantity="one">%1$d FAIT</item>
+        <item quantity="other">%1$d FAITS</item>
+    </plurals>
+    <string name="stamp_nothing">RIEN</string>
+    <string name="history_badge_reveals">RÉVÈLE %1$d</string>
+    <string name="history_badge_clean">PROPRE</string>
     <string name="privacy_title">Ce que révèle ce fichier</string>
     <string name="privacy_hint">Toute personne à qui vous envoyez le fichier d’origine peut voir ceci.</string>
     <string name="privacy_none_text">Aucune position, aucun nom ni numéro de série d’appareil dans les métadonnées.</string>

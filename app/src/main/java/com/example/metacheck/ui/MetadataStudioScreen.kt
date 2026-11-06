@@ -469,7 +469,7 @@ fun MetadataStudioScreen(
 private fun StudioTab(label: String, selected: Boolean, onClick: () -> Unit) {
     Box(Modifier.background(
         if (selected) MaterialTheme.colorScheme.primary.copy(alpha = .19f) else MaterialTheme.colorScheme.surface,
-        RoundedCornerShape(14.dp),
+        RoundedCornerShape(4.dp),
     ).clickable(onClick = onClick).padding(horizontal = 15.dp, vertical = 12.dp)) {
         Text(label, color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
     }
@@ -493,7 +493,7 @@ private fun StudioField(
         modifier = Modifier.fillMaxWidth(),
         // Тип клавиатуры передаётся явно: раньше он угадывался по русской подписи поля.
         keyboardOptions = KeyboardOptions(keyboardType = keyboard),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(4.dp),
     )
 }
 
@@ -531,7 +531,9 @@ private fun WorldGridDialog(
     var lat by remember { mutableStateOf(latitude.coerceIn(-90.0, 90.0)) }
     var lon by remember { mutableStateOf(longitude.coerceIn(-180.0, 180.0)) }
     val primary = MaterialTheme.colorScheme.primary
-    val outline = MaterialTheme.colorScheme.outline
+    val outline = MaterialTheme.colorScheme.outlineVariant
+    val signal = MaterialTheme.colorScheme.error
+    val surfaceTone = MaterialTheme.colorScheme.surfaceVariant
     val context = LocalContext.current
     // Контуры материков (Natural Earth, общественное достояние) из assets: без них сетка была пустой,
     // и выбрать точку «на глаз» было невозможно. Файл лежал в APK, но больше нигде не использовался.
@@ -552,7 +554,7 @@ private fun WorldGridDialog(
                         lat = (90.0 - (point.y / size.height) * 180.0).coerceIn(-90.0, 90.0)
                     }
                 }) {
-                    drawRect(brush = Brush.verticalGradient(listOf(Color(0xFF0A1520), Color(0xFF14243C))))
+                    drawRect(color = surfaceTone)
                     for (i in 1..11) {
                         val x = size.width * i / 12f
                         drawLine(outline.copy(alpha = .6f), Offset(x, 0f), Offset(x, size.height), 1f)
@@ -574,8 +576,8 @@ private fun WorldGridDialog(
                     }
                     val x = ((lon + 180) / 360 * size.width).toFloat()
                     val y = ((90 - lat) / 180 * size.height).toFloat()
-                    drawCircle(primary.copy(alpha = .23f), radius = 25f, center = Offset(x, y))
-                    drawCircle(primary, radius = 9f, center = Offset(x, y))
+                    drawCircle(signal, radius = 22f, center = Offset(x, y), style = androidx.compose.ui.graphics.drawscope.Stroke(width = 5f))
+                    drawCircle(signal, radius = 6f, center = Offset(x, y))
                 }
                 Text(stringResource(R.string.studio_grid_point,
                     String.format(Locale.US, "%.6f", lat), String.format(Locale.US, "%.6f", lon)),

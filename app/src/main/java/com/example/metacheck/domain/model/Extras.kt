@@ -7,6 +7,8 @@ data class HistoryEntry(
     val format: ImageFormat,
     val hasAiEvidence: Boolean,
     val hasGps: Boolean,
+    /** Сколько личных фактов выдаёт файл (место, серийный номер, автор…), как в отчёте. */
+    val exposureCount: Int = 0,
 )
 
 data class AppSettings(

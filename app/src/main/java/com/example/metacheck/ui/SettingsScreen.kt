@@ -45,7 +45,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metacheck.domain.api.ApiConfigValidator
 import com.example.metacheck.domain.metadata.DailyCleanQuota
 import com.example.metacheck.domain.model.ProSource
-import com.example.metacheck.ui.theme.CyberPalette
 
 @Composable
 fun SettingsScreen(
@@ -198,7 +197,7 @@ fun SettingsScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         textContentColor = MaterialTheme.colorScheme.onSurface,
-        shape = RoundedCornerShape(26.dp),
+        shape = RoundedCornerShape(8.dp),
         title = { Text(stringResource(R.string.settings_clear_title)) },
         text = { Text(stringResource(R.string.settings_clear_text)) },
         confirmButton = { TextButton(onClick = {

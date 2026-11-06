@@ -17,7 +17,10 @@ Versions follow `gradle/libs.versions.toml` (the app shows the same list: About 
 | Google Play Billing Library | 8.0.0 | Android SDK license (Google), see https://developer.android.com/studio/terms |
 | Google Play In-App Review | 2.0.1 | Android SDK license (Google), see https://developer.android.com/studio/terms |
 
+| IBM Plex Sans, IBM Plex Mono (fonts, in `res/font`) | — | SIL Open Font License 1.1 |
+
 Apache License 2.0 text: https://www.apache.org/licenses/LICENSE-2.0
+SIL Open Font License 1.1 text: https://openfontlicense.org (IBM Plex: Copyright © 2017 IBM Corp., Reserved Font Name "Plex")
 
 ## Map data
 Map data © OpenStreetMap contributors, Open Database License 1.0.

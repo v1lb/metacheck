@@ -44,7 +44,7 @@ import java.util.Locale
 fun LanguagePicker(selected: AppLanguage, onSelect: (AppLanguage) -> Unit, maxHeight: Dp = 340.dp) {
     val options = AppLanguage.entries
     val state = rememberLazyListState(initialFirstVisibleItemIndex = (options.indexOf(selected) - 1).coerceAtLeast(0))
-    val shape = RoundedCornerShape(20.dp)
+    val shape = RoundedCornerShape(6.dp)
     LazyColumn(
         state = state,
         modifier = Modifier.fillMaxWidth().heightIn(max = maxHeight).clip(shape)
@@ -62,7 +62,7 @@ fun LanguagePicker(selected: AppLanguage, onSelect: (AppLanguage) -> Unit, maxHe
 @Composable
 private fun LanguageRow(option: AppLanguage, selected: Boolean, onClick: () -> Unit) {
     val accent = MaterialTheme.colorScheme.primary
-    val shape = RoundedCornerShape(14.dp)
+    val shape = RoundedCornerShape(4.dp)
     Row(
         Modifier.fillMaxWidth().clip(shape)
             .border(BorderStroke(if (selected) 2.dp else 1.dp,

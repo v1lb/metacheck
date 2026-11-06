@@ -67,6 +67,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -107,7 +110,6 @@ import com.example.metacheck.domain.analytics.HistoryInsights
 import com.example.metacheck.domain.export.CleanFormat
 import com.example.metacheck.domain.export.ReportText
 import com.example.metacheck.domain.model.HistoryEntry
-import com.example.metacheck.ui.theme.CyberPalette
 import java.io.File
 import java.net.URI
 import java.text.SimpleDateFormat
@@ -281,13 +283,17 @@ fun MainScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Icon(Icons.Filled.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            val home = !showStudio && !showSettings
                             Text(
                                 if (showStudio) stringResource(R.string.studio_name)
                                 else if (showSettings) stringResource(R.string.main_title_settings)
-                                else stringResource(R.string.app_name),
-                                style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface,
+                                else stringResource(R.string.app_name).uppercase(),
+                                style = if (home) com.example.metacheck.ui.theme.MonoText.file.copy(
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize, fontWeight = FontWeight.SemiBold,
+                                    letterSpacing = androidx.compose.ui.unit.TextUnit(0.5f, androidx.compose.ui.unit.TextUnitType.Sp))
+                                else MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                             if (!showSettings && !showStudio && !inResult) {
                                 // Версия из PackageManager, а не строкой в коде (раньше здесь была устаревшая "2.5.1").
@@ -299,7 +305,7 @@ fun MainScreen(
                             }
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = .7f)),
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                     navigationIcon = {
                         if (showStudio || showSettings || inFlow) IconButton(onClick = {
                             if (showStudio) showStudio = false
@@ -310,7 +316,7 @@ fun MainScreen(
                     actions = {
                         if (!showSettings && !showStudio && !inFlow) {
                             IconButton(onClick = { showSettings = true }) {
-                                Icon(Icons.Default.Settings, stringResource(R.string.main_title_settings), tint = MaterialTheme.colorScheme.primary)
+                                Icon(Icons.Default.Settings, stringResource(R.string.main_title_settings), tint = MaterialTheme.colorScheme.onSurface)
                             }
                         }
                     },
@@ -318,7 +324,9 @@ fun MainScreen(
             },
         ) { padding ->
             Column(Modifier.padding(padding).fillMaxSize()) {
-                if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+                HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+                if (busy) LinearProgressIndicator(Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.onSurface,
+                    trackColor = MaterialTheme.colorScheme.outlineVariant)
                 // Плавный переход между экранами. Снимок состояния передаётся в каждый экран, поэтому
                 // уходящий экран дорисовывает свои данные, даже когда состояние уже сменилось
                 // (например, отчёт при возврате на главный).
@@ -449,7 +457,7 @@ fun MainScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             textContentColor = MaterialTheme.colorScheme.onSurface,
-            shape = RoundedCornerShape(26.dp),
+            shape = RoundedCornerShape(8.dp),
             title = { Text(stringResource(R.string.main_api_confirm_title)) },
             text = {
                 Text(stringResource(
@@ -467,7 +475,7 @@ fun MainScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             textContentColor = MaterialTheme.colorScheme.onSurface,
-            shape = RoundedCornerShape(26.dp),
+            shape = RoundedCornerShape(8.dp),
             title = { Text(stringResource(R.string.main_api_dialog_title)) },
             text = {
                 when (dialog) {
@@ -487,7 +495,7 @@ fun MainScreen(
 }
 
 @Composable
-private fun Dashboard(
+internal fun Dashboard(
     history: List<HistoryEntry>, historyEnabled: Boolean, isPro: Boolean,
     onPick: () -> Unit, onCamera: () -> Unit, onClipboard: () -> Unit,
     onOpen: (String) -> Unit, onDelete: (String) -> Unit,
@@ -503,7 +511,7 @@ private fun Dashboard(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             textContentColor = MaterialTheme.colorScheme.onSurface,
-            shape = RoundedCornerShape(26.dp),
+            shape = RoundedCornerShape(8.dp),
             title = { Text(stringResource(R.string.dash_delete_title)) },
             text = { Text(stringResource(R.string.dash_delete_text)) },
             confirmButton = { TextButton(onClick = { pendingDelete = null; onDelete(id) }) { Text(stringResource(R.string.common_delete)) } },
@@ -526,37 +534,44 @@ private fun Dashboard(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
-            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.primary) {
-                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Icon(Icons.Filled.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(18.dp))
-                        CyberEyebrow(stringResource(R.string.dash_eyebrow_secure))
-                    }
-                    Text(stringResource(R.string.dash_title), style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onSurface)
-                    Text(stringResource(R.string.dash_subtitle),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyLarge)
-                    NeonButton(stringResource(R.string.dash_choose_photo), onPick, Modifier.fillMaxWidth().height(56.dp),
-                        icon = Icons.Filled.AddPhotoAlternate)
-                    Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                        CyberOutlineButton(stringResource(R.string.dash_camera), onCamera, Modifier.weight(1f), icon = Icons.Filled.PhotoCamera)
-                        CyberOutlineButton(stringResource(R.string.dash_clipboard), onClipboard, Modifier.weight(1f), icon = Icons.Filled.ContentPaste)
-                    }
-                    Text(stringResource(R.string.dash_scan_hint),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                }
+            Column(Modifier.fillMaxWidth().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(stringResource(R.string.dash_title), style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onSurface)
+                Text(stringResource(R.string.dash_subtitle),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyLarge)
             }
         }
         item {
-            Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(stringResource(R.string.dash_history_title), style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface)
-                if (history.isNotEmpty()) TextButton(onClick = onCsv) {
-                    Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Text(stringResource(R.string.dash_history_csv), modifier = Modifier.padding(start = 6.dp))
+            // Пунктирная рамка «бланка»: сюда кладут файл.
+            Column(
+                Modifier.fillMaxWidth().dashedFrame(MaterialTheme.colorScheme.outline)
+                    .padding(start = 16.dp, end = 16.dp, top = 18.dp, bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(DASH_FORMATS, style = com.example.metacheck.ui.theme.MonoText.tag,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                NeonButton(stringResource(R.string.dash_choose_photo), onPick, Modifier.fillMaxWidth().height(56.dp),
+                    icon = Icons.Filled.Add)
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    CyberOutlineButton(stringResource(R.string.dash_camera), onCamera, Modifier.weight(1f))
+                    CyberOutlineButton(stringResource(R.string.dash_clipboard), onClipboard, Modifier.weight(1f))
                 }
+            }
+            Text(stringResource(R.string.dash_scan_hint), Modifier.padding(top = 8.dp, start = 2.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+        }
+        item {
+            Column(Modifier.fillMaxWidth().padding(top = 10.dp)) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(stringResource(R.string.dash_history_title), style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface)
+                    if (history.isNotEmpty()) TextButton(onClick = onCsv,
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)) {
+                        Text(stringResource(R.string.dash_history_csv))
+                    }
+                }
+                HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
             }
         }
         if (history.isEmpty()) item {
@@ -569,30 +584,34 @@ private fun Dashboard(
             }
         }
         items(history, key = { it.id }) { entry ->
-            GlassPanel(Modifier.fillMaxWidth(), if (entry.hasAiEvidence) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary) {
-                Row(Modifier.fillMaxWidth().clickable { onOpen(entry.id) }.padding(start = 15.dp, top = 10.dp, bottom = 10.dp, end = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Icon(if (entry.hasGps) Icons.Filled.LocationOn else Icons.Filled.Image, contentDescription = null,
-                        tint = if (entry.hasGps) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(end = 12.dp))
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(Modifier.fillMaxWidth()) {
+                Row(Modifier.fillMaxWidth().clickable { onOpen(entry.id) }.padding(top = 8.dp, bottom = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                         Text(entry.fileName.ifBlank { stringResource(R.string.common_unnamed) }, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleMedium)
-                        Text("${dateFormat.format(Date(entry.createdAt))}  •  ${texts.formatName(entry.format)}" +
-                            if (entry.hasAiEvidence) "  •  " + stringResource(R.string.dash_history_ai_badge) else "",
+                            style = com.example.metacheck.ui.theme.MonoText.file)
+                        Text("${dateFormat.format(Date(entry.createdAt))} · ${texts.formatName(entry.format)}" +
+                            if (entry.hasAiEvidence) " · " + stringResource(R.string.dash_history_ai_badge) else "",
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    }
+                    if (entry.exposureCount > 0) {
+                        Stamp(listOf(stringResource(R.string.history_badge_reveals, entry.exposureCount)),
+                            MaterialTheme.colorScheme.error, small = true)
+                    } else {
+                        Stamp(listOf(stringResource(R.string.history_badge_clean)), MaterialTheme.colorScheme.tertiary, small = true)
                     }
                     IconButton(onClick = { pendingDelete = entry.id }) {
                         Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.dash_history_delete, entry.fileName), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
+                HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
             }
         }
         item {
-            GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
+            GlassPanel(Modifier.fillMaxWidth()) {
                 Row(Modifier.fillMaxWidth().clickable(onClick = onStudio).padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Icon(Icons.Filled.Tune, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+                    Icon(Icons.Filled.Tune, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                         Text(stringResource(R.string.dash_eyebrow_studio), style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface)
@@ -628,13 +647,13 @@ private fun Dashboard(
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text(stringResource(R.string.dash_history_limit), color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodySmall)
-                        Text("${history.size} / $historyLimit", color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodySmall)
+                        Text("${history.size} / $historyLimit", color = MaterialTheme.colorScheme.onSurface, style = com.example.metacheck.ui.theme.MonoText.tag)
                     }
                     LinearProgressIndicator(
                         progress = { (history.size.toFloat() / historyLimit).coerceIn(0f, 1f) },
                         modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.tertiary,
-                        trackColor = MaterialTheme.colorScheme.outline,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        trackColor = MaterialTheme.colorScheme.outlineVariant,
                     )
                     Text(stringResource(if (isPro) R.string.dash_history_limit_pro else R.string.dash_history_limit_free),
                         color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
@@ -647,7 +666,7 @@ private fun Dashboard(
             GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.tertiary) {
                 Row(Modifier.fillMaxWidth().then(if (isPro) Modifier else Modifier.clickable(onClick = onUpgrade)).padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Icon(Icons.Filled.WorkspacePremium, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
+                    Icon(Icons.Filled.WorkspacePremium, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(if (isPro) R.string.dash_pro_active else R.string.dash_pro_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         Text(stringResource(if (isPro) R.string.dash_pro_active_text else R.string.dash_pro_text),
@@ -672,11 +691,10 @@ private fun ActivityChart(bins: List<Int>, modifier: Modifier = Modifier) {
         val widthPerBar = size.width / 7f
         bins.forEachIndexed { index, count ->
             val height = if (count == 0) 2.dp.toPx() else size.height * (.12f + .82f * count / maxCount)
-            drawRoundRect(
-                brush = Brush.verticalGradient(listOf(primary, secondary.copy(alpha = .38f))),
-                topLeft = Offset(index * widthPerBar + widthPerBar * .24f, size.height - height),
-                size = Size(widthPerBar * .52f, height),
-                cornerRadius = CornerRadius(7f, 7f),
+            drawRect(
+                color = primary,
+                topLeft = Offset(index * widthPerBar + widthPerBar * .3f, size.height - height),
+                size = Size(widthPerBar * .4f, height),
             )
         }
     }
@@ -688,7 +706,6 @@ private fun LoadingScreen() {
         GlassPanel(Modifier.fillMaxWidth().padding(22.dp)) {
             Column(Modifier.padding(26.dp), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(17.dp)) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 CyberEyebrow(stringResource(R.string.loading_eyebrow))
                 Text(stringResource(R.string.loading_title), style = MaterialTheme.typography.titleLarge)
                 ScanningBars(Modifier.fillMaxWidth().height(65.dp))
@@ -755,3 +772,6 @@ private fun screenTransition(from: ScreenKind, to: ScreenKind): ContentTransform
 
 /** Что можно выбрать для проверки: фото и видео (MP4/MOV; прочие видео отклонит проверка сигнатуры). */
 private val PICK_TYPES = arrayOf("image/*", "video/*")
+
+/** Строка форматов в рамке главного экрана: названия форматов не переводятся. */
+private const val DASH_FORMATS = "JPEG · PNG · HEIC · WEBP · MP4 · MOV"

@@ -276,7 +276,6 @@
     <string name="result_tab_analysis">分析</string>
     <string name="result_tab_metadata">メタデータ</string>
     <string name="result_tab_map">地図</string>
-    <string name="result_eyebrow_report">レポート · この端末上</string>
     <string name="result_badge_local">端末上</string>
     <string name="result_no_gps">このファイルには読み取れるGPS座標がありません。座標があるはずなら、「写真をチェック」で元の写真を選び、写真の位置情報へのアクセスを許可してください。</string>
     <string name="result_eyebrow_engine">メタデータ内のAIラベル</string>
@@ -301,7 +300,6 @@
     <string name="result_preview_description">確認中の画像：%1$s</string>
     <string name="result_preview_not_stored">写真は履歴に保存されません</string>
     <string name="result_preview_unavailable">プレビューを表示できません</string>
-    <string name="result_eyebrow_preview">プレビュー</string>
     <string name="signal_eyebrow_ai">AIの兆候</string>
     <string name="signal_eyebrow_caution">注意</string>
     <string name="signal_eyebrow_info">メモ</string>
@@ -313,7 +311,6 @@
     <string name="result_map_privacy_note">地図はボタンを押したときだけ読み込まれます。「地図で開く」は、選択した外部アプリに座標を渡します。</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">すべてのメタデータ</string>
     <string name="viewer_title">ファイルのメタデータ</string>
     <plurals name="viewer_field_count">
         <item quantity="other">%1$d 件のフィールド · 端末上で直接表示</item>
@@ -374,7 +371,6 @@
     <string name="main_api_dialog_title">外部API</string>
     <string name="main_api_waiting">サーバーの応答を待っています…</string>
     <string name="main_api_empty_response">空の応答</string>
-    <string name="dash_eyebrow_secure">写真のプライバシーチェック</string>
     <string name="dash_title">その写真、何がバレる？</string>
     <string name="dash_subtitle">撮影場所、カメラ、作成者、AIラベルがファイルに隠れています。送信前に確認して削除しましょう。</string>
     <string name="dash_scan_hint">元のJPEG、PNG、HEIC、またはMP4/MOV動画を選んでください。スクリーンショットではデータの一部がすでに失われています。</string>
@@ -595,13 +591,11 @@
     <string name="gps_shield_text_point">クリーニングせずに元の写真を共有すると、受信者に撮影場所の座標が見える場合があります。</string>
     <string name="gps_shield_text_tags">メタデータに位置情報がありますが、正確な座標は読み取れませんでした。</string>
     <string name="gps_shield_not_tracking">追跡されているという意味ではありません。位置情報タグ付きのファイルを共有したときにリスクが生じます。</string>
-    <string name="gps_shield_advice">共有する前に、GPSなしのコピーを作るのがおすすめです。位置情報を守る簡単な方法です。</string>
     <string name="gps_shield_action">写真を保護 · GPSを削除</string>
     <string name="gps_shield_action_video">動画を保護 · メタデータを削除</string>
     <string name="gps_shield_action_note_video">動画は再エンコードせずにコピーされるため、画質は変わりません。元のファイルはそのままです。動画のクリーニングはPro機能です。</string>
     <string name="gps_shield_action_note">タップしたら新しいコピーの保存先を選びます。元のファイルは変更されません。共有するのはコピーです。無料：1日 %1$d 枚まで。</string>
     <string name="gps_shield_open_original">位置情報タグを削除するには、元のJPEG/PNG写真を開いてください。保存されたレポートには写真そのものは含まれていません。</string>
-    <string name="gps_shield_coordinates">元ファイルの座標</string>
     <string name="gps_shield_partial">地図に地点を表示できません。GPSデータが不完全か、XMP/PNGに保存されています。</string>
     <string name="map_off">地図はオフ · 何も送信されません</string>
     <string name="map_consent">地点を地図に表示するため、アプリは %1$s のサーバーから地図タイルをダウンロードします。サーバーにはIPアドレスと、数百メートル程度の精度で地点の場所が伝わります。写真とそのメタデータは送信されません。</string>
@@ -636,7 +630,13 @@
     <string name="licenses_map_tiles">地図タイルは、設定されている場合はMapTiler（© MapTiler）、それ以外の場合はOpenStreetMap Foundationのサーバーから提供されます。</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">プライバシー</string>
+    <string name="stamp_reveals">このファイルからわかること</string>
+    <plurals name="stamp_facts">
+        <item quantity="other">%1$d 件</item>
+    </plurals>
+    <string name="stamp_nothing">なし</string>
+    <string name="history_badge_reveals">%1$d 件</string>
+    <string name="history_badge_clean">クリーン</string>
     <string name="privacy_title">このファイルからわかること</string>
     <string name="privacy_hint">元のファイルを送った相手は誰でもこれを見られます。</string>
     <string name="privacy_none_text">メタデータに位置情報、名前、端末のシリアル番号はありません。</string>

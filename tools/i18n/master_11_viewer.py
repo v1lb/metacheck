@@ -1,7 +1,6 @@
 # Просмотр метаданных (MetadataViewer.kt). (key, en, ru)
 
 S = [
-    ("viewer_eyebrow", "All metadata", "Все метаданные"),
     ("viewer_title", "File metadata", "Метаданные файла"),
     ("viewer_field_count",
      {"one": "%1$d field · viewed right on the device", "other": "%1$d fields · viewed right on the device"},
