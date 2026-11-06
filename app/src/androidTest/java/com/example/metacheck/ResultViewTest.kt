@@ -1,6 +1,8 @@
 package com.example.metacheck
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -78,6 +80,8 @@ class ResultViewTest {
         show(report(ai = false, gps = false))
         compose.onNodeWithText(text(R.string.result_tab_metadata)).performClick()
         compose.onNodeWithTag("metadata_search").performTextInput(text(R.string.exif_model))
+        // Поле может оказаться ниже края экрана эмулятора: прокручиваем список к нему.
+        compose.onNodeWithTag("metadata_viewer").performScrollToNode(hasText("Pixel 8"))
         compose.onNodeWithText("Pixel 8").assertIsDisplayed()
     }
 

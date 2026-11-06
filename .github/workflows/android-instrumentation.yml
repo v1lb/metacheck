@@ -56,6 +56,11 @@ jobs:
             app/build/reports/androidTests/**
             app/build/outputs/androidTest-results/**
           if-no-files-found: ignore
+      # Снимки в журнале (base64): так их можно посмотреть без скачивания архива.
+      - name: Print screenshots
+        if: always()
+        run: |
+          for f in app/build/screens/*.png; do [ -f "$f" ] || continue; echo "SCREEN $(basename "$f") $(base64 -w0 "$f")"; done
       - name: Save screenshots
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
