@@ -279,7 +279,6 @@
     <string name="result_tab_analysis">Анализ</string>
     <string name="result_tab_metadata">Метаданные</string>
     <string name="result_tab_map">Карта</string>
-    <string name="result_eyebrow_report">Отчёт · на этом устройстве</string>
     <string name="result_badge_local">На устройстве</string>
     <string name="result_no_gps">В этом файле нет читаемых GPS-координат. Если вы уверены, что они были, выберите оригинал фото кнопкой «Проверить фото» и разрешите доступ к геометкам.</string>
     <string name="result_eyebrow_engine">Метки ИИ в метаданных</string>
@@ -304,7 +303,6 @@
     <string name="result_preview_description">Проверяемое изображение: %1$s</string>
     <string name="result_preview_not_stored">Фотография не хранится в истории</string>
     <string name="result_preview_unavailable">Превью недоступно</string>
-    <string name="result_eyebrow_preview">Превью</string>
     <string name="signal_eyebrow_ai">Признак ИИ</string>
     <string name="signal_eyebrow_caution">Внимание</string>
     <string name="signal_eyebrow_info">Заметка</string>
@@ -316,7 +314,6 @@
     <string name="result_map_privacy_note">Карта загружается только по вашей кнопке. «Открыть в картах» передаст координаты выбранному внешнему приложению.</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">Все метаданные</string>
     <string name="viewer_title">Метаданные файла</string>
     <plurals name="viewer_field_count">
         <item quantity="one">%1$d поле · просмотр прямо на устройстве</item>
@@ -380,7 +377,6 @@
     <string name="main_api_dialog_title">Внешний API</string>
     <string name="main_api_waiting">Ожидание ответа сервера…</string>
     <string name="main_api_empty_response">Ответ пуст</string>
-    <string name="dash_eyebrow_secure">Проверка приватности фото</string>
     <string name="dash_title">Что выдаёт ваше фото?</string>
     <string name="dash_subtitle">Место съёмки, камера, автор и метки ИИ внутри файла. Проверьте и удалите их до отправки.</string>
     <string name="dash_scan_hint">Выбирайте исходный JPEG, PNG, HEIC или видео MP4/MOV: в скриншоте часть данных уже потеряна.</string>
@@ -601,13 +597,11 @@
     <string name="gps_shield_text_point">Если отправить оригинал без очистки, получатель может увидеть координаты места съёмки.</string>
     <string name="gps_shield_text_tags">В метаданных найдены сведения о местоположении, но точные координаты прочитать не удалось.</string>
     <string name="gps_shield_not_tracking">Это не означает, что за вами следят. Риск возникает, если передать файл с геометками.</string>
-    <string name="gps_shield_advice">Перед отправкой лучше создать копию без GPS: это простой способ защитить своё местоположение.</string>
     <string name="gps_shield_action">Защитить фото · удалить GPS</string>
     <string name="gps_shield_action_video">Защитить видео · удалить метаданные</string>
     <string name="gps_shield_action_note_video">Видео копируется без пережатия, качество не меняется. Оригинал останется прежним. Очистка видео доступна в Pro.</string>
     <string name="gps_shield_action_note">После нажатия выберите место для новой копии. Оригинал не изменится. Отправляйте именно копию. Free: до %1$d фото в сутки.</string>
     <string name="gps_shield_open_original">Чтобы убрать геометки, откройте исходную фотографию JPEG/PNG: сохранённый отчёт не содержит самого фото.</string>
-    <string name="gps_shield_coordinates">Координаты в исходном файле</string>
     <string name="gps_shield_partial">Точку нельзя показать на карте: GPS-данные неполные или записаны в XMP/PNG.</string>
     <string name="map_off">Карта выключена · ничего не отправляется</string>
     <string name="map_consent">Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов %1$s. Серверы увидят ваш IP-адрес и где находится точка, с точностью до нескольких сотен метров. Само фото и его метаданные не отправляются.</string>
@@ -642,7 +636,6 @@
     <string name="licenses_map_tiles">Фрагменты карты загружаются с MapTiler (© MapTiler), если он настроен, иначе с серверов OpenStreetMap Foundation.</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">Приватность</string>
     <string name="stamp_reveals">ФАЙЛ ВЫДАЁТ</string>
     <plurals name="stamp_facts">
         <item quantity="one">%1$d ФАКТ</item>

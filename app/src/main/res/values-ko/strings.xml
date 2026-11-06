@@ -276,7 +276,6 @@
     <string name="result_tab_analysis">분석</string>
     <string name="result_tab_metadata">메타데이터</string>
     <string name="result_tab_map">지도</string>
-    <string name="result_eyebrow_report">보고서 · 이 기기에서</string>
     <string name="result_badge_local">기기에서</string>
     <string name="result_no_gps">이 파일에는 읽을 수 있는 GPS 좌표가 없습니다. 좌표가 있었다고 확신한다면 “사진 확인”으로 원본 사진을 선택하고 사진 위치 정보 접근을 허용하세요.</string>
     <string name="result_eyebrow_engine">메타데이터의 AI 라벨</string>
@@ -301,7 +300,6 @@
     <string name="result_preview_description">확인 중인 이미지: %1$s</string>
     <string name="result_preview_not_stored">사진은 기록에 저장되지 않습니다</string>
     <string name="result_preview_unavailable">미리보기를 사용할 수 없음</string>
-    <string name="result_eyebrow_preview">미리보기</string>
     <string name="signal_eyebrow_ai">AI 징후</string>
     <string name="signal_eyebrow_caution">주의</string>
     <string name="signal_eyebrow_info">참고</string>
@@ -313,7 +311,6 @@
     <string name="result_map_privacy_note">지도는 버튼을 누를 때만 불러옵니다. “지도에서 열기”는 선택한 외부 앱에 좌표를 전달합니다.</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">모든 메타데이터</string>
     <string name="viewer_title">파일 메타데이터</string>
     <plurals name="viewer_field_count">
         <item quantity="other">필드 %1$d개 · 기기에서 바로 확인</item>
@@ -374,7 +371,6 @@
     <string name="main_api_dialog_title">외부 API</string>
     <string name="main_api_waiting">서버 응답을 기다리는 중…</string>
     <string name="main_api_empty_response">빈 응답</string>
-    <string name="dash_eyebrow_secure">사진 개인정보 확인</string>
     <string name="dash_title">사진이 무엇을 드러낼까요?</string>
     <string name="dash_subtitle">파일 안에 숨은 위치, 카메라, 작성자, AI 라벨. 보내기 전에 확인하고 제거하세요.</string>
     <string name="dash_scan_hint">원본 JPEG, PNG, HEIC 또는 MP4/MOV 동영상을 선택하세요. 스크린샷은 이미 일부 데이터가 사라진 상태입니다.</string>
@@ -595,13 +591,11 @@
     <string name="gps_shield_text_point">정리하지 않고 원본을 공유하면 받는 사람이 촬영 위치 좌표를 볼 수 있습니다.</string>
     <string name="gps_shield_text_tags">메타데이터에 위치 정보가 있지만 정확한 좌표는 읽을 수 없습니다.</string>
     <string name="gps_shield_not_tracking">추적되고 있다는 뜻은 아닙니다. 위치 태그가 있는 파일을 공유할 때 위험이 생깁니다.</string>
-    <string name="gps_shield_advice">공유하기 전에 GPS가 없는 사본을 만드는 것이 좋습니다. 위치를 보호하는 간단한 방법입니다.</string>
     <string name="gps_shield_action">사진 보호 · GPS 제거</string>
     <string name="gps_shield_action_video">동영상 보호 · 메타데이터 제거</string>
     <string name="gps_shield_action_note_video">동영상은 재인코딩 없이 복사되므로 화질이 그대로입니다. 원본은 변경되지 않습니다. 동영상 정리는 Pro 기능입니다.</string>
     <string name="gps_shield_action_note">탭한 후 새 사본을 저장할 위치를 선택하세요. 원본은 그대로 유지됩니다. 사본을 공유하세요. 무료: 하루 최대 %1$d장.</string>
     <string name="gps_shield_open_original">위치 태그를 제거하려면 원본 JPEG/PNG 사진을 여세요. 저장된 보고서에는 사진이 포함되어 있지 않습니다.</string>
-    <string name="gps_shield_coordinates">원본 파일의 좌표</string>
     <string name="gps_shield_partial">지도에 지점을 표시할 수 없습니다. GPS 데이터가 불완전하거나 XMP/PNG에 저장되어 있습니다.</string>
     <string name="map_off">지도 꺼짐 · 아무것도 전송되지 않음</string>
     <string name="map_consent">지점을 지도에 표시하려면 앱이 %1$s 서버에서 지도 타일을 내려받습니다. 서버는 IP 주소와 수백 미터 정확도의 지점 위치를 알 수 있습니다. 사진과 메타데이터는 전송되지 않습니다.</string>
@@ -636,7 +630,6 @@
     <string name="licenses_map_tiles">지도 타일은 설정된 경우 MapTiler(© MapTiler)가, 그렇지 않으면 OpenStreetMap Foundation 서버가 제공합니다.</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">개인정보</string>
     <string name="stamp_reveals">파일이 드러내는 정보</string>
     <plurals name="stamp_facts">
         <item quantity="other">%1$d개</item>

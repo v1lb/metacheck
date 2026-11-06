@@ -276,7 +276,6 @@
     <string name="result_tab_analysis">Analisis</string>
     <string name="result_tab_metadata">Metadata</string>
     <string name="result_tab_map">Peta</string>
-    <string name="result_eyebrow_report">Laporan · di perangkat ini</string>
     <string name="result_badge_local">Di perangkat</string>
     <string name="result_no_gps">File ini tidak memiliki koordinat GPS yang dapat dibaca. Jika Anda yakin file ini memilikinya, pilih foto asli melalui “Periksa foto” dan izinkan akses ke lokasi foto.</string>
     <string name="result_eyebrow_engine">Label AI di metadata</string>
@@ -301,7 +300,6 @@
     <string name="result_preview_description">Gambar yang diperiksa: %1$s</string>
     <string name="result_preview_not_stored">Foto tidak disimpan di riwayat</string>
     <string name="result_preview_unavailable">Pratinjau tidak tersedia</string>
-    <string name="result_eyebrow_preview">Pratinjau</string>
     <string name="signal_eyebrow_ai">Tanda AI</string>
     <string name="signal_eyebrow_caution">Perhatian</string>
     <string name="signal_eyebrow_info">Catatan</string>
@@ -313,7 +311,6 @@
     <string name="result_map_privacy_note">Peta hanya dimuat saat Anda menekan tombolnya. “Buka di peta” mengirim koordinat ke aplikasi eksternal yang Anda pilih.</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">Semua metadata</string>
     <string name="viewer_title">Metadata file</string>
     <plurals name="viewer_field_count">
         <item quantity="other">%1$d kolom · dilihat langsung di perangkat</item>
@@ -374,7 +371,6 @@
     <string name="main_api_dialog_title">API eksternal</string>
     <string name="main_api_waiting">Menunggu respons server…</string>
     <string name="main_api_empty_response">Respons kosong</string>
-    <string name="dash_eyebrow_secure">Pemeriksaan privasi foto</string>
     <string name="dash_title">Apa yang diungkap foto Anda?</string>
     <string name="dash_subtitle">Lokasi, kamera, pembuat, dan label AI tersembunyi di dalam file. Periksa dan hapus sebelum mengirim.</string>
     <string name="dash_scan_hint">Pilih JPEG, PNG, HEIC asli, atau video MP4/MOV: tangkapan layar sudah kehilangan sebagian data.</string>
@@ -595,13 +591,11 @@
     <string name="gps_shield_text_point">Jika Anda membagikan file asli tanpa membersihkannya, penerima dapat melihat koordinat lokasi pengambilan.</string>
     <string name="gps_shield_text_tags">Metadata berisi informasi lokasi, tetapi koordinat pastinya tidak dapat dibaca.</string>
     <string name="gps_shield_not_tracking">Ini tidak berarti Anda sedang dilacak. Risiko muncul saat Anda membagikan file dengan tag lokasi.</string>
-    <string name="gps_shield_advice">Sebelum membagikan, sebaiknya buat salinan tanpa GPS: cara mudah melindungi lokasi Anda.</string>
     <string name="gps_shield_action">Lindungi foto · hapus GPS</string>
     <string name="gps_shield_action_video">Lindungi video · hapus metadata</string>
     <string name="gps_shield_action_note_video">Video disalin tanpa encode ulang, jadi kualitasnya tetap sama. File asli tidak berubah. Pembersihan video adalah fitur Pro.</string>
     <string name="gps_shield_action_note">Setelah mengetuk, pilih tempat menyimpan salinan baru. File asli tetap sama. Bagikan salinannya. Gratis: hingga %1$d foto per hari.</string>
     <string name="gps_shield_open_original">Untuk menghapus tag lokasi, buka foto JPEG/PNG asli: laporan yang disimpan tidak berisi fotonya.</string>
-    <string name="gps_shield_coordinates">Koordinat di file asli</string>
     <string name="gps_shield_partial">Titik tidak dapat ditampilkan di peta: data GPS tidak lengkap atau disimpan di XMP/PNG.</string>
     <string name="map_off">Peta nonaktif · tidak ada yang dikirim</string>
     <string name="map_consent">Untuk menampilkan titik di peta, aplikasi akan mengunduh potongan peta dari server %1$s. Server akan melihat alamat IP Anda dan lokasi titik dengan ketelitian beberapa ratus meter. Foto dan metadatanya tidak dikirim.</string>
@@ -636,7 +630,6 @@
     <string name="licenses_map_tiles">Potongan peta disediakan oleh MapTiler (© MapTiler) jika dikonfigurasi; jika tidak, oleh server OpenStreetMap Foundation.</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">Privasi</string>
     <string name="stamp_reveals">FILE MENGUNGKAP</string>
     <plurals name="stamp_facts">
         <item quantity="other">%1$d FAKTA</item>

@@ -279,7 +279,6 @@
     <string name="result_tab_analysis">Аналіз</string>
     <string name="result_tab_metadata">Метадані</string>
     <string name="result_tab_map">Карта</string>
-    <string name="result_eyebrow_report">Звіт · на цьому пристрої</string>
     <string name="result_badge_local">На пристрої</string>
     <string name="result_no_gps">У цьому файлі немає GPS-координат, які можна прочитати. Якщо ви впевнені, що вони були, виберіть оригінальне фото через “Перевірити фото” й дозвольте доступ до місцезнаходження фото.</string>
     <string name="result_eyebrow_engine">Мітки ШІ в метаданих</string>
@@ -304,7 +303,6 @@
     <string name="result_preview_description">Зображення, що перевіряється: %1$s</string>
     <string name="result_preview_not_stored">Фото не зберігається в історії</string>
     <string name="result_preview_unavailable">Попередній перегляд недоступний</string>
-    <string name="result_eyebrow_preview">Перегляд</string>
     <string name="signal_eyebrow_ai">Ознака ШІ</string>
     <string name="signal_eyebrow_caution">Увага</string>
     <string name="signal_eyebrow_info">Примітка</string>
@@ -316,7 +314,6 @@
     <string name="result_map_privacy_note">Карта завантажується лише після натискання її кнопки. “Відкрити в картах” передає координати вибраному вами зовнішньому застосунку.</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">Усі метадані</string>
     <string name="viewer_title">Метадані файлу</string>
     <plurals name="viewer_field_count">
         <item quantity="one">%1$d поле · переглянуто просто на пристрої</item>
@@ -380,7 +377,6 @@
     <string name="main_api_dialog_title">Зовнішній API</string>
     <string name="main_api_waiting">Очікування відповіді сервера…</string>
     <string name="main_api_empty_response">Порожня відповідь</string>
-    <string name="dash_eyebrow_secure">Перевірка приватності фото</string>
     <string name="dash_title">Що видає ваше фото?</string>
     <string name="dash_subtitle">Місце зйомки, камера, автор і мітки ШІ всередині файлу. Перевірте й видаліть їх перед надсиланням.</string>
     <string name="dash_scan_hint">Вибирайте оригінальний JPEG, PNG, HEIC або відео MP4/MOV: у знімку екрана частина даних уже втрачена.</string>
@@ -601,13 +597,11 @@
     <string name="gps_shield_text_point">Якщо надіслати оригінал без очищення, одержувач може побачити координати місця зйомки.</string>
     <string name="gps_shield_text_tags">Метадані містять відомості про місцезнаходження, але точні координати прочитати не вдалося.</string>
     <string name="gps_shield_not_tracking">Це не означає, що за вами стежать. Ризик з’являється, коли ви надсилаєте файл із тегами місцезнаходження.</string>
-    <string name="gps_shield_advice">Перед надсиланням краще створити копію без GPS: це простий спосіб захистити своє місцезнаходження.</string>
     <string name="gps_shield_action">Захистити фото · видалити GPS</string>
     <string name="gps_shield_action_video">Захистити відео · видалити метадані</string>
     <string name="gps_shield_action_note_video">Відео копіюється без перекодування, якість не змінюється. Оригінал залишиться без змін. Очищення відео доступне в Pro.</string>
     <string name="gps_shield_action_note">Після натискання виберіть, куди зберегти нову копію. Оригінал не зміниться. Надсилайте копію. Безкоштовно: до %1$d фото на день.</string>
     <string name="gps_shield_open_original">Щоб видалити теги місцезнаходження, відкрийте оригінальне фото JPEG/PNG: збережений звіт не містить самого фото.</string>
-    <string name="gps_shield_coordinates">Координати в оригінальному файлі</string>
     <string name="gps_shield_partial">Точку не можна показати на карті: дані GPS неповні або збережені в XMP/PNG.</string>
     <string name="map_off">Карту вимкнено · нічого не надсилається</string>
     <string name="map_consent">Щоб показати точку на карті, застосунок завантажить фрагменти карти із серверів %1$s. Сервери побачать вашу IP-адресу й місце точки з точністю до кількох сотень метрів. Саме фото і його метадані не надсилаються.</string>
@@ -642,7 +636,6 @@
     <string name="licenses_map_tiles">Фрагменти карти надає MapTiler (© MapTiler), якщо його налаштовано, інакше — сервери OpenStreetMap Foundation.</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">Приватність</string>
     <string name="stamp_reveals">ФАЙЛ ВИДАЄ</string>
     <plurals name="stamp_facts">
         <item quantity="one">%1$d ФАКТ</item>

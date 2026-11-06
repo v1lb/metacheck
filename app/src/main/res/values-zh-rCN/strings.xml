@@ -276,7 +276,6 @@
     <string name="result_tab_analysis">分析</string>
     <string name="result_tab_metadata">元数据</string>
     <string name="result_tab_map">地图</string>
-    <string name="result_eyebrow_report">报告 · 在此设备上</string>
     <string name="result_badge_local">本机处理</string>
     <string name="result_no_gps">此文件没有可读取的 GPS 坐标。如果确定原本有坐标，请通过“检查照片”选择原始照片，并允许访问照片位置信息。</string>
     <string name="result_eyebrow_engine">元数据中的 AI 标签</string>
@@ -301,7 +300,6 @@
     <string name="result_preview_description">正在检查的图像：%1$s</string>
     <string name="result_preview_not_stored">照片不会保存在历史记录中</string>
     <string name="result_preview_unavailable">无法预览</string>
-    <string name="result_eyebrow_preview">预览</string>
     <string name="signal_eyebrow_ai">AI 迹象</string>
     <string name="signal_eyebrow_caution">注意</string>
     <string name="signal_eyebrow_info">提示</string>
@@ -313,7 +311,6 @@
     <string name="result_map_privacy_note">地图仅在您点按其按钮时加载。“在地图中打开”会将坐标传给您选择的外部应用。</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">全部元数据</string>
     <string name="viewer_title">文件元数据</string>
     <plurals name="viewer_field_count">
         <item quantity="other">%1$d 个字段 · 直接在设备上查看</item>
@@ -374,7 +371,6 @@
     <string name="main_api_dialog_title">外部 API</string>
     <string name="main_api_waiting">正在等待服务器响应…</string>
     <string name="main_api_empty_response">空响应</string>
-    <string name="dash_eyebrow_secure">照片隐私检查</string>
     <string name="dash_title">你的照片会泄露什么？</string>
     <string name="dash_subtitle">文件中隐藏着位置、相机、作者和 AI 标签。发送前检查并移除它们。</string>
     <string name="dash_scan_hint">请选择原始 JPEG、PNG、HEIC 或 MP4/MOV 视频：屏幕截图已丢失部分数据。</string>
@@ -595,13 +591,11 @@
     <string name="gps_shield_text_point">如果不清理就分享原图，接收者可能看到拍摄地点的坐标。</string>
     <string name="gps_shield_text_tags">元数据包含位置信息，但无法读取精确坐标。</string>
     <string name="gps_shield_not_tracking">这并不意味着您正被追踪。风险出现在您分享带有位置标签的文件时。</string>
-    <string name="gps_shield_advice">分享前最好创建一份不含 GPS 的副本：这是保护位置的简单方法。</string>
     <string name="gps_shield_action">保护照片 · 移除 GPS</string>
     <string name="gps_shield_action_video">保护视频 · 移除元数据</string>
     <string name="gps_shield_action_note_video">视频不经重新编码直接复制，画质保持不变。原文件不会改变。清理视频是 Pro 功能。</string>
     <string name="gps_shield_action_note">点按后选择新副本的保存位置。原文件保持不变。请分享副本。免费：每天最多 %1$d 张照片。</string>
     <string name="gps_shield_open_original">要移除位置标签，请打开原始 JPEG/PNG 照片：已保存的报告不包含照片本身。</string>
-    <string name="gps_shield_coordinates">原始文件中的坐标</string>
     <string name="gps_shield_partial">无法在地图上显示该位置：GPS 数据不完整，或存储在 XMP/PNG 中。</string>
     <string name="map_off">地图已关闭 · 不发送任何内容</string>
     <string name="map_consent">为在地图上显示该位置，应用将从 %1$s 的服务器下载地图图块。服务器会看到您的 IP 地址，以及精确到几百米的位置。不会发送照片及其元数据。</string>
@@ -636,7 +630,6 @@
     <string name="licenses_map_tiles">地图图块在配置时由 MapTiler（© MapTiler）提供，否则由 OpenStreetMap Foundation 的服务器提供。</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">隐私</string>
     <string name="stamp_reveals">文件泄露</string>
     <plurals name="stamp_facts">
         <item quantity="other">%1$d 项信息</item>

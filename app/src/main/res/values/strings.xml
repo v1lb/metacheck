@@ -278,7 +278,6 @@
     <string name="result_tab_analysis">Analysis</string>
     <string name="result_tab_metadata">Metadata</string>
     <string name="result_tab_map">Map</string>
-    <string name="result_eyebrow_report">Report · on this device</string>
     <string name="result_badge_local">On device</string>
     <string name="result_no_gps">This file has no readable GPS coordinates. If you are sure it had them, choose the original photo with “Check a photo” and allow access to photo locations.</string>
     <string name="result_eyebrow_engine">AI labels in metadata</string>
@@ -303,7 +302,6 @@
     <string name="result_preview_description">Image being checked: %1$s</string>
     <string name="result_preview_not_stored">The photo is not stored in history</string>
     <string name="result_preview_unavailable">Preview unavailable</string>
-    <string name="result_eyebrow_preview">Preview</string>
     <string name="signal_eyebrow_ai">AI sign</string>
     <string name="signal_eyebrow_caution">Attention</string>
     <string name="signal_eyebrow_info">Note</string>
@@ -315,7 +313,6 @@
     <string name="result_map_privacy_note">The map loads only when you press its button. “Open in maps” passes the coordinates to the external app you choose.</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">All metadata</string>
     <string name="viewer_title">File metadata</string>
     <plurals name="viewer_field_count">
         <item quantity="one">%1$d field · viewed right on the device</item>
@@ -377,7 +374,6 @@
     <string name="main_api_dialog_title">External API</string>
     <string name="main_api_waiting">Waiting for the server response…</string>
     <string name="main_api_empty_response">Empty response</string>
-    <string name="dash_eyebrow_secure">Photo privacy check</string>
     <string name="dash_title">What does your photo reveal?</string>
     <string name="dash_subtitle">Location, camera, author and AI labels hidden in the file. Check them and remove them before you send.</string>
     <string name="dash_scan_hint">Choose the original JPEG, PNG, HEIC or MP4/MOV video: a screenshot has already lost part of the data.</string>
@@ -613,13 +609,11 @@
     <string name="gps_shield_text_point">If you share the original without cleaning it, the recipient may see the coordinates of where it was taken.</string>
     <string name="gps_shield_text_tags">The metadata contains location information, but the exact coordinates could not be read.</string>
     <string name="gps_shield_not_tracking">This does not mean you are being tracked. The risk appears when you share a file with location tags.</string>
-    <string name="gps_shield_advice">Before sharing, it is better to create a copy without GPS: a simple way to protect your location.</string>
     <string name="gps_shield_action">Protect the photo · remove GPS</string>
     <string name="gps_shield_action_video">Protect the video · remove metadata</string>
     <string name="gps_shield_action_note_video">The video is copied without re-encoding, so the quality stays the same. The original stays unchanged. Video cleaning is a Pro feature.</string>
     <string name="gps_shield_action_note">After tapping, choose where to save the new copy. The original stays unchanged. Share the copy. Free: up to %1$d photos per day.</string>
     <string name="gps_shield_open_original">To remove location tags, open the original JPEG/PNG photo: a saved report does not contain the photo itself.</string>
-    <string name="gps_shield_coordinates">Coordinates in the original file</string>
     <string name="gps_shield_partial">The point cannot be shown on the map: the GPS data is incomplete or stored in XMP/PNG.</string>
     <string name="map_off">Map is off · nothing is sent</string>
     <string name="map_consent">To show the point on a map, the app will download map tiles from %1$s servers. The servers will see your IP address and where the point is, to within a few hundred metres. The photo and its metadata are not sent.</string>
@@ -654,7 +648,6 @@
     <string name="licenses_map_tiles">Map tiles are served by MapTiler (© MapTiler) when it is configured, otherwise by the OpenStreetMap Foundation servers.</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">Privacy</string>
     <string name="stamp_reveals">FILE REVEALS</string>
     <plurals name="stamp_facts">
         <item quantity="one">%1$d FACT</item>

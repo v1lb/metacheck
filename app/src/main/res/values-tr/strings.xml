@@ -277,7 +277,6 @@
     <string name="result_tab_analysis">Analiz</string>
     <string name="result_tab_metadata">Meta veriler</string>
     <string name="result_tab_map">Harita</string>
-    <string name="result_eyebrow_report">Rapor · bu cihazda</string>
     <string name="result_badge_local">Cihazda</string>
     <string name="result_no_gps">Bu dosyada okunabilir GPS koordinatı yok. Olduğundan eminseniz orijinal fotoğrafı “Fotoğrafı kontrol et” ile seçin ve fotoğraf konumlarına erişime izin verin.</string>
     <string name="result_eyebrow_engine">Meta verilerdeki yapay zekâ etiketleri</string>
@@ -302,7 +301,6 @@
     <string name="result_preview_description">Kontrol edilen görüntü: %1$s</string>
     <string name="result_preview_not_stored">Fotoğraf geçmişte saklanmaz</string>
     <string name="result_preview_unavailable">Önizleme kullanılamıyor</string>
-    <string name="result_eyebrow_preview">Önizleme</string>
     <string name="signal_eyebrow_ai">Yapay zekâ belirtisi</string>
     <string name="signal_eyebrow_caution">Dikkat</string>
     <string name="signal_eyebrow_info">Not</string>
@@ -314,7 +312,6 @@
     <string name="result_map_privacy_note">Harita yalnızca düğmesine bastığınızda yüklenir. “Haritalarda aç”, koordinatları seçtiğiniz harici uygulamaya iletir.</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">Tüm meta veriler</string>
     <string name="viewer_title">Dosya meta verileri</string>
     <plurals name="viewer_field_count">
         <item quantity="one">%1$d alan · doğrudan cihazda görüntülenir</item>
@@ -376,7 +373,6 @@
     <string name="main_api_dialog_title">Harici API</string>
     <string name="main_api_waiting">Sunucu yanıtı bekleniyor…</string>
     <string name="main_api_empty_response">Boş yanıt</string>
-    <string name="dash_eyebrow_secure">Fotoğraf gizliliği kontrolü</string>
     <string name="dash_title">Fotoğrafınız neyi ele veriyor?</string>
     <string name="dash_subtitle">Dosyada gizli konum, kamera, yazar ve yapay zekâ etiketleri. Göndermeden önce kontrol edip kaldırın.</string>
     <string name="dash_scan_hint">Orijinal JPEG, PNG, HEIC veya MP4/MOV videoyu seçin: ekran görüntüsü verilerin bir kısmını zaten kaybetmiştir.</string>
@@ -597,13 +593,11 @@
     <string name="gps_shield_text_point">Orijinali temizlemeden paylaşırsanız alıcı çekildiği yerin koordinatlarını görebilir.</string>
     <string name="gps_shield_text_tags">Meta veriler konum bilgisi içeriyor ancak kesin koordinatlar okunamadı.</string>
     <string name="gps_shield_not_tracking">Bu, takip edildiğiniz anlamına gelmez. Risk, konum etiketli bir dosyayı paylaştığınızda ortaya çıkar.</string>
-    <string name="gps_shield_advice">Paylaşmadan önce GPS’siz bir kopya oluşturmak daha iyidir: konumunuzu korumanın basit bir yolu.</string>
     <string name="gps_shield_action">Fotoğrafı koru · GPS’i kaldır</string>
     <string name="gps_shield_action_video">Videoyu koru · meta verileri kaldır</string>
     <string name="gps_shield_action_note_video">Video yeniden kodlanmadan kopyalanır, kalite aynı kalır. Orijinal değişmez. Video temizleme bir Pro özelliğidir.</string>
     <string name="gps_shield_action_note">Dokunduktan sonra yeni kopyanın nereye kaydedileceğini seçin. Orijinal değişmez. Kopyayı paylaşın. Ücretsiz: günde en fazla %1$d fotoğraf.</string>
     <string name="gps_shield_open_original">Konum etiketlerini kaldırmak için orijinal JPEG/PNG fotoğrafı açın: kayıtlı rapor fotoğrafın kendisini içermez.</string>
-    <string name="gps_shield_coordinates">Orijinal dosyadaki koordinatlar</string>
     <string name="gps_shield_partial">Nokta haritada gösterilemiyor: GPS verileri eksik veya XMP/PNG içinde saklanıyor.</string>
     <string name="map_off">Harita kapalı · hiçbir şey gönderilmez</string>
     <string name="map_consent">Noktayı haritada göstermek için uygulama %1$s sunucularından harita parçaları indirir. Sunucular IP adresinizi ve noktanın yerini birkaç yüz metre hassasiyetle görür. Fotoğraf ve meta verileri gönderilmez.</string>
@@ -638,7 +632,6 @@
     <string name="licenses_map_tiles">Harita parçaları yapılandırıldığında MapTiler (© MapTiler), aksi hâlde OpenStreetMap Foundation sunucuları tarafından sağlanır.</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">Gizlilik</string>
     <string name="stamp_reveals">DOSYA ELE VERİYOR</string>
     <plurals name="stamp_facts">
         <item quantity="one">%1$d BİLGİ</item>

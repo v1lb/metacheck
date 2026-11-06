@@ -277,7 +277,6 @@
     <string name="result_tab_analysis">Analyse</string>
     <string name="result_tab_metadata">Metadaten</string>
     <string name="result_tab_map">Karte</string>
-    <string name="result_eyebrow_report">Bericht · auf diesem Gerät</string>
     <string name="result_badge_local">Auf dem Gerät</string>
     <string name="result_no_gps">Diese Datei hat keine lesbaren GPS-Koordinaten. Wenn du sicher bist, dass sie welche hatte, wähle das Originalfoto über „Foto prüfen“ und erlaube den Zugriff auf Foto-Standorte.</string>
     <string name="result_eyebrow_engine">KI-Kennzeichnungen in den Metadaten</string>
@@ -302,7 +301,6 @@
     <string name="result_preview_description">Geprüftes Bild: %1$s</string>
     <string name="result_preview_not_stored">Das Foto wird nicht im Verlauf gespeichert</string>
     <string name="result_preview_unavailable">Vorschau nicht verfügbar</string>
-    <string name="result_eyebrow_preview">Vorschau</string>
     <string name="signal_eyebrow_ai">KI-Hinweis</string>
     <string name="signal_eyebrow_caution">Achtung</string>
     <string name="signal_eyebrow_info">Hinweis</string>
@@ -314,7 +312,6 @@
     <string name="result_map_privacy_note">Die Karte wird erst geladen, wenn du auf ihre Schaltfläche tippst. „In Karten öffnen“ übergibt die Koordinaten an die externe App, die du wählst.</string>
 
     <!-- master_11_viewer.py -->
-    <string name="viewer_eyebrow">Alle Metadaten</string>
     <string name="viewer_title">Metadaten der Datei</string>
     <plurals name="viewer_field_count">
         <item quantity="one">%1$d Feld · direkt auf dem Gerät angezeigt</item>
@@ -376,7 +373,6 @@
     <string name="main_api_dialog_title">Externe API</string>
     <string name="main_api_waiting">Warte auf die Antwort des Servers…</string>
     <string name="main_api_empty_response">Leere Antwort</string>
-    <string name="dash_eyebrow_secure">Foto-Datenschutzprüfung</string>
     <string name="dash_title">Was verrät dein Foto?</string>
     <string name="dash_subtitle">Standort, Kamera, Urheber und KI-Kennzeichnungen sind in der Datei versteckt. Prüfe und entferne sie vor dem Senden.</string>
     <string name="dash_scan_hint">Wähle das Original-JPEG, -PNG, -HEIC oder ein MP4/MOV-Video: Ein Screenshot hat bereits einen Teil der Daten verloren.</string>
@@ -597,13 +593,11 @@
     <string name="gps_shield_text_point">Wenn du das Original ohne Bereinigung teilst, kann der Empfänger die Koordinaten des Aufnahmeorts sehen.</string>
     <string name="gps_shield_text_tags">Die Metadaten enthalten Standortangaben, aber die genauen Koordinaten konnten nicht gelesen werden.</string>
     <string name="gps_shield_not_tracking">Das bedeutet nicht, dass du verfolgt wirst. Das Risiko entsteht, wenn du eine Datei mit Standort-Tags teilst.</string>
-    <string name="gps_shield_advice">Vor dem Teilen erstellst du am besten eine Kopie ohne GPS: ein einfacher Weg, deinen Standort zu schützen.</string>
     <string name="gps_shield_action">Foto schützen · GPS entfernen</string>
     <string name="gps_shield_action_video">Video schützen · Metadaten entfernen</string>
     <string name="gps_shield_action_note_video">Das Video wird ohne Neukodierung kopiert, die Qualität bleibt gleich. Das Original bleibt unverändert. Die Videobereinigung ist eine Pro-Funktion.</string>
     <string name="gps_shield_action_note">Wähle nach dem Tippen, wo die neue Kopie gespeichert wird. Das Original bleibt unverändert. Teile die Kopie. Kostenlos: bis zu %1$d Fotos pro Tag.</string>
     <string name="gps_shield_open_original">Um Standort-Tags zu entfernen, öffne das Original-JPEG/-PNG: Ein gespeicherter Bericht enthält das Foto selbst nicht.</string>
-    <string name="gps_shield_coordinates">Koordinaten in der Originaldatei</string>
     <string name="gps_shield_partial">Der Punkt kann nicht auf der Karte gezeigt werden: Die GPS-Daten sind unvollständig oder in XMP/PNG gespeichert.</string>
     <string name="map_off">Karte aus · nichts wird gesendet</string>
     <string name="map_consent">Um den Punkt auf einer Karte zu zeigen, lädt die App Kartenkacheln von den Servern von %1$s. Die Server sehen deine IP-Adresse und auf einige hundert Meter genau, wo der Punkt liegt. Das Foto und seine Metadaten werden nicht gesendet.</string>
@@ -638,7 +632,6 @@
     <string name="licenses_map_tiles">Kartenkacheln liefert MapTiler (© MapTiler), wenn konfiguriert, ansonsten die Server der OpenStreetMap Foundation.</string>
 
     <!-- master_19_privacy.py -->
-    <string name="privacy_eyebrow">Datenschutz</string>
     <string name="stamp_reveals">DATEI VERRÄT</string>
     <plurals name="stamp_facts">
         <item quantity="one">%1$d FAKT</item>
