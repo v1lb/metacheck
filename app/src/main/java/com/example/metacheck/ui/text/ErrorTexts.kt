@@ -133,6 +133,8 @@ object ErrorTexts {
             FailureCode.OVERWRITE_EDIT_JPEG_ONLY -> UiText.Res(R.string.failure_overwrite_edit_jpeg_only)
             FailureCode.OVERWRITE_STRIP_JPEG_PNG_ONLY -> UiText.Res(R.string.failure_overwrite_strip_jpeg_png_only)
             FailureCode.WIPE_GPS_JPEG_PNG_ONLY -> UiText.Res(R.string.failure_wipe_gps_jpeg_png_only)
+            FailureCode.VIDEO_UNSUPPORTED -> UiText.Res(R.string.failure_video_unsupported)
+            FailureCode.NOT_ENOUGH_SPACE -> UiText.Res(R.string.failure_not_enough_space)
             FailureCode.DECODE_FAILED -> UiText.Res(R.string.failure_decode_failed)
             FailureCode.ENCODE_FAILED -> UiText.Res(R.string.failure_encode_failed)
             FailureCode.OUT_OF_MEMORY -> UiText.Res(R.string.failure_out_of_memory)

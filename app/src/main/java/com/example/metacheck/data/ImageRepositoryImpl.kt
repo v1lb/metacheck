@@ -14,6 +14,11 @@ import com.example.metacheck.data.parser.ImageFormatDetector
 import com.example.metacheck.data.parser.PngTextParser
 import com.example.metacheck.data.parser.XmpExtractor
 import com.example.metacheck.data.parser.readBounded
+import com.example.metacheck.data.video.Mp4FormatException
+import com.example.metacheck.data.video.Mp4MetadataReader
+import com.example.metacheck.data.video.VideoFiles
+import com.example.metacheck.data.video.VideoMetadata
+import java.io.File
 import com.example.metacheck.domain.analysis.SignalEngine
 import com.example.metacheck.domain.analysis.SignalInput
 import com.example.metacheck.domain.model.FileInfo
@@ -35,6 +40,8 @@ import kotlinx.coroutines.withContext
 class ImageRepositoryImpl(
     private val resolver: ContentResolver,
     private val io: CoroutineDispatcher = Dispatchers.IO,
+    /** Папка для временной копии видео, если провайдер не даёт читать файл по месту. */
+    private val cacheDir: File? = null,
 ) : ImageRepository {
 
     override suspend fun analyze(source: String): Result<MetaReport> = withContext(io) {
@@ -60,6 +67,9 @@ class ImageRepositoryImpl(
         val (name, size) = queryNameAndSize(uri)
         // Пустые имя и MIME интерфейс показывает как «без имени» / «неизвестно» на языке пользователя.
         val mime = resolver.getType(uri).orEmpty()
+
+        // Видео читается выборочно (заголовки и moov), а не первые 16 МБ целиком.
+        if (ImageFormatDetector.detect(VideoFiles.head(resolver, uri)).isVideo) return analyzeVideo(uri, name, size, mime)
 
         // Размер известен заранее: буфер выделяется сразу, без удвоений и лишней копии.
         val (bytes, truncated) = resolver.openInputStream(uri)?.use { readBounded(it, MAX_SCAN_BYTES, size) }
@@ -112,6 +122,67 @@ class ImageRepositoryImpl(
     }
 
 
+    private fun analyzeVideo(uri: Uri, name: String, size: Long, mime: String): MetaReport {
+        val video = readVideoWithLocation(uri)
+        val xmp = video.xmpPacket?.let(XmpExtractor::parse)
+        val c2pa = video.c2paBox?.let { box -> try { C2paReader.read(box, ImageFormat.HEIC) } catch (_: Exception) { null } }
+        val xmpTools = listOfNotNull(
+            xmp?.fields?.get(XmpExtractor.KEY_CREATOR_TOOL)?.let { MetaItem("XMP CreatorTool", it) },
+            xmp?.fields?.get(XmpExtractor.KEY_SOFTWARE_AGENT)?.let { MetaItem("XMP softwareAgent", it) },
+        )
+        val signals = SignalEngine.evaluate(
+            SignalInput(
+                toolFields = video.toolFields + xmpTools,
+                freeTextFields = video.freeTextFields,
+                xmpFields = xmp?.fields.orEmpty(),
+                pngText = emptyList(),
+                c2pa = c2pa,
+                fileName = name,
+                hasGps = video.gps != null,
+                hasAnyMetadata = video.hasPersonalData || xmp?.items?.isNotEmpty() == true,
+                truncated = false,
+            ),
+        )
+        return MetaReport(
+            file = FileInfo(name, mime, size, video.format, video.moovBytes, false),
+            exifSections = video.sections,
+            xmpItems = xmp?.items.orEmpty(),
+            pngTextItems = emptyList(),
+            gps = video.gps,
+            signals = signals,
+        )
+    }
+
+    /** Как и с фото, Android 10+ прячет место съёмки видео, если файл открыт не через «оригинальный» URI. */
+    private fun readVideoWithLocation(uri: Uri): VideoMetadata {
+        val candidates = ArrayList<Uri>()
+        if (Build.VERSION.SDK_INT >= 29) {
+            mediaStoreUri(uri)?.let { media ->
+                candidates.add(try { MediaStore.setRequireOriginal(media) } catch (_: Exception) { media })
+            }
+        }
+        candidates.add(uri)
+        var fallback: VideoMetadata? = null
+        var lastError: Exception? = null
+        for (candidate in candidates) {
+            val result = try {
+                VideoFiles.open(resolver, candidate, cacheDir ?: File(System.getProperty("java.io.tmpdir") ?: "/tmp"))
+                    .use { Mp4MetadataReader.read(it.source) }
+            } catch (e: Mp4FormatException) {
+                lastError = e; null
+            } catch (e: Exception) {
+                if (candidate == uri) lastError = e
+                null
+            } ?: continue
+            if (result.gps != null) return result
+            if (fallback == null) fallback = result
+        }
+        return fallback ?: throw when (lastError) {
+            is Mp4FormatException, null -> UnsupportedFormatException()
+            else -> lastError!!
+        }
+    }
+
     /**
      * Читает EXIF, пытаясь получить координаты без редактирования системой.
      * Фото из системного выбора файлов приходят как content://com.android.providers.media.documents/...,
@@ -144,8 +215,13 @@ class ImageRepositoryImpl(
         MediaStore.AUTHORITY -> uri
         MEDIA_DOCUMENTS_AUTHORITY -> try {
             val parts = DocumentsContract.getDocumentId(uri).split(':')
-            val id = if (parts.size == 2 && parts[0] == "image") parts[1].toLongOrNull() else null
-            if (id != null) ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id) else null
+            val id = if (parts.size == 2) parts[1].toLongOrNull() else null
+            when {
+                id == null -> null
+                parts[0] == "image" -> ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                parts[0] == "video" -> ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+                else -> null
+            }
         } catch (_: Exception) {
             null
         }

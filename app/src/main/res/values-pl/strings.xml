@@ -9,6 +9,7 @@
     <string name="section_dates">Daty</string>
     <string name="section_gps">Geolokalizacja EXIF</string>
     <string name="section_authorship">Oprogramowanie i autorstwo</string>
+    <string name="section_container">Tagi kontenera wideo</string>
     <string name="exif_make">Producent</string>
     <string name="exif_model">Model</string>
     <string name="exif_lens_make">Producent obiektywu</string>
@@ -104,6 +105,12 @@
     <string name="group_exif">Techniczne EXIF</string>
     <string name="group_xmp">XMP / IPTC</string>
     <string name="group_png">PNG / tekst</string>
+    <string name="group_video">Wideo</string>
+    <string name="label_video_duration">Czas trwania</string>
+    <string name="label_video_codec">Kodek wideo</string>
+    <string name="label_video_created">Utworzono (UTC)</string>
+    <string name="label_video_location">Miejsce nagrania (ISO 6709)</string>
+    <string name="label_video_title">Tytuł</string>
     <string name="catalog_file_section">Plik</string>
     <string name="catalog_coordinates_section">Współrzędne</string>
     <string name="field_name">Nazwa</string>
@@ -198,6 +205,8 @@
     <string name="failure_overwrite_edit_jpeg_only">Edycja EXIF z nadpisaniem jest obsługiwana dla JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Nadpisywanie podczas czyszczenia obsługuje tylko JPEG i PNG: zapisz inne formaty jako nową kopię</string>
     <string name="failure_wipe_gps_jpeg_png_only">Usuwanie GPS obsługuje JPEG i PNG</string>
+    <string name="failure_video_unsupported">Tego filmu nie da się wyczyścić bez ponownego kodowania: struktura pliku nie jest obsługiwana (plik pofragmentowany, zaszyfrowany lub uszkodzony)</string>
+    <string name="failure_not_enough_space">Za mało wolnego miejsca na urządzeniu na wyczyszczoną kopię</string>
     <string name="failure_decode_failed">Nie udało się odczytać pikseli. Spróbuj innego obrazu</string>
     <string name="failure_encode_failed">Kodowanie obrazu nie powiodło się</string>
     <string name="failure_out_of_memory">Za mało pamięci, aby przetworzyć obraz</string>
@@ -374,8 +383,8 @@
     <string name="dash_eyebrow_secure">Sprawdzanie prywatności zdjęć</string>
     <string name="dash_title">Co zdradza Twoje zdjęcie?</string>
     <string name="dash_subtitle">Lokalizacja, aparat, autor i etykiety AI ukryte w pliku. Sprawdź je i usuń przed wysłaniem.</string>
-    <string name="dash_scan_hint">Wybierz oryginalny JPEG, PNG lub HEIC: zrzut ekranu utracił już część danych.</string>
-    <string name="dash_choose_photo">Sprawdź zdjęcie</string>
+    <string name="dash_scan_hint">Wybierz oryginalny JPEG, PNG, HEIC lub film MP4/MOV: zrzut ekranu utracił już część danych.</string>
+    <string name="dash_choose_photo">Sprawdź zdjęcie lub wideo</string>
     <string name="dash_camera">Aparat</string>
     <string name="dash_clipboard">Schowek</string>
     <string name="dash_eyebrow_studio">Studio metadanych</string>
@@ -558,8 +567,8 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">ZA DARMO  →  PRO</string>
-    <string name="pro_free_features">Za darmo: skanowanie i GPS Privacy Shield, podgląd EXIF, edycja i czyszczenie do %1$d zdjęć dziennie (UTC), 10 raportów w historii.</string>
-    <string name="pro_pro_features">Pro: nieograniczone czyszczenie i edycja, przetwarzanie wsadowe do 50 zdjęć, PDF/JSON, 50 raportów, API.</string>
+    <string name="pro_free_features">Za darmo: skanowanie zdjęć i filmów oraz GPS Privacy Shield, podgląd EXIF, edycja i czyszczenie do %1$d zdjęć dziennie (UTC), 10 raportów w historii.</string>
+    <string name="pro_pro_features">Pro: nieograniczone czyszczenie i edycja, czyszczenie filmów (MP4, MOV) bez ponownego kodowania, przetwarzanie wsadowe do 50 zdjęć, PDF/JSON, 50 raportów, API.</string>
     <string name="pro_one_time">Jednorazowy zakup w Google Play, bez subskrypcji.</string>
     <string name="pro_key_label">Klucz Pro, jeśli go masz</string>
     <string name="pro_key_apply">Zastosuj klucz</string>
@@ -587,11 +596,15 @@
     <string name="gps_shield_eyebrow">GPS w pliku</string>
     <string name="gps_shield_title_point">Miejsce wykonania zdjęcia jest w nim zapisane</string>
     <string name="gps_shield_title_tags">W zdjęciu znaleziono tagi lokalizacji</string>
+    <string name="gps_shield_title_point_video">Miejsce nagrania jest zapisane w filmie</string>
+    <string name="gps_shield_title_tags_video">W filmie znaleziono znaczniki lokalizacji</string>
     <string name="gps_shield_text_point">Jeśli udostępnisz oryginał bez czyszczenia, odbiorca może zobaczyć współrzędne miejsca wykonania.</string>
     <string name="gps_shield_text_tags">Metadane zawierają informacje o lokalizacji, ale nie udało się odczytać dokładnych współrzędnych.</string>
     <string name="gps_shield_not_tracking">Nie oznacza to, że ktoś Cię śledzi. Ryzyko pojawia się, gdy udostępniasz plik z tagami lokalizacji.</string>
     <string name="gps_shield_advice">Przed udostępnieniem lepiej utworzyć kopię bez GPS: to prosty sposób na ochronę lokalizacji.</string>
     <string name="gps_shield_action">Chroń zdjęcie · usuń GPS</string>
+    <string name="gps_shield_action_video">Chroń film · usuń metadane</string>
+    <string name="gps_shield_action_note_video">Film jest kopiowany bez ponownego kodowania, więc jakość się nie zmienia. Oryginał pozostaje bez zmian. Czyszczenie filmów to funkcja Pro.</string>
     <string name="gps_shield_action_note">Po dotknięciu wybierz, gdzie zapisać nową kopię. Oryginał pozostanie bez zmian. Udostępniaj kopię. Za darmo: do %1$d zdjęć dziennie.</string>
     <string name="gps_shield_open_original">Aby usunąć tagi lokalizacji, otwórz oryginalne zdjęcie JPEG/PNG: zapisany raport nie zawiera samego zdjęcia.</string>
     <string name="gps_shield_coordinates">Współrzędne w oryginalnym pliku</string>
@@ -630,7 +643,7 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Prywatność</string>
-    <string name="privacy_title">Co zdradza to zdjęcie</string>
+    <string name="privacy_title">Co zdradza ten plik</string>
     <string name="privacy_hint">Zobaczy to każdy, komu wyślesz oryginalny plik.</string>
     <string name="privacy_none_text">W metadanych nie ma lokalizacji, nazwisk ani numerów seryjnych urządzenia.</string>
     <string name="privacy_level_none">Nic osobistego</string>
@@ -653,7 +666,7 @@
     <string name="privacy_clean_share">Wyczyść i udostępnij</string>
     <string name="privacy_clean_save">Wyczyść i zapisz kopię</string>
     <string name="share_target_label">Wyślij bez metadanych</string>
-    <string name="share_chooser_title">Wyślij wyczyszczone zdjęcie</string>
-    <string name="share_no_app">Nie znaleziono aplikacji do udostępnienia zdjęcia</string>
+    <string name="share_chooser_title">Wyślij wyczyszczoną kopię</string>
+    <string name="share_no_app">Nie znaleziono aplikacji do udostępnienia pliku</string>
     <string name="share_not_verified">Nie udało się zweryfikować wyczyszczonej kopii, więc nie została udostępniona</string>
 </resources>

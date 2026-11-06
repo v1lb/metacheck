@@ -3,6 +3,9 @@ package com.example.metacheck.data.share
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
+import com.example.metacheck.data.parser.ImageFormatDetector
+import com.example.metacheck.domain.export.CleanFormat
+import com.example.metacheck.domain.model.ImageFormat
 import java.io.File
 
 /**
@@ -13,20 +16,21 @@ class SharedCopies(context: Context) {
     private val app = context.applicationContext
     private val dir get() = File(app.cacheDir, DIR).apply { mkdirs() }
 
-    /** Файл назначения: JPEG остаётся JPEG, остальное очистка сохраняет в PNG (как CleanFormat). */
+    /** Файл назначения: JPEG остаётся JPEG, видео — MP4/MOV, остальное очистка сохраняет в PNG (как CleanFormat). */
     fun newTarget(source: String): Target {
-        val jpeg = runCatching {
+        val format = runCatching {
             app.contentResolver.openInputStream(Uri.parse(source))?.use { stream ->
                 // read() может вернуть меньше байт, чем просили: дочитываем, иначе JPEG ушёл бы как «.png».
-                val head = ByteArray(3)
+                val head = ByteArray(16)
                 var n = 0
                 while (n < head.size) { val r = stream.read(head, n, head.size - n); if (r < 0) break; n += r }
-                n == 3 && head[0] == 0xFF.toByte() && head[1] == 0xD8.toByte() && head[2] == 0xFF.toByte()
-            } ?: false
-        }.getOrDefault(false)
-        val file = File(dir, "metacheck_${System.currentTimeMillis()}.${if (jpeg) "jpg" else "png"}")
+                ImageFormatDetector.detect(head, n)
+            }
+        }.getOrNull() ?: ImageFormat.UNKNOWN
+        val output = CleanFormat.outputFor(format)
+        val file = File(dir, "metacheck_${System.currentTimeMillis()}.${output.extension}")
         file.createNewFile()
-        return Target(file, FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file), if (jpeg) "image/jpeg" else "image/png")
+        return Target(file, FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file), output.mimeType)
     }
 
     fun discard(target: Target) {

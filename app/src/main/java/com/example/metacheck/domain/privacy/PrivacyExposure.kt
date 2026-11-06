@@ -80,8 +80,8 @@ object PrivacyExposures {
         val hasPrompt = report.pngTextItems.any { it.label.lowercase(Locale.ROOT) in promptKeywords && it.value.isNotBlank() } ||
             report.signals.any { it.kind == SignalKind.SD_PARAMETERS || it.kind == SignalKind.GENERATION_PARAMS || it.kind == SignalKind.COMFYUI_GRAPH }
         if (hasPrompt) add(ExposureKind.AI_PROMPT, "")
-        add(ExposureKind.CAPTURE_TIME, value("exif:DateTimeOriginal", "exif:DateTime", "xmp:xmp:CreateDate"))
-        add(ExposureKind.DESCRIPTION, values("exif:ImageDescription", "exif:UserComment", "xmp:dc:description", "xmp:dc:title"))
+        add(ExposureKind.CAPTURE_TIME, value("exif:DateTimeOriginal", "exif:DateTime", "xmp:xmp:CreateDate", "video:created"))
+        add(ExposureKind.DESCRIPTION, values("exif:ImageDescription", "exif:UserComment", "xmp:dc:description", "xmp:dc:title", "video:title"))
         val device = listOfNotNull(value("exif:Make", "xmp:tiff:Make"), value("exif:Model", "xmp:tiff:Model"))
             .fold(emptyList<String>()) { acc, part ->
                 // «Apple iPhone 15» вместо «Apple Apple iPhone 15»: модель часто уже содержит производителя.
