@@ -107,6 +107,17 @@ class EntitlementRepositoryImpl(
             false
         }
 
+    override suspend fun tipPriceText(): String? =
+        runCatchingCancellable { billing.tipPriceText() }.onFailure(onError).getOrNull()
+
+    override fun launchTip(activity: Activity): Boolean =
+        try {
+            billing.launchTip(activity)
+        } catch (e: Exception) {
+            onError(e)
+            false
+        }
+
     override suspend fun redeem(token: String): Result<LicenseInfo> = withContext(io) {
         runCatchingCancellable {
             val clean = token.trim()

@@ -1,5 +1,7 @@
 package com.example.metacheck.domain
 
+import com.example.metacheck.domain.metadata.DailyCleanQuota
+
 import android.app.Activity
 import com.example.metacheck.domain.metadata.*
 import com.example.metacheck.domain.model.*
@@ -43,13 +45,13 @@ class MetadataDailyQuotaTest {
         }
     }
 
-    @Test fun freeEditionAllows75WritesAndBlocks76th() = runBlocking {
+    @Test fun freeEditionAllowsDailyLimitThenBlocks() = runBlocking {
         val store = FakeStore(); val quota = Quota()
         val use = MetadataStudioUseCase(store, EntitlementFake(), quota)
-        repeat(75) { assertTrue(use.strip("a", "b").isSuccess) }
+        repeat(DailyCleanQuota.FREE_DAILY_LIMIT) { assertTrue(use.strip("a", "b").isSuccess) }
         assertTrue(use.wipeGps("a", "c").exceptionOrNull() is DailyLimitReachedException)
-        assertEquals(75, quota.count)
-        assertEquals(75, store.writes)
+        assertEquals(DailyCleanQuota.FREE_DAILY_LIMIT, quota.count)
+        assertEquals(DailyCleanQuota.FREE_DAILY_LIMIT, store.writes)
     }
 
     @Test fun failedWriteDoesNotConsumeQuota() = runBlocking {
@@ -93,13 +95,13 @@ class MetadataDailyQuotaTest {
         assertEquals(1, store.writes)
     }
 
-    @Test fun concurrentFreeRequestsRespect75Limit() = runBlocking {
+    @Test fun concurrentFreeRequestsRespectDailyLimit() = runBlocking {
         val store = FakeStore(); val quota = Quota()
         val use = MetadataStudioUseCase(store, EntitlementFake(), quota)
-        repeat(74) { assertTrue(use.strip("a", "b").isSuccess) }
+        repeat(DailyCleanQuota.FREE_DAILY_LIMIT - 1) { assertTrue(use.strip("a", "b").isSuccess) }
         val first = async { use.strip("a", "b") }
         val second = async { use.wipeGps("a", "c") }
         assertEquals(1, listOf(first.await(), second.await()).count { it.isSuccess })
-        assertEquals(75, store.writes)
+        assertEquals(DailyCleanQuota.FREE_DAILY_LIMIT, store.writes)
     }
 }

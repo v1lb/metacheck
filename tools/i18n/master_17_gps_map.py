@@ -31,8 +31,8 @@ S = [
     # --- Карта ---
     ("map_off", "Map is off · nothing is sent", "Карта выключена · ничего не отправляется"),
     ("map_consent",
-     "To show the point on a map, the app will download map tiles from %1$s servers. The servers will see your IP address and the approximate area of the point. The photo and its metadata are not sent.",
-     "Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов %1$s. Серверы увидят ваш IP-адрес и примерный район точки. Само фото и его метаданные не отправляются."),
+     "To show the point on a map, the app will download map tiles from %1$s servers. The servers will see your IP address and where the point is, to within a few hundred metres. The photo and its metadata are not sent.",
+     "Чтобы показать точку на карте, приложение загрузит фрагменты карты с серверов %1$s. Серверы увидят ваш IP-адрес и где находится точка, с точностью до нескольких сотен метров. Само фото и его метаданные не отправляются."),
     ("map_show", "Show map (request to %1$s)", "Показать карту (запрос к %1$s)"),
     ("map_enable_first", "To pick new coordinates on the map, turn the map on first.",
      "Чтобы выбрать новые координаты на карте, сначала включите карту."),

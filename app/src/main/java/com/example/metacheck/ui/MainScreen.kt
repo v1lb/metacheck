@@ -320,6 +320,12 @@ fun MainScreen(
                     },
                     state,
                 )
+                // Просьбу об оценке показываем только на главном экране: не поверх окна «Поделиться»
+                // сразу после очистки и не посреди работы в студии.
+                val reviewActivity = LocalContext.current.findActivity()
+                LaunchedEffect(screen.kind) {
+                    if (screen.kind == ScreenKind.HOME) reviewActivity?.let(ReviewPrompt::maybeAsk)
+                }
                 AnimatedContent(
                     targetState = screen,
                     contentKey = { it.kind },
@@ -399,6 +405,13 @@ fun MainScreen(
         }
     }
 
+    val promptActivity = LocalContext.current.findActivity()
+    LaunchedEffect(Unit) {
+        AppPrompts.paywall.collect { if (!entitlement.isPro) proVm.openPaywallForLimit() }
+    }
+    LaunchedEffect(promptActivity) {
+        AppPrompts.review.collect { promptActivity?.let(ReviewPrompt::recordClean) }
+    }
     LaunchedEffect(entitlement.isPro, paywallVisible) {
         if (entitlement.isPro && paywallVisible) proVm.dismissPaywall()
     }

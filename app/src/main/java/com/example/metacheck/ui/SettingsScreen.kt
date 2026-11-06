@@ -27,6 +27,8 @@ import com.example.metacheck.ui.text.asString
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -81,6 +83,21 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (!entitlement.isPro) NeonButton(stringResource(R.string.settings_pro_features), proVm::openPaywall, Modifier.fillMaxWidth())
                 if (entitlement.source == ProSource.LICENSE) CyberOutlineButton(stringResource(R.string.settings_remove_license), proVm::removeLicense)
+            }
+        }
+        val tipPrice by proVm.tipPrice.collectAsStateWithLifecycle()
+        LaunchedEffect(Unit) { proVm.loadTipPrice() }
+        // Кнопка появляется, только когда товар поддержки создан в Play Console и Play ответил ценой.
+        tipPrice?.let { shownTipPrice ->
+            val tipContext = LocalContext.current
+            GlassPanel(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(19.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(stringResource(R.string.tip_title), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.tip_text), style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    CyberOutlineButton(stringResource(R.string.tip_button, shownTipPrice),
+                        { tipContext.findActivity()?.let(proVm::tip) }, Modifier.fillMaxWidth())
+                }
             }
         }
         SectionLabel(stringResource(R.string.settings_section_history))

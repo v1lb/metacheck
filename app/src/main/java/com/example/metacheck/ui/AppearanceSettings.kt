@@ -3,7 +3,6 @@ package com.example.metacheck.ui
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -41,14 +40,7 @@ fun AppearanceSettings(prefs: UiPreferences, onMessage: (UiText) -> Unit) {
         Column(Modifier.padding(17.dp), verticalArrangement = Arrangement.spacedBy(13.dp)) {
             Text(stringResource(R.string.appearance_language), color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium)
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                AppLanguage.entries.forEach { option ->
-                    val label = stringResource(AppLocales.nameRes(option))
-                    // Выбранный язык выделен заливкой: раньше все три кнопки выглядели одинаково.
-                    if (option == language) NeonButton(label, {}, Modifier.weight(1f))
-                    else CyberOutlineButton(label, { AppLocales.apply(option) }, Modifier.weight(1f))
-                }
-            }
+            LanguagePicker(language, { AppLocales.apply(it) }, maxHeight = 300.dp)
             Text(stringResource(R.string.appearance_language_current, languageSummary(language)),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall)

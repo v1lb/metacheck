@@ -31,4 +31,9 @@ S = [
     ("pro_msg_launch_failed", "Could not open the purchase. Check Google Play and your internet connection.",
      "Не удалось открыть покупку. Проверьте Google Play и интернет."),
     ("pro_msg_key_accepted", "Key accepted", "Ключ принят"),
+    ('pro_limit_reached', 'You have cleaned %1$d photos today. The limit resets tomorrow, or get Pro with no limits.', 'Сегодня вы очистили %1$d фото. Завтра лимит обновится, или откройте Pro без ограничений.'),
+    ('tip_title', 'Support the developer', 'Поддержать разработчика'),
+    ('tip_text', 'MetaCheck is made by one developer, with no ads or tracking. A small one-time payment through Google Play does not unlock anything, it just helps the app grow.', 'MetaCheck делает один разработчик, без рекламы и слежки. Небольшой разовый платёж через Google Play ничего не открывает, он просто помогает приложению развиваться.'),
+    ('tip_button', 'Support · %1$s', 'Поддержать · %1$s'),
+    ('tip_thanks', 'Thank you for your support!', 'Спасибо за поддержку!'),
 ]
