@@ -63,7 +63,7 @@ fun PrivacyExposureCard(
             Column(Modifier.weight(1f).padding(top = 4.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Stamp(stampLines, color, Modifier.semantics { contentDescription = "${stampLines.joinToString(" ")}. $scoreText" })
                 Text(scoreText + " · " + stringResource(levelText(exposure.level)),
-                    style = MonoText.tag, color = color)
+                    style = MaterialTheme.typography.labelMedium, color = color)
                 Text(stringResource(if (count == 0) R.string.privacy_none_text else R.string.privacy_hint),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }

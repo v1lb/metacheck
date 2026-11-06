@@ -553,8 +553,8 @@ internal fun Dashboard(
                 NeonButton(stringResource(R.string.dash_choose_photo), onPick, Modifier.fillMaxWidth().height(56.dp),
                     icon = Icons.Filled.Add)
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CyberOutlineButton(stringResource(R.string.dash_camera), onCamera, Modifier.weight(1f), icon = Icons.Filled.PhotoCamera)
-                    CyberOutlineButton(stringResource(R.string.dash_clipboard), onClipboard, Modifier.weight(1f), icon = Icons.Filled.ContentPaste)
+                    CyberOutlineButton(stringResource(R.string.dash_camera), onCamera, Modifier.weight(1f))
+                    CyberOutlineButton(stringResource(R.string.dash_clipboard), onClipboard, Modifier.weight(1f))
                 }
             }
             Text(stringResource(R.string.dash_scan_hint), Modifier.padding(top = 8.dp, start = 2.dp),
@@ -774,4 +774,4 @@ private fun screenTransition(from: ScreenKind, to: ScreenKind): ContentTransform
 private val PICK_TYPES = arrayOf("image/*", "video/*")
 
 /** Строка форматов в рамке главного экрана: названия форматов не переводятся. */
-private const val DASH_FORMATS = "JPEG   PNG   HEIC   WEBP   MP4   MOV"
+private const val DASH_FORMATS = "JPEG · PNG · HEIC · WEBP · MP4 · MOV"

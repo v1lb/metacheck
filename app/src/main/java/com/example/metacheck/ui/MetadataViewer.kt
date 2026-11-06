@@ -85,11 +85,11 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(stringResource(R.string.viewer_title), style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+                    color = MaterialTheme.colorScheme.onSurface)
                 Text(pluralStringResource(R.plurals.viewer_field_count, records.size, records.size),
-                    style = MonoText.tag, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         item {
