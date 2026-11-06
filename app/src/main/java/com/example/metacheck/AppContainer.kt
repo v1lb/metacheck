@@ -34,7 +34,7 @@ class AppContainer(app: Application) {
     val sharedCopies = com.example.metacheck.data.share.SharedCopies(app)
     val uiPreferences = UiPreferences(app)
     private val crypto: Crypto = KeystoreCrypto()
-    private val imageRepository: ImageRepository = ImageRepositoryImpl(app.contentResolver)
+    private val imageRepository: ImageRepository = ImageRepositoryImpl(app.contentResolver, cacheDir = app.cacheDir)
 
     val settings: SettingsRepository =
         SettingsRepositoryImpl(app.getSharedPreferences("settings", Context.MODE_PRIVATE), crypto)

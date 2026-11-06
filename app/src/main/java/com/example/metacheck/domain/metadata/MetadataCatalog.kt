@@ -15,6 +15,7 @@ enum class MetadataGroup(val marker: String) {
     EXIF("EXIF"),
     XMP("XMP"),
     PNG("PNG"),
+    VIDEO("MP4"),
 }
 
 /**
@@ -56,6 +57,7 @@ object MetadataCatalog {
                 SectionKey.CAMERA, SectionKey.EXPOSURE -> MetadataGroup.CAMERA
                 SectionKey.DATES -> MetadataGroup.MAIN
                 SectionKey.GPS -> MetadataGroup.LOCATION
+                SectionKey.CONTAINER -> MetadataGroup.VIDEO
                 else -> MetadataGroup.EXIF
             }
             items(group, texts.sectionTitle(section), section.items)
@@ -88,6 +90,7 @@ object MetadataCatalog {
                     MetadataGroup.EXIF -> "technical exif image software"
                     MetadataGroup.XMP -> "xmp iptc metadata"
                     MetadataGroup.PNG -> "png text comments"
+                    MetadataGroup.VIDEO -> "video mp4 mov quicktime container tags"
                 }
                 val searchable = listOf(
                     englishCategory, item.group.marker, item.groupTitle, item.section,

@@ -9,6 +9,7 @@
     <string name="section_dates">날짜</string>
     <string name="section_gps">EXIF 위치 정보</string>
     <string name="section_authorship">소프트웨어 및 작성자</string>
+    <string name="section_container">동영상 컨테이너 태그</string>
     <string name="exif_make">제조사</string>
     <string name="exif_model">모델</string>
     <string name="exif_lens_make">렌즈 제조사</string>
@@ -104,6 +105,12 @@
     <string name="group_exif">기술 EXIF</string>
     <string name="group_xmp">XMP / IPTC</string>
     <string name="group_png">PNG / 텍스트</string>
+    <string name="group_video">동영상</string>
+    <string name="label_video_duration">길이</string>
+    <string name="label_video_codec">동영상 코덱</string>
+    <string name="label_video_created">생성 시각(UTC)</string>
+    <string name="label_video_location">촬영 위치(ISO 6709)</string>
+    <string name="label_video_title">제목</string>
     <string name="catalog_file_section">파일</string>
     <string name="catalog_coordinates_section">좌표</string>
     <string name="field_name">이름</string>
@@ -198,6 +205,8 @@
     <string name="failure_overwrite_edit_jpeg_only">덮어쓰기로 EXIF 편집은 JPEG에서 지원됩니다</string>
     <string name="failure_overwrite_strip_jpeg_png_only">정리 중 덮어쓰기는 JPEG와 PNG만 지원합니다. 다른 형식은 새 사본으로 저장하세요</string>
     <string name="failure_wipe_gps_jpeg_png_only">GPS 제거는 JPEG와 PNG를 지원합니다</string>
+    <string name="failure_video_unsupported">이 동영상은 재인코딩 없이 정리할 수 없습니다. 파일 구조가 지원되지 않습니다(조각화, 암호화 또는 손상된 파일)</string>
+    <string name="failure_not_enough_space">정리된 사본을 저장할 여유 공간이 기기에 부족합니다</string>
     <string name="failure_decode_failed">픽셀을 읽을 수 없습니다. 다른 이미지를 사용해 보세요</string>
     <string name="failure_encode_failed">이미지 인코딩 실패</string>
     <string name="failure_out_of_memory">이미지를 처리할 메모리가 부족합니다</string>
@@ -368,8 +377,8 @@
     <string name="dash_eyebrow_secure">사진 개인정보 확인</string>
     <string name="dash_title">사진이 무엇을 드러낼까요?</string>
     <string name="dash_subtitle">파일 안에 숨은 위치, 카메라, 작성자, AI 라벨. 보내기 전에 확인하고 제거하세요.</string>
-    <string name="dash_scan_hint">원본 JPEG, PNG 또는 HEIC를 선택하세요. 스크린샷은 이미 일부 데이터가 사라진 상태입니다.</string>
-    <string name="dash_choose_photo">사진 확인</string>
+    <string name="dash_scan_hint">원본 JPEG, PNG, HEIC 또는 MP4/MOV 동영상을 선택하세요. 스크린샷은 이미 일부 데이터가 사라진 상태입니다.</string>
+    <string name="dash_choose_photo">사진 또는 동영상 확인</string>
     <string name="dash_camera">카메라</string>
     <string name="dash_clipboard">클립보드</string>
     <string name="dash_eyebrow_studio">메타데이터 스튜디오</string>
@@ -552,8 +561,8 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">무료  →  PRO</string>
-    <string name="pro_free_features">무료: 스캔 및 GPS Privacy Shield, EXIF 뷰어, 하루 최대 %1$d장 편집·정리(UTC), 기록 10개.</string>
-    <string name="pro_pro_features">Pro: 무제한 정리 및 편집, 최대 50장 일괄 처리, PDF/JSON, 보고서 50개, API.</string>
+    <string name="pro_free_features">무료: 사진·동영상 스캔 및 GPS Privacy Shield, EXIF 뷰어, 하루 최대 %1$d장 사진 편집·정리(UTC), 기록 10개.</string>
+    <string name="pro_pro_features">Pro: 무제한 정리 및 편집, 재인코딩 없는 동영상 정리(MP4, MOV), 최대 50장 일괄 처리, PDF/JSON, 보고서 50개, API.</string>
     <string name="pro_one_time">Google Play를 통한 1회 구매, 구독 없음.</string>
     <string name="pro_key_label">Pro 키(있는 경우)</string>
     <string name="pro_key_apply">키 적용</string>
@@ -581,11 +590,15 @@
     <string name="gps_shield_eyebrow">파일의 GPS</string>
     <string name="gps_shield_title_point">촬영 위치가 사진에 저장되어 있습니다</string>
     <string name="gps_shield_title_tags">사진에서 위치 태그를 찾았습니다</string>
+    <string name="gps_shield_title_point_video">촬영 위치가 동영상에 저장되어 있습니다</string>
+    <string name="gps_shield_title_tags_video">동영상에서 위치 태그가 발견되었습니다</string>
     <string name="gps_shield_text_point">정리하지 않고 원본을 공유하면 받는 사람이 촬영 위치 좌표를 볼 수 있습니다.</string>
     <string name="gps_shield_text_tags">메타데이터에 위치 정보가 있지만 정확한 좌표는 읽을 수 없습니다.</string>
     <string name="gps_shield_not_tracking">추적되고 있다는 뜻은 아닙니다. 위치 태그가 있는 파일을 공유할 때 위험이 생깁니다.</string>
     <string name="gps_shield_advice">공유하기 전에 GPS가 없는 사본을 만드는 것이 좋습니다. 위치를 보호하는 간단한 방법입니다.</string>
     <string name="gps_shield_action">사진 보호 · GPS 제거</string>
+    <string name="gps_shield_action_video">동영상 보호 · 메타데이터 제거</string>
+    <string name="gps_shield_action_note_video">동영상은 재인코딩 없이 복사되므로 화질이 그대로입니다. 원본은 변경되지 않습니다. 동영상 정리는 Pro 기능입니다.</string>
     <string name="gps_shield_action_note">탭한 후 새 사본을 저장할 위치를 선택하세요. 원본은 그대로 유지됩니다. 사본을 공유하세요. 무료: 하루 최대 %1$d장.</string>
     <string name="gps_shield_open_original">위치 태그를 제거하려면 원본 JPEG/PNG 사진을 여세요. 저장된 보고서에는 사진이 포함되어 있지 않습니다.</string>
     <string name="gps_shield_coordinates">원본 파일의 좌표</string>
@@ -624,7 +637,7 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">개인정보</string>
-    <string name="privacy_title">이 사진이 드러내는 정보</string>
+    <string name="privacy_title">이 파일이 드러내는 정보</string>
     <string name="privacy_hint">원본 파일을 받은 사람은 누구나 이 정보를 볼 수 있습니다.</string>
     <string name="privacy_none_text">메타데이터에 위치, 이름, 기기 일련번호가 없습니다.</string>
     <string name="privacy_level_none">개인 정보 없음</string>
@@ -647,7 +660,7 @@
     <string name="privacy_clean_share">정리 후 공유</string>
     <string name="privacy_clean_save">정리 후 사본 저장</string>
     <string name="share_target_label">메타데이터 없이 보내기</string>
-    <string name="share_chooser_title">정리된 사진 보내기</string>
-    <string name="share_no_app">사진을 공유할 앱이 없습니다</string>
+    <string name="share_chooser_title">정리된 사본 보내기</string>
+    <string name="share_no_app">파일을 공유할 앱이 없습니다</string>
     <string name="share_not_verified">정리된 사본을 확인할 수 없어 공유하지 않았습니다</string>
 </resources>

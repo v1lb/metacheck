@@ -116,7 +116,7 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
                 ReportTab.METADATA -> MetadataViewer(report, actions.onCsv, sourceUri)
                 ReportTab.GPS -> {
                     val point = report.gps
-                    if (point != null) GpsTab(point, actions.onWipeGps)
+                    if (point != null) GpsTab(point, actions.onWipeGps, report.file.format.isVideo)
                     else Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
                         Text(stringResource(R.string.result_no_gps),
                             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
@@ -159,13 +159,13 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
         else -> MaterialTheme.colorScheme.primary
     }
     LazyColumn(modifier = Modifier.testTag("overview_list"), contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(15.dp)) {
-        item { PhotoPreview(sourceUri, report.file.name) }
+        item { PhotoPreview(sourceUri, report.file.name, report.file.format.isVideo) }
         item {
             val exposure = remember(report) { com.example.metacheck.domain.privacy.PrivacyExposures.of(report) }
             PrivacyExposureCard(exposure, actions.onCleanShare, actions.onClean)
         }
         if (GpsPrivacy.hasLocationMarkers(report)) {
-            item { GpsPrivacyAlert(report.gps, actions.onWipeGps, partialTags = report.gps == null) }
+            item { GpsPrivacyAlert(report.gps, actions.onWipeGps, partialTags = report.gps == null, video = report.file.format.isVideo) }
         }
         item {
             GlassPanel(accent = color, modifier = Modifier.fillMaxWidth()) {
@@ -225,7 +225,7 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
 }
 
 @Composable
-private fun PhotoPreview(sourceUri: String?, name: String) {
+private fun PhotoPreview(sourceUri: String?, name: String, video: Boolean = false) {
     val context = LocalContext.current
     val image by produceState<androidx.compose.ui.graphics.ImageBitmap?>(initialValue = null, key1 = sourceUri) {
         value = withContext(Dispatchers.IO) {
@@ -233,6 +233,7 @@ private fun PhotoPreview(sourceUri: String?, name: String) {
             try {
                 val uri = Uri.parse(sourceUri)
                 if (uri.scheme != "content") return@withContext null
+                if (video) return@withContext videoFrame(context, uri)
                 val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
                 context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
                 if (opts.outWidth <= 0 || opts.outHeight <= 0) return@withContext null
@@ -284,6 +285,22 @@ private fun PhotoPreview(sourceUri: String?, name: String) {
     }
 }
 
+/** Первый кадр видео для превью (только на устройстве). */
+private fun videoFrame(context: android.content.Context, uri: Uri): androidx.compose.ui.graphics.ImageBitmap? {
+    val retriever = android.media.MediaMetadataRetriever()
+    return try {
+        retriever.setDataSource(context, uri)
+        val frame = if (android.os.Build.VERSION.SDK_INT >= 27) {
+            retriever.getScaledFrameAtTime(0, android.media.MediaMetadataRetriever.OPTION_CLOSEST_SYNC, 1024, 1024)
+        } else retriever.getFrameAtTime(0)
+        frame?.asImageBitmap()
+    } catch (_: Exception) {
+        null
+    } finally {
+        runCatching { retriever.release() }
+    }
+}
+
 @Composable
 private fun SignalPanel(signal: Signal) {
     val color = when (signal.severity) {
@@ -306,13 +323,13 @@ private fun SignalPanel(signal: Signal) {
 }
 
 @Composable
-private fun GpsTab(gps: GpsPoint, onWipeGps: (() -> Unit)?) {
+private fun GpsTab(gps: GpsPoint, onWipeGps: (() -> Unit)?, video: Boolean = false) {
     val context = LocalContext.current
     val noMapsApp = stringResource(R.string.result_no_maps_app)
     val coords = String.format(Locale.US, "%.6f, %.6f", gps.latitude, gps.longitude)
     LazyColumn(contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { SectionLabel(stringResource(R.string.result_eyebrow_geolocation)) }
-        item { GpsPrivacyAlert(gps, onWipeGps) }
+        item { GpsPrivacyAlert(gps, onWipeGps, video = video) }
         item {
             val latLon = stringResource(R.string.result_lat_lon)
             val altitude = stringResource(R.string.result_altitude)

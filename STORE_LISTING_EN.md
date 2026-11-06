@@ -7,7 +7,7 @@ Other languages: [STORE_LISTING_I18N.md](STORE_LISTING_I18N.md). Russian: [STORE
 **Short description (max 80):**
 See what your photos reveal: GPS, camera, author. Remove it in one tap.
 
-**Full description (max 4000, 2924 now):**
+**Full description (max 4000, 3158 now):**
 ```
 A phone photo carries more than you see: the exact place it was taken, the phone model, the camera serial number, the author's name and the time. MetaCheck shows what your picture reveals and removes it before you send it.
 
@@ -23,6 +23,7 @@ PHOTO PRIVACY
 • "Send without metadata" in the Share menu: pick it in your gallery or any app and the photo goes out already cleaned.
 • Metadata cleaning: a copy without EXIF, GPS and XMP. The original file is not changed. GPS is removed from JPEG without re-compression.
 • Shows where the photo was taken and, when you tap the button, the point on a map.
+• Videos (MP4, MOV): see the filming location, phone model and date hidden in the file. Pro removes them without re-encoding, so the quality stays the same.
 
 ALL METADATA
 • EXIF: camera, lens, shutter speed, aperture, ISO, dates and more, with field search.
@@ -35,8 +36,8 @@ AI LABELS IN THE FILE
 • Only labels inside the file are checked; the picture itself is not analyzed. Social networks and messengers strip labels, so for such images the app honestly says there is no data. Missing labels do not prove a photo is real.
 
 FREE AND PRO
-Free: analysis, metadata viewer, privacy score, GPS Privacy Shield, cleaning and editing up to 10 photos per day, a history of up to 10 reports.
-Pro (one-time purchase, no subscription): no daily limit, batch cleaning of up to 50 photos, PDF and JSON export, a history of up to 50 reports, sending a report to your own API.
+Free: analysis of photos and videos, metadata viewer, privacy score, GPS Privacy Shield, cleaning and editing up to 10 photos per day, a history of up to 10 reports.
+Pro (one-time purchase, no subscription): no daily limit, cleaning videos (MP4, MOV) without re-encoding, batch cleaning of up to 50 photos, PDF and JSON export, a history of up to 50 reports, sending a report to your own API.
 
 PRIVATE BY DESIGN
 • Analysis runs on your device. Images are never uploaded.
@@ -45,7 +46,7 @@ PRIVATE BY DESIGN
 • Sending a JSON report to your own server is off by default and works only on your command.
 
 HOW TO USE
-1. Tap "Check a photo" and pick an image, or use the camera or clipboard.
+1. Tap "Check a photo or video" and pick a file, or use the camera or clipboard.
 2. See the privacy score and what the file reveals.
 3. Tap "Clean and share" or "Remove GPS", and send the clean copy.
 

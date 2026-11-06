@@ -9,6 +9,7 @@
     <string name="section_dates">Tarihler</string>
     <string name="section_gps">EXIF konum bilgisi</string>
     <string name="section_authorship">Yazılım ve yazar</string>
+    <string name="section_container">Video kapsayıcı etiketleri</string>
     <string name="exif_make">Üretici</string>
     <string name="exif_model">Model</string>
     <string name="exif_lens_make">Lens üreticisi</string>
@@ -104,6 +105,12 @@
     <string name="group_exif">Teknik EXIF</string>
     <string name="group_xmp">XMP / IPTC</string>
     <string name="group_png">PNG / metin</string>
+    <string name="group_video">Video</string>
+    <string name="label_video_duration">Süre</string>
+    <string name="label_video_codec">Video codec’i</string>
+    <string name="label_video_created">Oluşturulma (UTC)</string>
+    <string name="label_video_location">Çekim yeri (ISO 6709)</string>
+    <string name="label_video_title">Başlık</string>
     <string name="catalog_file_section">Dosya</string>
     <string name="catalog_coordinates_section">Koordinatlar</string>
     <string name="field_name">Ad</string>
@@ -198,6 +205,8 @@
     <string name="failure_overwrite_edit_jpeg_only">Üzerine yazarak EXIF düzenleme JPEG için desteklenir</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Temizleme sırasında üzerine yazma yalnızca JPEG ve PNG’yi destekler: diğer biçimleri yeni kopya olarak kaydedin</string>
     <string name="failure_wipe_gps_jpeg_png_only">GPS kaldırma JPEG ve PNG’yi destekler</string>
+    <string name="failure_video_unsupported">Bu video yeniden kodlanmadan temizlenemez: dosya yapısı desteklenmiyor (parçalı, şifreli veya bozuk dosya)</string>
+    <string name="failure_not_enough_space">Temizlenmiş kopya için cihazda yeterli boş alan yok</string>
     <string name="failure_decode_failed">Pikseller okunamadı. Başka bir görüntü deneyin</string>
     <string name="failure_encode_failed">Görüntü kodlanamadı</string>
     <string name="failure_out_of_memory">Görüntüyü işlemek için yeterli bellek yok</string>
@@ -370,8 +379,8 @@
     <string name="dash_eyebrow_secure">Fotoğraf gizliliği kontrolü</string>
     <string name="dash_title">Fotoğrafınız neyi ele veriyor?</string>
     <string name="dash_subtitle">Dosyada gizli konum, kamera, yazar ve yapay zekâ etiketleri. Göndermeden önce kontrol edip kaldırın.</string>
-    <string name="dash_scan_hint">Orijinal JPEG, PNG veya HEIC dosyasını seçin: ekran görüntüsü verilerin bir kısmını zaten kaybetmiştir.</string>
-    <string name="dash_choose_photo">Fotoğrafı kontrol et</string>
+    <string name="dash_scan_hint">Orijinal JPEG, PNG, HEIC veya MP4/MOV videoyu seçin: ekran görüntüsü verilerin bir kısmını zaten kaybetmiştir.</string>
+    <string name="dash_choose_photo">Fotoğraf veya videoyu kontrol et</string>
     <string name="dash_camera">Kamera</string>
     <string name="dash_clipboard">Pano</string>
     <string name="dash_eyebrow_studio">Meta veri stüdyosu</string>
@@ -554,8 +563,8 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">ÜCRETSİZ  →  PRO</string>
-    <string name="pro_free_features">Ücretsiz: tarama ve GPS Privacy Shield, EXIF görüntüleyici, günde en fazla %1$d fotoğrafı düzenleme ve temizleme (UTC), geçmişte 10 rapor.</string>
-    <string name="pro_pro_features">Pro: sınırsız temizleme ve düzenleme, en fazla 50 fotoğrafı toplu işleme, PDF/JSON, 50 rapor, API.</string>
+    <string name="pro_free_features">Ücretsiz: fotoğraf ve video tarama ve GPS Privacy Shield, EXIF görüntüleyici, günde en fazla %1$d fotoğrafı düzenleme ve temizleme (UTC), geçmişte 10 rapor.</string>
+    <string name="pro_pro_features">Pro: sınırsız temizleme ve düzenleme, yeniden kodlamadan video temizleme (MP4, MOV), en fazla 50 fotoğrafı toplu işleme, PDF/JSON, 50 rapor, API.</string>
     <string name="pro_one_time">Google Play üzerinden tek seferlik satın alma, abonelik yok.</string>
     <string name="pro_key_label">Varsa Pro anahtarı</string>
     <string name="pro_key_apply">Anahtarı uygula</string>
@@ -583,11 +592,15 @@
     <string name="gps_shield_eyebrow">Dosyada GPS</string>
     <string name="gps_shield_title_point">Çekim yeri fotoğrafa kaydedilmiş</string>
     <string name="gps_shield_title_tags">Fotoğrafta konum etiketleri bulundu</string>
+    <string name="gps_shield_title_point_video">Çekim yeri videoda kayıtlı</string>
+    <string name="gps_shield_title_tags_video">Videoda konum etiketleri bulundu</string>
     <string name="gps_shield_text_point">Orijinali temizlemeden paylaşırsanız alıcı çekildiği yerin koordinatlarını görebilir.</string>
     <string name="gps_shield_text_tags">Meta veriler konum bilgisi içeriyor ancak kesin koordinatlar okunamadı.</string>
     <string name="gps_shield_not_tracking">Bu, takip edildiğiniz anlamına gelmez. Risk, konum etiketli bir dosyayı paylaştığınızda ortaya çıkar.</string>
     <string name="gps_shield_advice">Paylaşmadan önce GPS’siz bir kopya oluşturmak daha iyidir: konumunuzu korumanın basit bir yolu.</string>
     <string name="gps_shield_action">Fotoğrafı koru · GPS’i kaldır</string>
+    <string name="gps_shield_action_video">Videoyu koru · meta verileri kaldır</string>
+    <string name="gps_shield_action_note_video">Video yeniden kodlanmadan kopyalanır, kalite aynı kalır. Orijinal değişmez. Video temizleme bir Pro özelliğidir.</string>
     <string name="gps_shield_action_note">Dokunduktan sonra yeni kopyanın nereye kaydedileceğini seçin. Orijinal değişmez. Kopyayı paylaşın. Ücretsiz: günde en fazla %1$d fotoğraf.</string>
     <string name="gps_shield_open_original">Konum etiketlerini kaldırmak için orijinal JPEG/PNG fotoğrafı açın: kayıtlı rapor fotoğrafın kendisini içermez.</string>
     <string name="gps_shield_coordinates">Orijinal dosyadaki koordinatlar</string>
@@ -626,7 +639,7 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Gizlilik</string>
-    <string name="privacy_title">Bu fotoğraf neyi ele veriyor</string>
+    <string name="privacy_title">Bu dosya neyi ele veriyor</string>
     <string name="privacy_hint">Orijinal dosyayı gönderdiğiniz herkes bunu görebilir.</string>
     <string name="privacy_none_text">Meta verilerde konum, ad veya cihaz seri numarası yok.</string>
     <string name="privacy_level_none">Kişisel bir şey yok</string>
@@ -649,7 +662,7 @@
     <string name="privacy_clean_share">Temizle ve paylaş</string>
     <string name="privacy_clean_save">Temizle ve kopyayı kaydet</string>
     <string name="share_target_label">Meta veri olmadan gönder</string>
-    <string name="share_chooser_title">Temizlenmiş fotoğrafı gönder</string>
-    <string name="share_no_app">Fotoğrafı paylaşacak uygulama bulunamadı</string>
+    <string name="share_chooser_title">Temizlenmiş kopyayı gönder</string>
+    <string name="share_no_app">Dosyayı paylaşacak uygulama bulunamadı</string>
     <string name="share_not_verified">Temizlenmiş kopya doğrulanamadığı için paylaşılmadı</string>
 </resources>

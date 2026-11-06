@@ -11,6 +11,7 @@ S = [
     ("section_dates", "Dates", "Даты"),
     ("section_gps", "EXIF geolocation", "Геолокация EXIF"),
     ("section_authorship", "Software and authorship", "Программа и авторство"),
+    ("section_container", "Video container tags", "Теги контейнера видео"),
 
     # --- Поля EXIF (ключ exif:<тег>) ---
     ("exif_make", "Make", "Производитель"),
@@ -114,6 +115,12 @@ S = [
     ("group_exif", "Technical EXIF", "Технические EXIF"),
     ("group_xmp", "XMP / IPTC", "XMP / IPTC"),
     ("group_png", "PNG / text", "PNG / текст"),
+    ("group_video", "Video", "Видео"),
+    ("label_video_duration", "Duration", "Длительность"),
+    ("label_video_codec", "Video codec", "Видеокодек"),
+    ("label_video_created", "Created (UTC)", "Создано (UTC)"),
+    ("label_video_location", "Location (ISO 6709)", "Место съёмки (ISO 6709)"),
+    ("label_video_title", "Title", "Название"),
 
     # --- Каталог ---
     ("catalog_file_section", "File", "Файл"),
