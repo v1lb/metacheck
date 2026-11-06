@@ -495,7 +495,7 @@ fun MainScreen(
 }
 
 @Composable
-private fun Dashboard(
+internal fun Dashboard(
     history: List<HistoryEntry>, historyEnabled: Boolean, isPro: Boolean,
     onPick: () -> Unit, onCamera: () -> Unit, onClipboard: () -> Unit,
     onOpen: (String) -> Unit, onDelete: (String) -> Unit,

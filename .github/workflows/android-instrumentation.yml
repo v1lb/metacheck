@@ -45,7 +45,8 @@ jobs:
           disable-linux-hw-accel: false
           emulator-boot-timeout: 900
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: ./gradlew --no-daemon connectedDebugAndroidTest
+          # Приложение остаётся установленным после тестов, чтобы забрать снимки экранов из ScreenshotTest.
+          script: ./gradlew --no-daemon connectedDebugAndroidTest -Pandroid.injected.androidTest.leaveApksInstalledAfterRun=true; s=$?; adb pull /sdcard/Android/data/dev.metacheck.app.debug/files/screens app/build/screens || true; exit $s
       - name: Save instrumented-test reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -54,4 +55,11 @@ jobs:
           path: |
             app/build/reports/androidTests/**
             app/build/outputs/androidTest-results/**
+          if-no-files-found: ignore
+      - name: Save screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: metacheck-screens
+          path: app/build/screens/**
           if-no-files-found: ignore
