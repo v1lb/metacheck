@@ -11,7 +11,7 @@ MetaCheck: borrar EXIF y GPS
 ```
 **Short description:**
 ```
-Mira lo que revelan tus fotos: GPS, cámara, autor. Elimínalo con un toque.
+Mira lo que revelan tus fotos y vídeos: GPS, móvil, autor. Bórralo en un toque.
 ```
 **Full description:**
 ```
@@ -30,13 +30,18 @@ PRIVACIDAD DE LAS FOTOS
 • Limpieza de metadatos: una copia sin EXIF, GPS ni XMP. El archivo original no cambia. El GPS se elimina del JPEG sin recompresión.
 • Muestra dónde se tomó la foto y, al tocar el botón, el punto en un mapa.
 
+PRIVACIDAD DE LOS VÍDEOS (MP4, MOV)
+• Mira el lugar de grabación, el modelo del teléfono, la fecha y pistas ocultas como el código de tiempo.
+• Pro limpia los vídeos sin recodificar: imagen y sonido se copian byte a byte, así que la calidad no cambia, ni siquiera en vídeos 4K largos.
+• Funciona con vídeos de móviles Android y de iPhone.
+
 TODOS LOS METADATOS
 • EXIF: cámara, objetivo, velocidad, apertura, ISO, fechas y más, con búsqueda por campos.
 • XMP, IPTC y bloques de texto PNG. Exporta el informe en PDF, JSON o CSV.
 • Edita el EXIF (fecha, cámara, autor, coordenadas) en una copia JPEG.
 
 ETIQUETAS DE IA EN EL ARCHIVO
-• Content Credentials (C2PA): etiquetas «creado con IA» y «editado con IA» de ChatGPT, Gemini, Adobe Firefly y otros.
+• Content Credentials (C2PA): etiquetas «creado con IA» y «editado con IA» de ChatGPT, Gemini, Adobe Firefly, Sora y otros.
 • Etiquetas IPTC, parámetros de generación de Stable Diffusion, ComfyUI y NovelAI, y unos 70 nombres de generadores.
 • Solo se revisan las etiquetas dentro del archivo; la imagen en sí no se analiza. Las redes sociales y las apps de mensajería eliminan las etiquetas, así que en esas imágenes la app indica con honestidad que no hay datos. La ausencia de etiquetas no prueba que una foto sea real.
 
@@ -51,7 +56,7 @@ PRIVADO POR DISEÑO
 • El envío del informe JSON a tu propio servidor está desactivado por defecto y solo funciona cuando tú lo ordenas.
 
 CÓMO SE USA
-1. Toca «Comprobar foto» y elige una imagen, o usa la cámara o el portapapeles.
+1. Toca «Comprobar foto o vídeo» y elige una imagen, o usa la cámara o el portapapeles.
 2. Mira el índice de privacidad y lo que revela el archivo.
 3. Toca «Limpiar y compartir» o «Eliminar GPS» y envía la copia limpia.
 
@@ -66,7 +71,7 @@ MetaCheck: remover EXIF e GPS
 ```
 **Short description:**
 ```
-Veja o que suas fotos revelam: GPS, câmera, autor. Remova com um toque.
+Veja o que suas fotos e vídeos revelam: GPS, celular, autor. Remova num toque.
 ```
 **Full description:**
 ```
@@ -85,13 +90,18 @@ PRIVACIDADE DAS FOTOS
 • Limpeza de metadados: uma cópia sem EXIF, GPS e XMP. O arquivo original não muda. O GPS é removido do JPEG sem recompressão.
 • Mostra onde a foto foi tirada e, ao tocar no botão, o ponto no mapa.
 
+PRIVACIDADE DOS VÍDEOS (MP4, MOV)
+• Veja o local da gravação, o modelo do celular, a data e faixas ocultas, como o timecode.
+• O Pro limpa vídeos sem recodificação: imagem e som são copiados byte a byte, então a qualidade não muda, mesmo em vídeos 4K longos.
+• Funciona com vídeos de celulares Android e iPhone.
+
 TODOS OS METADADOS
 • EXIF: câmera, lente, velocidade do obturador, abertura, ISO, datas e mais, com busca por campo.
 • XMP, IPTC e blocos de texto PNG. Exporte o relatório em PDF, JSON ou CSV.
 • Edite o EXIF (data, câmera, autor, coordenadas) em uma cópia JPEG.
 
 RÓTULOS DE IA NO ARQUIVO
-• Content Credentials (C2PA): rótulos "criado por IA" e "editado com IA" do ChatGPT, Gemini, Adobe Firefly e outros.
+• Content Credentials (C2PA): rótulos "criado por IA" e "editado com IA" do ChatGPT, Gemini, Adobe Firefly, Sora e outros.
 • Rótulos IPTC, parâmetros de geração do Stable Diffusion, ComfyUI e NovelAI, e cerca de 70 nomes de geradores.
 • Apenas os rótulos dentro do arquivo são verificados; a imagem em si não é analisada. Redes sociais e mensageiros removem os rótulos, então nessas imagens o app informa honestamente que não há dados. A ausência de rótulos não prova que uma foto é real.
 
@@ -106,7 +116,7 @@ PRIVADO DESDE A CONCEPÇÃO
 • O envio do relatório JSON para seu próprio servidor fica desativado por padrão e só funciona quando você pede.
 
 COMO USAR
-1. Toque em "Verificar foto" e escolha uma imagem, ou use a câmera ou a área de transferência.
+1. Toque em "Verificar foto ou vídeo" e escolha uma imagem, ou use a câmera ou a área de transferência.
 2. Veja o índice de privacidade e o que o arquivo revela.
 3. Toque em "Limpar e compartilhar" ou "Remover GPS" e envie a cópia limpa.
 
@@ -121,7 +131,7 @@ MetaCheck: EXIF & GPS löschen
 ```
 **Short description:**
 ```
-Sieh, was deine Fotos verraten: GPS, Kamera, Urheber. Mit einem Tipp entfernen.
+Was deine Fotos und Videos verraten: GPS, Handy, Autor. Per Tipp entfernen.
 ```
 **Full description:**
 ```
@@ -140,13 +150,18 @@ FOTO-DATENSCHUTZ
 • Metadaten bereinigen: eine Kopie ohne EXIF, GPS und XMP. Die Originaldatei bleibt unverändert. GPS wird ohne Neukomprimierung aus JPEG entfernt.
 • Zeigt, wo das Foto aufgenommen wurde, und auf Tipp den Punkt auf einer Karte.
 
+VIDEO-PRIVATSPHÄRE (MP4, MOV)
+• Sieh Aufnahmeort, Handymodell, Aufnahmedatum und versteckte Spuren wie den Timecode.
+• Pro bereinigt Videos ohne Neukodierung: Bild und Ton werden Byte für Byte kopiert, die Qualität bleibt also gleich, auch bei langen 4K-Videos.
+• Funktioniert mit Videos von Android-Handys und iPhone.
+
 ALLE METADATEN
 • EXIF: Kamera, Objektiv, Belichtungszeit, Blende, ISO, Daten und mehr, mit Feldsuche.
 • XMP, IPTC und PNG-Textblöcke. Bericht als PDF, JSON oder CSV exportieren.
 • EXIF (Datum, Kamera, Urheber, Koordinaten) in einer JPEG-Kopie bearbeiten.
 
 KI-KENNZEICHNUNGEN IN DER DATEI
-• Content Credentials (C2PA): Kennzeichnungen „von KI erstellt“ und „mit KI bearbeitet“ von ChatGPT, Gemini, Adobe Firefly und anderen.
+• Content Credentials (C2PA): Kennzeichnungen „von KI erstellt“ und „mit KI bearbeitet“ von ChatGPT, Gemini, Adobe Firefly, Sora und anderen.
 • IPTC-Kennzeichnungen, Generierungsparameter von Stable Diffusion, ComfyUI und NovelAI sowie rund 70 Generatornamen.
 • Geprüft werden nur Kennzeichnungen in der Datei; das Bild selbst wird nicht analysiert. Soziale Netzwerke und Messenger entfernen Kennzeichnungen, daher sagt die App bei solchen Bildern ehrlich, dass keine Daten vorliegen. Fehlende Kennzeichnungen beweisen nicht, dass ein Foto echt ist.
 
@@ -161,7 +176,7 @@ PRIVAT VON GRUND AUF
 • Das Senden des JSON-Berichts an deinen eigenen Server ist standardmäßig aus und funktioniert nur auf deinen Befehl.
 
 SO GEHT’S
-1. Tippe auf „Foto prüfen“ und wähle ein Bild, oder nutze Kamera oder Zwischenablage.
+1. Tippe auf „Foto oder Video prüfen“ und wähle ein Bild, oder nutze Kamera oder Zwischenablage.
 2. Sieh dir den Datenschutzwert an und was die Datei verrät.
 3. Tippe auf „Bereinigen und teilen“ oder „GPS entfernen“ und sende die bereinigte Kopie.
 
@@ -176,7 +191,7 @@ MetaCheck: effacer EXIF et GPS
 ```
 **Short description:**
 ```
-Voyez ce que vos photos révèlent : GPS, appareil, auteur. Effacez-le d’un geste.
+Voyez ce que révèlent vos photos et vidéos : GPS, téléphone, auteur. Effacez-le.
 ```
 **Full description:**
 ```
@@ -195,13 +210,17 @@ CONFIDENTIALITÉ DES PHOTOS
 • Nettoyage des métadonnées : une copie sans EXIF, GPS ni XMP. Le fichier d’origine n’est pas modifié. Le GPS est retiré du JPEG sans recompression.
 • Indique où la photo a été prise et, sur pression du bouton, le point sur une carte.
 
+CONFIDENTIALITÉ DES VIDÉOS (MP4, MOV)
+• Lieu de tournage, modèle du téléphone, date et pistes cachées comme le timecode.
+• Pro nettoie les vidéos sans réencodage : l’image et le son sont copiés octet par octet, la qualité reste identique. Vidéos Android et iPhone.
+
 TOUTES LES MÉTADONNÉES
 • EXIF : appareil, objectif, vitesse, ouverture, ISO, dates et plus, avec recherche par champ.
 • XMP, IPTC et blocs de texte PNG. Exportez le rapport en PDF, JSON ou CSV.
 • Modifiez l’EXIF (date, appareil, auteur, coordonnées) dans une copie JPEG.
 
 ÉTIQUETTES IA DANS LE FICHIER
-• Content Credentials (C2PA) : étiquettes « créé par IA » et « modifié avec IA » de ChatGPT, Gemini, Adobe Firefly et d’autres.
+• Content Credentials (C2PA) : étiquettes « créé par IA » et « modifié avec IA » de ChatGPT, Gemini, Adobe Firefly, Sora et d’autres.
 • Étiquettes IPTC, paramètres de génération de Stable Diffusion, ComfyUI et NovelAI, et environ 70 noms de générateurs.
 • Seules les étiquettes contenues dans le fichier sont vérifiées ; l’image elle-même n’est pas analysée. Les réseaux sociaux et les messageries suppriment les étiquettes : pour ces images, l’application indique honnêtement qu’il n’y a pas de données. L’absence d’étiquette ne prouve pas qu’une photo est réelle.
 
@@ -216,7 +235,7 @@ PRIVÉ PAR CONCEPTION
 • L’envoi du rapport JSON vers votre propre serveur est désactivé par défaut et ne fonctionne que sur votre commande.
 
 MODE D’EMPLOI
-1. Appuyez sur « Vérifier une photo » et choisissez une image, ou utilisez l’appareil photo ou le presse-papiers.
+1. Appuyez sur « Vérifier une photo ou une vidéo » et choisissez une image, ou utilisez l’appareil photo ou le presse-papiers.
 2. Consultez le score de confidentialité et ce que révèle le fichier.
 3. Appuyez sur « Nettoyer et partager » ou « Supprimer le GPS », puis envoyez la copie nettoyée.
 
@@ -231,7 +250,7 @@ MetaCheck: rimuovi EXIF e GPS
 ```
 **Short description:**
 ```
-Scopri cosa rivelano le foto: GPS, fotocamera, autore. Rimuovilo con un tocco.
+Scopri cosa rivelano foto e video: GPS, telefono, autore. Rimuovi con un tocco.
 ```
 **Full description:**
 ```
@@ -250,13 +269,18 @@ PRIVACY DELLE FOTO
 • Pulizia dei metadati: una copia senza EXIF, GPS e XMP. Il file originale non cambia. Il GPS viene rimosso dal JPEG senza ricompressione.
 • Mostra dove è stata scattata la foto e, toccando il pulsante, il punto su una mappa.
 
+PRIVACY DEI VIDEO (MP4, MOV)
+• Vedi il luogo delle riprese, il modello del telefono, la data e le tracce nascoste come il timecode.
+• Pro pulisce i video senza ricodifica: immagine e audio vengono copiati byte per byte, quindi la qualità resta identica, anche nei lunghi video 4K.
+• Funziona con i video dei telefoni Android e di iPhone.
+
 TUTTI I METADATI
 • EXIF: fotocamera, obiettivo, tempo di scatto, apertura, ISO, date e altro, con ricerca per campo.
 • XMP, IPTC e blocchi di testo PNG. Esporta il report in PDF, JSON o CSV.
 • Modifica l’EXIF (data, fotocamera, autore, coordinate) in una copia JPEG.
 
 ETICHETTE IA NEL FILE
-• Content Credentials (C2PA): etichette «creato con IA» e «modificato con IA» di ChatGPT, Gemini, Adobe Firefly e altri.
+• Content Credentials (C2PA): etichette «creato con IA» e «modificato con IA» di ChatGPT, Gemini, Adobe Firefly, Sora e altri.
 • Etichette IPTC, parametri di generazione di Stable Diffusion, ComfyUI e NovelAI, e circa 70 nomi di generatori.
 • Vengono controllate solo le etichette nel file; l’immagine in sé non viene analizzata. Social network e app di messaggistica rimuovono le etichette, quindi per queste immagini l’app dice onestamente che non ci sono dati. L’assenza di etichette non prova che una foto sia reale.
 
@@ -271,7 +295,7 @@ PRIVATO PER DESIGN
 • L’invio del report JSON al tuo server è disattivato per impostazione predefinita e funziona solo su tuo comando.
 
 COME SI USA
-1. Tocca «Controlla una foto» e scegli un’immagine, oppure usa la fotocamera o gli appunti.
+1. Tocca «Controlla una foto o un video» e scegli un’immagine, oppure usa la fotocamera o gli appunti.
 2. Guarda il punteggio privacy e cosa rivela il file.
 3. Tocca «Pulisci e condividi» o «Rimuovi il GPS» e invia la copia pulita.
 
@@ -286,7 +310,7 @@ MetaCheck: видалення EXIF, GPS
 ```
 **Short description:**
 ```
-Дізнайтеся, що видають ваші фото: GPS, камера, автор. Видаліть одним дотиком.
+Дізнайтеся, що видають ваші фото й відео: GPS, телефон, автор. Видаліть за мить.
 ```
 **Full description:**
 ```
@@ -305,13 +329,18 @@ MetaCheck: видалення EXIF, GPS
 • Очищення метаданих: копія без EXIF, GPS і XMP. Оригінальний файл не змінюється. GPS видаляється з JPEG без повторного стиснення.
 • Показує, де зроблено фото, а після натискання кнопки — точку на карті.
 
+ПРИВАТНІСТЬ ВІДЕО (MP4, MOV)
+• Місце зйомки, модель телефона, дата запису й приховані доріжки, наприклад таймкод.
+• Pro очищає відео без перекодування: зображення й звук копіюються байт у байт, тож якість не змінюється навіть у довгих відео 4K.
+• Працює з відео з телефонів Android та iPhone.
+
 УСІ МЕТАДАНІ
 • EXIF: камера, об’єктив, витримка, діафрагма, ISO, дати та інше, з пошуком за полями.
 • XMP, IPTC і текстові блоки PNG. Експорт звіту в PDF, JSON або CSV.
 • Редагування EXIF (дата, камера, автор, координати) у копії JPEG.
 
 МІТКИ ШІ У ФАЙЛІ
-• Content Credentials (C2PA): мітки «створено ШІ» та «змінено ШІ» від ChatGPT, Gemini, Adobe Firefly та інших.
+• Content Credentials (C2PA): мітки «створено ШІ» та «змінено ШІ» від ChatGPT, Gemini, Adobe Firefly, Sora та інших.
 • Мітки IPTC, параметри генерації Stable Diffusion, ComfyUI і NovelAI, а також близько 70 назв генераторів.
 • Перевіряються лише мітки всередині файлу; саме зображення не аналізується. Соцмережі й месенджери видаляють мітки, тож для таких зображень застосунок чесно повідомляє, що даних немає. Відсутність міток не доводить, що фото справжнє.
 
@@ -326,7 +355,7 @@ Pro (одноразова покупка, без підписки): без де�
 • Надсилання JSON-звіту на ваш сервер за замовчуванням вимкнено й працює лише за вашою командою.
 
 ЯК КОРИСТУВАТИСЯ
-1. Торкніться «Перевірити фото» й виберіть зображення або скористайтеся камерою чи буфером обміну.
+1. Торкніться «Перевірити фото або відео» й виберіть зображення або скористайтеся камерою чи буфером обміну.
 2. Перегляньте індекс приватності й те, що видає файл.
 3. Торкніться «Очистити й надіслати» або «Видалити GPS» і надішліть очищену копію.
 
@@ -341,7 +370,7 @@ MetaCheck: usuń EXIF i GPS
 ```
 **Short description:**
 ```
-Zobacz, co zdradzają Twoje zdjęcia: GPS, aparat, autor. Usuń to jednym ruchem.
+Zdjęcia i filmy zdradzają GPS, telefon i autora. Sprawdź i usuń jednym ruchem.
 ```
 **Full description:**
 ```
@@ -360,13 +389,18 @@ PRYWATNOŚĆ ZDJĘĆ
 • Czyszczenie metadanych: kopia bez EXIF, GPS i XMP. Oryginalny plik się nie zmienia. GPS jest usuwany z JPEG bez ponownej kompresji.
 • Pokazuje, gdzie zrobiono zdjęcie, a po naciśnięciu przycisku — punkt na mapie.
 
+PRYWATNOŚĆ FILMÓW (MP4, MOV)
+• Zobacz miejsce nagrania, model telefonu, datę i ukryte ścieżki, takie jak kod czasowy.
+• Pro czyści filmy bez ponownego kodowania: obraz i dźwięk są kopiowane bajt po bajcie, więc jakość się nie zmienia, nawet w długich filmach 4K.
+• Działa z filmami z telefonów z Androidem i iPhone’a.
+
 WSZYSTKIE METADANE
 • EXIF: aparat, obiektyw, czas naświetlania, przysłona, ISO, daty i więcej, z wyszukiwaniem pól.
 • XMP, IPTC i bloki tekstowe PNG. Eksport raportu do PDF, JSON lub CSV.
 • Edycja EXIF (data, aparat, autor, współrzędne) w kopii JPEG.
 
 ETYKIETY AI W PLIKU
-• Content Credentials (C2PA): etykiety „utworzone przez AI” i „edytowane przez AI” od ChatGPT, Gemini, Adobe Firefly i innych.
+• Content Credentials (C2PA): etykiety „utworzone przez AI” i „edytowane przez AI” od ChatGPT, Gemini, Adobe Firefly, Sora i innych.
 • Etykiety IPTC, parametry generowania Stable Diffusion, ComfyUI i NovelAI oraz około 70 nazw generatorów.
 • Sprawdzane są tylko etykiety w pliku; sam obraz nie jest analizowany. Serwisy społecznościowe i komunikatory usuwają etykiety, więc w takich przypadkach aplikacja uczciwie informuje, że brak danych. Brak etykiet nie dowodzi, że zdjęcie jest prawdziwe.
 
@@ -381,7 +415,7 @@ PRYWATNOŚĆ OD PODSTAW
 • Wysyłanie raportu JSON na własny serwer jest domyślnie wyłączone i działa tylko na Twoje polecenie.
 
 JAK KORZYSTAĆ
-1. Dotknij „Sprawdź zdjęcie” i wybierz obraz albo użyj aparatu lub schowka.
+1. Dotknij „Sprawdź zdjęcie lub wideo” i wybierz obraz albo użyj aparatu lub schowka.
 2. Zobacz wskaźnik prywatności i to, co zdradza plik.
 3. Dotknij „Wyczyść i udostępnij” lub „Usuń GPS” i wyślij czystą kopię.
 
@@ -396,7 +430,7 @@ MetaCheck: EXIF ve GPS silme
 ```
 **Short description:**
 ```
-Fotoğraflarınız neyi ele veriyor: GPS, kamera, yazar. Tek dokunuşla silin.
+Fotoğraf ve videolarınız GPS, telefon ve yazarı ele verir. Tek dokunuşla silin.
 ```
 **Full description:**
 ```
@@ -415,13 +449,18 @@ FOTOĞRAF GİZLİLİĞİ
 • Meta veri temizleme: EXIF, GPS ve XMP içermeyen bir kopya. Orijinal dosya değişmez. GPS, JPEG’den yeniden sıkıştırma olmadan kaldırılır.
 • Fotoğrafın nerede çekildiğini ve düğmeye dokunduğunuzda noktayı haritada gösterir.
 
+VİDEO GİZLİLİĞİ (MP4, MOV)
+• Çekim yerini, telefon modelini, kayıt tarihini ve zaman kodu gibi gizli izleri görün.
+• Pro videoları yeniden kodlamadan temizler: görüntü ve ses bayt bayt kopyalanır, bu yüzden uzun 4K videolarda bile kalite aynı kalır.
+• Android telefonların ve iPhone’un videolarıyla çalışır.
+
 TÜM META VERİLER
 • EXIF: kamera, lens, deklanşör hızı, diyafram, ISO, tarihler ve daha fazlası; alan aramasıyla.
 • XMP, IPTC ve PNG metin blokları. Raporu PDF, JSON veya CSV olarak dışa aktarın.
 • Bir JPEG kopyasında EXIF’i (tarih, kamera, yazar, koordinatlar) düzenleyin.
 
 DOSYADAKİ YAPAY ZEKÂ ETİKETLERİ
-• Content Credentials (C2PA): ChatGPT, Gemini, Adobe Firefly ve diğerlerinin “yapay zekâ ile oluşturuldu” ve “yapay zekâ ile düzenlendi” etiketleri.
+• Content Credentials (C2PA): ChatGPT, Gemini, Adobe Firefly, Sora ve diğerlerinin “yapay zekâ ile oluşturuldu” ve “yapay zekâ ile düzenlendi” etiketleri.
 • IPTC etiketleri; Stable Diffusion, ComfyUI ve NovelAI üretim parametreleri ve yaklaşık 70 üretici adı.
 • Yalnızca dosyanın içindeki etiketler kontrol edilir; görüntünün kendisi analiz edilmez. Sosyal ağlar ve mesajlaşma uygulamaları etiketleri siler; bu tür görüntülerde uygulama dürüstçe veri olmadığını söyler. Etiketlerin olmaması fotoğrafın gerçek olduğunu kanıtlamaz.
 
@@ -436,7 +475,7 @@ TASARIMI GEREĞİ GİZLİ
 • JSON raporunu kendi sunucunuza gönderme varsayılan olarak kapalıdır ve yalnızca sizin komutunuzla çalışır.
 
 NASIL KULLANILIR
-1. “Fotoğrafı kontrol et”e dokunun ve bir görüntü seçin ya da kamerayı veya panoyu kullanın.
+1. “Fotoğraf veya videoyu kontrol et”e dokunun ve bir görüntü seçin ya da kamerayı veya panoyu kullanın.
 2. Gizlilik puanını ve dosyanın neyi ele verdiğini görün.
 3. “Temizle ve paylaş” veya “GPS’i kaldır”a dokunun ve temiz kopyayı gönderin.
 
@@ -451,7 +490,7 @@ MetaCheck: Hapus EXIF & GPS
 ```
 **Short description:**
 ```
-Lihat apa yang diungkap foto Anda: GPS, kamera, pembuat. Hapus sekali ketuk.
+Apa yang diungkap foto dan video Anda: GPS, ponsel, pembuat. Hapus sekali ketuk.
 ```
 **Full description:**
 ```
@@ -470,13 +509,18 @@ PRIVASI FOTO
 • Pembersihan metadata: salinan tanpa EXIF, GPS, dan XMP. File asli tidak berubah. GPS dihapus dari JPEG tanpa kompresi ulang.
 • Menampilkan lokasi pengambilan foto dan, saat tombol diketuk, titiknya di peta.
 
+PRIVASI VIDEO (MP4, MOV)
+• Lihat lokasi perekaman, model ponsel, tanggal rekaman, dan trek tersembunyi seperti timecode.
+• Pro membersihkan video tanpa encode ulang: gambar dan suara disalin byte demi byte, jadi kualitasnya tetap sama, bahkan untuk video 4K yang panjang.
+• Berfungsi dengan video dari ponsel Android dan iPhone.
+
 SEMUA METADATA
 • EXIF: kamera, lensa, kecepatan rana, bukaan, ISO, tanggal, dan lainnya, dengan pencarian kolom.
 • XMP, IPTC, dan blok teks PNG. Ekspor laporan sebagai PDF, JSON, atau CSV.
 • Edit EXIF (tanggal, kamera, pembuat, koordinat) di salinan JPEG.
 
 LABEL AI DI DALAM FILE
-• Content Credentials (C2PA): label “dibuat oleh AI” dan “diedit dengan AI” dari ChatGPT, Gemini, Adobe Firefly, dan lainnya.
+• Content Credentials (C2PA): label “dibuat oleh AI” dan “diedit dengan AI” dari ChatGPT, Gemini, Adobe Firefly, Sora, dan lainnya.
 • Label IPTC, parameter pembuatan Stable Diffusion, ComfyUI, dan NovelAI, serta sekitar 70 nama generator.
 • Hanya label di dalam file yang diperiksa; gambarnya sendiri tidak dianalisis. Media sosial dan aplikasi pesan menghapus label, jadi untuk gambar seperti itu aplikasi dengan jujur menyatakan tidak ada data. Tidak adanya label tidak membuktikan foto itu asli.
 
@@ -491,7 +535,7 @@ PRIVAT SEJAK AWAL
 • Pengiriman laporan JSON ke server Anda sendiri nonaktif secara default dan hanya berjalan atas perintah Anda.
 
 CARA MENGGUNAKAN
-1. Ketuk “Periksa foto” dan pilih gambar, atau gunakan kamera atau papan klip.
+1. Ketuk “Periksa foto atau video” dan pilih gambar, atau gunakan kamera atau papan klip.
 2. Lihat skor privasi dan apa yang diungkap file.
 3. Ketuk “Bersihkan dan bagikan” atau “Hapus GPS”, lalu kirim salinan bersihnya.
 
@@ -506,7 +550,7 @@ MetaCheck：EXIF・GPSを削除
 ```
 **Short description:**
 ```
-写真からわかる情報（GPS・カメラ・作成者）を確認し、ワンタップで削除。
+写真や動画からわかる情報を確認：GPS、スマホ、作成者。ワンタップで削除。
 ```
 **Full description:**
 ```
@@ -525,13 +569,18 @@ MetaCheck：EXIF・GPSを削除
 • メタデータのクリーニング：EXIF、GPS、XMPを含まないコピーを作成します。元のファイルは変更されません。JPEGのGPSは再圧縮せずに削除します。
 • 撮影場所を表示し、ボタンをタップすると地図上に地点を表示します。
 
+動画のプライバシー（MP4、MOV）
+• 撮影場所、スマホの機種、撮影日時、タイムコードなどの隠れたトラックを確認できます。
+• Proでは動画を再エンコードせずにクリーニング。映像と音声はバイト単位でそのままコピーされるため、長い4K動画でも画質は変わりません。
+• AndroidスマホとiPhoneの動画に対応。
+
 すべてのメタデータ
 • EXIF：カメラ、レンズ、シャッター速度、絞り、ISO、日時など。フィールド検索付き。
 • XMP、IPTC、PNGテキストチャンク。レポートをPDF、JSON、CSVで書き出せます。
 • JPEGのコピーでEXIF（日付、カメラ、作成者、座標）を編集できます。
 
 ファイル内のAIラベル
-• Content Credentials（C2PA）：ChatGPT、Gemini、Adobe Fireflyなどによる「AIで作成」「AIで編集」のラベル。
+• Content Credentials（C2PA）：ChatGPT、Gemini、Adobe Firefly, Soraなどによる「AIで作成」「AIで編集」のラベル。
 • IPTCラベル、Stable Diffusion・ComfyUI・NovelAIの生成パラメーター、約70種類の生成ツール名。
 • 確認するのはファイル内のラベルのみで、画像そのものは分析しません。SNSやメッセージアプリはラベルを削除するため、そうした画像ではデータがないことを正直に表示します。ラベルがないことは、写真が本物である証明にはなりません。
 
@@ -546,7 +595,7 @@ Pro（買い切り、サブスクリプションなし）：1日の上限なし�
 • 独自サーバーへのJSONレポート送信は初期設定でオフになっており、操作したときだけ実行されます。
 
 使い方
-1. 「写真をチェック」をタップして画像を選ぶか、カメラやクリップボードを使います。
+1. 「写真・動画をチェック」をタップして画像を選ぶか、カメラやクリップボードを使います。
 2. プライバシースコアと、ファイルからわかる情報を確認します。
 3. 「クリーニングして共有」または「GPSを削除」をタップし、クリーンなコピーを送信します。
 
@@ -561,7 +610,7 @@ MetaCheck: EXIF·GPS 제거
 ```
 **Short description:**
 ```
-사진이 드러내는 GPS, 카메라, 작성자 정보를 확인하고 한 번에 제거하세요.
+사진과 동영상이 드러내는 정보 확인: GPS, 휴대폰, 작성자. 한 번에 삭제.
 ```
 **Full description:**
 ```
@@ -580,13 +629,18 @@ MetaCheck: EXIF·GPS 제거
 • 메타데이터 정리: EXIF, GPS, XMP가 없는 사본을 만듭니다. 원본 파일은 바뀌지 않습니다. JPEG의 GPS는 다시 압축하지 않고 제거합니다.
 • 사진을 찍은 위치를 보여주고, 버튼을 누르면 지도에 지점을 표시합니다.
 
+동영상 개인정보 보호(MP4, MOV)
+• 촬영 위치, 휴대폰 모델, 촬영 날짜, 타임코드 같은 숨은 트랙을 확인하세요.
+• Pro는 동영상을 재인코딩 없이 정리합니다. 영상과 소리가 바이트 단위로 그대로 복사되므로 긴 4K 동영상도 화질이 그대로입니다.
+• Android 휴대폰과 iPhone 동영상을 지원합니다.
+
 모든 메타데이터
 • EXIF: 카메라, 렌즈, 셔터 속도, 조리개, ISO, 날짜 등을 필드 검색과 함께 제공합니다.
 • XMP, IPTC, PNG 텍스트 청크. 보고서를 PDF, JSON, CSV로 내보낼 수 있습니다.
 • JPEG 사본에서 EXIF(날짜, 카메라, 작성자, 좌표)를 편집할 수 있습니다.
 
 파일 속 AI 라벨
-• Content Credentials(C2PA): ChatGPT, Gemini, Adobe Firefly 등이 붙이는 “AI로 생성”, “AI로 편집” 라벨.
+• Content Credentials(C2PA): ChatGPT, Gemini, Adobe Firefly, Sora 등이 붙이는 “AI로 생성”, “AI로 편집” 라벨.
 • IPTC 라벨, Stable Diffusion·ComfyUI·NovelAI 생성 매개변수, 약 70개 생성 도구 이름.
 • 파일 안의 라벨만 확인하며 이미지 자체는 분석하지 않습니다. SNS와 메신저는 라벨을 제거하므로 이런 이미지에서는 데이터가 없다고 솔직하게 알려줍니다. 라벨이 없다고 사진이 진짜라는 뜻은 아닙니다.
 
@@ -601,7 +655,7 @@ Pro(1회 구매, 구독 없음): 하루 제한 없음, 재인코딩 없는 동�
 • 내 서버로 JSON 보고서 보내기는 기본적으로 꺼져 있으며 사용자가 직접 실행할 때만 작동합니다.
 
 사용 방법
-1. “사진 확인”을 누르고 이미지를 선택하거나 카메라 또는 클립보드를 사용하세요.
+1. “사진 또는 동영상 확인”을 누르고 이미지를 선택하거나 카메라 또는 클립보드를 사용하세요.
 2. 개인정보 점수와 파일이 드러내는 정보를 확인하세요.
 3. “정리 후 공유” 또는 “GPS 제거”를 누르고 정리된 사본을 보내세요.
 
@@ -616,7 +670,7 @@ MetaCheck：清除 EXIF 和 GPS
 ```
 **Short description:**
 ```
-看看照片泄露了哪些信息：GPS、相机、作者。一键清除。
+查看照片和视频泄露了什么：GPS、手机、作者。一键删除。
 ```
 **Full description:**
 ```
@@ -635,13 +689,18 @@ MetaCheck：清除 EXIF 和 GPS
 • 清理元数据：生成不含 EXIF、GPS 和 XMP 的副本，原文件保持不变。JPEG 中的 GPS 会在不重新压缩的情况下移除。
 • 显示照片的拍摄地点，点按按钮即可在地图上查看位置。
 
+视频隐私（MP4、MOV）
+• 查看拍摄地点、手机型号、拍摄日期以及时间码等隐藏轨道。
+• Pro 版不重新编码即可清理视频：画面和声音逐字节复制，因此即使是很长的 4K 视频，画质也完全不变。
+• 支持 Android 手机和 iPhone 拍摄的视频。
+
 全部元数据
 • EXIF：相机、镜头、快门速度、光圈、ISO、日期等，支持字段搜索。
 • XMP、IPTC 和 PNG 文本块。可将报告导出为 PDF、JSON 或 CSV。
 • 在 JPEG 副本中编辑 EXIF（日期、相机、作者、坐标）。
 
 文件中的 AI 标签
-• Content Credentials（C2PA）：ChatGPT、Gemini、Adobe Firefly 等添加的“AI 创建”和“AI 编辑”标签。
+• Content Credentials（C2PA）：ChatGPT、Gemini、Adobe Firefly, Sora 等添加的“AI 创建”和“AI 编辑”标签。
 • IPTC 标签，Stable Diffusion、ComfyUI 和 NovelAI 的生成参数，以及约 70 种生成器名称。
 • 只检查文件中的标签，不分析图像本身。社交网络和即时通讯应用会删除标签，因此对这类图像，应用会如实说明没有数据。没有标签并不能证明照片是真实的。
 
@@ -656,7 +715,7 @@ Pro（一次性购买，无需订阅）：无每日上限，不重新编码清�
 • 向自有服务器发送 JSON 报告默认关闭，只在你主动操作时才会执行。
 
 使用方法
-1. 点按“检查照片”并选择图像，或使用相机或剪贴板。
+1. 点按“检查照片或视频”并选择图像，或使用相机或剪贴板。
 2. 查看隐私评分以及文件泄露的信息。
 3. 点按“清理并分享”或“移除 GPS”，发送清理后的副本。
 
