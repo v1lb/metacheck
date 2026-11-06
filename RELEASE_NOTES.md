@@ -1,6 +1,10 @@
 # Google Play release notes (up to 500 characters per language)
 
 ## ru-RU
+Версия 2.8.0
+• Новый дизайн: светлая «бумажная» и тёмная тема, понятный штамп «Файл выдаёт N фактов»
+• Новая иконка
+
 Версия 2.7.0
 • Видео MP4 и MOV: место съёмки, модель телефона, дата и скрытые дорожки
 • Очистка видео без пережатия (Pro): качество не меняется, видео и звук копируются байт в байт
@@ -17,6 +21,10 @@
 • Раздел «О приложении»: политика, условия, лицензии
 
 ## en-US
+Version 2.8.0
+• New design: light paper and dark themes, a clear "File reveals N facts" stamp
+• New icon
+
 Version 2.7.0
 • MP4 and MOV videos: filming location, phone model, date and hidden tracks
 • Video cleaning without re-encoding (Pro): the quality stays the same, video and audio are copied byte for byte
