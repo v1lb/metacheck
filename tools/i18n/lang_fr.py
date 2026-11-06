@@ -1,4 +1,3 @@
-# French translation of MetaCheck. Generated with AI assistance, not yet reviewed by a native speaker.
 # Keys must match the master_*.py files; run python3 tools/i18n/gen.py after editing.
 T = {
     'about_eyebrow': 'À propos',
