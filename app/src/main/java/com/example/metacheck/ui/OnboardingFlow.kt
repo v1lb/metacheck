@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -61,9 +62,9 @@ import com.example.metacheck.ui.preferences.AppLanguage
 import com.example.metacheck.ui.preferences.AppLocales
 import androidx.compose.ui.res.stringResource
 import com.example.metacheck.R
+import com.example.metacheck.ui.theme.Paper
 import java.util.Locale
 import com.example.metacheck.ui.preferences.UiPreferences
-import com.example.metacheck.ui.theme.CyberPalette
 import kotlinx.coroutines.launch
 
 /** Full-screen first-run experience; navigation and preferences are independent of image processing. */
@@ -186,28 +187,23 @@ fun OnboardingFlow(prefs: UiPreferences) {
 
 private const val STEPS = 3
 
+/** Знак приложения на первом шаге: штамп «MC» в рамке, как отметка на бланке. */
 @Composable
 private fun NeonMark() {
-    val transition = rememberInfiniteTransition(label = "logo-glow")
-    val pulse by transition.animateFloat(.38f, .9f,
-        infiniteRepeatable(tween(1500), RepeatMode.Reverse), label = "logo-opacity")
-    Box(Modifier.size(128.dp).background(
-        Brush.radialGradient(listOf(MaterialTheme.colorScheme.primary.copy(alpha = pulse * .3f), Color.Transparent)),
-        RoundedCornerShape(50)), contentAlignment = Alignment.Center) {
-        Icon(Icons.Filled.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(56.dp))
+    Box(Modifier.size(112.dp), contentAlignment = Alignment.Center) {
+        Stamp(listOf("METACHECK", "MC"), MaterialTheme.colorScheme.error)
     }
 }
 
 /** A selectable, high-fidelity mini UI. Tapping any part changes the live app theme. */
 @Composable
 fun ThemePreviewCard(dark: Boolean, selected: Boolean, title: String, subtitle: String, onClick: () -> Unit) {
-    val base = if (dark) Color(0xFF0A0C10) else Color(0xFFF4F8FC)
-    val pane = if (dark) Color(0xFF172436) else Color.White
-    val text = if (dark) Color.White else Color(0xFF0A2233)
-    val accent = if (dark) Color(0xFF00F3FF) else Color(0xFF006579)
+    val base = if (dark) Paper.Dark else Paper.Light
+    val pane = if (dark) Paper.DarkRaised else Paper.LightRaised
+    val text = if (dark) Paper.DarkInk else Paper.Ink
+    val accent = if (dark) Paper.DarkSignal else Paper.Signal
     val outline = MaterialTheme.colorScheme.outline
-    val shape = RoundedCornerShape(22.dp)
+    val shape = RoundedCornerShape(6.dp)
     Column(Modifier.fillMaxWidth().clip(shape)
         .border(if (selected) 2.dp else 1.dp,
             if (selected) MaterialTheme.colorScheme.primary else outline.copy(alpha = .55f), shape)
@@ -225,23 +221,25 @@ fun ThemePreviewCard(dark: Boolean, selected: Boolean, title: String, subtitle: 
             Icon(if (selected) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
                 contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         }
-        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(13.dp))
+        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(4.dp))
             .background(base).padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("MetaCheck    /    EXIF", color = text, style = MaterialTheme.typography.labelMedium)
+            Text("METACHECK", color = text, style = com.example.metacheck.ui.theme.MonoText.tag)
             Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                 Box(Modifier.weight(1f).height(38.dp).clip(RoundedCornerShape(8.dp))
-                    .background(pane).border(1.dp, accent.copy(alpha = .3f), RoundedCornerShape(8.dp)),
+                    .background(pane).border(1.dp, text.copy(alpha = .25f), RoundedCornerShape(3.dp)),
                     contentAlignment = Alignment.CenterStart) {
                     Text("  AI · 0", color = text, style = MaterialTheme.typography.labelLarge)
                 }
                 Box(Modifier.weight(1f).height(38.dp).clip(RoundedCornerShape(8.dp))
-                    .background(pane).border(1.dp, accent.copy(alpha = .3f), RoundedCornerShape(8.dp)),
+                    .background(pane).border(1.dp, text.copy(alpha = .25f), RoundedCornerShape(3.dp)),
                     contentAlignment = Alignment.CenterStart) {
                     Text("  GPS · ✓", color = text, style = MaterialTheme.typography.labelLarge)
                 }
             }
-            Box(Modifier.fillMaxWidth().height(7.dp).clip(RoundedCornerShape(5.dp))
-                .background(accent.copy(alpha = .65f)))
+            Box(Modifier.fillMaxWidth().height(32.dp).clip(RoundedCornerShape(3.dp)).background(text),
+                contentAlignment = Alignment.Center) {
+                Box(Modifier.width(64.dp).height(4.dp).background(base))
+            }
         }
     }
 }

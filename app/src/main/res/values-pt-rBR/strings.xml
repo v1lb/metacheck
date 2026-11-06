@@ -641,6 +641,14 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Privacidade</string>
+    <string name="stamp_reveals">O ARQUIVO REVELA</string>
+    <plurals name="stamp_facts">
+        <item quantity="one">%1$d DADO</item>
+        <item quantity="other">%1$d DADOS</item>
+    </plurals>
+    <string name="stamp_nothing">NADA</string>
+    <string name="history_badge_reveals">REVELA %1$d</string>
+    <string name="history_badge_clean">LIMPO</string>
     <string name="privacy_title">O que este arquivo revela</string>
     <string name="privacy_hint">Qualquer pessoa para quem você enviar o arquivo original pode ver isso.</string>
     <string name="privacy_none_text">Não há localização, nomes ou números de série do aparelho nos metadados.</string>

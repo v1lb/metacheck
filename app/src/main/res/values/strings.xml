@@ -655,6 +655,14 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Privacy</string>
+    <string name="stamp_reveals">FILE REVEALS</string>
+    <plurals name="stamp_facts">
+        <item quantity="one">%1$d FACT</item>
+        <item quantity="other">%1$d FACTS</item>
+    </plurals>
+    <string name="stamp_nothing">NOTHING</string>
+    <string name="history_badge_reveals">REVEALS %1$d</string>
+    <string name="history_badge_clean">CLEAN</string>
     <string name="privacy_title">What this file reveals</string>
     <string name="privacy_hint">Anyone you send the original file to can see this.</string>
     <string name="privacy_none_text">No location, names or device serial numbers in the metadata.</string>

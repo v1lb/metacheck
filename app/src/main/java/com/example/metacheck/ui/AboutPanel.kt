@@ -72,7 +72,7 @@ fun AboutPanel() {
         containerColor = MaterialTheme.colorScheme.surface,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         textContentColor = MaterialTheme.colorScheme.onSurface,
-        shape = RoundedCornerShape(26.dp),
+        shape = RoundedCornerShape(8.dp),
         title = { Text(stringResource(R.string.about_licenses)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {

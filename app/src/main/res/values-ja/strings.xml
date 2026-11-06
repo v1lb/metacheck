@@ -637,6 +637,13 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">プライバシー</string>
+    <string name="stamp_reveals">このファイルからわかること</string>
+    <plurals name="stamp_facts">
+        <item quantity="other">%1$d 件</item>
+    </plurals>
+    <string name="stamp_nothing">なし</string>
+    <string name="history_badge_reveals">%1$d 件</string>
+    <string name="history_badge_clean">クリーン</string>
     <string name="privacy_title">このファイルからわかること</string>
     <string name="privacy_hint">元のファイルを送った相手は誰でもこれを見られます。</string>
     <string name="privacy_none_text">メタデータに位置情報、名前、端末のシリアル番号はありません。</string>

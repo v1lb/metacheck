@@ -50,6 +50,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -65,7 +67,6 @@ import com.example.metacheck.domain.model.MetaItem
 import com.example.metacheck.domain.model.MetaReport
 import com.example.metacheck.domain.model.Severity
 import com.example.metacheck.domain.model.Signal
-import com.example.metacheck.ui.theme.CyberPalette
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -98,16 +99,17 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
     var selected by rememberSaveable(reportStateKey(report)) { mutableIntStateOf(0) }
     val tab = tabs[selected.coerceIn(0, tabs.lastIndex)]
     Column(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                CyberEyebrow(stringResource(R.string.result_eyebrow_report))
-                Text(report.file.name.ifBlank { stringResource(R.string.common_unnamed) },
-                    style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-            androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.PhoneAndroid, contentDescription = null,
-                tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(16.dp))
-            Text(" " + stringResource(R.string.result_badge_local), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelMedium)
+        val context = LocalContext.current
+        val formatName = rememberMetaTexts().formatName(report.file.format)
+        Column(Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 10.dp, bottom = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(report.file.name.ifBlank { stringResource(R.string.common_unnamed) },
+                style = com.example.metacheck.ui.theme.MonoText.file, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(formatName + " · " + android.text.format.Formatter.formatShortFileSize(context, report.file.sizeBytes) +
+                " · " + stringResource(R.string.result_badge_local),
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
         }
+        androidx.compose.material3.HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
         // Вкладки сменяются растворением, а не мгновенно.
         Crossfade(targetState = tab, modifier = Modifier.weight(1f), animationSpec = tween(220), label = "report-tab") { tab ->
         Box(Modifier.fillMaxSize()) {
@@ -125,21 +127,23 @@ fun ResultView(report: MetaReport, actions: ResultActions, sourceUri: String? = 
             }
         }
         }
+        androidx.compose.material3.HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
         Row(
-            Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(horizontal = 9.dp, vertical = 9.dp),
-            horizontalArrangement = Arrangement.spacedBy(3.dp),
+            Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface),
         ) {
             tabs.forEachIndexed { index, item ->
                 val active = item == tab
+                val ink = MaterialTheme.colorScheme.onSurface
                 Column(
-                    Modifier.weight(1f).clip(RoundedCornerShape(14.dp))
-                        .background(if (active) MaterialTheme.colorScheme.primary.copy(alpha = .13f) else Color.Transparent)
-                        .clickable { selected = index }.padding(vertical = 8.dp),
+                    Modifier.weight(1f)
+                        .drawBehind { if (active) drawRect(ink, size = androidx.compose.ui.geometry.Size(size.width, 3.dp.toPx())) }
+                        .clickable { selected = index }.padding(top = 10.dp, bottom = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     androidx.compose.material3.Icon(item.icon, contentDescription = null,
                         tint = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(stringResource(item.label), style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
                         color = if (active) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
@@ -155,22 +159,22 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
     val attention = report.needsAiReview
     val color = when {
         evidence -> MaterialTheme.colorScheme.error
-        attention -> if (MaterialTheme.colorScheme.background.red < .15f) Color(0xFFFFC875) else Color(0xFF7F4A00)
+        attention -> MaterialTheme.colorScheme.secondary
         else -> MaterialTheme.colorScheme.primary
     }
     LazyColumn(modifier = Modifier.testTag("overview_list"), contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(15.dp)) {
-        item { PhotoPreview(sourceUri, report.file.name, report.file.format.isVideo) }
         item {
             val exposure = remember(report) { com.example.metacheck.domain.privacy.PrivacyExposures.of(report) }
-            PrivacyExposureCard(exposure, actions.onCleanShare, actions.onClean)
+            PrivacyExposureCard(exposure, actions.onCleanShare, actions.onClean,
+                preview = { PhotoPreview(sourceUri, report.file.name, report.file.format.isVideo) })
         }
         if (GpsPrivacy.hasLocationMarkers(report)) {
             item { GpsPrivacyAlert(report.gps, actions.onWipeGps, partialTags = report.gps == null, video = report.file.format.isVideo) }
         }
         item {
-            GlassPanel(accent = color, modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    CyberEyebrow(stringResource(R.string.result_eyebrow_engine), color = color)
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                SectionLabel(stringResource(R.string.result_eyebrow_engine))
+                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         stringResource(
                             when {
@@ -179,8 +183,8 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
                                 else -> R.string.result_verdict_clean
                             },
                         ),
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = if (evidence || attention) color else MaterialTheme.colorScheme.onSurface,
                     )
                     Text(stringResource(R.string.result_metadata_only),
                         color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
@@ -193,13 +197,13 @@ private fun OverviewTab(report: MetaReport, actions: ResultActions, sourceUri: S
             }
         }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                MetricPanel(report.actionableSignalCount.toString(), stringResource(R.string.result_metric_signals), Modifier.weight(1f))
-                MetricPanel(report.exifSections.size.toString(), stringResource(R.string.result_metric_exif_groups), Modifier.weight(1f), MaterialTheme.colorScheme.secondary)
-                MetricPanel(rememberMetaTexts().formatName(report.file.format), stringResource(R.string.result_metric_format), Modifier.weight(1f), MaterialTheme.colorScheme.tertiary)
+            Column {
+                FieldRow(stringResource(R.string.result_metric_signals), report.actionableSignalCount.toString())
+                FieldRow(stringResource(R.string.result_metric_exif_groups), report.exifSections.size.toString())
+                FieldRow(stringResource(R.string.result_metric_format), rememberMetaTexts().formatName(report.file.format))
             }
         }
-        item { NeonButton(stringResource(R.string.result_view_all_metadata), onMetadata, Modifier.fillMaxWidth()) }
+        item { CyberOutlineButton(stringResource(R.string.result_view_all_metadata), onMetadata, Modifier.fillMaxWidth()) }
         item { SectionLabel(stringResource(R.string.result_section_actions)) }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
@@ -263,24 +267,23 @@ private fun PhotoPreview(sourceUri: String?, name: String, video: Boolean = fals
             } catch (_: Exception) { null } catch (_: OutOfMemoryError) { null } catch (_: StackOverflowError) { null } // превью необязательно: без него, но без крэша
         }
     }
-    GlassPanel(Modifier.fillMaxWidth()) {
-        Box(
-            Modifier.fillMaxWidth().height(190.dp)
-                .background(Brush.linearGradient(listOf(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface))),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (image != null) {
-                Image(image!!, contentDescription = stringResource(R.string.result_preview_description, name),
-                    contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
-            } else {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.HideImage, contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(40.dp))
-                    Text(stringResource(if (sourceUri == null) R.string.result_preview_not_stored else R.string.result_preview_unavailable),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
-                }
+    Box(
+        Modifier.size(width = 108.dp, height = 136.dp)
+            .border(1.dp, MaterialTheme.colorScheme.outline)
+            .background(MaterialTheme.colorScheme.surfaceVariant),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (image != null) {
+            Image(image!!, contentDescription = stringResource(R.string.result_preview_description, name),
+                contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+        } else {
+            Column(Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.HideImage, contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(28.dp))
+                Text(stringResource(if (sourceUri == null) R.string.result_preview_not_stored else R.string.result_preview_unavailable),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center)
             }
-            CyberEyebrow(stringResource(R.string.result_eyebrow_preview), Modifier.align(Alignment.TopStart).padding(12.dp))
         }
     }
 }
@@ -305,11 +308,11 @@ private fun videoFrame(context: android.content.Context, uri: Uri): androidx.com
 private fun SignalPanel(signal: Signal) {
     val color = when (signal.severity) {
         Severity.AI_EVIDENCE -> MaterialTheme.colorScheme.error
-        Severity.CAUTION -> if (MaterialTheme.colorScheme.background.red < .15f) Color(0xFFFFC875) else Color(0xFF7F4A00)
+        Severity.CAUTION -> MaterialTheme.colorScheme.secondary
         Severity.INFO -> MaterialTheme.colorScheme.primary
     }
-    GlassPanel(modifier = Modifier.fillMaxWidth(), accent = color) {
-        Column(Modifier.padding(17.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
             val texts = rememberMetaTexts()
             CyberEyebrow(stringResource(when (signal.severity) {
                 Severity.AI_EVIDENCE -> R.string.signal_eyebrow_ai
@@ -319,6 +322,7 @@ private fun SignalPanel(signal: Signal) {
             Text(texts.signalTitle(signal), style = MaterialTheme.typography.titleMedium)
             Text(texts.signalDetail(signal), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
         }
+        androidx.compose.material3.HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
     }
 }
 

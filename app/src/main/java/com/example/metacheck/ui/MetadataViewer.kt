@@ -37,14 +37,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.metacheck.ui.theme.MonoText
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.example.metacheck.domain.metadata.MetadataCatalog
 import com.example.metacheck.domain.metadata.MetadataGroup
 import com.example.metacheck.domain.metadata.MetadataRecord
 import com.example.metacheck.domain.model.MetaReport
-import com.example.metacheck.ui.theme.CyberPalette
 
 /** Accessible, searchable native viewer for every EXIF/XMP/PNG field actually extracted. */
 @Composable
@@ -81,13 +82,14 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
     LazyColumn(
         modifier = Modifier.testTag("metadata_viewer"),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 30.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                CyberEyebrow(stringResource(R.string.viewer_eyebrow))
-                Text(stringResource(R.string.viewer_title), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
-                Text(pluralStringResource(R.plurals.viewer_field_count, records.size, records.size), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+                Text(stringResource(R.string.viewer_title), style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+                Text(pluralStringResource(R.plurals.viewer_field_count, records.size, records.size),
+                    style = MonoText.tag, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         item {
@@ -101,7 +103,7 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
                 trailingIcon = {
                     if (query.isNotEmpty()) TextButton(onClick = { query = "" }) { Text(stringResource(R.string.viewer_search_clear)) }
                 },
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(4.dp),
             )
         }
         item {
@@ -115,10 +117,10 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
         }
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(stringResource(R.string.viewer_found, results.size), style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.viewer_found, results.size), style = MonoText.tag,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.align(Alignment.CenterVertically))
                 if (onCsv != null) {
-                    TextButton(onClick = onCsv) { Text(stringResource(R.string.viewer_export_csv), color = MaterialTheme.colorScheme.primary) }
+                    TextButton(onClick = onCsv) { Text(stringResource(R.string.viewer_export_csv), color = MaterialTheme.colorScheme.onSurface) }
                 }
             }
         }
@@ -132,15 +134,17 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
                         selectedLon = newLon
                         pointChanged = true
                     })
-                    Button(
-                        enabled = sourceUri != null && report.file.format.name == "JPEG" && !studioBusy,
+                    CyberOutlineButton(
+                        stringResource(if (studioBusy) R.string.viewer_saving else R.string.viewer_save_gps),
                         onClick = {
                             if (sourceUri != null) {
                                 studioVm.requestEditCopy(sourceUri, MetadataPatch(latitude = point.latitude, longitude = point.longitude))
                                 saveGpsFile.launch("gps-${report.file.name.substringBeforeLast('.')}.jpg")
                             }
                         },
-                    ) { Text(stringResource(if (studioBusy) R.string.viewer_saving else R.string.viewer_save_gps)) }
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = sourceUri != null && report.file.format.name == "JPEG" && !studioBusy,
+                    )
                     if (report.file.format.name != "JPEG") {
                         Text(stringResource(R.string.viewer_gps_jpeg_only))
                     }
@@ -169,7 +173,8 @@ fun MetadataViewer(report: MetaReport, onCsv: (() -> Unit)?, sourceUri: String? 
             val sections = results.groupBy { it.group }
             sections.forEach { (category, entries) ->
                 item {
-                    SectionLabel("${category.marker} / ${stringResource(ResourceMetaTexts.groupTitleId(category)).uppercase()}")
+                    SectionLabel(stringResource(ResourceMetaTexts.groupTitleId(category)),
+                        Modifier.padding(top = 8.dp), trailing = "${category.marker} · ${entries.size}")
                 }
                 items(entries) { entry -> MetadataEntry(entry) }
             }
@@ -190,25 +195,20 @@ private fun MetadataChip(title: String, active: Boolean, onClick: () -> Unit) {
         colors = FilterChipDefaults.filterChipColors(
             containerColor = MaterialTheme.colorScheme.surface,
             labelColor = MaterialTheme.colorScheme.onSurface,
-            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = .22f),
-            selectedLabelColor = MaterialTheme.colorScheme.onSurface,
+            selectedContainerColor = MaterialTheme.colorScheme.primary,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
         ),
-        border = BorderStroke(1.dp, if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline),
+        shape = RoundedCornerShape(18.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
     )
 }
 
+/** Поле: подпись слева, значение моноширинным справа (длинное — под подписью); линия снизу. */
 @Composable
 private fun MetadataEntry(record: MetadataRecord) {
-    GlassPanel(Modifier.fillMaxWidth(), accent = if (record.group == MetadataGroup.LOCATION) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 13.dp),
-            verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Text(record.label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            SelectionContainer {
-                Text(record.value, style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.fillMaxWidth())
-            }
-            Text(record.section, style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary.copy(alpha = .92f))
-        }
+    val personal = record.group == MetadataGroup.LOCATION
+    SelectionContainer {
+        FieldRow(record.label, record.value,
+            valueColor = if (personal) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
     }
 }

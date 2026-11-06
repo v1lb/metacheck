@@ -49,13 +49,12 @@ fun CyberGeoMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = null) {
     } else {
         Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
             // Цвета из темы: раньше голубой и светло-серый текст был почти не виден в светлой теме.
-            Text(stringResource(R.string.map_off), color = MaterialTheme.colorScheme.primary)
-            Text("%.6f, %.6f".format(Locale.US, gps.latitude, gps.longitude), color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.map_off), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleSmall)
+            Text("%.6f, %.6f".format(Locale.US, gps.latitude, gps.longitude), color = MaterialTheme.colorScheme.onSurface,
+                style = com.example.metacheck.ui.theme.MonoText.file)
             // Пользователь должен знать, чей сервер увидит район точки: текст зависит от провайдера.
             Text(stringResource(R.string.map_consent, provider.serviceName), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Button(onClick = { enabled = true }) {
-                Text(stringResource(R.string.map_show, provider.serviceName))
-            }
+            CyberOutlineButton(stringResource(R.string.map_show, provider.serviceName), { enabled = true }, Modifier.fillMaxWidth())
             if (onSelect != null) {
                 Text(stringResource(R.string.map_enable_first), color = MaterialTheme.colorScheme.error)
             }
@@ -82,8 +81,7 @@ private fun LiveOsmMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = nu
             setUseDataConnection(true)
             controller.setZoom(15.0)
             setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null)
-            // Dark cyan-tinted cartography without modifying server tiles.
-            // Use standard high-contrast OSM tiles until a legible dark tile provider is configured.
+            // Обычные контрастные тайлы OSM: подкрашивать карту не нужно.
             overlayManager.tilesOverlay.setColorFilter(null)
             // Карта лежит внутри прокручиваемого списка: без этого список перехватывал вертикальный
             // жест, и карту нельзя было сдвинуть вверх-вниз (только вбок и щипком).
@@ -103,8 +101,9 @@ private fun LiveOsmMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = nu
         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         icon = android.graphics.drawable.GradientDrawable().apply {
             shape = android.graphics.drawable.GradientDrawable.OVAL
-            setColor(android.graphics.Color.rgb(0,243,255))
-            setStroke(5, android.graphics.Color.rgb(255,0,85))
+            // Метка цвета штампа: светлый центр, кирпичное кольцо — видна и на светлой, и на тёмной карте.
+            setColor(android.graphics.Color.rgb(244, 241, 234))
+            setStroke(7, android.graphics.Color.rgb(185, 61, 10))
             setSize(35,35)
         }
     } }
@@ -123,13 +122,14 @@ private fun LiveOsmMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = nu
     }
     LaunchedEffect(chosen) { marker.position = chosen; map.invalidate() }
     Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-        Text(stringResource(R.string.map_live_eyebrow), color = MaterialTheme.colorScheme.primary)
+        CyberEyebrow(stringResource(R.string.map_live_eyebrow))
         AndroidView(factory = { map }, modifier = Modifier.fillMaxWidth().height(290.dp), update = { it.invalidate() })
-        Text("%.6f, %.6f".format(Locale.US, chosen.latitude, chosen.longitude), color = MaterialTheme.colorScheme.primary)
+        Text("%.6f, %.6f".format(Locale.US, chosen.latitude, chosen.longitude), color = MaterialTheme.colorScheme.onSurface,
+            style = com.example.metacheck.ui.theme.MonoText.file)
         Text(status.asString(), color = MaterialTheme.colorScheme.onSurfaceVariant)
         OutlinedTextField(value = address, onValueChange = { address = it }, label = { Text(stringResource(R.string.map_address_label)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
         Text(stringResource(R.string.map_geocoder_note), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Button(onClick = {
+        CyberOutlineButton(stringResource(R.string.map_find), {
             scope.launch {
                 status = UiText.Res(R.string.map_searching)
                 val found = withContext(Dispatchers.IO) {
@@ -145,11 +145,11 @@ private fun LiveOsmMap(gps: GpsPoint, onSelect: ((Double, Double) -> Unit)? = nu
                     status = UiText.Res(R.string.map_address_found)
                 } else status = UiText.Res(R.string.map_address_not_found)
             }
-        }, enabled = address.isNotBlank()) { Text(stringResource(R.string.map_find)) }
+        }, Modifier.fillMaxWidth(), enabled = address.isNotBlank())
         if (onSelect != null) {
-            Button(onClick = { onSelect(chosen.latitude, chosen.longitude) }) { Text(stringResource(R.string.map_apply)) }
+            NeonButton(stringResource(R.string.map_apply), { onSelect(chosen.latitude, chosen.longitude) }, Modifier.fillMaxWidth())
         } else {
-            Text(stringResource(R.string.map_then_save), color = MaterialTheme.colorScheme.secondary)
+            Text(stringResource(R.string.map_then_save), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Text(stringResource(R.string.map_attribution_note, MapTiles.provider(context).attribution), color = MaterialTheme.colorScheme.onSurfaceVariant)
     }

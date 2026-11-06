@@ -639,6 +639,14 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Gizlilik</string>
+    <string name="stamp_reveals">DOSYA ELE VERİYOR</string>
+    <plurals name="stamp_facts">
+        <item quantity="one">%1$d BİLGİ</item>
+        <item quantity="other">%1$d BİLGİ</item>
+    </plurals>
+    <string name="stamp_nothing">HİÇBİR ŞEY</string>
+    <string name="history_badge_reveals">%1$d BİLGİ</string>
+    <string name="history_badge_clean">TEMİZ</string>
     <string name="privacy_title">Bu dosya neyi ele veriyor</string>
     <string name="privacy_hint">Orijinal dosyayı gönderdiğiniz herkes bunu görebilir.</string>
     <string name="privacy_none_text">Meta verilerde konum, ad veya cihaz seri numarası yok.</string>

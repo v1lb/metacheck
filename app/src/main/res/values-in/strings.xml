@@ -637,6 +637,13 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Privasi</string>
+    <string name="stamp_reveals">FILE MENGUNGKAP</string>
+    <plurals name="stamp_facts">
+        <item quantity="other">%1$d FAKTA</item>
+    </plurals>
+    <string name="stamp_nothing">TIDAK ADA</string>
+    <string name="history_badge_reveals">MENGUNGKAP %1$d</string>
+    <string name="history_badge_clean">BERSIH</string>
     <string name="privacy_title">Apa yang diungkap file ini</string>
     <string name="privacy_hint">Siapa pun yang Anda kirimi file asli dapat melihat ini.</string>
     <string name="privacy_none_text">Tidak ada lokasi, nama, atau nomor seri perangkat di metadata.</string>

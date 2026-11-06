@@ -72,6 +72,7 @@ class FileHistoryRepository(
                 format = report.file.format,
                 hasAiEvidence = report.hasAiEvidence,
                 hasGps = report.gps != null,
+                exposureCount = com.example.metacheck.domain.privacy.PrivacyExposures.of(report).items.size,
             )
         }.take(limit).toList()
     }

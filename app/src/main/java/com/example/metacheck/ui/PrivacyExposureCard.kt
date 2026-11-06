@@ -24,7 +24,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.HorizontalDivider
+import com.example.metacheck.ui.theme.MonoText
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -36,70 +39,57 @@ import com.example.metacheck.domain.privacy.ExposureLevel
 import com.example.metacheck.domain.privacy.PrivacyExposure
 
 /**
- * «Что раскрывает это фото»: индекс риска 0–100 и список того, что увидит получатель оригинала,
- * с реальными значениями (координаты, серийный номер, имя автора). Кнопки ведут прямо к очистке.
+ * «Что выдаёт файл»: штамп с числом найденных личных фактов, индекс риска 0–100 и пронумерованный
+ * список того, что увидит получатель оригинала, с реальными значениями. Кнопки ведут прямо к очистке.
+ * [preview] — миниатюра файла слева от штампа.
  */
 @Composable
 fun PrivacyExposureCard(
     exposure: PrivacyExposure,
     onCleanShare: (() -> Unit)?,
     onClean: (() -> Unit)?,
+    preview: (@Composable () -> Unit)? = null,
 ) {
     val color = levelColor(exposure.level)
-    GlassPanel(Modifier.fillMaxWidth(), color) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                ScoreGauge(exposure.score, color)
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    CyberEyebrow(stringResource(R.string.privacy_eyebrow), color = color)
-                    Text(stringResource(R.string.privacy_title), style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface)
-                    Text(stringResource(levelText(exposure.level)), color = color,
-                        style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                }
+    val count = exposure.items.size
+    val stampLines = listOf(
+        stringResource(R.string.stamp_reveals),
+        if (count == 0) stringResource(R.string.stamp_nothing) else pluralStringResource(R.plurals.stamp_facts, count, count),
+    )
+    val scoreText = stringResource(R.string.privacy_score_description, exposure.score)
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            preview?.invoke()
+            Column(Modifier.weight(1f).padding(top = 4.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Stamp(stampLines, color, Modifier.semantics { contentDescription = "${stampLines.joinToString(" ")}. $scoreText" })
+                Text(scoreText + " · " + stringResource(levelText(exposure.level)),
+                    style = MonoText.tag, color = color)
+                Text(stringResource(if (count == 0) R.string.privacy_none_text else R.string.privacy_hint),
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            if (exposure.items.isEmpty()) {
-                Text(stringResource(R.string.privacy_none_text), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            } else {
-                Text(stringResource(R.string.privacy_hint), color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium)
-                exposure.items.forEach { item ->
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("●", color = if (item.kind.weight >= 15) color else MaterialTheme.colorScheme.onSurfaceVariant)
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(kindText(item.kind)), style = MaterialTheme.typography.labelLarge,
+        }
+        if (count > 0) {
+            SectionLabel(stringResource(R.string.privacy_title))
+            Column {
+                exposure.items.forEachIndexed { index, item ->
+                    Row(Modifier.fillMaxWidth().padding(vertical = 11.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("%02d".format(index + 1), style = MonoText.tag,
+                            color = if (item.kind.weight >= 15) color else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 3.dp))
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                            Text(stringResource(kindText(item.kind)), style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface)
                             Text(item.value.ifEmpty { stringResource(R.string.privacy_value_present) },
-                                style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MonoText.value, color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 2, overflow = TextOverflow.Ellipsis)
                         }
                     }
+                    HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
                 }
-                onCleanShare?.let { NeonButton(stringResource(R.string.privacy_clean_share), it, Modifier.fillMaxWidth()) }
-                onClean?.let { CyberOutlineButton(stringResource(R.string.privacy_clean_save), it, Modifier.fillMaxWidth()) }
             }
+            onCleanShare?.let { NeonButton(stringResource(R.string.privacy_clean_share), it, Modifier.fillMaxWidth()) }
+            onClean?.let { CyberOutlineButton(stringResource(R.string.privacy_clean_save), it, Modifier.fillMaxWidth()) }
         }
-    }
-}
-
-/** Кольцо с числом: заполняется с анимацией при открытии отчёта. */
-@Composable
-private fun ScoreGauge(score: Int, color: Color) {
-    val track = MaterialTheme.colorScheme.outline
-    val progress = remember(score) { Animatable(0f) }
-    LaunchedEffect(score) { progress.animateTo(score / 100f, tween(900, easing = FastOutSlowInEasing)) }
-    val description = stringResource(R.string.privacy_score_description, score)
-    Box(Modifier.size(76.dp).semantics { contentDescription = description }, contentAlignment = Alignment.Center) {
-        Canvas(Modifier.size(76.dp)) {
-            val stroke = 7.dp.toPx()
-            val inset = stroke / 2
-            val arcSize = Size(size.width - stroke, size.height - stroke)
-            drawArc(track, 135f, 270f, false, Offset(inset, inset), arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
-            drawArc(color, 135f, 270f * progress.value, false, Offset(inset, inset), arcSize,
-                style = Stroke(stroke, cap = StrokeCap.Round))
-        }
-        Text("$score", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.onSurface)
     }
 }
 

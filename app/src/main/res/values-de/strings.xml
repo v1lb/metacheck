@@ -639,6 +639,14 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Datenschutz</string>
+    <string name="stamp_reveals">DATEI VERRÄT</string>
+    <plurals name="stamp_facts">
+        <item quantity="one">%1$d FAKT</item>
+        <item quantity="other">%1$d FAKTEN</item>
+    </plurals>
+    <string name="stamp_nothing">NICHTS</string>
+    <string name="history_badge_reveals">VERRÄT %1$d</string>
+    <string name="history_badge_clean">SAUBER</string>
     <string name="privacy_title">Was diese Datei verrät</string>
     <string name="privacy_hint">Jeder, dem du die Originaldatei schickst, kann das sehen.</string>
     <string name="privacy_none_text">Keine Standortdaten, Namen oder Geräteseriennummern in den Metadaten.</string>

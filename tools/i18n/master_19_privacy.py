@@ -1,6 +1,14 @@
 # Индекс приватности и «Очистить и отправить».
 S = [
     ("privacy_eyebrow", "Privacy", "Приватность"),
+    # Штамп в отчёте и метки в истории (заглавными, как отметка на бланке).
+    ("stamp_reveals", "FILE REVEALS", "ФАЙЛ ВЫДАЁТ"),
+    ("stamp_facts",
+     {"one": "%1$d FACT", "other": "%1$d FACTS"},
+     {"one": "%1$d ФАКТ", "few": "%1$d ФАКТА", "many": "%1$d ФАКТОВ", "other": "%1$d ФАКТА"}),
+    ("stamp_nothing", "NOTHING", "НИЧЕГО"),
+    ("history_badge_reveals", "REVEALS %1$d", "ВЫДАЁТ %1$d"),
+    ("history_badge_clean", "CLEAN", "ЧИСТО"),
     ("privacy_title", "What this file reveals", "Что раскрывает этот файл"),
     ("privacy_hint", "Anyone you send the original file to can see this.",
      "Это увидит любой, кому вы отправите оригинал файла."),

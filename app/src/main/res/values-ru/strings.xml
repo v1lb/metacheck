@@ -643,6 +643,16 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Приватность</string>
+    <string name="stamp_reveals">ФАЙЛ ВЫДАЁТ</string>
+    <plurals name="stamp_facts">
+        <item quantity="one">%1$d ФАКТ</item>
+        <item quantity="few">%1$d ФАКТА</item>
+        <item quantity="many">%1$d ФАКТОВ</item>
+        <item quantity="other">%1$d ФАКТА</item>
+    </plurals>
+    <string name="stamp_nothing">НИЧЕГО</string>
+    <string name="history_badge_reveals">ВЫДАЁТ %1$d</string>
+    <string name="history_badge_clean">ЧИСТО</string>
     <string name="privacy_title">Что раскрывает этот файл</string>
     <string name="privacy_hint">Это увидит любой, кому вы отправите оригинал файла.</string>
     <string name="privacy_none_text">В метаданных нет координат, имён и серийных номеров устройства.</string>

@@ -643,6 +643,16 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Prywatność</string>
+    <string name="stamp_reveals">PLIK ZDRADZA</string>
+    <plurals name="stamp_facts">
+        <item quantity="one">%1$d FAKT</item>
+        <item quantity="few">%1$d FAKTY</item>
+        <item quantity="many">%1$d FAKTÓW</item>
+        <item quantity="other">%1$d FAKTU</item>
+    </plurals>
+    <string name="stamp_nothing">NIC</string>
+    <string name="history_badge_reveals">ZDRADZA %1$d</string>
+    <string name="history_badge_clean">CZYSTY</string>
     <string name="privacy_title">Co zdradza ten plik</string>
     <string name="privacy_hint">Zobaczy to każdy, komu wyślesz oryginalny plik.</string>
     <string name="privacy_none_text">W metadanych nie ma lokalizacji, nazwisk ani numerów seryjnych urządzenia.</string>

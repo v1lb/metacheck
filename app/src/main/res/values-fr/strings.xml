@@ -641,6 +641,14 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">Confidentialité</string>
+    <string name="stamp_reveals">LE FICHIER RÉVÈLE</string>
+    <plurals name="stamp_facts">
+        <item quantity="one">%1$d FAIT</item>
+        <item quantity="other">%1$d FAITS</item>
+    </plurals>
+    <string name="stamp_nothing">RIEN</string>
+    <string name="history_badge_reveals">RÉVÈLE %1$d</string>
+    <string name="history_badge_clean">PROPRE</string>
     <string name="privacy_title">Ce que révèle ce fichier</string>
     <string name="privacy_hint">Toute personne à qui vous envoyez le fichier d’origine peut voir ceci.</string>
     <string name="privacy_none_text">Aucune position, aucun nom ni numéro de série d’appareil dans les métadonnées.</string>

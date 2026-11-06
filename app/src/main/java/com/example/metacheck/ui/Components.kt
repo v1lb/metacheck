@@ -4,7 +4,9 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Icon
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.ui.Alignment
+import com.example.metacheck.ui.theme.MonoText
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,8 +17,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,40 +26,33 @@ import com.example.metacheck.ui.text.rememberMetaTexts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.metacheck.domain.model.MetaItem
 
 private const val MAX_VALUE_CHARS = 6000
 
-/** Подписи и значения полей локализуются здесь, по ключам ([MetaItem.key]); значения без ключа — как есть. */
+/**
+ * Раздел метаданных: заголовок с числом полей и линия, под ней строки «подпись — значение».
+ * Подписи и значения полей локализуются здесь, по ключам ([MetaItem.key]); значения без ключа — как есть.
+ */
 @Composable
 fun SectionCard(title: String, items: List<MetaItem>, initiallyExpanded: Boolean = false) {
     var expanded by remember(title) { mutableStateOf(initiallyExpanded) }
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = .48f)),
-    ) {
-        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(Modifier.fillMaxWidth().clickable { expanded = !expanded },
-                horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(title, style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f))
-                Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-            }
-            if (!expanded) {
-                Text(pluralStringResource(R.plurals.section_fields_collapsed, items.size, items.size),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-            } else {
-                items.forEachIndexed { index, item ->
-                    if (index > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .22f))
-                    ItemRow(item)
-                }
-            }
+    Column(Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.fillMaxWidth().clickable { expanded = !expanded }.padding(top = 10.dp, bottom = 7.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f))
+            Text("${items.size}", style = MonoText.tag, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                contentDescription = pluralStringResource(R.plurals.section_fields_collapsed, items.size, items.size),
+                tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(start = 6.dp))
+        }
+        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+        if (expanded) {
+            items.forEach { ItemRow(it) }
         }
     }
 }
@@ -70,33 +63,19 @@ private fun ItemRow(item: MetaItem) {
     val label = texts.itemLabel(item)
     val full = texts.itemValue(item)
     val value = if (full.length > MAX_VALUE_CHARS) full.take(MAX_VALUE_CHARS) + "…" else full
-    val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
-    if (value.length > 42 || value.contains('\n')) {
-        Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Text(label, style = MaterialTheme.typography.labelMedium, color = labelColor)
-            Text(value, style = MaterialTheme.typography.bodyMedium)
-        }
-    } else {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            Text(label, style = MaterialTheme.typography.labelMedium, color = labelColor,
-                modifier = Modifier.weight(.46f))
-            Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium,
-                modifier = Modifier.weight(.54f))
-        }
-    }
+    FieldRow(label, value)
 }
 
+/** Отдельное сообщение: лист с рамкой цвета смысла и заголовком. */
 @Composable
 fun BannerCard(title: String, body: String, container: Color, content: Color) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-        border = BorderStroke(1.dp, content.copy(alpha = .25f)),
-        colors = CardDefaults.cardColors(containerColor = container, contentColor = content),
+    Column(
+        Modifier.fillMaxWidth()
+            .border(1.5.dp, content, androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(body, style = MaterialTheme.typography.bodyMedium)
-        }
+        Text(title, style = MaterialTheme.typography.titleMedium, color = content)
+        Text(body, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
     }
 }

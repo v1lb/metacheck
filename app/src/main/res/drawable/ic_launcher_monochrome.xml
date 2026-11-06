@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Тематическая иконка Android 13+: тот же рисунок одним цветом. -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.2"
+        android:strokeLineJoin="round"
+        android:pathData="M36,27 H61 L71,37 V80 H36 Z M61,27 V37 H71" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M42.5,46 H64 M42.5,53.5 H64 M42.5,61 H54" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:pathData="M68,58 a11,11 0 1,0 0.01,0 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M63,67.5 h10 v4 h-10 z" />
+</vector>

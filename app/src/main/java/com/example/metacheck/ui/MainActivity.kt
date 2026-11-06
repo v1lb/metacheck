@@ -60,6 +60,14 @@ class MainActivity : AppCompatActivity() {
             val selection by uiPrefs.state.collectAsStateWithLifecycle()
             val loaded by uiPrefs.loaded.collectAsStateWithLifecycle()
             val dark = UiSelection.effectiveDark(selection.appearance, isSystemInDarkTheme())
+            // Значки строки состояния под выбранную в приложении тему, а не только под системную.
+            val view = androidx.compose.ui.platform.LocalView.current
+            androidx.compose.runtime.SideEffect {
+                androidx.core.view.WindowCompat.getInsetsController(window, view).apply {
+                    isAppearanceLightStatusBars = !dark
+                    isAppearanceLightNavigationBars = !dark
+                }
+            }
             MetaCheckTheme(darkTheme = dark) {
                 when (UiSelection.startDestination(loaded, selection.completed)) {
                     // Пустой фон, а не онбординг: виден, только если DataStore читается дольше MAX_SPLASH_MS.

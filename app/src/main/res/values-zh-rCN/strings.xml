@@ -637,6 +637,13 @@
 
     <!-- master_19_privacy.py -->
     <string name="privacy_eyebrow">隐私</string>
+    <string name="stamp_reveals">文件泄露</string>
+    <plurals name="stamp_facts">
+        <item quantity="other">%1$d 项信息</item>
+    </plurals>
+    <string name="stamp_nothing">无</string>
+    <string name="history_badge_reveals">泄露 %1$d</string>
+    <string name="history_badge_clean">干净</string>
     <string name="privacy_title">这个文件泄露了什么</string>
     <string name="privacy_hint">任何收到原始文件的人都能看到这些信息。</string>
     <string name="privacy_none_text">元数据中没有位置、姓名或设备序列号。</string>
