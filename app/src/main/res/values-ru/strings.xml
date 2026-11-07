@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">Долгота GPS (XMP)</string>
     <string name="xmp_gps_altitude">Высота GPS (XMP)</string>
     <string name="xmp_digital_source_type">Тип источника (IPTC)</string>
+    <string name="meta_keywords">Ключевые слова</string>
+    <string name="meta_headline">Заголовок</string>
+    <string name="meta_credit">Указание авторства</string>
+    <string name="meta_source">Источник</string>
+    <string name="meta_sublocation">Место</string>
+    <string name="meta_city">Город</string>
+    <string name="meta_state">Регион</string>
+    <string name="meta_country">Страна</string>
     <string name="xmp_history_agents">Программы в истории правок</string>
     <string name="value_exposure_fraction">1/%1$d с</string>
     <string name="value_exposure_seconds">%1$s с</string>
@@ -345,7 +353,7 @@
     <string name="common_cancel">Отмена</string>
     <string name="common_close">Закрыть</string>
     <string name="common_delete">Удалить</string>
-    <string name="studio_name">Metadata Studio</string>
+    <string name="studio_name">Студия метаданных</string>
     <string name="main_title_settings">Настройки</string>
     <string name="main_msg_history_load_failed">Не удалось загрузить историю</string>
     <string name="main_msg_history_save_failed">Проверка завершена, но историю сохранить не удалось</string>
@@ -419,12 +427,14 @@
     <string name="error_home">На главную</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">На этом устройстве</string>
     <string name="studio_title">Управление метаданными</string>
     <string name="studio_quota_pro">PRO · Без ограничений на очистку</string>
     <string name="studio_quota_free">FREE · Очищено сегодня: %1$d из %2$d · Сброс в 00:00 UTC</string>
     <string name="studio_subtitle">Реальное сохранение изменений в файл. Без отправки изображения в сеть.</string>
     <string name="studio_back_to_report">← К отчёту</string>
+    <string name="studio_copy_from_photo">Взять данные из другого фото</string>
+    <string name="studio_copy_done">Заполнено полей из другого фото: %1$d. Проверьте и сохраните.</string>
+    <string name="studio_copy_none">В этом фото нет данных EXIF, которые можно взять.</string>
     <string name="studio_tab_strip">Очистка</string>
     <string name="studio_tab_edit">EXIF-редактор</string>
     <string name="studio_tab_batch">Пакетно PRO</string>
@@ -439,7 +449,6 @@
     <string name="studio_strip_save_copy">Сохранить очищенный дубликат</string>
     <string name="studio_strip_overwrite">Перезаписать оригинал с резервной копией</string>
     <string name="studio_strip_overwrite_note">Для перезаписи доступны только JPEG/PNG и только документы с правом записи. Сначала вы выберете место для полноценной резервной копии.</string>
-    <string name="studio_edit_eyebrow">2 · Редактор EXIF</string>
     <string name="studio_edit_gps_title">Координаты и GPS</string>
     <string name="studio_edit_remove_gps">Удалить GPS целиком</string>
     <string name="studio_field_latitude">Широта (−90…90)</string>
@@ -658,6 +667,7 @@
     <string name="privacy_kind_location_tags">Метки местоположения</string>
     <string name="privacy_kind_owner">Владелец камеры</string>
     <string name="privacy_kind_device_serial">Серийный номер устройства</string>
+    <string name="privacy_kind_place_name">Название места</string>
     <string name="privacy_kind_author">Автор и права</string>
     <string name="privacy_kind_ai_prompt">Промпт и настройки ИИ</string>
     <string name="privacy_kind_capture_time">Когда снято</string>

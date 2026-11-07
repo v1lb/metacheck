@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">GPS 경도(XMP)</string>
     <string name="xmp_gps_altitude">GPS 고도(XMP)</string>
     <string name="xmp_digital_source_type">원본 유형(IPTC)</string>
+    <string name="meta_keywords">키워드</string>
+    <string name="meta_headline">헤드라인</string>
+    <string name="meta_credit">크레디트</string>
+    <string name="meta_source">출처</string>
+    <string name="meta_sublocation">장소</string>
+    <string name="meta_city">도시</string>
+    <string name="meta_state">지역</string>
+    <string name="meta_country">국가</string>
     <string name="xmp_history_agents">편집 기록의 소프트웨어</string>
     <string name="value_exposure_fraction">1/%1$d초</string>
     <string name="value_exposure_seconds">%1$s초</string>
@@ -413,12 +421,14 @@
     <string name="error_home">홈</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">이 기기에서</string>
     <string name="studio_title">메타데이터 관리</string>
     <string name="studio_quota_pro">PRO · 무제한 정리</string>
     <string name="studio_quota_free">무료 · 오늘 정리: %1$d / %2$d · 00:00 UTC에 초기화</string>
     <string name="studio_subtitle">변경 사항이 실제로 파일에 저장됩니다. 이미지는 업로드되지 않습니다.</string>
     <string name="studio_back_to_report">← 보고서로 돌아가기</string>
+    <string name="studio_copy_from_photo">다른 사진에서 데이터 가져오기</string>
+    <string name="studio_copy_done">다른 사진에서 채운 항목: %1$d개. 확인 후 저장하세요.</string>
+    <string name="studio_copy_none">이 사진에는 가져올 EXIF 데이터가 없습니다.</string>
     <string name="studio_tab_strip">정리</string>
     <string name="studio_tab_edit">EXIF 편집기</string>
     <string name="studio_tab_batch">일괄 PRO</string>
@@ -433,7 +443,6 @@
     <string name="studio_strip_save_copy">정리된 사본 저장</string>
     <string name="studio_strip_overwrite">원본 교체(백업 포함)</string>
     <string name="studio_strip_overwrite_note">쓰기 가능한 JPEG/PNG 문서만 교체할 수 있습니다. 먼저 전체 백업을 저장할 위치를 선택합니다.</string>
-    <string name="studio_edit_eyebrow">2 · EXIF 편집기</string>
     <string name="studio_edit_gps_title">좌표 및 GPS</string>
     <string name="studio_edit_remove_gps">모든 GPS 제거</string>
     <string name="studio_field_latitude">위도(−90…90)</string>
@@ -649,6 +658,7 @@
     <string name="privacy_kind_location_tags">위치 태그</string>
     <string name="privacy_kind_owner">카메라 소유자</string>
     <string name="privacy_kind_device_serial">기기 일련번호</string>
+    <string name="privacy_kind_place_name">장소 이름</string>
     <string name="privacy_kind_author">작성자 및 권리</string>
     <string name="privacy_kind_ai_prompt">AI 프롬프트 및 설정</string>
     <string name="privacy_kind_capture_time">촬영 시각</string>

@@ -1,7 +1,6 @@
 # Metadata Studio (MetadataStudioScreen.kt, MetadataStudioViewModel.kt). (key, en, ru)
 
 S = [
-    ("studio_eyebrow", "On this device", "На этом устройстве"),
     ("studio_title", "Metadata management", "Управление метаданными"),
     ("studio_quota_pro", "PRO · Unlimited cleaning", "PRO · Без ограничений на очистку"),
     ("studio_quota_free", "FREE · Cleaned today: %1$d of %2$d · Resets at 00:00 UTC",
@@ -9,6 +8,10 @@ S = [
     ("studio_subtitle", "Changes are really saved to the file. The image is never uploaded.",
      "Реальное сохранение изменений в файл. Без отправки изображения в сеть."),
     ("studio_back_to_report", "← Back to report", "← К отчёту"),
+    ("studio_copy_from_photo", "Copy data from another photo", "Взять данные из другого фото"),
+    ("studio_copy_done", "Fields filled from the other photo: %1$d. Check them and save.",
+     "Заполнено полей из другого фото: %1$d. Проверьте и сохраните."),
+    ("studio_copy_none", "That photo has no EXIF data to copy.", "В этом фото нет данных EXIF, которые можно взять."),
     ("studio_tab_strip", "Cleaning", "Очистка"),
     ("studio_tab_edit", "EXIF editor", "EXIF-редактор"),
     ("studio_tab_batch", "Batch PRO", "Пакетно PRO"),
@@ -31,7 +34,6 @@ S = [
      "Only writable JPEG/PNG documents can be replaced. First you will choose where to save a full backup.",
      "Для перезаписи доступны только JPEG/PNG и только документы с правом записи. Сначала вы выберете место для полноценной резервной копии."),
 
-    ("studio_edit_eyebrow", "2 · EXIF editor", "2 · Редактор EXIF"),
     ("studio_edit_gps_title", "Coordinates and GPS", "Координаты и GPS"),
     ("studio_edit_remove_gps", "Remove all GPS", "Удалить GPS целиком"),
     ("studio_field_latitude", "Latitude (−90…90)", "Широта (−90…90)"),

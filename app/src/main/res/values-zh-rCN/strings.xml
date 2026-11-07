@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">GPS 经度（XMP）</string>
     <string name="xmp_gps_altitude">GPS 海拔（XMP）</string>
     <string name="xmp_digital_source_type">来源类型（IPTC）</string>
+    <string name="meta_keywords">关键词</string>
+    <string name="meta_headline">标题</string>
+    <string name="meta_credit">署名</string>
+    <string name="meta_source">来源</string>
+    <string name="meta_sublocation">地点</string>
+    <string name="meta_city">城市</string>
+    <string name="meta_state">地区</string>
+    <string name="meta_country">国家</string>
     <string name="xmp_history_agents">编辑历史中的软件</string>
     <string name="value_exposure_fraction">1/%1$d 秒</string>
     <string name="value_exposure_seconds">%1$s 秒</string>
@@ -413,12 +421,14 @@
     <string name="error_home">首页</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">在此设备上</string>
     <string name="studio_title">元数据管理</string>
     <string name="studio_quota_pro">PRO · 无限清理</string>
     <string name="studio_quota_free">免费 · 今日已清理：%1$d / %2$d · 00:00 UTC 重置</string>
     <string name="studio_subtitle">更改会真正保存到文件中。图像永远不会上传。</string>
     <string name="studio_back_to_report">← 返回报告</string>
+    <string name="studio_copy_from_photo">从另一张照片复制数据</string>
+    <string name="studio_copy_done">已从另一张照片填入 %1$d 个字段。请检查后保存。</string>
+    <string name="studio_copy_none">该照片没有可复制的 EXIF 数据。</string>
     <string name="studio_tab_strip">清理</string>
     <string name="studio_tab_edit">EXIF 编辑器</string>
     <string name="studio_tab_batch">批量 PRO</string>
@@ -433,7 +443,6 @@
     <string name="studio_strip_save_copy">保存清理后的副本</string>
     <string name="studio_strip_overwrite">替换原文件（含备份）</string>
     <string name="studio_strip_overwrite_note">只能替换可写入的 JPEG/PNG 文档。您需要先选择完整备份的保存位置。</string>
-    <string name="studio_edit_eyebrow">2 · EXIF 编辑器</string>
     <string name="studio_edit_gps_title">坐标和 GPS</string>
     <string name="studio_edit_remove_gps">移除全部 GPS</string>
     <string name="studio_field_latitude">纬度（−90…90）</string>
@@ -649,6 +658,7 @@
     <string name="privacy_kind_location_tags">位置标签</string>
     <string name="privacy_kind_owner">相机所有者</string>
     <string name="privacy_kind_device_serial">设备序列号</string>
+    <string name="privacy_kind_place_name">地名</string>
     <string name="privacy_kind_author">作者和权利</string>
     <string name="privacy_kind_ai_prompt">AI 提示词和设置</string>
     <string name="privacy_kind_capture_time">拍摄时间</string>

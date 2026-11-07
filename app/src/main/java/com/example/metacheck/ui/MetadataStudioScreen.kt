@@ -10,7 +10,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -63,6 +61,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.exifinterface.media.ExifInterface
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metacheck.domain.metadata.MetadataPatch
@@ -181,6 +182,31 @@ fun MetadataStudioScreen(
     val chooseImage = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
     }
+    // «Взять данные из другого фото»: дата, камера, автор, параметры съёмки и место — в поля редактора.
+    val donorScope = rememberCoroutineScope()
+    var donorInfo by remember { mutableStateOf<UiText?>(null) }
+    val chooseDonor = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        donorScope.launch {
+            val donor = withContext(Dispatchers.IO) { readDonorExif(context, uri) }
+            if (donor == null || donor.filled == 0) { donorInfo = UiText.Res(R.string.studio_copy_none); return@launch }
+            donor.dateTaken?.let { dateTaken = it }
+            donor.dateDigitized?.let { dateDigitized = it }
+            donor.make?.let { manufacturer = it }
+            donor.model?.let { model = it }
+            donor.author?.let { author = it }
+            donor.copyright?.let { copyright = it }
+            donor.description?.let { description = it }
+            donor.iso?.let { iso = it }
+            donor.aperture?.let { aperture = it }
+            donor.shutter?.let { shutter = it }
+            if (donor.latitude != null && donor.longitude != null) {
+                gpsRemove = false
+                latitude = donor.latitude; longitude = donor.longitude
+            }
+            donorInfo = UiText.Res(R.string.studio_copy_done, donor.filled)
+        }
+    }
     // После выгрузки процесса rememberSaveable возвращает URI, но временное право на него уже отозвано.
     // Проверяем один раз при восстановлении и честно просим выбрать файл снова.
     LaunchedEffect(Unit) {
@@ -269,20 +295,18 @@ fun MetadataStudioScreen(
     ) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                CyberEyebrow(stringResource(R.string.studio_eyebrow))
-                Text(stringResource(R.string.studio_title), style = MaterialTheme.typography.headlineMedium,
+                Text(stringResource(R.string.studio_title), style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurface)
                 Text(if (isPro) stringResource(R.string.studio_quota_pro) else
                     stringResource(R.string.studio_quota_free, usedToday, DailyCleanQuota.FREE_DAILY_LIMIT),
-                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                    style = com.example.metacheck.ui.theme.MonoText.tag, color = MaterialTheme.colorScheme.onSurface)
                 Text(stringResource(R.string.studio_subtitle),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 CyberOutlineButton(stringResource(R.string.studio_back_to_report), onBack, Modifier.fillMaxWidth())
             }
         }
         item {
-            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth()) {
                 StudioTab(stringResource(R.string.studio_tab_strip), mode == StudioMode.STRIP) { mode = StudioMode.STRIP }
                 StudioTab(stringResource(R.string.studio_tab_edit), mode == StudioMode.EDIT) {
                     mode = StudioMode.EDIT
@@ -347,9 +371,12 @@ fun MetadataStudioScreen(
             }
         } else if (mode == StudioMode.EDIT) {
             item {
-                GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
+                GlassPanel(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(13.dp)) {
-                        CyberEyebrow(stringResource(R.string.studio_edit_eyebrow))
+                        CyberOutlineButton(stringResource(R.string.studio_copy_from_photo), { chooseDonor.launch(arrayOf("image/*")) },
+                            Modifier.fillMaxWidth())
+                        donorInfo?.let { Text(it.asString(), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         Text(stringResource(R.string.studio_edit_gps_title), style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface)
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -466,13 +493,56 @@ fun MetadataStudioScreen(
 }
 
 @Composable
-private fun StudioTab(label: String, selected: Boolean, onClick: () -> Unit) {
-    Box(Modifier.background(
-        if (selected) MaterialTheme.colorScheme.primary.copy(alpha = .19f) else MaterialTheme.colorScheme.surface,
-        RoundedCornerShape(4.dp),
-    ).clickable(onClick = onClick).padding(horizontal = 15.dp, vertical = 12.dp)) {
-        Text(label, color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
+private fun androidx.compose.foundation.layout.RowScope.StudioTab(label: String, selected: Boolean, onClick: () -> Unit) {
+    val ink = MaterialTheme.colorScheme.onSurface
+    Column(Modifier.weight(1f)) {
+        Box(Modifier.fillMaxWidth().defaultMinSize(minHeight = 48.dp).clickable(onClick = onClick).padding(horizontal = 6.dp, vertical = 10.dp),
+            contentAlignment = Alignment.Center) {
+            Text(label, color = if (selected) ink else MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = if (selected) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2)
+        }
+        Box(Modifier.fillMaxWidth().height(if (selected) 3.dp else 1.dp)
+            .background(if (selected) ink else MaterialTheme.colorScheme.outlineVariant))
     }
+}
+
+/** Поля EXIF другого фото для подстановки в редактор; [filled] — сколько полей найдено. */
+private data class DonorExif(
+    val dateTaken: String?, val dateDigitized: String?, val make: String?, val model: String?,
+    val author: String?, val copyright: String?, val description: String?,
+    val iso: String?, val aperture: String?, val shutter: String?,
+    val latitude: String?, val longitude: String?,
+) {
+    val filled: Int get() = listOf(dateTaken, dateDigitized, make, model, author, copyright, description, iso, aperture, shutter)
+        .count { it != null } + if (latitude != null && longitude != null) 1 else 0
+}
+
+/** Читает EXIF выбранного фото; координаты — через «оригинальный» URI, если Android это позволяет. */
+private fun readDonorExif(context: android.content.Context, uri: Uri): DonorExif? {
+    fun open(u: Uri) = runCatching { context.contentResolver.openInputStream(u)?.use { ExifInterface(it) } }.getOrNull()
+    val exif = open(uri) ?: return null
+    val gps = (if (android.os.Build.VERSION.SDK_INT >= 29) runCatching {
+        open(android.provider.MediaStore.setRequireOriginal(uri))?.latLong
+    }.getOrNull() else null) ?: exif.latLong
+    fun text(tag: String) = exif.getAttribute(tag)?.trim()?.takeIf { it.isNotEmpty() }
+    val fNumber = exif.getAttributeDouble(ExifInterface.TAG_F_NUMBER, 0.0).takeIf { it > 0 }
+    val exposure = exif.getAttributeDouble(ExifInterface.TAG_EXPOSURE_TIME, 0.0).takeIf { it > 0 }
+    return DonorExif(
+        dateTaken = text(ExifInterface.TAG_DATETIME_ORIGINAL),
+        dateDigitized = text(ExifInterface.TAG_DATETIME_DIGITIZED),
+        make = text(ExifInterface.TAG_MAKE),
+        model = text(ExifInterface.TAG_MODEL),
+        author = text(ExifInterface.TAG_ARTIST),
+        copyright = text(ExifInterface.TAG_COPYRIGHT),
+        description = text(ExifInterface.TAG_IMAGE_DESCRIPTION),
+        iso = (text(ExifInterface.TAG_PHOTOGRAPHIC_SENSITIVITY))?.substringBefore(',')?.trim(),
+        aperture = fNumber?.let { String.format(Locale.US, "%.1f", it) },
+        shutter = exposure?.let { if (it >= 1) String.format(Locale.US, "%.1f", it) else "1/" + Math.round(1 / it) },
+        latitude = gps?.let { String.format(Locale.US, "%.6f", it[0]) },
+        longitude = gps?.let { String.format(Locale.US, "%.6f", it[1]) },
+    )
 }
 
 @Composable

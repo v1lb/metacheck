@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">Bujur GPS (XMP)</string>
     <string name="xmp_gps_altitude">Ketinggian GPS (XMP)</string>
     <string name="xmp_digital_source_type">Jenis sumber (IPTC)</string>
+    <string name="meta_keywords">Kata kunci</string>
+    <string name="meta_headline">Judul utama</string>
+    <string name="meta_credit">Kredit</string>
+    <string name="meta_source">Sumber</string>
+    <string name="meta_sublocation">Tempat</string>
+    <string name="meta_city">Kota</string>
+    <string name="meta_state">Wilayah</string>
+    <string name="meta_country">Negara</string>
     <string name="xmp_history_agents">Perangkat lunak di riwayat edit</string>
     <string name="value_exposure_fraction">1/%1$d dtk</string>
     <string name="value_exposure_seconds">%1$s dtk</string>
@@ -413,12 +421,14 @@
     <string name="error_home">Beranda</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">Di perangkat ini</string>
     <string name="studio_title">Pengelolaan metadata</string>
     <string name="studio_quota_pro">PRO · Pembersihan tanpa batas</string>
     <string name="studio_quota_free">GRATIS · Dibersihkan hari ini: %1$d dari %2$d · Diatur ulang pukul 00:00 UTC</string>
     <string name="studio_subtitle">Perubahan benar-benar disimpan ke file. Gambar tidak pernah diunggah.</string>
     <string name="studio_back_to_report">← Kembali ke laporan</string>
+    <string name="studio_copy_from_photo">Salin data dari foto lain</string>
+    <string name="studio_copy_done">Kolom yang diisi dari foto lain: %1$d. Periksa lalu simpan.</string>
+    <string name="studio_copy_none">Foto itu tidak memiliki data EXIF untuk disalin.</string>
     <string name="studio_tab_strip">Pembersihan</string>
     <string name="studio_tab_edit">Editor EXIF</string>
     <string name="studio_tab_batch">Massal PRO</string>
@@ -433,7 +443,6 @@
     <string name="studio_strip_save_copy">Simpan salinan bersih</string>
     <string name="studio_strip_overwrite">Ganti file asli, dengan cadangan</string>
     <string name="studio_strip_overwrite_note">Hanya dokumen JPEG/PNG yang dapat ditulisi yang bisa diganti. Pertama, Anda akan memilih tempat menyimpan cadangan lengkap.</string>
-    <string name="studio_edit_eyebrow">2 · Editor EXIF</string>
     <string name="studio_edit_gps_title">Koordinat dan GPS</string>
     <string name="studio_edit_remove_gps">Hapus semua GPS</string>
     <string name="studio_field_latitude">Lintang (−90…90)</string>
@@ -649,6 +658,7 @@
     <string name="privacy_kind_location_tags">Tag lokasi</string>
     <string name="privacy_kind_owner">Pemilik kamera</string>
     <string name="privacy_kind_device_serial">Nomor seri perangkat</string>
+    <string name="privacy_kind_place_name">Nama tempat</string>
     <string name="privacy_kind_author">Pembuat dan hak</string>
     <string name="privacy_kind_ai_prompt">Prompt dan pengaturan AI</string>
     <string name="privacy_kind_capture_time">Kapan diambil</string>

@@ -114,6 +114,7 @@ private fun kindText(kind: ExposureKind): Int = when (kind) {
     ExposureKind.LOCATION_TAGS -> R.string.privacy_kind_location_tags
     ExposureKind.OWNER -> R.string.privacy_kind_owner
     ExposureKind.DEVICE_SERIAL -> R.string.privacy_kind_device_serial
+    ExposureKind.PLACE_NAME -> R.string.privacy_kind_place_name
     ExposureKind.AUTHOR -> R.string.privacy_kind_author
     ExposureKind.AI_PROMPT -> R.string.privacy_kind_ai_prompt
     ExposureKind.CAPTURE_TIME -> R.string.privacy_kind_capture_time

@@ -82,6 +82,14 @@
     <string name="xmp_gps_longitude">GPS longitude (XMP)</string>
     <string name="xmp_gps_altitude">GPS altitude (XMP)</string>
     <string name="xmp_digital_source_type">Source type (IPTC)</string>
+    <string name="meta_keywords">Keywords</string>
+    <string name="meta_headline">Headline</string>
+    <string name="meta_credit">Credit line</string>
+    <string name="meta_source">Source</string>
+    <string name="meta_sublocation">Place</string>
+    <string name="meta_city">City</string>
+    <string name="meta_state">Region</string>
+    <string name="meta_country">Country</string>
     <string name="xmp_history_agents">Software in edit history</string>
     <string name="value_exposure_fraction">1/%1$d s</string>
     <string name="value_exposure_seconds">%1$s s</string>
@@ -342,7 +350,7 @@
     <string name="common_cancel">Cancel</string>
     <string name="common_close">Close</string>
     <string name="common_delete">Delete</string>
-    <string name="studio_name">Metadata Studio</string>
+    <string name="studio_name">Metadata studio</string>
     <string name="main_title_settings">Settings</string>
     <string name="main_msg_history_load_failed">Could not load history</string>
     <string name="main_msg_history_save_failed">Check finished, but the history could not be saved</string>
@@ -416,12 +424,14 @@
     <string name="error_home">Home</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">On this device</string>
     <string name="studio_title">Metadata management</string>
     <string name="studio_quota_pro">PRO · Unlimited cleaning</string>
     <string name="studio_quota_free">FREE · Cleaned today: %1$d of %2$d · Resets at 00:00 UTC</string>
     <string name="studio_subtitle">Changes are really saved to the file. The image is never uploaded.</string>
     <string name="studio_back_to_report">← Back to report</string>
+    <string name="studio_copy_from_photo">Copy data from another photo</string>
+    <string name="studio_copy_done">Fields filled from the other photo: %1$d. Check them and save.</string>
+    <string name="studio_copy_none">That photo has no EXIF data to copy.</string>
     <string name="studio_tab_strip">Cleaning</string>
     <string name="studio_tab_edit">EXIF editor</string>
     <string name="studio_tab_batch">Batch PRO</string>
@@ -436,7 +446,6 @@
     <string name="studio_strip_save_copy">Save a clean copy</string>
     <string name="studio_strip_overwrite">Replace the original, with a backup</string>
     <string name="studio_strip_overwrite_note">Only writable JPEG/PNG documents can be replaced. First you will choose where to save a full backup.</string>
-    <string name="studio_edit_eyebrow">2 · EXIF editor</string>
     <string name="studio_edit_gps_title">Coordinates and GPS</string>
     <string name="studio_edit_remove_gps">Remove all GPS</string>
     <string name="studio_field_latitude">Latitude (−90…90)</string>
@@ -668,6 +677,7 @@
     <string name="privacy_kind_location_tags">Location tags</string>
     <string name="privacy_kind_owner">Camera owner</string>
     <string name="privacy_kind_device_serial">Device serial number</string>
+    <string name="privacy_kind_place_name">Place name</string>
     <string name="privacy_kind_author">Author and rights</string>
     <string name="privacy_kind_ai_prompt">AI prompt and settings</string>
     <string name="privacy_kind_capture_time">When it was taken</string>

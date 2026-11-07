@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">Довгота GPS (XMP)</string>
     <string name="xmp_gps_altitude">Висота GPS (XMP)</string>
     <string name="xmp_digital_source_type">Тип джерела (IPTC)</string>
+    <string name="meta_keywords">Ключові слова</string>
+    <string name="meta_headline">Заголовок</string>
+    <string name="meta_credit">Зазначення авторства</string>
+    <string name="meta_source">Джерело</string>
+    <string name="meta_sublocation">Місце</string>
+    <string name="meta_city">Місто</string>
+    <string name="meta_state">Регіон</string>
+    <string name="meta_country">Країна</string>
     <string name="xmp_history_agents">Програми в історії редагування</string>
     <string name="value_exposure_fraction">1/%1$d с</string>
     <string name="value_exposure_seconds">%1$s с</string>
@@ -419,12 +427,14 @@
     <string name="error_home">Головна</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">На цьому пристрої</string>
     <string name="studio_title">Керування метаданими</string>
     <string name="studio_quota_pro">PRO · Необмежене очищення</string>
     <string name="studio_quota_free">БЕЗКОШТОВНО · Очищено сьогодні: %1$d з %2$d · Скидання о 00:00 UTC</string>
     <string name="studio_subtitle">Зміни справді записуються у файл. Зображення ніколи не надсилається в мережу.</string>
     <string name="studio_back_to_report">← Назад до звіту</string>
+    <string name="studio_copy_from_photo">Взяти дані з іншого фото</string>
+    <string name="studio_copy_done">Заповнено полів з іншого фото: %1$d. Перевірте та збережіть.</string>
+    <string name="studio_copy_none">У цьому фото немає даних EXIF, які можна взяти.</string>
     <string name="studio_tab_strip">Очищення</string>
     <string name="studio_tab_edit">Редактор EXIF</string>
     <string name="studio_tab_batch">Пакет PRO</string>
@@ -439,7 +449,6 @@
     <string name="studio_strip_save_copy">Зберегти очищену копію</string>
     <string name="studio_strip_overwrite">Замінити оригінал, з резервною копією</string>
     <string name="studio_strip_overwrite_note">Замінити можна лише JPEG/PNG-документи з правом запису. Спершу ви виберете, куди зберегти повну резервну копію.</string>
-    <string name="studio_edit_eyebrow">2 · Редактор EXIF</string>
     <string name="studio_edit_gps_title">Координати й GPS</string>
     <string name="studio_edit_remove_gps">Видалити весь GPS</string>
     <string name="studio_field_latitude">Широта (−90…90)</string>
@@ -658,6 +667,7 @@
     <string name="privacy_kind_location_tags">Теги місцезнаходження</string>
     <string name="privacy_kind_owner">Власник камери</string>
     <string name="privacy_kind_device_serial">Серійний номер пристрою</string>
+    <string name="privacy_kind_place_name">Назва місця</string>
     <string name="privacy_kind_author">Автор і права</string>
     <string name="privacy_kind_ai_prompt">Промпт і налаштування ШІ</string>
     <string name="privacy_kind_capture_time">Коли знято</string>

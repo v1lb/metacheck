@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">GPS経度（XMP）</string>
     <string name="xmp_gps_altitude">GPS高度（XMP）</string>
     <string name="xmp_digital_source_type">ソースの種類（IPTC）</string>
+    <string name="meta_keywords">キーワード</string>
+    <string name="meta_headline">見出し</string>
+    <string name="meta_credit">クレジット</string>
+    <string name="meta_source">提供元</string>
+    <string name="meta_sublocation">場所</string>
+    <string name="meta_city">都市</string>
+    <string name="meta_state">地域</string>
+    <string name="meta_country">国</string>
     <string name="xmp_history_agents">編集履歴のソフトウェア</string>
     <string name="value_exposure_fraction">1/%1$d 秒</string>
     <string name="value_exposure_seconds">%1$s 秒</string>
@@ -413,12 +421,14 @@
     <string name="error_home">ホーム</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">この端末上</string>
     <string name="studio_title">メタデータ管理</string>
     <string name="studio_quota_pro">PRO · 無制限にクリーニング</string>
     <string name="studio_quota_free">無料 · 本日のクリーニング：%1$d / %2$d · 00:00 UTCにリセット</string>
     <string name="studio_subtitle">変更は実際にファイルへ保存されます。画像がアップロードされることはありません。</string>
     <string name="studio_back_to_report">← レポートに戻る</string>
+    <string name="studio_copy_from_photo">別の写真からデータをコピー</string>
+    <string name="studio_copy_done">別の写真から入力した項目：%1$d。確認して保存してください。</string>
+    <string name="studio_copy_none">その写真にはコピーできるEXIFデータがありません。</string>
     <string name="studio_tab_strip">クリーニング</string>
     <string name="studio_tab_edit">EXIFエディター</string>
     <string name="studio_tab_batch">一括 PRO</string>
@@ -433,7 +443,6 @@
     <string name="studio_strip_save_copy">クリーンなコピーを保存</string>
     <string name="studio_strip_overwrite">元のファイルを置き換える（バックアップあり）</string>
     <string name="studio_strip_overwrite_note">置き換えられるのは書き込み可能なJPEG/PNGドキュメントのみです。まず完全なバックアップの保存先を選択します。</string>
-    <string name="studio_edit_eyebrow">2 · EXIFエディター</string>
     <string name="studio_edit_gps_title">座標とGPS</string>
     <string name="studio_edit_remove_gps">GPSをすべて削除</string>
     <string name="studio_field_latitude">緯度（−90〜90）</string>
@@ -649,6 +658,7 @@
     <string name="privacy_kind_location_tags">位置情報タグ</string>
     <string name="privacy_kind_owner">カメラ所有者</string>
     <string name="privacy_kind_device_serial">端末のシリアル番号</string>
+    <string name="privacy_kind_place_name">地名</string>
     <string name="privacy_kind_author">作成者と権利</string>
     <string name="privacy_kind_ai_prompt">AIのプロンプトと設定</string>
     <string name="privacy_kind_capture_time">撮影日時</string>

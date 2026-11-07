@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">Longitudine GPS (XMP)</string>
     <string name="xmp_gps_altitude">Altitudine GPS (XMP)</string>
     <string name="xmp_digital_source_type">Tipo di origine (IPTC)</string>
+    <string name="meta_keywords">Parole chiave</string>
+    <string name="meta_headline">Titolo</string>
+    <string name="meta_credit">Credito</string>
+    <string name="meta_source">Fonte</string>
+    <string name="meta_sublocation">Luogo</string>
+    <string name="meta_city">Città</string>
+    <string name="meta_state">Regione</string>
+    <string name="meta_country">Paese</string>
     <string name="xmp_history_agents">Software nella cronologia delle modifiche</string>
     <string name="value_exposure_fraction">1/%1$d s</string>
     <string name="value_exposure_seconds">%1$s s</string>
@@ -417,12 +425,14 @@
     <string name="error_home">Home</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">Su questo dispositivo</string>
     <string name="studio_title">Gestione dei metadati</string>
     <string name="studio_quota_pro">PRO · Pulizia illimitata</string>
     <string name="studio_quota_free">GRATIS · Pulite oggi: %1$d di %2$d · Si azzera alle 00:00 UTC</string>
     <string name="studio_subtitle">Le modifiche vengono davvero salvate nel file. L’immagine non viene mai caricata.</string>
     <string name="studio_back_to_report">← Torna al report</string>
+    <string name="studio_copy_from_photo">Copia i dati da un’altra foto</string>
+    <string name="studio_copy_done">Campi compilati dall’altra foto: %1$d. Controllali e salva.</string>
+    <string name="studio_copy_none">Quella foto non ha dati EXIF da copiare.</string>
     <string name="studio_tab_strip">Pulizia</string>
     <string name="studio_tab_edit">Editor EXIF</string>
     <string name="studio_tab_batch">Batch PRO</string>
@@ -437,7 +447,6 @@
     <string name="studio_strip_save_copy">Salva una copia pulita</string>
     <string name="studio_strip_overwrite">Sostituisci l’originale, con backup</string>
     <string name="studio_strip_overwrite_note">Solo i documenti JPEG/PNG scrivibili possono essere sostituiti. Prima sceglierai dove salvare un backup completo.</string>
-    <string name="studio_edit_eyebrow">2 · Editor EXIF</string>
     <string name="studio_edit_gps_title">Coordinate e GPS</string>
     <string name="studio_edit_remove_gps">Rimuovi tutto il GPS</string>
     <string name="studio_field_latitude">Latitudine (−90…90)</string>
@@ -654,6 +663,7 @@
     <string name="privacy_kind_location_tags">Tag di posizione</string>
     <string name="privacy_kind_owner">Proprietario della fotocamera</string>
     <string name="privacy_kind_device_serial">Numero di serie del dispositivo</string>
+    <string name="privacy_kind_place_name">Nome del luogo</string>
     <string name="privacy_kind_author">Autore e diritti</string>
     <string name="privacy_kind_ai_prompt">Prompt e impostazioni IA</string>
     <string name="privacy_kind_capture_time">Quando è stata scattata</string>

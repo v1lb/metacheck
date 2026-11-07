@@ -6,7 +6,7 @@ S = [
     ("common_cancel", "Cancel", "Отмена"),
     ("common_close", "Close", "Закрыть"),
     ("common_delete", "Delete", "Удалить"),
-    ("studio_name", "Metadata Studio", "Metadata Studio"),
+    ("studio_name", "Metadata studio", "Студия метаданных"),
     ("main_title_settings", "Settings", "Настройки"),
 
     # --- Сообщения (snackbar) ---

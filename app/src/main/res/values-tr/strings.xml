@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">GPS boylamı (XMP)</string>
     <string name="xmp_gps_altitude">GPS yüksekliği (XMP)</string>
     <string name="xmp_digital_source_type">Kaynak türü (IPTC)</string>
+    <string name="meta_keywords">Anahtar kelimeler</string>
+    <string name="meta_headline">Başlık</string>
+    <string name="meta_credit">Kaynak gösterimi</string>
+    <string name="meta_source">Kaynak</string>
+    <string name="meta_sublocation">Yer</string>
+    <string name="meta_city">Şehir</string>
+    <string name="meta_state">Bölge</string>
+    <string name="meta_country">Ülke</string>
     <string name="xmp_history_agents">Düzenleme geçmişindeki yazılımlar</string>
     <string name="value_exposure_fraction">1/%1$d sn</string>
     <string name="value_exposure_seconds">%1$s sn</string>
@@ -415,12 +423,14 @@
     <string name="error_home">Ana sayfa</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">Bu cihazda</string>
     <string name="studio_title">Meta veri yönetimi</string>
     <string name="studio_quota_pro">PRO · Sınırsız temizleme</string>
     <string name="studio_quota_free">ÜCRETSİZ · Bugün temizlenen: %1$d / %2$d · 00:00 UTC’de sıfırlanır</string>
     <string name="studio_subtitle">Değişiklikler gerçekten dosyaya kaydedilir. Görüntü asla yüklenmez.</string>
     <string name="studio_back_to_report">← Rapora dön</string>
+    <string name="studio_copy_from_photo">Başka bir fotoğraftan veri al</string>
+    <string name="studio_copy_done">Diğer fotoğraftan doldurulan alanlar: %1$d. Kontrol edip kaydedin.</string>
+    <string name="studio_copy_none">Bu fotoğrafta alınacak EXIF verisi yok.</string>
     <string name="studio_tab_strip">Temizleme</string>
     <string name="studio_tab_edit">EXIF düzenleyici</string>
     <string name="studio_tab_batch">Toplu PRO</string>
@@ -435,7 +445,6 @@
     <string name="studio_strip_save_copy">Temiz kopyayı kaydet</string>
     <string name="studio_strip_overwrite">Orijinali yedekle birlikte değiştir</string>
     <string name="studio_strip_overwrite_note">Yalnızca yazılabilir JPEG/PNG belgeleri değiştirilebilir. Önce tam yedeğin nereye kaydedileceğini seçersiniz.</string>
-    <string name="studio_edit_eyebrow">2 · EXIF düzenleyici</string>
     <string name="studio_edit_gps_title">Koordinatlar ve GPS</string>
     <string name="studio_edit_remove_gps">Tüm GPS’i kaldır</string>
     <string name="studio_field_latitude">Enlem (−90…90)</string>
@@ -652,6 +661,7 @@
     <string name="privacy_kind_location_tags">Konum etiketleri</string>
     <string name="privacy_kind_owner">Kamera sahibi</string>
     <string name="privacy_kind_device_serial">Cihaz seri numarası</string>
+    <string name="privacy_kind_place_name">Yer adı</string>
     <string name="privacy_kind_author">Yazar ve haklar</string>
     <string name="privacy_kind_ai_prompt">Yapay zekâ istemi ve ayarları</string>
     <string name="privacy_kind_capture_time">Ne zaman çekildi</string>

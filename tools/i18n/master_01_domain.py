@@ -87,6 +87,14 @@ S = [
     ("xmp_gps_longitude", "GPS longitude (XMP)", "Долгота GPS (XMP)"),
     ("xmp_gps_altitude", "GPS altitude (XMP)", "Высота GPS (XMP)"),
     ("xmp_digital_source_type", "Source type (IPTC)", "Тип источника (IPTC)"),
+    ("meta_keywords", "Keywords", "Ключевые слова"),
+    ("meta_headline", "Headline", "Заголовок"),
+    ("meta_credit", "Credit line", "Указание авторства"),
+    ("meta_source", "Source", "Источник"),
+    ("meta_sublocation", "Place", "Место"),
+    ("meta_city", "City", "Город"),
+    ("meta_state", "Region", "Регион"),
+    ("meta_country", "Country", "Страна"),
     ("xmp_history_agents", "Software in edit history", "Программы в истории правок"),
 
     # --- Значения полей (ValueFormat) ---
