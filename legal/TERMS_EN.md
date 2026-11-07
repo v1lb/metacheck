@@ -5,26 +5,26 @@ lang: en
 
 # MetaCheck Terms of Use
 
-**Effective date:** 2026-11-05
+**Effective date:** 2026-11-07
 **Developer:** Puwer Studio
 **Contact:** werk9886@gmail.com
 
 By using MetaCheck you agree to these terms. If you do not agree, stop using the app.
 
 ## 1. Purpose of the app
-MetaCheck shows image metadata (EXIF, XMP, GPS, supported text chunks), flags indicators that may be related to AI generation, and creates copies of images with removed or edited metadata.
+MetaCheck shows the metadata of photos and videos (EXIF, XMP, GPS, supported text chunks, MP4/MOV container tags), flags indicators that may be related to AI generation, and creates copies of files with removed or edited metadata.
 
 ## 2. Results are probabilistic
-The analysis relies on metadata and heuristics only, not on the pixels of the image. Results are informational and may be incomplete, inaccurate or wrong. A detected marker does not prove an image was created by AI, and the absence of markers does not prove it was made by a camera or a person. Metadata can be removed, edited, forged or unsupported by the app. A result must not be the only basis for legal, financial, professional, journalistic, moderation or other significant decisions or accusations.
+The analysis relies on metadata and heuristics only, not on the content of the image or video. Results are informational and may be incomplete, inaccurate or wrong. A detected marker does not prove a file was created by AI, and the absence of markers does not prove it was made by a camera or a person. Metadata can be removed, edited, forged or unsupported by the app. A result must not be the only basis for legal, financial, professional, journalistic, moderation or other significant decisions or accusations.
 
 ## 3. Your files and your responsibility
-You choose the images and where results are saved. You are responsible for having the right to process, modify, store and share the images and reports you select. Do not use the app to violate others' rights, to stalk or harass people, or for any unlawful purpose. Make a backup before editing or replacing an original. Before sharing a file, check its contents, including metadata and coordinates.
+You choose the files and where results are saved. You are responsible for having the right to process, modify, store and share the files and reports you select. Do not use the app to violate others' rights, to stalk or harass people, or for any unlawful purpose. Make a backup before editing or replacing an original. Before sharing a file, check its contents, including metadata and coordinates.
 
 ## 4. Cleaning and editing metadata
-The app removes known metadata fields in a new copy. Re-saving may change quality, size, format and colour data, and animation or special blocks may be lost. We do not guarantee that everything that could identify you or the circumstances of the shot is removed: the image itself, watermarks, sensor characteristics and the file name may reveal it. If privacy is critical, verify the final file with an independent tool before publishing.
+The app removes known metadata fields in a new copy. Re-saving a photo may change quality, size, format and colour data, and animation or special blocks may be lost. Videos are copied without re-encoding: picture and sound are unchanged, while tags, auxiliary tracks (such as timecode and tracks with coordinates) and creation times are removed; some videos (fragmented, encrypted or damaged) cannot be cleaned. We do not guarantee that everything that could identify you or the circumstances of the shot is removed: the image or video itself, its sound, watermarks, sensor characteristics and the file name may reveal it. If privacy is critical, verify the final file with an independent tool before publishing.
 
 ## 5. Free version and Pro
-Some features are free with limits (at the time of publication, metadata cleaning is limited to 10 photos per day). Additional features are unlocked by a one-time Pro purchase through Google Play; there is no subscription. The feature set, limits and price are shown in the app and on the Google Play page and may change in future versions. A purchased Pro is not revoked without cause. Do not try to bypass free-version limits or purchase checks. The optional "Support the developer" payment is a voluntary contribution: it does not unlock any features.
+Some features are free with limits (at the time of publication, metadata cleaning is limited to 10 photos per day, and video cleaning is available in Pro only). Additional features are unlocked by a one-time Pro purchase through Google Play; there is no subscription. The feature set, limits and price are shown in the app and on the Google Play page and may change in future versions. A purchased Pro is not revoked without cause. Do not try to bypass free-version limits or purchase checks. The optional "Support the developer" payment is a voluntary contribution: it does not unlock any features.
 
 ## 6. Payments and refunds
 Payments are processed by Google Play. Cancellation and refund requests are made through Google Play and handled under its rules and applicable law. The developer does not receive payment details and cannot promise a refund in every case. These terms do not limit mandatory consumer rights.
