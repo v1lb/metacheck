@@ -34,7 +34,7 @@ object IptcReader {
     private val photoshop = "Photoshop 3.0\u0000".toByteArray(Charsets.US_ASCII)
 
     fun read(data: ByteArray): List<MetaItem> = try {
-        parseIim(findIim(data) ?: return emptyList())
+        findIim(data)?.let(::parseIim).orEmpty()
     } catch (_: RuntimeException) {
         emptyList()
     }
