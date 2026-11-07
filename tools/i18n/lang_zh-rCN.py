@@ -540,6 +540,7 @@ T = {
     'studio_copy_none': '该照片没有可复制的 EXIF 数据。',
     'studio_date_unchanged': '不变',
     'studio_date_value': '%1$s：%2$s',
+    'studio_dates_hint': '图库按拍摄日期排序照片。保存后，MetaCheck 会请求 Android 重新读取文件；在 Google 相册更新自己的图库前，可能仍显示旧日期。',
     'studio_edit_camera_title': '相机和作者',
     'studio_edit_dates_title': '拍摄日期',
     'studio_edit_gps_title': '坐标和 GPS',

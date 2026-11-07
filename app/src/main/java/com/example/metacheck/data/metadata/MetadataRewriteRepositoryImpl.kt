@@ -106,6 +106,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             if (!verifySameFile(stage, dst)) {
                 throw AppFailure(FailureCode.EDIT_UNVERIFIED)
             }
+            refreshGallery(dst)
             MetadataWriteResult(stage.length(), false, "JPEG", verified = true)
         } finally { stage.delete() }
     }
@@ -140,6 +141,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
                 mutationAttempted = true
                 writeDocument(original, prepared)
                 if (!verifySameFile(prepared, original)) throw AppFailure(FailureCode.REPLACED_FILE_UNVERIFIED)
+                refreshGallery(original)
             } catch (e: Exception) {
                 if (mutationAttempted) {
                     try {
@@ -475,6 +477,26 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         if (!allowNewFileFallback) throw AppFailure(FailureCode.NO_SAFE_OVERWRITE)
         val stream = resolver.openOutputStream(uri, "wt") ?: throw AppFailure(FailureCode.CANNOT_OPEN_OUTPUT)
         stream.use { destination -> FileInputStream(staged).use { it.copyTo(destination, 64 * 1024) } }
+    }
+
+    /**
+     * Просит Android перечитать сохранённый файл, чтобы галерея сразу показала новую дату и место.
+     * Частая жалоба на редакторы EXIF: «дата поменялась, а в галерее старая». Без гарантий:
+     * путь к файлу известен не для всех провайдеров, а Google Фото ведёт собственную базу.
+     */
+    private fun refreshGallery(uri: Uri) {
+        runCatching {
+            val media = when {
+                uri.authority == android.provider.MediaStore.AUTHORITY -> uri
+                Build.VERSION.SDK_INT >= 29 -> android.provider.MediaStore.getMediaUri(context, uri)
+                else -> null
+            } ?: return
+            @Suppress("DEPRECATION")
+            val path = resolver.query(media, arrayOf(android.provider.MediaStore.MediaColumns.DATA), null, null, null)?.use {
+                if (it.moveToFirst()) it.getString(0) else null
+            } ?: return
+            android.media.MediaScannerConnection.scanFile(context, arrayOf(path), null, null)
+        }
     }
 
     private fun verifySameFile(staged: File, uri: Uri): Boolean = runCatching {

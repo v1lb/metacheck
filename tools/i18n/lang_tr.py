@@ -540,6 +540,7 @@ T = {
     'studio_copy_none': 'Bu fotoğrafta alınacak EXIF verisi yok.',
     'studio_date_unchanged': 'değişmedi',
     'studio_date_value': '%1$s: %2$s',
+    'studio_dates_hint': 'Galeriler fotoğrafları çekim tarihine göre sıralar. Kaydettikten sonra MetaCheck, Android’den dosyayı yeniden okumasını ister; Google Fotoğraflar kendi kitaplığını güncelleyene kadar eski tarihi gösterebilir.',
     'studio_edit_camera_title': 'Kamera ve yazar',
     'studio_edit_dates_title': 'Çekim tarihi',
     'studio_edit_gps_title': 'Koordinatlar ve GPS',

@@ -453,6 +453,7 @@
     <string name="studio_edit_dates_title">Aufnahmedatum</string>
     <string name="studio_field_date_taken">Aufnahmedatum</string>
     <string name="studio_field_date_digitized">Digitalisierungsdatum</string>
+    <string name="studio_dates_hint">Galerien sortieren Fotos nach dem Aufnahmedatum. Nach dem Speichern bittet MetaCheck Android, die Datei neu einzulesen; Google Fotos zeigt eventuell das alte Datum, bis es seine eigene Mediathek aktualisiert.</string>
     <string name="studio_date_value">%1$s: %2$s</string>
     <string name="studio_date_unchanged">unverändert</string>
     <string name="studio_edit_camera_title">Kamera und Urheber</string>

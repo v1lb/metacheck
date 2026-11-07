@@ -540,6 +540,7 @@ T = {
     'studio_copy_none': 'Foto itu tidak memiliki data EXIF untuk disalin.',
     'studio_date_unchanged': 'tidak diubah',
     'studio_date_value': '%1$s: %2$s',
+    'studio_dates_hint': 'Galeri mengurutkan foto berdasarkan tanggal pengambilan. Setelah disimpan, MetaCheck meminta Android membaca ulang file; Google Foto mungkin menampilkan tanggal lama sampai memperbarui pustakanya sendiri.',
     'studio_edit_camera_title': 'Kamera dan pembuat',
     'studio_edit_dates_title': 'Tanggal pengambilan',
     'studio_edit_gps_title': 'Koordinat dan GPS',

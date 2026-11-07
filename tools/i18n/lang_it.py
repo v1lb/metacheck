@@ -540,6 +540,7 @@ T = {
     'studio_copy_none': 'Quella foto non ha dati EXIF da copiare.',
     'studio_date_unchanged': 'invariata',
     'studio_date_value': '%1$s: %2$s',
+    'studio_dates_hint': 'Le gallerie ordinano le foto per data di scatto. Dopo il salvataggio, MetaCheck chiede ad Android di rileggere il file; Google Foto può mostrare la data vecchia finché non aggiorna la propria libreria.',
     'studio_edit_camera_title': 'Fotocamera e autore',
     'studio_edit_dates_title': 'Data di scatto',
     'studio_edit_gps_title': 'Coordinate e GPS',

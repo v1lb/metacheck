@@ -451,6 +451,7 @@
     <string name="studio_edit_dates_title">拍摄日期</string>
     <string name="studio_field_date_taken">拍摄日期</string>
     <string name="studio_field_date_digitized">数字化日期</string>
+    <string name="studio_dates_hint">图库按拍摄日期排序照片。保存后，MetaCheck 会请求 Android 重新读取文件；在 Google 相册更新自己的图库前，可能仍显示旧日期。</string>
     <string name="studio_date_value">%1$s：%2$s</string>
     <string name="studio_date_unchanged">不变</string>
     <string name="studio_edit_camera_title">相机和作者</string>

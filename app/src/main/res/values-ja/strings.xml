@@ -451,6 +451,7 @@
     <string name="studio_edit_dates_title">撮影日時</string>
     <string name="studio_field_date_taken">撮影日時</string>
     <string name="studio_field_date_digitized">デジタル化日時</string>
+    <string name="studio_dates_hint">ギャラリーは撮影日時で写真を並べます。保存後、MetaCheck は Android にファイルの再読み込みを依頼します。Google フォトは独自のライブラリを更新するまで古い日付を表示することがあります。</string>
     <string name="studio_date_value">%1$s：%2$s</string>
     <string name="studio_date_unchanged">変更なし</string>
     <string name="studio_edit_camera_title">カメラと作成者</string>

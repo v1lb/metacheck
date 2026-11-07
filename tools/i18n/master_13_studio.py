@@ -42,6 +42,8 @@ S = [
     ("studio_edit_dates_title", "Capture date", "Дата съёмки"),
     ("studio_field_date_taken", "Date taken", "Дата оригинала"),
     ("studio_field_date_digitized", "Date digitized", "Дата оцифровки"),
+    ("studio_dates_hint", "Galleries sort photos by the date taken. After saving, MetaCheck asks Android to re-read the file; Google Photos may show the old date until it updates its own library.",
+     "По дате оригинала галереи сортируют фото. После сохранения MetaCheck просит Android перечитать файл; Google Фото может показывать старую дату, пока не обновит свою библиотеку."),
     ("studio_date_value", "%1$s: %2$s", "%1$s: %2$s"),
     ("studio_date_unchanged", "unchanged", "не изменять"),
     ("studio_edit_camera_title", "Camera and authorship", "Камера и авторство"),

@@ -457,6 +457,7 @@
     <string name="studio_edit_dates_title">Data wykonania</string>
     <string name="studio_field_date_taken">Data wykonania</string>
     <string name="studio_field_date_digitized">Data digitalizacji</string>
+    <string name="studio_dates_hint">Galerie sortują zdjęcia według daty wykonania. Po zapisaniu MetaCheck prosi Androida o ponowne odczytanie pliku; Zdjęcia Google mogą pokazywać starą datę, dopóki nie zaktualizują własnej biblioteki.</string>
     <string name="studio_date_value">%1$s: %2$s</string>
     <string name="studio_date_unchanged">bez zmian</string>
     <string name="studio_edit_camera_title">Aparat i autorstwo</string>

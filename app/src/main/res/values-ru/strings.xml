@@ -457,6 +457,7 @@
     <string name="studio_edit_dates_title">Дата съёмки</string>
     <string name="studio_field_date_taken">Дата оригинала</string>
     <string name="studio_field_date_digitized">Дата оцифровки</string>
+    <string name="studio_dates_hint">По дате оригинала галереи сортируют фото. После сохранения MetaCheck просит Android перечитать файл; Google Фото может показывать старую дату, пока не обновит свою библиотеку.</string>
     <string name="studio_date_value">%1$s: %2$s</string>
     <string name="studio_date_unchanged">не изменять</string>
     <string name="studio_edit_camera_title">Камера и авторство</string>

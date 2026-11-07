@@ -540,6 +540,7 @@ T = {
     'studio_copy_none': 'У цьому фото немає даних EXIF, які можна взяти.',
     'studio_date_unchanged': 'без змін',
     'studio_date_value': '%1$s: %2$s',
+    'studio_dates_hint': 'За датою оригіналу галереї сортують фото. Після збереження MetaCheck просить Android перечитати файл; Google Фото може показувати стару дату, доки не оновить свою бібліотеку.',
     'studio_edit_camera_title': 'Камера й авторство',
     'studio_edit_dates_title': 'Дата зйомки',
     'studio_edit_gps_title': 'Координати й GPS',

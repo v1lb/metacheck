@@ -453,6 +453,7 @@
     <string name="studio_edit_dates_title">Çekim tarihi</string>
     <string name="studio_field_date_taken">Çekim tarihi</string>
     <string name="studio_field_date_digitized">Dijitalleştirme tarihi</string>
+    <string name="studio_dates_hint">Galeriler fotoğrafları çekim tarihine göre sıralar. Kaydettikten sonra MetaCheck, Android’den dosyayı yeniden okumasını ister; Google Fotoğraflar kendi kitaplığını güncelleyene kadar eski tarihi gösterebilir.</string>
     <string name="studio_date_value">%1$s: %2$s</string>
     <string name="studio_date_unchanged">değişmedi</string>
     <string name="studio_edit_camera_title">Kamera ve yazar</string>

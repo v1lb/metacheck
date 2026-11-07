@@ -540,6 +540,7 @@ T = {
     'studio_copy_none': 'その写真にはコピーできるEXIFデータがありません。',
     'studio_date_unchanged': '変更なし',
     'studio_date_value': '%1$s：%2$s',
+    'studio_dates_hint': 'ギャラリーは撮影日時で写真を並べます。保存後、MetaCheck は Android にファイルの再読み込みを依頼します。Google フォトは独自のライブラリを更新するまで古い日付を表示することがあります。',
     'studio_edit_camera_title': 'カメラと作成者',
     'studio_edit_dates_title': '撮影日時',
     'studio_edit_gps_title': '座標とGPS',

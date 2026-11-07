@@ -540,6 +540,7 @@ T = {
     'studio_copy_none': 'Dieses Foto enthält keine EXIF-Daten zum Übernehmen.',
     'studio_date_unchanged': 'unverändert',
     'studio_date_value': '%1$s: %2$s',
+    'studio_dates_hint': 'Galerien sortieren Fotos nach dem Aufnahmedatum. Nach dem Speichern bittet MetaCheck Android, die Datei neu einzulesen; Google Fotos zeigt eventuell das alte Datum, bis es seine eigene Mediathek aktualisiert.',
     'studio_edit_camera_title': 'Kamera und Urheber',
     'studio_edit_dates_title': 'Aufnahmedatum',
     'studio_edit_gps_title': 'Koordinaten und GPS',

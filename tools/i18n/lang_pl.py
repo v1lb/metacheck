@@ -540,6 +540,7 @@ T = {
     'studio_copy_none': 'To zdjęcie nie ma danych EXIF do skopiowania.',
     'studio_date_unchanged': 'bez zmian',
     'studio_date_value': '%1$s: %2$s',
+    'studio_dates_hint': 'Galerie sortują zdjęcia według daty wykonania. Po zapisaniu MetaCheck prosi Androida o ponowne odczytanie pliku; Zdjęcia Google mogą pokazywać starą datę, dopóki nie zaktualizują własnej biblioteki.',
     'studio_edit_camera_title': 'Aparat i autorstwo',
     'studio_edit_dates_title': 'Data wykonania',
     'studio_edit_gps_title': 'Współrzędne i GPS',

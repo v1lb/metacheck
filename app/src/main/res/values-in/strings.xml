@@ -451,6 +451,7 @@
     <string name="studio_edit_dates_title">Tanggal pengambilan</string>
     <string name="studio_field_date_taken">Tanggal diambil</string>
     <string name="studio_field_date_digitized">Tanggal digitalisasi</string>
+    <string name="studio_dates_hint">Galeri mengurutkan foto berdasarkan tanggal pengambilan. Setelah disimpan, MetaCheck meminta Android membaca ulang file; Google Foto mungkin menampilkan tanggal lama sampai memperbarui pustakanya sendiri.</string>
     <string name="studio_date_value">%1$s: %2$s</string>
     <string name="studio_date_unchanged">tidak diubah</string>
     <string name="studio_edit_camera_title">Kamera dan pembuat</string>

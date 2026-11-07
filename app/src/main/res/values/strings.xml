@@ -454,6 +454,7 @@
     <string name="studio_edit_dates_title">Capture date</string>
     <string name="studio_field_date_taken">Date taken</string>
     <string name="studio_field_date_digitized">Date digitized</string>
+    <string name="studio_dates_hint">Galleries sort photos by the date taken. After saving, MetaCheck asks Android to re-read the file; Google Photos may show the old date until it updates its own library.</string>
     <string name="studio_date_value">%1$s: %2$s</string>
     <string name="studio_date_unchanged">unchanged</string>
     <string name="studio_edit_camera_title">Camera and authorship</string>

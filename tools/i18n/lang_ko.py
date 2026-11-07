@@ -540,6 +540,7 @@ T = {
     'studio_copy_none': '이 사진에는 가져올 EXIF 데이터가 없습니다.',
     'studio_date_unchanged': '변경 없음',
     'studio_date_value': '%1$s: %2$s',
+    'studio_dates_hint': '갤러리는 촬영 날짜로 사진을 정렬합니다. 저장 후 MetaCheck가 Android에 파일을 다시 읽도록 요청합니다. Google 포토는 자체 보관함을 업데이트할 때까지 이전 날짜를 표시할 수 있습니다.',
     'studio_edit_camera_title': '카메라 및 작성자',
     'studio_edit_dates_title': '촬영 날짜',
     'studio_edit_gps_title': '좌표 및 GPS',

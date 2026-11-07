@@ -392,6 +392,8 @@ fun MetadataStudioScreen(
                         Text(stringResource(R.string.studio_edit_dates_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         StudioDatePicker(stringResource(R.string.studio_field_date_taken), dateTaken) { dateTaken = it }
                         StudioDatePicker(stringResource(R.string.studio_field_date_digitized), dateDigitized) { dateDigitized = it }
+                        Text(stringResource(R.string.studio_dates_hint), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                         Text(stringResource(R.string.studio_edit_camera_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         StudioField(stringResource(R.string.patch_field_make), manufacturer) { manufacturer = it }
@@ -539,7 +541,8 @@ private fun readDonorExif(context: android.content.Context, uri: Uri): DonorExif
         description = text(ExifInterface.TAG_IMAGE_DESCRIPTION),
         iso = (text(ExifInterface.TAG_PHOTOGRAPHIC_SENSITIVITY))?.substringBefore(',')?.trim(),
         aperture = fNumber?.let { String.format(Locale.US, "%.1f", it) },
-        shutter = exposure?.let { if (it >= 1) String.format(Locale.US, "%.1f", it) else "1/" + Math.round(1 / it) },
+        // Поле выдержки принимает секунды десятичной дробью: 1/50 → 0.02.
+        shutter = exposure?.let { java.math.BigDecimal(it).round(java.math.MathContext(4)).stripTrailingZeros().toPlainString() },
         latitude = gps?.let { String.format(Locale.US, "%.6f", it[0]) },
         longitude = gps?.let { String.format(Locale.US, "%.6f", it[1]) },
     )
