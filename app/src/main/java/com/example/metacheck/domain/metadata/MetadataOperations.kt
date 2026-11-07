@@ -111,9 +111,21 @@ class MetadataStudioUseCase(
         repository.overwriteWithBackup(source, backup, patch)
     }
 
+    /**
+     * Пакетная очистка. Бесплатно — до [BatchLimits.FREE_PER_RUN] фото за раз, каждое успешное фото
+     * входит в дневной лимит. Pro — до [BatchLimits.PRO_PER_RUN] за раз без лимита.
+     */
     suspend fun batch(sources: List<String>, tree: String, progress: (BatchProgress) -> Unit): Result<BatchProgress> = runCatchingCancellable {
-        if (!entitlements.current().isPro) throw ProRequiredException()
-        ensure(sources.size in 1..50, FailureCode.BATCH_SIZE)
-        repository.stripBatch(sources, tree, progress)
+        lock.withLock {
+            val free = !entitlements.current().isPro
+            if (free) {
+                if (sources.size > BatchLimits.FREE_PER_RUN) throw ProRequiredException()
+                if (usedToday() + sources.size > DailyCleanQuota.FREE_DAILY_LIMIT) throw DailyLimitReachedException()
+            }
+            ensure(sources.size in 1..BatchLimits.PRO_PER_RUN, FailureCode.BATCH_SIZE)
+            val result = repository.stripBatch(sources, tree, progress)
+            if (free) withContext(io) { repeat(result.succeeded) { quota.recordSuccess() } }
+            result
+        }
     }
 }

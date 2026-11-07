@@ -92,6 +92,8 @@ fun MetadataStudioScreen(
     val message by vm.message.collectAsStateWithLifecycle()
     val batch by vm.batch.collectAsStateWithLifecycle()
     val usedToday by vm.usedToday.collectAsStateWithLifecycle()
+    val audit by vm.audit.collectAsStateWithLifecycle()
+    val perRun = com.example.metacheck.domain.metadata.BatchLimits.perRun(isPro, usedToday)
     var mode by rememberSaveable { mutableStateOf(StudioMode.STRIP) }
     var source by rememberSaveable { mutableStateOf(initialUri.orEmpty()) }
     var batchSources by rememberSaveable { mutableStateOf(emptyList<String>()) }
@@ -222,16 +224,23 @@ fun MetadataStudioScreen(
             }
         }
     }
+    // Выбрать можно сколько угодно: за один запуск очищается [perRun] фото, остальные ждут следующего запуска.
     val chooseMultiple = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { list ->
         if (list.isNotEmpty()) {
-            if (!isPro) onUpgrade()
-            else if (list.size > 50) actionError = UiText.Res(R.string.failure_batch_size)
-            else { batchSources = list.map(Uri::toString); actionError = null }
+            batchSources = list.map(Uri::toString).distinct().take(MAX_QUEUE); actionError = null
+        }
+    }
+    val chooseAuditTree = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { tree ->
+        if (tree != null) {
+            vm.persistAccess(tree)
+            actionError = null
+            vm.auditFolder(tree) { risky -> batchSources = risky.take(MAX_QUEUE) }
         }
     }
     val chooseTree = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { folder ->
-        if (folder != null && batchSources.isNotEmpty()) {
-            vm.batchStrip(batchSources, folder)
+        val run = batchSources.take(perRun)
+        if (folder != null && run.isNotEmpty()) {
+            vm.batchStrip(run, folder) { batchSources = batchSources.filterNot { it in run } }
         }
     }
     val saveCleanJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
@@ -312,7 +321,7 @@ fun MetadataStudioScreen(
                     mode = StudioMode.EDIT
                 }
                 StudioTab(stringResource(R.string.studio_tab_batch), mode == StudioMode.BATCH) {
-                    if (isPro) mode = StudioMode.BATCH else onUpgrade()
+                    mode = StudioMode.BATCH
                 }
             }
         }
@@ -431,12 +440,34 @@ fun MetadataStudioScreen(
                         Text(stringResource(R.string.studio_batch_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
                         Text(stringResource(R.string.studio_batch_text),
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(stringResource(R.string.studio_batch_selected, batchSources.size), color = MaterialTheme.colorScheme.onSurface)
-                        CyberOutlineButton(stringResource(R.string.studio_batch_choose_photos), { chooseMultiple.launch(arrayOf("image/*")) }, Modifier.fillMaxWidth())
-                        NeonButton(stringResource(R.string.studio_batch_choose_folder_start), {
-                            if (!busy && batchSources.isNotEmpty()) chooseTree.launch(null)
-                            else actionError = UiText.Res(R.string.studio_batch_choose_files_first)
+                        CyberOutlineButton(stringResource(R.string.studio_audit_button), {
+                            if (!audit.running) chooseAuditTree.launch(null)
                         }, Modifier.fillMaxWidth())
+                        Text(stringResource(R.string.studio_audit_hint), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        CyberOutlineButton(stringResource(R.string.studio_batch_choose_photos), { chooseMultiple.launch(arrayOf("image/*")) }, Modifier.fillMaxWidth())
+                        if (audit.running) {
+                            LinearProgressIndicator(Modifier.fillMaxWidth())
+                            Text(stringResource(R.string.studio_audit_running, audit.scanned), color = MaterialTheme.colorScheme.onSurface)
+                        }
+                        audit.result?.let { result -> AuditSummary(result) }
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        Text(stringResource(R.string.studio_batch_selected, batchSources.size), color = MaterialTheme.colorScheme.onSurface)
+                        if (batchSources.isNotEmpty()) Text(
+                            stringResource(R.string.studio_batch_run_size, minOf(perRun, batchSources.size)),
+                            style = com.example.metacheck.ui.theme.MonoText.tag, color = MaterialTheme.colorScheme.onSurface)
+                        if (!isPro) Text(stringResource(R.string.studio_batch_free_note, com.example.metacheck.domain.metadata.BatchLimits.FREE_PER_RUN,
+                            com.example.metacheck.domain.metadata.BatchLimits.PRO_PER_RUN),
+                            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        NeonButton(stringResource(R.string.studio_batch_choose_folder_start), {
+                            when {
+                                busy || audit.running -> Unit
+                                batchSources.isEmpty() -> actionError = UiText.Res(R.string.studio_batch_choose_files_first)
+                                perRun == 0 -> onUpgrade()
+                                else -> chooseTree.launch(null)
+                            }
+                        }, Modifier.fillMaxWidth())
+                        if (!isPro && batchSources.size > perRun) CyberOutlineButton(stringResource(R.string.studio_batch_upgrade), onUpgrade, Modifier.fillMaxWidth())
                         if (batch.total > 0) {
                             LinearProgressIndicator(
                                 progress = { batch.completed.toFloat() / batch.total },
@@ -491,6 +522,34 @@ fun MetadataStudioScreen(
                 worldPicker = false
             },
         )
+    }
+}
+
+/** Не больше стольких фото в очереди пакета: выбор и проверка папки могут дать сотни. */
+private const val MAX_QUEUE = 200
+
+@Composable
+private fun AuditSummary(result: com.example.metacheck.domain.metadata.AuditResult) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(R.string.studio_audit_summary, result.scanned), style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface)
+        if (result.findings.isEmpty()) {
+            Text(stringResource(R.string.studio_audit_clean_none), color = MaterialTheme.colorScheme.tertiary)
+        } else {
+            val mono = com.example.metacheck.ui.theme.MonoText.value
+            if (result.withLocation > 0) Text(stringResource(R.string.studio_audit_location, result.withLocation), style = mono,
+                color = MaterialTheme.colorScheme.error)
+            if (result.withSerial > 0) Text(stringResource(R.string.studio_audit_serial, result.withSerial), style = mono,
+                color = MaterialTheme.colorScheme.onSurface)
+            if (result.withPerson > 0) Text(stringResource(R.string.studio_audit_person, result.withPerson), style = mono,
+                color = MaterialTheme.colorScheme.onSurface)
+            if (result.otherOnly > 0) Text(stringResource(R.string.studio_audit_other, result.otherOnly), style = mono,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.studio_audit_selected), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (result.limited) Text(stringResource(R.string.studio_audit_limited, com.example.metacheck.domain.metadata.FolderAuditRepository.MAX_FILES),
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

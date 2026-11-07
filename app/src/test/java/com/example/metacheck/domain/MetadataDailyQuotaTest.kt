@@ -69,10 +69,32 @@ class MetadataDailyQuotaTest {
         assertEquals(1, quota.count)
     }
 
-    @Test fun freeUserCannotBatch() = runBlocking {
-        val store = FakeStore()
-        val use = MetadataStudioUseCase(store, EntitlementFake(), Quota())
-        assertTrue(use.batch(listOf("a", "b"), "tree") {}.exceptionOrNull() is ProRequiredException)
+    @Test fun freeUserBatchesUpToFivePerRunWithinDailyLimit() = runBlocking {
+        val store = FakeStore(); val quota = Quota()
+        val use = MetadataStudioUseCase(store, EntitlementFake(), quota)
+        assertTrue(use.batch(List(6) { "f$it" }, "tree") {}.exceptionOrNull() is ProRequiredException)
+        assertTrue(use.batch(List(5) { "f$it" }, "tree") {}.isSuccess)
+        assertEquals(5, quota.count)
+        assertTrue(use.batch(List(5) { "g$it" }, "tree") {}.isSuccess)
+        assertTrue(use.batch(listOf("h"), "tree") {}.exceptionOrNull() is DailyLimitReachedException)
+        assertEquals(DailyCleanQuota.FREE_DAILY_LIMIT, quota.count)
+    }
+
+    @Test fun batchLimitsPerRun() {
+        assertEquals(5, BatchLimits.perRun(isPro = false, usedToday = 0))
+        assertEquals(2, BatchLimits.perRun(isPro = false, usedToday = 8))
+        assertEquals(0, BatchLimits.perRun(isPro = false, usedToday = 12))
+        assertEquals(50, BatchLimits.perRun(isPro = true, usedToday = 99))
+    }
+
+    @Test fun auditPutsRiskiestFirst() {
+        val r = AuditResult.of(3, listOf(
+            AuditFinding("a", "a", location = false, serial = false, person = false),
+            AuditFinding("b", "b", location = true, serial = false, person = false),
+            AuditFinding("c", "c", location = false, serial = true, person = true),
+        ), limited = false)
+        assertEquals(listOf("b", "c", "a"), r.findings.map { it.uri })
+        assertEquals(1, r.withLocation); assertEquals(1, r.otherOnly)
     }
 
     @Test fun proUnlimitedWritesAndEdits() = runBlocking {
