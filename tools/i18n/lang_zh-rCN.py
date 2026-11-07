@@ -544,7 +544,7 @@ T = {
     'studio_edit_camera_title': '相机和作者',
     'studio_edit_dates_title': '拍摄日期',
     'studio_edit_gps_title': '坐标和 GPS',
-    'studio_edit_note': '空字段保持不变。编辑器仅支持 JPEG；与 EXIF 冲突的独立 XMP/IPTC 块会从 JPEG 中移除。保存之前不会对源文件做任何更改。任何编辑都可能使 C2PA 签名失效。',
+    'studio_edit_note': '留空的字段保持不变。编辑器适用于 JPEG。关键词、说明等描述性字段会保留；XMP/IPTC 中旧的日期、坐标和编辑历史会被删除。保存之前不会更改原文件。任何编辑都可能使 C2PA 签名失效。',
     'studio_edit_overwrite': '替换 JPEG（含备份）',
     'studio_edit_remove_gps': '移除全部 GPS',
     'studio_edit_save_copy': '保存编辑后的 JPEG 副本',

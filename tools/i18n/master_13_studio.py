@@ -53,8 +53,8 @@ S = [
     ("studio_field_shutter", "Shutter speed in seconds (for example, 0.02)", "Выдержка в секундах (например, 0.02)"),
     ("studio_field_keep", "Leave unchanged", "Оставить без изменений"),
     ("studio_edit_note",
-     "Empty fields stay unchanged. The editor works with JPEG; separate XMP/IPTC blocks that contradict EXIF are removed from the JPEG. Nothing is applied to the source file until you save. Any edit may invalidate C2PA signatures.",
-     "Пустые поля остаются без изменений. Редактор работает с JPEG; противоречащие EXIF блоки XMP/IPTC в JPEG удаляются. Изменения не применяются к исходному файлу до сохранения. Любая правка может сделать C2PA-подписи недействительными."),
+     "Empty fields stay unchanged. The editor works with JPEG. Keywords, captions and other descriptive fields are kept; old dates, coordinates and edit history in XMP/IPTC are removed. Nothing changes in the source file until you save. Any edit may invalidate C2PA signatures.",
+     "Пустые поля остаются без изменений. Редактор работает с JPEG. Ключевые слова, подписи и другие описательные поля сохраняются; старые даты, координаты и история правок в XMP/IPTC удаляются. Исходный файл не меняется до сохранения. Любая правка может сделать C2PA-подписи недействительными."),
     ("studio_edit_save_copy", "Save an edited JPEG copy", "Сохранить изменённую копию JPEG"),
     ("studio_edit_overwrite", "Replace the JPEG, with a backup", "Перезаписать JPEG с резервной копией"),
 

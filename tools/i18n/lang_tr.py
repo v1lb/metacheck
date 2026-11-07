@@ -544,7 +544,7 @@ T = {
     'studio_edit_camera_title': 'Kamera ve yazar',
     'studio_edit_dates_title': 'Çekim tarihi',
     'studio_edit_gps_title': 'Koordinatlar ve GPS',
-    'studio_edit_note': 'Boş alanlar değişmeden kalır. Düzenleyici JPEG ile çalışır; EXIF ile çelişen ayrı XMP/IPTC blokları JPEG’den kaldırılır. Kaydedene kadar kaynak dosyaya hiçbir şey uygulanmaz. Her düzenleme C2PA imzalarını geçersiz kılabilir.',
+    'studio_edit_note': 'Boş alanlar değişmez. Düzenleyici JPEG ile çalışır. Anahtar kelimeler, açıklamalar ve diğer tanımlayıcı alanlar korunur; XMP/IPTC içindeki eski tarihler, koordinatlar ve düzenleme geçmişi silinir. Kaydedene kadar kaynak dosya değişmez. Her düzenleme C2PA imzalarını geçersiz kılabilir.',
     'studio_edit_overwrite': 'JPEG’i yedekle birlikte değiştir',
     'studio_edit_remove_gps': 'Tüm GPS’i kaldır',
     'studio_edit_save_copy': 'Düzenlenmiş JPEG kopyasını kaydet',

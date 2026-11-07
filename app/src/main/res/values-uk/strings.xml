@@ -466,7 +466,7 @@
     <string name="studio_field_aperture">Діафрагма (наприклад, 1.8)</string>
     <string name="studio_field_shutter">Витримка в секундах (наприклад, 0.02)</string>
     <string name="studio_field_keep">Залишити без змін</string>
-    <string name="studio_edit_note">Порожні поля не змінюються. Редактор працює з JPEG; окремі блоки XMP/IPTC, що суперечать EXIF, видаляються з JPEG. До збереження у вихідний файл нічого не записується. Будь-яке редагування може зробити підписи C2PA недійсними.</string>
+    <string name="studio_edit_note">Порожні поля залишаються без змін. Редактор працює з JPEG. Ключові слова, підписи та інші описові поля зберігаються; старі дати, координати та історія правок у XMP/IPTC видаляються. Вихідний файл не змінюється до збереження. Будь-яка правка може зробити підписи C2PA недійсними.</string>
     <string name="studio_edit_save_copy">Зберегти відредаговану копію JPEG</string>
     <string name="studio_edit_overwrite">Замінити JPEG, з резервною копією</string>
     <string name="studio_batch_eyebrow">Пакетне очищення · Pro</string>

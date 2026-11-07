@@ -460,7 +460,7 @@
     <string name="studio_field_aperture">Bukaan (misalnya 1.8)</string>
     <string name="studio_field_shutter">Kecepatan rana dalam detik (misalnya 0.02)</string>
     <string name="studio_field_keep">Biarkan tidak diubah</string>
-    <string name="studio_edit_note">Kolom kosong tidak diubah. Editor berfungsi dengan JPEG; blok XMP/IPTC terpisah yang bertentangan dengan EXIF dihapus dari JPEG. Tidak ada yang diterapkan ke file sumber sampai Anda menyimpan. Setiap edit dapat membuat tanda tangan C2PA tidak valid.</string>
+    <string name="studio_edit_note">Kolom kosong tidak berubah. Editor bekerja dengan JPEG. Kata kunci, keterangan, dan kolom deskriptif lain dipertahankan; tanggal lama, koordinat, dan riwayat edit di XMP/IPTC dihapus. File sumber tidak berubah sampai Anda menyimpan. Setiap edit dapat membuat tanda tangan C2PA tidak valid.</string>
     <string name="studio_edit_save_copy">Simpan salinan JPEG yang diedit</string>
     <string name="studio_edit_overwrite">Ganti JPEG, dengan cadangan</string>
     <string name="studio_batch_eyebrow">Pembersihan massal · Pro</string>

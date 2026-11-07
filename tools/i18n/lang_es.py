@@ -544,7 +544,7 @@ T = {
     'studio_edit_camera_title': 'Cámara y autoría',
     'studio_edit_dates_title': 'Fecha de captura',
     'studio_edit_gps_title': 'Coordenadas y GPS',
-    'studio_edit_note': 'Los campos vacíos no cambian. El editor funciona con JPEG; los bloques XMP/IPTC separados que contradicen el EXIF se eliminan del JPEG. No se aplica nada al archivo de origen hasta que guardes. Cualquier edición puede invalidar las firmas C2PA.',
+    'studio_edit_note': 'Los campos vacíos no cambian. El editor funciona con JPEG. Se conservan las palabras clave, los pies de foto y otros campos descriptivos; se eliminan las fechas, coordenadas e historial de edición antiguos de XMP/IPTC. El archivo original no cambia hasta que guardes. Cualquier edición puede invalidar las firmas C2PA.',
     'studio_edit_overwrite': 'Reemplazar el JPEG, con copia de seguridad',
     'studio_edit_remove_gps': 'Eliminar todo el GPS',
     'studio_edit_save_copy': 'Guardar una copia JPEG editada',

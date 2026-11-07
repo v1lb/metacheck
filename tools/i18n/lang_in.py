@@ -544,7 +544,7 @@ T = {
     'studio_edit_camera_title': 'Kamera dan pembuat',
     'studio_edit_dates_title': 'Tanggal pengambilan',
     'studio_edit_gps_title': 'Koordinat dan GPS',
-    'studio_edit_note': 'Kolom kosong tidak diubah. Editor berfungsi dengan JPEG; blok XMP/IPTC terpisah yang bertentangan dengan EXIF dihapus dari JPEG. Tidak ada yang diterapkan ke file sumber sampai Anda menyimpan. Setiap edit dapat membuat tanda tangan C2PA tidak valid.',
+    'studio_edit_note': 'Kolom kosong tidak berubah. Editor bekerja dengan JPEG. Kata kunci, keterangan, dan kolom deskriptif lain dipertahankan; tanggal lama, koordinat, dan riwayat edit di XMP/IPTC dihapus. File sumber tidak berubah sampai Anda menyimpan. Setiap edit dapat membuat tanda tangan C2PA tidak valid.',
     'studio_edit_overwrite': 'Ganti JPEG, dengan cadangan',
     'studio_edit_remove_gps': 'Hapus semua GPS',
     'studio_edit_save_copy': 'Simpan salinan JPEG yang diedit',

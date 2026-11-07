@@ -75,7 +75,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         try {
             val prepared = when (readMime(src)) {
                 "image/jpeg" -> {
-                    prepareEdited(src, stage, MetadataPatch(removeGps = true))
+                    prepareEdited(src, stage, MetadataPatch(removeGps = true), keepDescriptive = false)
                     val exif = ExifInterface(stage.absolutePath)
                     ensure(exif.latLong == null && GPS_TAGS.all { exif.getAttribute(it) == null }, FailureCode.GPS_NOT_REMOVED)
                     // Координаты прячутся не только в EXIF: Motion Photo, MPF-кадры, XMP, миниатюра.
@@ -312,12 +312,25 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         }
     }
 
-    private fun prepareEdited(source: Uri, output: File, patch: MetadataPatch) {
+    /**
+     * [keepDescriptive]: ключевые слова, подписи и прочие описательные поля переносятся в новые XMP/IPTC
+     * (см. [DescriptiveMetadata]). Для «удалить только GPS» выключено: там нужен файл без XMP/IPTC вовсе.
+     */
+    private fun prepareEdited(source: Uri, output: File, patch: MetadataPatch, keepDescriptive: Boolean = true) {
         val sourceMime = readMime(source)
         ensure(sourceMime == "image/jpeg", FailureCode.EDIT_JPEG_ONLY)
         val original = createTemp("editable_original", ".jpg")
         try {
             copyUriToFile(source, original)
+            val descriptive = if (!keepDescriptive) DescriptiveMetadata() else DescriptiveMetadata.read(original).let { d ->
+                val placeChanged = patch.removeGps || (patch.latitude != null && patch.longitude != null)
+                // Поля, которые пользователь меняет в EXIF, не дублируем старыми значениями.
+                (if (placeChanged) d.withoutPlaces() else d).copy(
+                    caption = if (patch.description != null) null else d.caption,
+                    byline = if (patch.author != null) null else d.byline,
+                    copyright = if (patch.copyright != null) null else d.copyright,
+                )
+            }
             // При удалении GPS убираем и миниатюру EXIF: у обрезанного фото она показывает исходный кадр.
             JpegSegments.removeContradictorySegments(original, output, dropExifThumbnail = patch.removeGps)
             val exif = ExifInterface(output.absolutePath)
@@ -363,6 +376,15 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             if (patch.removeGps) {
                 val hidden = JpegSegments.inspect(output)
                 if (hidden.hasHiddenPayload) throw AppFailure(FailureCode.HIDDEN_DATA_FOUND, hidden.parts().toList())
+            }
+            // Описательные поля добавляются после проверки: в них по построению нет координат и дат.
+            val segments = descriptive.segments()
+            if (segments.isNotEmpty()) {
+                val withFields = createTemp("edit_fields", ".jpg")
+                try {
+                    JpegSegments.insertAfterHeader(output, withFields, segments)
+                    withFields.copyTo(output, overwrite = true)
+                } finally { withFields.delete() }
             }
         } finally { original.delete() }
     }

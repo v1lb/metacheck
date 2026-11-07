@@ -544,7 +544,7 @@ T = {
     'studio_edit_camera_title': 'カメラと作成者',
     'studio_edit_dates_title': '撮影日時',
     'studio_edit_gps_title': '座標とGPS',
-    'studio_edit_note': '空欄の項目は変更されません。エディターはJPEGに対応しています。EXIFと矛盾する個別のXMP/IPTCブロックはJPEGから削除されます。保存するまで元のファイルには何も適用されません。編集するとC2PA署名が無効になる場合があります。',
+    'studio_edit_note': '空欄の項目は変更されません。エディターは JPEG に対応しています。キーワード、キャプションなどの説明フィールドは保持され、XMP/IPTC 内の古い日付、座標、編集履歴は削除されます。保存するまで元のファイルは変更されません。編集により C2PA 署名が無効になる場合があります。',
     'studio_edit_overwrite': 'JPEGを置き換える（バックアップあり）',
     'studio_edit_remove_gps': 'GPSをすべて削除',
     'studio_edit_save_copy': '編集したJPEGのコピーを保存',

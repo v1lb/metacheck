@@ -544,7 +544,7 @@ T = {
     'studio_edit_camera_title': '카메라 및 작성자',
     'studio_edit_dates_title': '촬영 날짜',
     'studio_edit_gps_title': '좌표 및 GPS',
-    'studio_edit_note': '빈 필드는 변경되지 않습니다. 편집기는 JPEG에서 작동하며, EXIF와 충돌하는 별도의 XMP/IPTC 블록은 JPEG에서 제거됩니다. 저장하기 전까지 원본 파일에는 아무것도 적용되지 않습니다. 모든 편집은 C2PA 서명을 무효화할 수 있습니다.',
+    'studio_edit_note': '빈 항목은 변경되지 않습니다. 편집기는 JPEG에서 작동합니다. 키워드, 캡션 등 설명 항목은 유지되고 XMP/IPTC의 이전 날짜, 좌표, 편집 기록은 삭제됩니다. 저장하기 전까지 원본 파일은 바뀌지 않습니다. 편집하면 C2PA 서명이 무효가 될 수 있습니다.',
     'studio_edit_overwrite': 'JPEG 교체(백업 포함)',
     'studio_edit_remove_gps': '모든 GPS 제거',
     'studio_edit_save_copy': '편집한 JPEG 사본 저장',

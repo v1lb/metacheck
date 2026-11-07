@@ -462,7 +462,7 @@
     <string name="studio_field_aperture">Diyafram (örneğin 1.8)</string>
     <string name="studio_field_shutter">Saniye cinsinden deklanşör hızı (örneğin 0.02)</string>
     <string name="studio_field_keep">Değiştirmeden bırak</string>
-    <string name="studio_edit_note">Boş alanlar değişmeden kalır. Düzenleyici JPEG ile çalışır; EXIF ile çelişen ayrı XMP/IPTC blokları JPEG’den kaldırılır. Kaydedene kadar kaynak dosyaya hiçbir şey uygulanmaz. Her düzenleme C2PA imzalarını geçersiz kılabilir.</string>
+    <string name="studio_edit_note">Boş alanlar değişmez. Düzenleyici JPEG ile çalışır. Anahtar kelimeler, açıklamalar ve diğer tanımlayıcı alanlar korunur; XMP/IPTC içindeki eski tarihler, koordinatlar ve düzenleme geçmişi silinir. Kaydedene kadar kaynak dosya değişmez. Her düzenleme C2PA imzalarını geçersiz kılabilir.</string>
     <string name="studio_edit_save_copy">Düzenlenmiş JPEG kopyasını kaydet</string>
     <string name="studio_edit_overwrite">JPEG’i yedekle birlikte değiştir</string>
     <string name="studio_batch_eyebrow">Toplu temizleme · Pro</string>

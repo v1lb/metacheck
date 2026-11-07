@@ -466,7 +466,7 @@
     <string name="studio_field_aperture">Przysłona (np. 1.8)</string>
     <string name="studio_field_shutter">Czas naświetlania w sekundach (np. 0.02)</string>
     <string name="studio_field_keep">Pozostaw bez zmian</string>
-    <string name="studio_edit_note">Puste pola pozostają bez zmian. Edytor obsługuje JPEG; osobne bloki XMP/IPTC sprzeczne z EXIF są usuwane z JPEG. Do zapisania nic nie jest stosowane do pliku źródłowego. Każda edycja może unieważnić podpisy C2PA.</string>
+    <string name="studio_edit_note">Puste pola pozostają bez zmian. Edytor działa z JPEG. Słowa kluczowe, podpisy i inne pola opisowe są zachowywane; stare daty, współrzędne i historia edycji w XMP/IPTC są usuwane. Plik źródłowy nie zmienia się do momentu zapisania. Każda edycja może unieważnić podpisy C2PA.</string>
     <string name="studio_edit_save_copy">Zapisz edytowaną kopię JPEG</string>
     <string name="studio_edit_overwrite">Zastąp JPEG, z kopią zapasową</string>
     <string name="studio_batch_eyebrow">Czyszczenie wsadowe · Pro</string>

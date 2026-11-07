@@ -463,7 +463,7 @@
     <string name="studio_field_aperture">Aperture (for example, 1.8)</string>
     <string name="studio_field_shutter">Shutter speed in seconds (for example, 0.02)</string>
     <string name="studio_field_keep">Leave unchanged</string>
-    <string name="studio_edit_note">Empty fields stay unchanged. The editor works with JPEG; separate XMP/IPTC blocks that contradict EXIF are removed from the JPEG. Nothing is applied to the source file until you save. Any edit may invalidate C2PA signatures.</string>
+    <string name="studio_edit_note">Empty fields stay unchanged. The editor works with JPEG. Keywords, captions and other descriptive fields are kept; old dates, coordinates and edit history in XMP/IPTC are removed. Nothing changes in the source file until you save. Any edit may invalidate C2PA signatures.</string>
     <string name="studio_edit_save_copy">Save an edited JPEG copy</string>
     <string name="studio_edit_overwrite">Replace the JPEG, with a backup</string>
     <string name="studio_batch_eyebrow">Batch cleaning · Pro</string>

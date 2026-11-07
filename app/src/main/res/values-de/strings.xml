@@ -462,7 +462,7 @@
     <string name="studio_field_aperture">Blende (z. B. 1.8)</string>
     <string name="studio_field_shutter">Belichtungszeit in Sekunden (z. B. 0.02)</string>
     <string name="studio_field_keep">Unverändert lassen</string>
-    <string name="studio_edit_note">Leere Felder bleiben unverändert. Der Editor funktioniert mit JPEG; separate XMP-/IPTC-Blöcke, die dem EXIF widersprechen, werden aus dem JPEG entfernt. Bis zum Speichern wird nichts auf die Quelldatei angewendet. Jede Bearbeitung kann C2PA-Signaturen ungültig machen.</string>
+    <string name="studio_edit_note">Leere Felder bleiben unverändert. Der Editor funktioniert mit JPEG. Schlagwörter, Bildunterschriften und andere beschreibende Felder bleiben erhalten; alte Datumsangaben, Koordinaten und Bearbeitungsverlauf in XMP/IPTC werden entfernt. Die Quelldatei ändert sich erst beim Speichern. Jede Bearbeitung kann C2PA-Signaturen ungültig machen.</string>
     <string name="studio_edit_save_copy">Bearbeitete JPEG-Kopie speichern</string>
     <string name="studio_edit_overwrite">JPEG ersetzen, mit Sicherung</string>
     <string name="studio_batch_eyebrow">Stapelbereinigung · Pro</string>

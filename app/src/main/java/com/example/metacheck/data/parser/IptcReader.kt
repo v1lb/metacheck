@@ -33,10 +33,15 @@ object IptcReader {
     private const val MAX_VALUE_LENGTH = 2000
     private val photoshop = "Photoshop 3.0\u0000".toByteArray(Charsets.US_ASCII)
 
-    fun read(data: ByteArray): List<MetaItem> = try {
+    fun read(data: ByteArray): List<MetaItem> = fields(data).map { (name, texts) ->
+        MetaItem(name, texts.joinToString(", ").take(MAX_VALUE_LENGTH), KEY_PREFIX + name)
+    }
+
+    /** Поля по имени ("Keywords", "City"…) со всеми значениями; повторяемые поля — списком. */
+    fun fields(data: ByteArray): Map<String, List<String>> = try {
         findIim(data)?.let(::parseIim).orEmpty()
     } catch (_: RuntimeException) {
-        emptyList()
+        emptyMap()
     }
 
     /** Ищет APP13 до начала сжатых данных (SOS) и возвращает содержимое ресурса 0x0404. */
@@ -80,7 +85,7 @@ object IptcReader {
         return null
     }
 
-    private fun parseIim(d: ByteArray): List<MetaItem> {
+    private fun parseIim(d: ByteArray): Map<String, List<String>> {
         var utf8 = false
         val values = LinkedHashMap<Int, MutableList<ByteArray>>()
         var p = 0
@@ -103,14 +108,15 @@ object IptcReader {
             count++
             p = start + len
         }
-        return datasets.mapNotNull { (dataset, name) ->
+        val result = LinkedHashMap<String, List<String>>()
+        for ((dataset, name) in datasets) {
             val texts = values[dataset].orEmpty()
                 .map { decode(it, utf8).trim() }
                 .filter { it.isNotEmpty() }
                 .distinct()
-            if (texts.isEmpty()) null
-            else MetaItem(name, texts.joinToString(", ").take(MAX_VALUE_LENGTH), KEY_PREFIX + name)
+            if (texts.isNotEmpty()) result[name] = texts
         }
+        return result
     }
 
     /** UTF-8, если так помечено или байты корректны как UTF-8; иначе Latin-1 (старые файлы). */
