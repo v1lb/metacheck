@@ -471,7 +471,6 @@
     <string name="studio_edit_note">Порожні поля залишаються без змін. Редактор працює з JPEG. Ключові слова, підписи та інші описові поля зберігаються; старі дати, координати та історія правок у XMP/IPTC видаляються. Вихідний файл не змінюється до збереження. Будь-яка правка може зробити підписи C2PA недійсними.</string>
     <string name="studio_edit_save_copy">Зберегти відредаговану копію JPEG</string>
     <string name="studio_edit_overwrite">Замінити JPEG, з резервною копією</string>
-    <string name="studio_batch_eyebrow">Пакетне очищення</string>
     <string name="studio_batch_title">Пакетне очищення</string>
     <string name="studio_batch_text">Очищені копії зберігаються у вибрану папку. Оригінали залишаються без змін.</string>
     <string name="studio_batch_selected">Вибрано: %1$d</string>

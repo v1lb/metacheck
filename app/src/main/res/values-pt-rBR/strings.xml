@@ -469,7 +469,6 @@
     <string name="studio_edit_note">Campos vazios ficam inalterados. O editor funciona com JPEG. Palavras-chave, legendas e outros campos descritivos são mantidos; datas, coordenadas e histórico de edição antigos em XMP/IPTC são removidos. O arquivo original não muda até você salvar. Qualquer edição pode invalidar assinaturas C2PA.</string>
     <string name="studio_edit_save_copy">Salvar uma cópia JPEG editada</string>
     <string name="studio_edit_overwrite">Substituir o JPEG, com backup</string>
-    <string name="studio_batch_eyebrow">Limpeza em lote</string>
     <string name="studio_batch_title">Limpeza em lote</string>
     <string name="studio_batch_text">As cópias limpas são salvas na pasta que você escolher. Os originais não mudam.</string>
     <string name="studio_batch_selected">Selecionadas: %1$d</string>

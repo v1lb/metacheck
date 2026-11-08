@@ -542,7 +542,6 @@ T = {
     'studio_batch_choose_folder_start': 'Klasör seç ve başlat',
     'studio_batch_choose_photos': 'Fotoğraf seç',
     'studio_batch_errors': 'Dosya hataları',
-    'studio_batch_eyebrow': 'Toplu temizleme',
     'studio_batch_file_error': '%1$s: %2$s',
     'studio_batch_free_note': 'Ücretsiz: günlük sınır dahilinde çalıştırma başına %1$d fotoğraf. Pro: çalıştırma başına %2$d, sınırsız.',
     'studio_batch_progress': '%1$d/%2$d · Başarılı: %3$d · Başarısız: %4$d',

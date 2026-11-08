@@ -542,7 +542,6 @@ T = {
     'studio_batch_choose_folder_start': 'フォルダを選んで開始',
     'studio_batch_choose_photos': '写真を選択',
     'studio_batch_errors': 'ファイルのエラー',
-    'studio_batch_eyebrow': '一括クリーニング',
     'studio_batch_file_error': '%1$s：%2$s',
     'studio_batch_free_note': '無料：1回 %1$d 枚まで（1日の上限内）。Pro：1回 %2$d 枚まで、上限なし。',
     'studio_batch_progress': '%1$d/%2$d · 成功：%3$d · 失敗：%4$d',

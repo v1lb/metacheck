@@ -465,7 +465,6 @@
     <string name="studio_edit_note">빈 항목은 변경되지 않습니다. 편집기는 JPEG에서 작동합니다. 키워드, 캡션 등 설명 항목은 유지되고 XMP/IPTC의 이전 날짜, 좌표, 편집 기록은 삭제됩니다. 저장하기 전까지 원본 파일은 바뀌지 않습니다. 편집하면 C2PA 서명이 무효가 될 수 있습니다.</string>
     <string name="studio_edit_save_copy">편집한 JPEG 사본 저장</string>
     <string name="studio_edit_overwrite">JPEG 교체(백업 포함)</string>
-    <string name="studio_batch_eyebrow">일괄 정리</string>
     <string name="studio_batch_title">일괄 정리</string>
     <string name="studio_batch_text">정리된 사본은 선택한 폴더에 저장됩니다. 원본은 변경되지 않습니다.</string>
     <string name="studio_batch_selected">선택됨: %1$d</string>

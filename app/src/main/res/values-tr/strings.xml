@@ -467,7 +467,6 @@
     <string name="studio_edit_note">Boş alanlar değişmez. Düzenleyici JPEG ile çalışır. Anahtar kelimeler, açıklamalar ve diğer tanımlayıcı alanlar korunur; XMP/IPTC içindeki eski tarihler, koordinatlar ve düzenleme geçmişi silinir. Kaydedene kadar kaynak dosya değişmez. Her düzenleme C2PA imzalarını geçersiz kılabilir.</string>
     <string name="studio_edit_save_copy">Düzenlenmiş JPEG kopyasını kaydet</string>
     <string name="studio_edit_overwrite">JPEG’i yedekle birlikte değiştir</string>
-    <string name="studio_batch_eyebrow">Toplu temizleme</string>
     <string name="studio_batch_title">Toplu temizleme</string>
     <string name="studio_batch_text">Temiz kopyalar seçtiğiniz klasöre kaydedilir. Orijinaller değişmez.</string>
     <string name="studio_batch_selected">Seçilen: %1$d</string>

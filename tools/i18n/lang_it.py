@@ -542,7 +542,6 @@ T = {
     'studio_batch_choose_folder_start': 'Scegli la cartella e avvia',
     'studio_batch_choose_photos': 'Scegli le foto',
     'studio_batch_errors': 'Errori dei file',
-    'studio_batch_eyebrow': 'Pulizia in blocco',
     'studio_batch_file_error': '%1$s: %2$s',
     'studio_batch_free_note': 'Gratis: %1$d foto per giro, entro il limite giornaliero. Pro: %2$d per giro, senza limiti.',
     'studio_batch_progress': '%1$d/%2$d · Riusciti: %3$d · Non riusciti: %4$d',

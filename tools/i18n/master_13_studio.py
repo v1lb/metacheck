@@ -58,7 +58,6 @@ S = [
     ("studio_edit_save_copy", "Save an edited JPEG copy", "Сохранить изменённую копию JPEG"),
     ("studio_edit_overwrite", "Replace the JPEG, with a backup", "Перезаписать JPEG с резервной копией"),
 
-    ("studio_batch_eyebrow", "Batch cleaning", "Пакетная очистка"),
     ("studio_batch_title", "Batch cleaning", "Массовая очистка"),
     ("studio_batch_text",
      "Clean copies are saved to the folder you choose. The originals stay unchanged.",

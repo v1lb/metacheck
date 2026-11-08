@@ -542,7 +542,6 @@ T = {
     'studio_batch_choose_folder_start': 'Wybierz folder i rozpocznij',
     'studio_batch_choose_photos': 'Wybierz zdjęcia',
     'studio_batch_errors': 'Błędy plików',
-    'studio_batch_eyebrow': 'Czyszczenie wsadowe',
     'studio_batch_file_error': '%1$s: %2$s',
     'studio_batch_free_note': 'Za darmo: %1$d zdjęć na przebieg, w ramach dziennego limitu. Pro: %2$d na przebieg, bez limitu.',
     'studio_batch_progress': '%1$d/%2$d · Udane: %3$d · Nieudane: %4$d',

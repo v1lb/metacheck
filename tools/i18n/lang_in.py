@@ -542,7 +542,6 @@ T = {
     'studio_batch_choose_folder_start': 'Pilih folder dan mulai',
     'studio_batch_choose_photos': 'Pilih foto',
     'studio_batch_errors': 'Kesalahan file',
-    'studio_batch_eyebrow': 'Pembersihan massal',
     'studio_batch_file_error': '%1$s: %2$s',
     'studio_batch_free_note': 'Gratis: %1$d foto per proses, dalam batas harian. Pro: %2$d per proses, tanpa batas.',
     'studio_batch_progress': '%1$d/%2$d · Berhasil: %3$d · Gagal: %4$d',

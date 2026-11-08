@@ -542,7 +542,6 @@ T = {
     'studio_batch_choose_folder_start': 'Choisir un dossier et démarrer',
     'studio_batch_choose_photos': 'Choisir des photos',
     'studio_batch_errors': 'Erreurs de fichiers',
-    'studio_batch_eyebrow': 'Nettoyage par lot',
     'studio_batch_file_error': '%1$s : %2$s',
     'studio_batch_free_note': 'Gratuit : %1$d photos par lot, dans la limite quotidienne. Pro : %2$d par lot, sans limite.',
     'studio_batch_progress': '%1$d/%2$d · Réussis : %3$d · Échecs : %4$d',

@@ -472,7 +472,6 @@ fun MetadataStudioScreen(
             item {
                 GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
                     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        CyberEyebrow(stringResource(R.string.studio_batch_eyebrow))
                         Text(stringResource(R.string.studio_batch_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
                         Text(stringResource(R.string.studio_batch_text),
                             color = MaterialTheme.colorScheme.onSurfaceVariant)

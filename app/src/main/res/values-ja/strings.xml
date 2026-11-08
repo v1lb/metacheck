@@ -465,7 +465,6 @@
     <string name="studio_edit_note">空欄の項目は変更されません。エディターは JPEG に対応しています。キーワード、キャプションなどの説明フィールドは保持され、XMP/IPTC 内の古い日付、座標、編集履歴は削除されます。保存するまで元のファイルは変更されません。編集により C2PA 署名が無効になる場合があります。</string>
     <string name="studio_edit_save_copy">編集したJPEGのコピーを保存</string>
     <string name="studio_edit_overwrite">JPEGを置き換える（バックアップあり）</string>
-    <string name="studio_batch_eyebrow">一括クリーニング</string>
     <string name="studio_batch_title">一括クリーニング</string>
     <string name="studio_batch_text">クリーンなコピーは選んだフォルダに保存されます。元のファイルは変更されません。</string>
     <string name="studio_batch_selected">選択済み：%1$d</string>

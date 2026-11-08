@@ -542,7 +542,6 @@ T = {
     'studio_batch_choose_folder_start': '폴더를 선택하고 시작',
     'studio_batch_choose_photos': '사진 선택',
     'studio_batch_errors': '파일 오류',
-    'studio_batch_eyebrow': '일괄 정리',
     'studio_batch_file_error': '%1$s: %2$s',
     'studio_batch_free_note': '무료: 실행당 %1$d장, 일일 한도 내. Pro: 실행당 %2$d장, 제한 없음.',
     'studio_batch_progress': '%1$d/%2$d · 성공: %3$d · 실패: %4$d',

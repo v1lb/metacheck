@@ -542,7 +542,6 @@ T = {
     'studio_batch_choose_folder_start': 'Ordner wählen und starten',
     'studio_batch_choose_photos': 'Fotos auswählen',
     'studio_batch_errors': 'Dateifehler',
-    'studio_batch_eyebrow': 'Stapelbereinigung',
     'studio_batch_file_error': '%1$s: %2$s',
     'studio_batch_free_note': 'Kostenlos: %1$d Fotos pro Durchlauf, im Rahmen des Tageslimits. Pro: %2$d pro Durchlauf, ohne Limit.',
     'studio_batch_progress': '%1$d/%2$d · Erfolgreich: %3$d · Fehlgeschlagen: %4$d',

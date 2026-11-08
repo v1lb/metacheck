@@ -465,7 +465,6 @@
     <string name="studio_edit_note">留空的字段保持不变。编辑器适用于 JPEG。关键词、说明等描述性字段会保留；XMP/IPTC 中旧的日期、坐标和编辑历史会被删除。保存之前不会更改原文件。任何编辑都可能使 C2PA 签名失效。</string>
     <string name="studio_edit_save_copy">保存编辑后的 JPEG 副本</string>
     <string name="studio_edit_overwrite">替换 JPEG（含备份）</string>
-    <string name="studio_batch_eyebrow">批量清理</string>
     <string name="studio_batch_title">批量清理</string>
     <string name="studio_batch_text">清理后的副本保存到你选择的文件夹，原文件保持不变。</string>
     <string name="studio_batch_selected">已选择：%1$d</string>

@@ -542,7 +542,6 @@ T = {
     'studio_batch_choose_folder_start': '选择文件夹并开始',
     'studio_batch_choose_photos': '选择照片',
     'studio_batch_errors': '文件错误',
-    'studio_batch_eyebrow': '批量清理',
     'studio_batch_file_error': '%1$s：%2$s',
     'studio_batch_free_note': '免费：每次 %1$d 张，计入每日限额。Pro：每次 %2$d 张，不限次数。',
     'studio_batch_progress': '%1$d/%2$d · 成功：%3$d · 失败：%4$d',

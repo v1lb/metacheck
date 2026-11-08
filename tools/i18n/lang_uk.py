@@ -542,7 +542,6 @@ T = {
     'studio_batch_choose_folder_start': 'Вибрати папку й почати',
     'studio_batch_choose_photos': 'Вибрати фото',
     'studio_batch_errors': 'Помилки файлів',
-    'studio_batch_eyebrow': 'Пакетне очищення',
     'studio_batch_file_error': '%1$s: %2$s',
     'studio_batch_free_note': 'Безкоштовно — %1$d фото за запуск, у межах денного ліміту. Pro — %2$d за запуск, без ліміту.',
     'studio_batch_progress': '%1$d/%2$d · Успішно: %3$d · Помилки: %4$d',

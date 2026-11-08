@@ -1,6 +1,11 @@
 # Google Play release notes (up to 500 characters per language)
 
 ## ru-RU
+Версия 2.10.0
+• HEIC и WebP очищаются без пережатия: качество и размер прежние
+• «Проверить всю папку» прямо на главном экране
+• Сдвиг даты съёмки у нескольких фото сразу (Pro)
+
 Версия 2.9.0
 • Проверка всей папки: сколько фото выдают место, серийный номер и имя
 • Пакетная очистка бесплатно — по 5 фото за раз
@@ -28,6 +33,11 @@
 • Раздел «О приложении»: политика, условия, лицензии
 
 ## en-US
+Version 2.10.0
+• HEIC and WebP are cleaned without re-encoding: same quality and size
+• "Check a whole folder" right on the home screen
+• Shift the date taken for several photos at once (Pro)
+
 Version 2.9.0
 • Check a whole folder: how many photos give away location, serial number and name
 • Free batch cleaning, 5 photos at a time

@@ -468,7 +468,6 @@
     <string name="studio_edit_note">Empty fields stay unchanged. The editor works with JPEG. Keywords, captions and other descriptive fields are kept; old dates, coordinates and edit history in XMP/IPTC are removed. Nothing changes in the source file until you save. Any edit may invalidate C2PA signatures.</string>
     <string name="studio_edit_save_copy">Save an edited JPEG copy</string>
     <string name="studio_edit_overwrite">Replace the JPEG, with a backup</string>
-    <string name="studio_batch_eyebrow">Batch cleaning</string>
     <string name="studio_batch_title">Batch cleaning</string>
     <string name="studio_batch_text">Clean copies are saved to the folder you choose. The originals stay unchanged.</string>
     <string name="studio_batch_selected">Selected: %1$d</string>
