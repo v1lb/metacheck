@@ -209,6 +209,7 @@
     <string name="failure_format_unconfirmed">파일 시그니처가 JPEG 또는 PNG 이미지임을 확인하지 못했습니다</string>
     <string name="failure_format_unconfirmed_type">파일 시그니처가 JPEG 또는 PNG 이미지임을 확인하지 못했습니다(제공자 유형: %1$s)</string>
     <string name="failure_unsupported_image">지원되지 않는 이미지 형식</string>
+    <string name="failure_no_date_to_shift">이 사진에는 이동할 촬영 날짜가 없습니다</string>
     <string name="failure_edit_jpeg_only">EXIF 편집기는 JPEG에서 작동합니다. PNG/HEIC/AVIF는 현재 새 사본으로 완전히 정리하는 것만 가능합니다</string>
     <string name="failure_overwrite_edit_jpeg_only">덮어쓰기로 EXIF 편집은 JPEG에서 지원됩니다</string>
     <string name="failure_overwrite_strip_jpeg_png_only">정리 중 덮어쓰기는 JPEG와 PNG만 지원합니다. 다른 형식은 새 사본으로 저장하세요</string>
@@ -381,6 +382,7 @@
     <string name="main_api_empty_response">빈 응답</string>
     <string name="dash_title">사진이 무엇을 드러낼까요?</string>
     <string name="dash_subtitle">파일 안에 숨은 위치, 카메라, 작성자, AI 라벨. 보내기 전에 확인하고 제거하세요.</string>
+    <string name="dash_audit_text">폴더의 사진 중 몇 장이 촬영 위치를 드러내는지 확인하세요.</string>
     <string name="dash_scan_hint">원본 JPEG, PNG, HEIC 또는 MP4/MOV 동영상을 선택하세요. 스크린샷은 이미 일부 데이터가 사라진 상태입니다.</string>
     <string name="dash_choose_photo">사진 또는 동영상 확인</string>
     <string name="dash_camera">카메라</string>
@@ -503,6 +505,14 @@
     <string name="studio_msg_verified">기록이 확인되었습니다.</string>
     <string name="studio_msg_not_verified">기록을 다시 확인할 수 없습니다. 파일을 직접 열어 보세요.</string>
     <string name="studio_msg_downscaled">안전한 처리를 위해 해상도를 낮췄습니다.</string>
+    <string name="studio_msg_shift_done">날짜 이동 완료: 저장 %1$d개, 실패 %2$d개.</string>
+    <string name="studio_shift_title">촬영 날짜 이동</string>
+    <string name="studio_shift_text">카메라 시계나 시간대가 잘못되었을 때 선택한 JPEG 사진에 사용합니다. 새 날짜의 사본이 선택한 폴더에 같은 이름으로 저장됩니다.</string>
+    <string name="studio_shift_hours">시간</string>
+    <string name="studio_shift_minutes">분</string>
+    <string name="studio_shift_run">폴더 선택 후 이동</string>
+    <string name="studio_shift_invalid">시간과 분(0–59)을 입력하세요. 최대 1년입니다.</string>
+    <string name="studio_shift_pro">Pro에서 사용할 수 있습니다.</string>
     <string name="studio_msg_batch_done">일괄 정리 완료: %1$d개 저장, %2$d개 실패.</string>
     <string name="studio_msg_interrupted">작업이 중단되었습니다. 시스템이 앱을 다시 시작했습니다. 다시 시도하세요. 생성된 빈 파일은 삭제해도 됩니다</string>
 

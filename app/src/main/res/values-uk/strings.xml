@@ -209,6 +209,7 @@
     <string name="failure_format_unconfirmed">Сигнатура файлу не підтверджує зображення JPEG або PNG</string>
     <string name="failure_format_unconfirmed_type">Сигнатура файлу не підтверджує зображення JPEG або PNG (тип від постачальника: %1$s)</string>
     <string name="failure_unsupported_image">Непідтримуваний формат зображення</string>
+    <string name="failure_no_date_to_shift">У фото немає дати зйомки, яку можна зсунути</string>
     <string name="failure_edit_jpeg_only">Редактор EXIF працює з JPEG; PNG/HEIC/AVIF поки можна лише повністю очистити як нову копію</string>
     <string name="failure_overwrite_edit_jpeg_only">Редагування EXIF з перезаписом підтримується для JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Перезапис під час очищення підтримує лише JPEG і PNG: інші формати збережіть як нову копію</string>
@@ -387,6 +388,7 @@
     <string name="main_api_empty_response">Порожня відповідь</string>
     <string name="dash_title">Що видає ваше фото?</string>
     <string name="dash_subtitle">Місце зйомки, камера, автор і мітки ШІ всередині файлу. Перевірте й видаліть їх перед надсиланням.</string>
+    <string name="dash_audit_text">Дізнайтеся, скільки фото в папці видають, де їх знято.</string>
     <string name="dash_scan_hint">Вибирайте оригінальний JPEG, PNG, HEIC або відео MP4/MOV: у знімку екрана частина даних уже втрачена.</string>
     <string name="dash_choose_photo">Перевірити фото або відео</string>
     <string name="dash_camera">Камера</string>
@@ -509,6 +511,14 @@
     <string name="studio_msg_verified">Запис перевірено.</string>
     <string name="studio_msg_not_verified">Не вдалося повторно перевірити запис: відкрийте файл вручну.</string>
     <string name="studio_msg_downscaled">Роздільність зменшено для безпечної обробки.</string>
+    <string name="studio_msg_shift_done">Дати зсунуто: збережено %1$d, помилок %2$d.</string>
+    <string name="studio_shift_title">Зсунути дату зйомки</string>
+    <string name="studio_shift_text">Для вибраних фото JPEG, якщо в камері був неправильний час або часовий пояс. Копії з новою датою зберігаються у вибрану папку під тими самими назвами.</string>
+    <string name="studio_shift_hours">Години</string>
+    <string name="studio_shift_minutes">Хвилини</string>
+    <string name="studio_shift_run">Вибрати папку й зсунути</string>
+    <string name="studio_shift_invalid">Вкажіть години та хвилини (0–59), не більше року.</string>
+    <string name="studio_shift_pro">Доступно в Pro.</string>
     <string name="studio_msg_batch_done">Пакетне очищення завершено: збережено %1$d, помилок %2$d.</string>
     <string name="studio_msg_interrupted">Операцію перервано: система перезапустила застосунок. Спробуйте ще раз; створений порожній файл можна видалити</string>
 

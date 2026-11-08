@@ -36,6 +36,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.Text
 import androidx.compose.ui.res.stringResource
+import com.example.metacheck.domain.model.ImageFormat
 import com.example.metacheck.R
 import com.example.metacheck.domain.metadata.DailyCleanQuota
 import com.example.metacheck.ui.text.ErrorTexts
@@ -85,6 +86,9 @@ fun MetadataStudioScreen(
     isPro: Boolean,
     onUpgrade: () -> Unit,
     onBack: () -> Unit,
+    startAudit: Boolean = false,
+    onAuditStarted: () -> Unit = {},
+    startInBatch: Boolean = false,
     vm: MetadataStudioViewModel = viewModel(factory = MetadataStudioViewModel.Factory),
 ) {
     val context = LocalContext.current
@@ -94,7 +98,7 @@ fun MetadataStudioScreen(
     val usedToday by vm.usedToday.collectAsStateWithLifecycle()
     val audit by vm.audit.collectAsStateWithLifecycle()
     val perRun = com.example.metacheck.domain.metadata.BatchLimits.perRun(isPro, usedToday)
-    var mode by rememberSaveable { mutableStateOf(StudioMode.STRIP) }
+    var mode by rememberSaveable { mutableStateOf(if (startInBatch) StudioMode.BATCH else StudioMode.STRIP) }
     var source by rememberSaveable { mutableStateOf(initialUri.orEmpty()) }
     var batchSources by rememberSaveable { mutableStateOf(emptyList<String>()) }
     var worldPicker by remember { mutableStateOf(false) }
@@ -122,7 +126,7 @@ fun MetadataStudioScreen(
             if (source.isEmpty()) null else runCatching {
                 val uri = Uri.parse(source)
                 context.contentResolver.openInputStream(uri)?.use { stream ->
-                    val header = ByteArray(8)
+                    val header = ByteArray(16)
                     var count = 0
                     while (count < header.size) {
                         val n = stream.read(header, count, header.size - count)
@@ -130,9 +134,11 @@ fun MetadataStudioScreen(
                         if (n == 0) continue
                         count += n
                     }
-                    when {
-                        count >= 3 && header[0] == 0xFF.toByte() && header[1] == 0xD8.toByte() && header[2] == 0xFF.toByte() -> "image/jpeg"
-                        count == 8 && header.toList() == listOf(137, 80, 78, 71, 13, 10, 26, 10).map { it.toByte() } -> "image/png"
+                    when (com.example.metacheck.data.parser.ImageFormatDetector.detect(header, count)) {
+                        ImageFormat.JPEG -> "image/jpeg"
+                        ImageFormat.PNG -> "image/png"
+                        ImageFormat.WEBP -> "image/webp"
+                        ImageFormat.HEIC -> "image/heic"
                         else -> context.contentResolver.getType(uri)?.lowercase(Locale.ROOT)
                     }
                 }
@@ -237,6 +243,25 @@ fun MetadataStudioScreen(
             vm.auditFolder(tree) { risky -> batchSources = risky.take(MAX_QUEUE) }
         }
     }
+    LaunchedEffect(startAudit) {
+        if (startAudit) {
+            mode = StudioMode.BATCH
+            onAuditStarted()
+            if (!vm.audit.value.running) chooseAuditTree.launch(null)
+        }
+    }
+    var shiftBack by rememberSaveable { mutableStateOf(false) }
+    var shiftHours by rememberSaveable { mutableStateOf("") }
+    var shiftMinutes by rememberSaveable { mutableStateOf("") }
+    var pendingShift by rememberSaveable { mutableStateOf<Long?>(null) }
+    val chooseShiftTree = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { folder ->
+        val seconds = pendingShift
+        pendingShift = null
+        val run = batchSources.take(com.example.metacheck.domain.metadata.BatchLimits.PRO_PER_RUN)
+        if (folder != null && seconds != null && run.isNotEmpty()) {
+            vm.shiftDates(run, folder, seconds) { batchSources = batchSources.filterNot { it in run } }
+        }
+    }
     val chooseTree = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { folder ->
         val run = batchSources.take(perRun)
         if (folder != null && run.isNotEmpty()) {
@@ -247,6 +272,13 @@ fun MetadataStudioScreen(
         if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
     }
     val saveCleanPng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
+        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
+    }
+    // WebP и HEIC чистятся без пережатия и остаются в своём формате.
+    val saveCleanWebp = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/webp")) { uri ->
+        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
+    }
+    val saveCleanHeic = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/heic")) { uri ->
         if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
     }
     // Операция и её параметры берутся только из ViewModel (SavedStateHandle), а не из состояния Composable:
@@ -363,8 +395,12 @@ fun MetadataStudioScreen(
                             if (source.isNotBlank() && !busy) {
                                 val error = formatError(jpegOnly = false, overwrite = false)
                                 if (error != null) actionError = error
-                                else if (sourceIsJpeg) saveCleanJpeg.launch("metacheck-clean-${System.currentTimeMillis()}.jpg")
-                                else saveCleanPng.launch("metacheck-clean-${System.currentTimeMillis()}.png")
+                                else when (selectedMime) {
+                                    "image/jpeg" -> saveCleanJpeg.launch("metacheck-clean-${System.currentTimeMillis()}.jpg")
+                                    "image/webp" -> saveCleanWebp.launch("metacheck-clean-${System.currentTimeMillis()}.webp")
+                                    "image/heic" -> saveCleanHeic.launch("metacheck-clean-${System.currentTimeMillis()}.heic")
+                                    else -> saveCleanPng.launch("metacheck-clean-${System.currentTimeMillis()}.png")
+                                }
                             }
                         }, modifier = Modifier.fillMaxWidth())
                         CyberOutlineButton(stringResource(R.string.studio_strip_overwrite), {
@@ -477,6 +513,44 @@ fun MetadataStudioScreen(
                                 color = MaterialTheme.colorScheme.onSurface)
                             if (batch.current.isNotBlank()) Text(batch.current, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
+                    }
+                }
+            }
+            item {
+                // Сдвиг даты у выбранных фото: камера была в другом часовом поясе или с неверным временем.
+                GlassPanel(Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text(stringResource(R.string.studio_shift_title), style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(R.string.studio_shift_text), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.weight(1.1f)) {
+                                StudioTab("+", !shiftBack) { shiftBack = false }
+                                StudioTab("−", shiftBack) { shiftBack = true }
+                            }
+                            OutlinedTextField(shiftHours, { shiftHours = it.filter(Char::isDigit).take(4) },
+                                Modifier.weight(1f), label = { Text(stringResource(R.string.studio_shift_hours)) }, singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(4.dp))
+                            OutlinedTextField(shiftMinutes, { shiftMinutes = it.filter(Char::isDigit).take(2) },
+                                Modifier.weight(1f), label = { Text(stringResource(R.string.studio_shift_minutes)) }, singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(4.dp))
+                        }
+                        val shiftRun = minOf(batchSources.size, com.example.metacheck.domain.metadata.BatchLimits.PRO_PER_RUN)
+                        if (batchSources.isNotEmpty()) Text(stringResource(R.string.studio_batch_run_size, shiftRun),
+                            style = com.example.metacheck.ui.theme.MonoText.tag, color = MaterialTheme.colorScheme.onSurface)
+                        NeonButton(stringResource(R.string.studio_shift_run), {
+                            val seconds = com.example.metacheck.domain.metadata.DateShift.seconds(shiftBack, shiftHours, shiftMinutes)
+                            when {
+                                busy || audit.running -> Unit
+                                !isPro -> onUpgrade()
+                                batchSources.isEmpty() -> actionError = UiText.Res(R.string.studio_batch_choose_files_first)
+                                seconds == null -> actionError = UiText.Res(R.string.studio_shift_invalid)
+                                else -> { pendingShift = seconds; chooseShiftTree.launch(null) }
+                            }
+                        }, Modifier.fillMaxWidth())
+                        if (!isPro) Text(stringResource(R.string.studio_shift_pro), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }

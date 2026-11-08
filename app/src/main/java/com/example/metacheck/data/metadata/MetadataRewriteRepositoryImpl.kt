@@ -21,6 +21,8 @@ import com.example.metacheck.domain.metadata.MetadataPatch
 import com.example.metacheck.domain.metadata.MetadataRewriteRepository
 import com.example.metacheck.domain.metadata.MetadataWriteResult
 import com.example.metacheck.data.parser.ImageFormatDetector
+import com.example.metacheck.domain.model.ImageFormat
+import com.example.metacheck.domain.metadata.DateShift
 import com.example.metacheck.data.video.Mp4Cleaner
 import com.example.metacheck.data.video.Mp4FormatException
 import com.example.metacheck.data.video.VideoFiles
@@ -53,7 +55,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         ensure(src != dst, FailureCode.SAME_AS_SOURCE)
         val stage = createTemp("strip", ".img")
         try {
-            val prepared = renderClean(src, stage)
+            val prepared = cleanImage(src, stage, allowFallback = false)
             ensure(verifyNoMetadata(stage, prepared.mime), FailureCode.CLEAN_CHECK_FAILED)
             writeDocument(dst, stage, allowNewFileFallback = true)
             // A copied image is NOT a successful privacy operation until the
@@ -160,6 +162,44 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
 
     override suspend fun stripBatch(
         sources: List<String>, destinationTree: String, progress: (BatchProgress) -> Unit,
+    ): BatchProgress = runBatch(sources, destinationTree, progress) { src, stage, label, index ->
+        val prepared = cleanImage(src, stage, allowFallback = true)
+        if (!verifyNoMetadata(stage, prepared.mime)) throw AppFailure(FailureCode.CLEAN_CHECK_FAILED)
+        prepared.mime to uniqueName(label, extensionFor(prepared.mime), index)
+    }
+
+    /**
+     * Сдвиг даты съёмки у нескольких JPEG: DateTimeOriginal, DateTimeDigitized и DateTime смещаются на
+     * [shiftSeconds]. Копии сохраняются в папку [destinationTree] под прежними именами, оригиналы не меняются.
+     * Ключевые слова и подписи сохраняются, как при обычной правке.
+     */
+    override suspend fun shiftDatesBatch(
+        sources: List<String>, destinationTree: String, shiftSeconds: Long, progress: (BatchProgress) -> Unit,
+    ): BatchProgress = runBatch(sources, destinationTree, progress) { src, stage, label, _ ->
+        ensure(readMime(src) == "image/jpeg", FailureCode.EDIT_JPEG_ONLY)
+        val dates = resolver.openInputStream(src)?.use { stream ->
+            val exif = ExifInterface(stream)
+            listOf(ExifInterface.TAG_DATETIME_ORIGINAL, ExifInterface.TAG_DATETIME_DIGITIZED, ExifInterface.TAG_DATETIME)
+                .associateWith { exif.getAttribute(it)?.let { v -> DateShift.shift(v, shiftSeconds) } }
+        } ?: throw AppFailure(FailureCode.CANNOT_READ_SOURCE)
+        ensure(dates.values.any { it != null }, FailureCode.NO_DATE_TO_SHIFT)
+        prepareEdited(src, stage, MetadataPatch(
+            dateTaken = dates[ExifInterface.TAG_DATETIME_ORIGINAL],
+            dateDigitized = dates[ExifInterface.TAG_DATETIME_DIGITIZED],
+        ))
+        dates[ExifInterface.TAG_DATETIME]?.let { shifted ->
+            ExifInterface(stage.absolutePath).apply { setAttribute(ExifInterface.TAG_DATETIME, shifted); saveAttributes() }
+        }
+        val base = label.substringBeforeLast('.', label)
+            .map { if (it.isLetterOrDigit() || it == '_' || it == '-') it else '_' }
+            .joinToString("").take(80).ifBlank { "photo" }
+        "image/jpeg" to "$base.jpg"
+    }
+
+    /** Общий цикл пакета: файл за файлом, ошибки копятся, недописанный файл удаляется. */
+    private suspend fun runBatch(
+        sources: List<String>, destinationTree: String, progress: (BatchProgress) -> Unit,
+        produce: (src: Uri, stage: File, label: String, index: Int) -> Pair<String, String>,
     ): BatchProgress = withContext(Dispatchers.IO) {
         ensure(sources.size in 1..50, FailureCode.BATCH_SIZE)
         val tree = checkedUri(destinationTree)
@@ -174,14 +214,12 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             val stage = createTemp("batch", ".img")
             var target: Uri? = null
             try {
-                val prepared = renderClean(checkedUri(raw), stage)
-                if (!verifyNoMetadata(stage, prepared.mime)) throw AppFailure(FailureCode.CLEAN_CHECK_FAILED)
-                val ext = if (prepared.mime == "image/jpeg") "jpg" else "png"
-                val name = uniqueName(label, ext, index)
-                target = DocumentsContract.createDocument(resolver, root, prepared.mime, name)
+                val (mime, name) = produce(checkedUri(raw), stage, label, index)
+                target = DocumentsContract.createDocument(resolver, root, mime, name)
                     ?: throw AppFailure(FailureCode.CANNOT_CREATE_IN_FOLDER)
                 writeDocument(target, stage, allowNewFileFallback = true)
                 if (!verifySameFile(stage, target)) throw AppFailure(FailureCode.SAVED_FILE_UNVERIFIED)
+                refreshGallery(target)
                 report = report.copy(succeeded = report.succeeded + 1)
             } catch (e: CancellationException) {
                 target?.let { runCatching { DocumentsContract.deleteDocument(resolver, it) } }
@@ -391,8 +429,50 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
 
     private data class Prepared(val mime: String, val downscaled: Boolean) {
         fun asResult(bytes: Long, verified: Boolean) = MetadataWriteResult(
-            bytes, downscaled, if (mime == "image/jpeg") "JPEG" else "PNG", verified,
+            bytes, downscaled, when (mime) { "image/jpeg" -> "JPEG"; "image/webp" -> "WebP"; "image/heic" -> "HEIC"; else -> "PNG" }, verified,
         )
+    }
+
+    /**
+     * WebP и HEIC чистятся без пережатия (качество и размер сохраняются), остальное — через [renderClean].
+     * [allowFallback]: если формат файла назначения не задан заранее (пакет), при сбое можно пережать в PNG/JPEG.
+     */
+    private fun cleanImage(source: Uri, output: File, allowFallback: Boolean): Prepared {
+        val format = runCatching {
+            resolver.openInputStream(source)?.use { stream ->
+                val head = ByteArray(32)
+                var n = 0
+                while (n < head.size) { val r = stream.read(head, n, head.size - n); if (r < 0) break; n += r }
+                ImageFormatDetector.detect(head, n)
+            }
+        }.getOrNull()
+        val lossless: ((File, File) -> Unit)? = when (format) {
+            ImageFormat.WEBP -> WebpCleaner::strip
+            ImageFormat.HEIC -> HeifCleaner::strip
+            else -> null
+        }
+        if (lossless == null) return renderClean(source, output)
+        val mime = if (format == ImageFormat.WEBP) "image/webp" else "image/heic"
+        val raw = createTemp("lossless_source", ".bin")
+        try {
+            copyUriToFile(source, raw)
+            lossless(raw, output)
+            // Картинка должна по-прежнему открываться.
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(output.absolutePath, bounds)
+            if (Build.VERSION.SDK_INT >= 28 && (bounds.outWidth <= 0 || bounds.outHeight <= 0)) throw AppFailure(FailureCode.DECODE_FAILED)
+            return Prepared(mime, false)
+        } catch (e: java.io.IOException) {
+            if (!allowFallback) throw AppFailure(FailureCode.CLEAN_CHECK_FAILED, cause = e)
+            return renderClean(source, output)
+        } finally { raw.delete() }
+    }
+
+    private fun extensionFor(mime: String) = when (mime) {
+        "image/jpeg" -> "jpg"
+        "image/webp" -> "webp"
+        "image/heic" -> "heic"
+        else -> "png"
     }
 
     private fun renderClean(source: Uri, output: File): Prepared {
@@ -475,8 +555,12 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
-    private fun verifyNoMetadata(source: File, mime: String): Boolean =
-        if (mime == "image/jpeg") JpegSegments.isStrippedJpeg(source) else hasOnlyImagePngChunks(source)
+    private fun verifyNoMetadata(source: File, mime: String): Boolean = when (mime) {
+        "image/jpeg" -> JpegSegments.isStrippedJpeg(source)
+        "image/webp" -> WebpCleaner.isClean(source)
+        "image/heic" -> HeifCleaner.isClean(source)
+        else -> hasOnlyImagePngChunks(source)
+    }
 
     private fun hasOnlyImagePngChunks(file: File): Boolean =
         BufferedInputStream(FileInputStream(file)).use(PngCleanCheck::isClean)

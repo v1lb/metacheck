@@ -209,6 +209,7 @@
     <string name="failure_format_unconfirmed">La signature du fichier ne confirme pas une image JPEG ou PNG</string>
     <string name="failure_format_unconfirmed_type">La signature du fichier ne confirme pas une image JPEG ou PNG (type du fournisseur : %1$s)</string>
     <string name="failure_unsupported_image">Format d’image non pris en charge</string>
+    <string name="failure_no_date_to_shift">La photo n’a pas de date de prise de vue à décaler</string>
     <string name="failure_edit_jpeg_only">L’éditeur EXIF fonctionne avec JPEG ; pour l’instant, PNG/HEIC/AVIF peuvent seulement être entièrement nettoyés en nouvelle copie</string>
     <string name="failure_overwrite_edit_jpeg_only">La modification EXIF avec écrasement est prise en charge pour JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">L’écrasement lors du nettoyage ne prend en charge que JPEG et PNG : enregistrez les autres formats en nouvelle copie</string>
@@ -385,6 +386,7 @@
     <string name="main_api_empty_response">Réponse vide</string>
     <string name="dash_title">Que révèle votre photo ?</string>
     <string name="dash_subtitle">Position, appareil, auteur et étiquettes IA cachés dans le fichier. Vérifiez-les et supprimez-les avant d’envoyer.</string>
+    <string name="dash_audit_text">Découvrez combien de photos d’un dossier révèlent où elles ont été prises.</string>
     <string name="dash_scan_hint">Choisissez le JPEG, PNG ou HEIC d’origine ou une vidéo MP4/MOV : une capture d’écran a déjà perdu une partie des données.</string>
     <string name="dash_choose_photo">Vérifier une photo ou une vidéo</string>
     <string name="dash_camera">Appareil photo</string>
@@ -507,6 +509,14 @@
     <string name="studio_msg_verified">Écriture vérifiée.</string>
     <string name="studio_msg_not_verified">Impossible de revérifier l’écriture : ouvrez le fichier manuellement.</string>
     <string name="studio_msg_downscaled">La résolution a été réduite pour un traitement sûr.</string>
+    <string name="studio_msg_shift_done">Dates décalées : %1$d enregistrées, %2$d en échec.</string>
+    <string name="studio_shift_title">Décaler la date de prise de vue</string>
+    <string name="studio_shift_text">Pour les photos JPEG sélectionnées, si l’heure ou le fuseau de l’appareil étaient faux. Les copies avec la nouvelle date sont enregistrées dans le dossier choisi, sous les mêmes noms.</string>
+    <string name="studio_shift_hours">Heures</string>
+    <string name="studio_shift_minutes">Minutes</string>
+    <string name="studio_shift_run">Choisir un dossier et décaler</string>
+    <string name="studio_shift_invalid">Indiquez les heures et minutes (0–59), un an maximum.</string>
+    <string name="studio_shift_pro">Disponible dans Pro.</string>
     <string name="studio_msg_batch_done">Nettoyage par lot terminé : %1$d enregistrées, %2$d en échec.</string>
     <string name="studio_msg_interrupted">Opération interrompue : le système a redémarré l’application. Réessayez ; vous pouvez supprimer le fichier vide créé</string>
 

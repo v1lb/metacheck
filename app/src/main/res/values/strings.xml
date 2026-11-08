@@ -210,6 +210,7 @@
     <string name="failure_format_unconfirmed">The file signature does not confirm a JPEG or PNG image</string>
     <string name="failure_format_unconfirmed_type">The file signature does not confirm a JPEG or PNG image (provider type: %1$s)</string>
     <string name="failure_unsupported_image">Unsupported image format</string>
+    <string name="failure_no_date_to_shift">The photo has no date taken to shift</string>
     <string name="failure_edit_jpeg_only">The EXIF editor works with JPEG; PNG/HEIC/AVIF can be fully cleaned as a new copy for now</string>
     <string name="failure_overwrite_edit_jpeg_only">Editing EXIF with overwrite is supported for JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Overwrite during cleaning supports only JPEG and PNG: save other formats as a new copy</string>
@@ -384,6 +385,7 @@
     <string name="main_api_empty_response">Empty response</string>
     <string name="dash_title">What does your photo reveal?</string>
     <string name="dash_subtitle">Location, camera, author and AI labels hidden in the file. Check them and remove them before you send.</string>
+    <string name="dash_audit_text">Find out how many photos in a folder give away where they were taken.</string>
     <string name="dash_scan_hint">Choose the original JPEG, PNG, HEIC or MP4/MOV video: a screenshot has already lost part of the data.</string>
     <string name="dash_choose_photo">Check a photo or video</string>
     <string name="dash_camera">Camera</string>
@@ -506,6 +508,14 @@
     <string name="studio_msg_verified">Write verified.</string>
     <string name="studio_msg_not_verified">Could not re-check the write: open the file manually.</string>
     <string name="studio_msg_downscaled">The resolution was reduced for safe processing.</string>
+    <string name="studio_msg_shift_done">Dates shifted: %1$d saved, %2$d failed.</string>
+    <string name="studio_shift_title">Shift the date taken</string>
+    <string name="studio_shift_text">For the selected JPEG photos, if the camera clock or time zone was wrong. Copies with the new date are saved to the folder you choose, under the same names.</string>
+    <string name="studio_shift_hours">Hours</string>
+    <string name="studio_shift_minutes">Minutes</string>
+    <string name="studio_shift_run">Choose a folder and shift</string>
+    <string name="studio_shift_invalid">Enter hours and minutes (0–59), up to one year.</string>
+    <string name="studio_shift_pro">Available in Pro.</string>
     <string name="studio_msg_batch_done">Batch cleaning finished: %1$d saved, %2$d failed.</string>
     <string name="studio_msg_interrupted">Operation interrupted: the app was restarted by the system. Please try again; you can delete the empty file that was created</string>
 

@@ -130,6 +130,7 @@ object ErrorTexts {
                 else UiText.Res(R.string.failure_format_unconfirmed_type, arg)
             FailureCode.UNSUPPORTED_IMAGE -> UiText.Res(R.string.failure_unsupported_image)
             FailureCode.EDIT_JPEG_ONLY -> UiText.Res(R.string.failure_edit_jpeg_only)
+            FailureCode.NO_DATE_TO_SHIFT -> UiText.Res(R.string.failure_no_date_to_shift)
             FailureCode.OVERWRITE_EDIT_JPEG_ONLY -> UiText.Res(R.string.failure_overwrite_edit_jpeg_only)
             FailureCode.OVERWRITE_STRIP_JPEG_PNG_ONLY -> UiText.Res(R.string.failure_overwrite_strip_jpeg_png_only)
             FailureCode.WIPE_GPS_JPEG_PNG_ONLY -> UiText.Res(R.string.failure_wipe_gps_jpeg_png_only)

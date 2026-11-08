@@ -209,6 +209,7 @@
     <string name="failure_format_unconfirmed">A assinatura do arquivo não confirma uma imagem JPEG ou PNG</string>
     <string name="failure_format_unconfirmed_type">A assinatura do arquivo não confirma uma imagem JPEG ou PNG (tipo do provedor: %1$s)</string>
     <string name="failure_unsupported_image">Formato de imagem incompatível</string>
+    <string name="failure_no_date_to_shift">A foto não tem data de captura para ajustar</string>
     <string name="failure_edit_jpeg_only">O editor EXIF funciona com JPEG; por enquanto, PNG/HEIC/AVIF só podem ser limpos por completo como nova cópia</string>
     <string name="failure_overwrite_edit_jpeg_only">A edição de EXIF com substituição é compatível apenas com JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">A substituição durante a limpeza aceita apenas JPEG e PNG: salve outros formatos como nova cópia</string>
@@ -385,6 +386,7 @@
     <string name="main_api_empty_response">Resposta vazia</string>
     <string name="dash_title">O que sua foto revela?</string>
     <string name="dash_subtitle">Localização, câmera, autor e rótulos de IA escondidos no arquivo. Verifique e remova antes de enviar.</string>
+    <string name="dash_audit_text">Descubra quantas fotos de uma pasta revelam onde foram tiradas.</string>
     <string name="dash_scan_hint">Escolha o JPEG, PNG ou HEIC original ou um vídeo MP4/MOV: uma captura de tela já perdeu parte dos dados.</string>
     <string name="dash_choose_photo">Verificar foto ou vídeo</string>
     <string name="dash_camera">Câmera</string>
@@ -507,6 +509,14 @@
     <string name="studio_msg_verified">Gravação verificada.</string>
     <string name="studio_msg_not_verified">Não foi possível verificar a gravação novamente: abra o arquivo manualmente.</string>
     <string name="studio_msg_downscaled">A resolução foi reduzida para um processamento seguro.</string>
+    <string name="studio_msg_shift_done">Datas ajustadas: %1$d salvas, %2$d com erro.</string>
+    <string name="studio_shift_title">Ajustar a data de captura</string>
+    <string name="studio_shift_text">Para as fotos JPEG selecionadas, se o relógio ou o fuso horário da câmera estavam errados. As cópias com a nova data são salvas na pasta escolhida com os mesmos nomes.</string>
+    <string name="studio_shift_hours">Horas</string>
+    <string name="studio_shift_minutes">Minutos</string>
+    <string name="studio_shift_run">Escolher pasta e ajustar</string>
+    <string name="studio_shift_invalid">Informe horas e minutos (0–59), no máximo um ano.</string>
+    <string name="studio_shift_pro">Disponível no Pro.</string>
     <string name="studio_msg_batch_done">Limpeza em lote concluída: %1$d salvas, %2$d com falha.</string>
     <string name="studio_msg_interrupted">Operação interrompida: o sistema reiniciou o app. Tente novamente; você pode excluir o arquivo vazio que foi criado</string>
 

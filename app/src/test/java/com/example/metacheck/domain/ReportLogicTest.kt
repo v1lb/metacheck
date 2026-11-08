@@ -52,9 +52,11 @@ class ReportLogicTest {
     // --- CleanFormat ---
 
     @Test
-    fun jpegStaysJpegOthersBecomePng() {
+    fun jpegWebpHeicKeepFormatOthersBecomePng() {
         assertEquals("jpg", CleanFormat.outputFor(ImageFormat.JPEG).extension)
-        for (f in listOf(ImageFormat.PNG, ImageFormat.WEBP, ImageFormat.HEIC, ImageFormat.GIF, ImageFormat.AVIF)) {
+        assertEquals("webp", CleanFormat.outputFor(ImageFormat.WEBP).extension)
+        assertEquals("image/heic", CleanFormat.outputFor(ImageFormat.HEIC).mimeType)
+        for (f in listOf(ImageFormat.PNG, ImageFormat.GIF, ImageFormat.AVIF)) {
             assertEquals("image/png", CleanFormat.outputFor(f).mimeType)
         }
     }

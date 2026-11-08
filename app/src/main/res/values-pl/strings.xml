@@ -209,6 +209,7 @@
     <string name="failure_format_unconfirmed">Sygnatura pliku nie potwierdza obrazu JPEG ani PNG</string>
     <string name="failure_format_unconfirmed_type">Sygnatura pliku nie potwierdza obrazu JPEG ani PNG (typ dostawcy: %1$s)</string>
     <string name="failure_unsupported_image">Nieobsługiwany format obrazu</string>
+    <string name="failure_no_date_to_shift">Zdjęcie nie ma daty wykonania do przesunięcia</string>
     <string name="failure_edit_jpeg_only">Edytor EXIF obsługuje JPEG; PNG/HEIC/AVIF można na razie tylko w pełni wyczyścić jako nową kopię</string>
     <string name="failure_overwrite_edit_jpeg_only">Edycja EXIF z nadpisaniem jest obsługiwana dla JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Nadpisywanie podczas czyszczenia obsługuje tylko JPEG i PNG: zapisz inne formaty jako nową kopię</string>
@@ -387,6 +388,7 @@
     <string name="main_api_empty_response">Pusta odpowiedź</string>
     <string name="dash_title">Co zdradza Twoje zdjęcie?</string>
     <string name="dash_subtitle">Lokalizacja, aparat, autor i etykiety AI ukryte w pliku. Sprawdź je i usuń przed wysłaniem.</string>
+    <string name="dash_audit_text">Sprawdź, ile zdjęć w folderze zdradza, gdzie zostały zrobione.</string>
     <string name="dash_scan_hint">Wybierz oryginalny JPEG, PNG, HEIC lub film MP4/MOV: zrzut ekranu utracił już część danych.</string>
     <string name="dash_choose_photo">Sprawdź zdjęcie lub wideo</string>
     <string name="dash_camera">Aparat</string>
@@ -509,6 +511,14 @@
     <string name="studio_msg_verified">Zapis zweryfikowany.</string>
     <string name="studio_msg_not_verified">Nie udało się ponownie sprawdzić zapisu: otwórz plik ręcznie.</string>
     <string name="studio_msg_downscaled">Zmniejszono rozdzielczość dla bezpiecznego przetwarzania.</string>
+    <string name="studio_msg_shift_done">Daty przesunięte: zapisano %1$d, błędów %2$d.</string>
+    <string name="studio_shift_title">Przesuń datę wykonania</string>
+    <string name="studio_shift_text">Dla wybranych zdjęć JPEG, jeśli zegar lub strefa czasowa aparatu były błędne. Kopie z nową datą są zapisywane w wybranym folderze pod tymi samymi nazwami.</string>
+    <string name="studio_shift_hours">Godziny</string>
+    <string name="studio_shift_minutes">Minuty</string>
+    <string name="studio_shift_run">Wybierz folder i przesuń</string>
+    <string name="studio_shift_invalid">Podaj godziny i minuty (0–59), maksymalnie rok.</string>
+    <string name="studio_shift_pro">Dostępne w Pro.</string>
     <string name="studio_msg_batch_done">Czyszczenie wsadowe zakończone: zapisano %1$d, nieudane %2$d.</string>
     <string name="studio_msg_interrupted">Operacja przerwana: system ponownie uruchomił aplikację. Spróbuj ponownie; możesz usunąć utworzony pusty plik</string>
 

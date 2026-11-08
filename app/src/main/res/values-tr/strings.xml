@@ -209,6 +209,7 @@
     <string name="failure_format_unconfirmed">Dosya imzası bir JPEG veya PNG görüntüsünü doğrulamıyor</string>
     <string name="failure_format_unconfirmed_type">Dosya imzası bir JPEG veya PNG görüntüsünü doğrulamıyor (sağlayıcı türü: %1$s)</string>
     <string name="failure_unsupported_image">Desteklenmeyen görüntü biçimi</string>
+    <string name="failure_no_date_to_shift">Fotoğrafta kaydırılacak çekim tarihi yok</string>
     <string name="failure_edit_jpeg_only">EXIF düzenleyici JPEG ile çalışır; PNG/HEIC/AVIF şimdilik yalnızca yeni kopya olarak tamamen temizlenebilir</string>
     <string name="failure_overwrite_edit_jpeg_only">Üzerine yazarak EXIF düzenleme JPEG için desteklenir</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Temizleme sırasında üzerine yazma yalnızca JPEG ve PNG’yi destekler: diğer biçimleri yeni kopya olarak kaydedin</string>
@@ -383,6 +384,7 @@
     <string name="main_api_empty_response">Boş yanıt</string>
     <string name="dash_title">Fotoğrafınız neyi ele veriyor?</string>
     <string name="dash_subtitle">Dosyada gizli konum, kamera, yazar ve yapay zekâ etiketleri. Göndermeden önce kontrol edip kaldırın.</string>
+    <string name="dash_audit_text">Bir klasördeki kaç fotoğrafın çekildiği yeri açığa çıkardığını öğrenin.</string>
     <string name="dash_scan_hint">Orijinal JPEG, PNG, HEIC veya MP4/MOV videoyu seçin: ekran görüntüsü verilerin bir kısmını zaten kaybetmiştir.</string>
     <string name="dash_choose_photo">Fotoğraf veya videoyu kontrol et</string>
     <string name="dash_camera">Kamera</string>
@@ -505,6 +507,14 @@
     <string name="studio_msg_verified">Yazma doğrulandı.</string>
     <string name="studio_msg_not_verified">Yazma yeniden kontrol edilemedi: dosyayı elle açın.</string>
     <string name="studio_msg_downscaled">Güvenli işleme için çözünürlük düşürüldü.</string>
+    <string name="studio_msg_shift_done">Tarihler kaydırıldı: %1$d kaydedildi, %2$d başarısız.</string>
+    <string name="studio_shift_title">Çekim tarihini kaydır</string>
+    <string name="studio_shift_text">Kameranın saati veya saat dilimi yanlışsa seçili JPEG fotoğraflar için. Yeni tarihli kopyalar seçtiğiniz klasöre aynı adlarla kaydedilir.</string>
+    <string name="studio_shift_hours">Saat</string>
+    <string name="studio_shift_minutes">Dakika</string>
+    <string name="studio_shift_run">Klasör seç ve kaydır</string>
+    <string name="studio_shift_invalid">Saat ve dakika (0–59) girin, en fazla bir yıl.</string>
+    <string name="studio_shift_pro">Pro’da kullanılabilir.</string>
     <string name="studio_msg_batch_done">Toplu temizleme bitti: %1$d kaydedildi, %2$d başarısız.</string>
     <string name="studio_msg_interrupted">İşlem kesildi: sistem uygulamayı yeniden başlattı. Lütfen tekrar deneyin; oluşturulan boş dosyayı silebilirsiniz</string>
 

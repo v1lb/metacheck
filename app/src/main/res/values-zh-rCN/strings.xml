@@ -209,6 +209,7 @@
     <string name="failure_format_unconfirmed">文件签名无法确认是 JPEG 或 PNG 图像</string>
     <string name="failure_format_unconfirmed_type">文件签名无法确认是 JPEG 或 PNG 图像（提供方类型：%1$s）</string>
     <string name="failure_unsupported_image">不支持的图像格式</string>
+    <string name="failure_no_date_to_shift">这张照片没有可调整的拍摄日期</string>
     <string name="failure_edit_jpeg_only">EXIF 编辑器仅支持 JPEG；PNG/HEIC/AVIF 目前只能作为新副本完全清理</string>
     <string name="failure_overwrite_edit_jpeg_only">覆盖方式编辑 EXIF 仅支持 JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">清理时覆盖仅支持 JPEG 和 PNG：其他格式请另存为新副本</string>
@@ -381,6 +382,7 @@
     <string name="main_api_empty_response">空响应</string>
     <string name="dash_title">你的照片会泄露什么？</string>
     <string name="dash_subtitle">文件中隐藏着位置、相机、作者和 AI 标签。发送前检查并移除它们。</string>
+    <string name="dash_audit_text">看看文件夹中有多少照片泄露了拍摄地点。</string>
     <string name="dash_scan_hint">请选择原始 JPEG、PNG、HEIC 或 MP4/MOV 视频：屏幕截图已丢失部分数据。</string>
     <string name="dash_choose_photo">检查照片或视频</string>
     <string name="dash_camera">相机</string>
@@ -503,6 +505,14 @@
     <string name="studio_msg_verified">写入已验证。</string>
     <string name="studio_msg_not_verified">无法重新检查写入：请手动打开文件。</string>
     <string name="studio_msg_downscaled">为安全处理已降低分辨率。</string>
+    <string name="studio_msg_shift_done">日期已调整：成功 %1$d 张，失败 %2$d 张。</string>
+    <string name="studio_shift_title">调整拍摄日期</string>
+    <string name="studio_shift_text">用于所选 JPEG 照片，适用于相机时钟或时区设置错误的情况。调整后的副本以相同文件名保存到你选择的文件夹。</string>
+    <string name="studio_shift_hours">小时</string>
+    <string name="studio_shift_minutes">分钟</string>
+    <string name="studio_shift_run">选择文件夹并调整</string>
+    <string name="studio_shift_invalid">请输入小时和分钟（0–59），最多一年。</string>
+    <string name="studio_shift_pro">Pro 版可用。</string>
     <string name="studio_msg_batch_done">批量清理完成：已保存 %1$d 个，失败 %2$d 个。</string>
     <string name="studio_msg_interrupted">操作已中断：系统重启了应用。请重试；可以删除已创建的空文件</string>
 

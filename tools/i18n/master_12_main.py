@@ -51,6 +51,8 @@ S = [
     # --- Главная (Dashboard) ---
     ("dash_title", "What does your photo reveal?", "Что выдаёт ваше фото?"),
     ("dash_subtitle", "Location, camera, author and AI labels hidden in the file. Check them and remove them before you send.", "Место съёмки, камера, автор и метки ИИ внутри файла. Проверьте и удалите их до отправки."),
+    ("dash_audit_text", "Find out how many photos in a folder give away where they were taken.",
+     "Узнайте, сколько фото в папке выдают, где они сняты."),
     ("dash_scan_hint", "Choose the original JPEG, PNG, HEIC or MP4/MOV video: a screenshot has already lost part of the data.",
      "Выбирайте исходный JPEG, PNG, HEIC или видео MP4/MOV: в скриншоте часть данных уже потеряна."),
     ("dash_choose_photo", "Check a photo or video", "Проверить фото или видео"),

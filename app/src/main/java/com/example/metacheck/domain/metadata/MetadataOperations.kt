@@ -27,6 +27,14 @@ interface MetadataRewriteRepository {
         progress: (BatchProgress) -> Unit,
     ): BatchProgress
 
+    /** Сдвиг дат съёмки у нескольких JPEG, копии — в папку [destinationTree]. */
+    suspend fun shiftDatesBatch(
+        sources: List<String>,
+        destinationTree: String,
+        shiftSeconds: Long,
+        progress: (BatchProgress) -> Unit,
+    ): BatchProgress = throw UnsupportedOperationException("shift")
+
     /** true: источник — видео MP4/MOV (по сигнатуре файла, не по MIME). */
     suspend fun isVideo(source: String): Boolean = false
 
@@ -110,6 +118,17 @@ class MetadataStudioUseCase(
         }
         repository.overwriteWithBackup(source, backup, patch)
     }
+
+    /** Сдвиг даты съёмки у нескольких фото (Pro): часовой пояс камеры был выставлен неверно. */
+    suspend fun shiftDates(sources: List<String>, tree: String, shiftSeconds: Long, progress: (BatchProgress) -> Unit): Result<BatchProgress> =
+        runCatchingCancellable {
+            lock.withLock {
+                if (!entitlements.current().isPro) throw ProRequiredException()
+                ensure(sources.size in 1..BatchLimits.PRO_PER_RUN, FailureCode.BATCH_SIZE)
+                ensure(shiftSeconds != 0L && kotlin.math.abs(shiftSeconds) <= DateShift.MAX_SECONDS, FailureCode.BATCH_SIZE)
+                repository.shiftDatesBatch(sources, tree, shiftSeconds, progress)
+            }
+        }
 
     /**
      * Пакетная очистка. Бесплатно — до [BatchLimits.FREE_PER_RUN] фото за раз, каждое успешное фото

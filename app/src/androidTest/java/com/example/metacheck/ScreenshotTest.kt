@@ -111,6 +111,26 @@ class ScreenshotTest {
         save("home_" + if (dark) "dark" else "light")
     }
 
+    private fun studioBatch(dark: Boolean) {
+        val target = InstrumentationRegistry.getInstrumentation().targetContext
+        val c = (target.applicationContext as MetaCheckApplication).container
+        val vm = com.example.metacheck.ui.MetadataStudioViewModel(c.metadataStudio, folderAudit = c.folderAudit)
+        compose.setContent {
+            MetaCheckTheme(darkTheme = dark) {
+                Box(Modifier.size(412.dp, 1400.dp).background(androidx.compose.material3.MaterialTheme.colorScheme.background)) {
+                    com.example.metacheck.ui.MetadataStudioScreen(initialUri = null, isPro = false, onUpgrade = {}, onBack = {},
+                        startInBatch = true, vm = vm)
+                }
+            }
+        }
+        compose.waitForIdle()
+        save("studio_batch_" + if (dark) "dark" else "light")
+    }
+
+    @Test fun studioBatchLight() = studioBatch(dark = false)
+
+    @Test fun studioBatchDark() = studioBatch(dark = true)
+
     @Test fun homeLight() = dashboard(dark = false)
 
     @Test fun homeDark() = dashboard(dark = true)

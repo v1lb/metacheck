@@ -207,6 +207,21 @@ class MetadataStudioViewModel(
         usedToday.value = studio.usedToday()
     }
 
+    fun shiftDates(sources: List<String>, targetTree: Uri, seconds: Long, onDone: () -> Unit = {}) = work {
+        _batch.value = BatchProgress(total = sources.size, running = true)
+        studio.shiftDates(sources, targetTree.toString(), seconds) { _batch.value = it }.fold(
+            onSuccess = {
+                _message.value = UiText.Res(R.string.studio_msg_shift_done, it.succeeded, it.failed)
+                _batch.value = it
+                onDone()
+            },
+            onFailure = {
+                _batch.value = _batch.value.copy(running = false)
+                _message.value = failMessage(it)
+            },
+        )
+    }
+
     private fun work(operation: suspend () -> Unit) {
         // Не молча: к этому моменту системный диалог уже мог создать пустой файл под новую операцию.
         if (_busy.value) { _message.value = UiText.Res(R.string.main_msg_busy); return }

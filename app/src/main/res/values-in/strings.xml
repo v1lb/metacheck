@@ -209,6 +209,7 @@
     <string name="failure_format_unconfirmed">Tanda tangan file tidak mengonfirmasi gambar JPEG atau PNG</string>
     <string name="failure_format_unconfirmed_type">Tanda tangan file tidak mengonfirmasi gambar JPEG atau PNG (jenis penyedia: %1$s)</string>
     <string name="failure_unsupported_image">Format gambar tidak didukung</string>
+    <string name="failure_no_date_to_shift">Foto tidak memiliki tanggal pengambilan untuk digeser</string>
     <string name="failure_edit_jpeg_only">Editor EXIF berfungsi dengan JPEG; untuk saat ini PNG/HEIC/AVIF hanya dapat dibersihkan sepenuhnya sebagai salinan baru</string>
     <string name="failure_overwrite_edit_jpeg_only">Mengedit EXIF dengan penimpaan didukung untuk JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Penimpaan saat pembersihan hanya mendukung JPEG dan PNG: simpan format lain sebagai salinan baru</string>
@@ -381,6 +382,7 @@
     <string name="main_api_empty_response">Respons kosong</string>
     <string name="dash_title">Apa yang diungkap foto Anda?</string>
     <string name="dash_subtitle">Lokasi, kamera, pembuat, dan label AI tersembunyi di dalam file. Periksa dan hapus sebelum mengirim.</string>
+    <string name="dash_audit_text">Cari tahu berapa banyak foto di folder yang membuka lokasi pengambilannya.</string>
     <string name="dash_scan_hint">Pilih JPEG, PNG, HEIC asli, atau video MP4/MOV: tangkapan layar sudah kehilangan sebagian data.</string>
     <string name="dash_choose_photo">Periksa foto atau video</string>
     <string name="dash_camera">Kamera</string>
@@ -503,6 +505,14 @@
     <string name="studio_msg_verified">Penulisan terverifikasi.</string>
     <string name="studio_msg_not_verified">Tidak dapat memeriksa ulang penulisan: buka file secara manual.</string>
     <string name="studio_msg_downscaled">Resolusi dikurangi agar pemrosesan aman.</string>
+    <string name="studio_msg_shift_done">Tanggal digeser: %1$d disimpan, %2$d gagal.</string>
+    <string name="studio_shift_title">Geser tanggal pengambilan</string>
+    <string name="studio_shift_text">Untuk foto JPEG yang dipilih, jika jam atau zona waktu kamera salah. Salinan dengan tanggal baru disimpan di folder yang dipilih dengan nama yang sama.</string>
+    <string name="studio_shift_hours">Jam</string>
+    <string name="studio_shift_minutes">Menit</string>
+    <string name="studio_shift_run">Pilih folder dan geser</string>
+    <string name="studio_shift_invalid">Masukkan jam dan menit (0–59), maksimal satu tahun.</string>
+    <string name="studio_shift_pro">Tersedia di Pro.</string>
     <string name="studio_msg_batch_done">Pembersihan massal selesai: %1$d disimpan, %2$d gagal.</string>
     <string name="studio_msg_interrupted">Operasi terhenti: sistem memulai ulang aplikasi. Coba lagi; Anda dapat menghapus file kosong yang dibuat</string>
 

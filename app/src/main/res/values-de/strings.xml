@@ -209,6 +209,7 @@
     <string name="failure_format_unconfirmed">Die Dateisignatur bestätigt kein JPEG- oder PNG-Bild</string>
     <string name="failure_format_unconfirmed_type">Die Dateisignatur bestätigt kein JPEG- oder PNG-Bild (Anbietertyp: %1$s)</string>
     <string name="failure_unsupported_image">Nicht unterstütztes Bildformat</string>
+    <string name="failure_no_date_to_shift">Das Foto hat kein Aufnahmedatum zum Verschieben</string>
     <string name="failure_edit_jpeg_only">Der EXIF-Editor funktioniert mit JPEG; PNG/HEIC/AVIF lassen sich vorerst nur vollständig als neue Kopie bereinigen</string>
     <string name="failure_overwrite_edit_jpeg_only">Das Bearbeiten von EXIF mit Überschreiben wird für JPEG unterstützt</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Überschreiben beim Bereinigen unterstützt nur JPEG und PNG: Speichere andere Formate als neue Kopie</string>
@@ -383,6 +384,7 @@
     <string name="main_api_empty_response">Leere Antwort</string>
     <string name="dash_title">Was verrät dein Foto?</string>
     <string name="dash_subtitle">Standort, Kamera, Urheber und KI-Kennzeichnungen sind in der Datei versteckt. Prüfe und entferne sie vor dem Senden.</string>
+    <string name="dash_audit_text">Finden Sie heraus, wie viele Fotos in einem Ordner verraten, wo sie aufgenommen wurden.</string>
     <string name="dash_scan_hint">Wähle das Original-JPEG, -PNG, -HEIC oder ein MP4/MOV-Video: Ein Screenshot hat bereits einen Teil der Daten verloren.</string>
     <string name="dash_choose_photo">Foto oder Video prüfen</string>
     <string name="dash_camera">Kamera</string>
@@ -505,6 +507,14 @@
     <string name="studio_msg_verified">Schreibvorgang geprüft.</string>
     <string name="studio_msg_not_verified">Der Schreibvorgang konnte nicht erneut geprüft werden: Öffne die Datei manuell.</string>
     <string name="studio_msg_downscaled">Die Auflösung wurde für eine sichere Verarbeitung verringert.</string>
+    <string name="studio_msg_shift_done">Datum verschoben: %1$d gespeichert, %2$d fehlgeschlagen.</string>
+    <string name="studio_shift_title">Aufnahmedatum verschieben</string>
+    <string name="studio_shift_text">Für die ausgewählten JPEG-Fotos, wenn Uhrzeit oder Zeitzone der Kamera falsch waren. Kopien mit neuem Datum werden unter denselben Namen im gewählten Ordner gespeichert.</string>
+    <string name="studio_shift_hours">Stunden</string>
+    <string name="studio_shift_minutes">Minuten</string>
+    <string name="studio_shift_run">Ordner wählen und verschieben</string>
+    <string name="studio_shift_invalid">Stunden und Minuten (0–59) eingeben, höchstens ein Jahr.</string>
+    <string name="studio_shift_pro">In Pro verfügbar.</string>
     <string name="studio_msg_batch_done">Stapelbereinigung abgeschlossen: %1$d gespeichert, %2$d fehlgeschlagen.</string>
     <string name="studio_msg_interrupted">Vorgang unterbrochen: Das System hat die App neu gestartet. Bitte versuche es erneut; die erstellte leere Datei kannst du löschen</string>
 

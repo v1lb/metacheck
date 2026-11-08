@@ -209,6 +209,7 @@
     <string name="failure_format_unconfirmed">La firma del file non conferma un’immagine JPEG o PNG</string>
     <string name="failure_format_unconfirmed_type">La firma del file non conferma un’immagine JPEG o PNG (tipo del provider: %1$s)</string>
     <string name="failure_unsupported_image">Formato immagine non supportato</string>
+    <string name="failure_no_date_to_shift">La foto non ha una data di scatto da spostare</string>
     <string name="failure_edit_jpeg_only">L’editor EXIF funziona con JPEG; per ora PNG/HEIC/AVIF si possono solo pulire completamente come nuova copia</string>
     <string name="failure_overwrite_edit_jpeg_only">La modifica EXIF con sovrascrittura è supportata per JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">La sovrascrittura durante la pulizia supporta solo JPEG e PNG: salva gli altri formati come nuova copia</string>
@@ -385,6 +386,7 @@
     <string name="main_api_empty_response">Risposta vuota</string>
     <string name="dash_title">Cosa rivela la tua foto?</string>
     <string name="dash_subtitle">Posizione, fotocamera, autore ed etichette IA nascosti nel file. Controllali e rimuovili prima di inviare.</string>
+    <string name="dash_audit_text">Scopri quante foto di una cartella rivelano dove sono state scattate.</string>
     <string name="dash_scan_hint">Scegli il JPEG, PNG o HEIC originale o un video MP4/MOV: uno screenshot ha già perso parte dei dati.</string>
     <string name="dash_choose_photo">Controlla una foto o un video</string>
     <string name="dash_camera">Fotocamera</string>
@@ -507,6 +509,14 @@
     <string name="studio_msg_verified">Scrittura verificata.</string>
     <string name="studio_msg_not_verified">Impossibile ricontrollare la scrittura: apri il file manualmente.</string>
     <string name="studio_msg_downscaled">La risoluzione è stata ridotta per un’elaborazione sicura.</string>
+    <string name="studio_msg_shift_done">Date spostate: %1$d salvate, %2$d con errori.</string>
+    <string name="studio_shift_title">Sposta la data di scatto</string>
+    <string name="studio_shift_text">Per le foto JPEG selezionate, se l’ora o il fuso orario della fotocamera erano sbagliati. Le copie con la nuova data vengono salvate nella cartella scelta con gli stessi nomi.</string>
+    <string name="studio_shift_hours">Ore</string>
+    <string name="studio_shift_minutes">Minuti</string>
+    <string name="studio_shift_run">Scegli la cartella e sposta</string>
+    <string name="studio_shift_invalid">Inserisci ore e minuti (0–59), al massimo un anno.</string>
+    <string name="studio_shift_pro">Disponibile in Pro.</string>
     <string name="studio_msg_batch_done">Pulizia in batch completata: %1$d salvate, %2$d non riuscite.</string>
     <string name="studio_msg_interrupted">Operazione interrotta: il sistema ha riavviato l’app. Riprova; puoi eliminare il file vuoto creato</string>
 
