@@ -24,12 +24,15 @@ class LosslessCleanDeviceTest {
         testAssets.open(name).use { input -> f.outputStream().use { input.copyTo(it) } }
     }
 
-    private fun check(name: String, clean: (File, File) -> Unit) {
+    /** [exifGps]: Android ExifInterface читает GPS из образца (для WebP от exiftool — нет, проверяем блоки). */
+    private fun check(name: String, exifGps: Boolean, isClean: (File) -> Boolean, clean: (File, File) -> Unit) {
         val src = asset(name)
         val out = File(target.cacheDir, "clean_$name")
         try {
-            assertNotNull("sample must have GPS", ExifInterface(src.absolutePath).latLong)
+            if (exifGps) assertNotNull("sample must have GPS", ExifInterface(src.absolutePath).latLong)
+            assertTrue(!isClean(src))
             clean(src, out)
+            assertTrue(isClean(out))
             assertNull(ExifInterface(out.absolutePath).latLong)
             val original = BitmapFactory.decodeFile(src.absolutePath)
             val cleaned = BitmapFactory.decodeFile(out.absolutePath)
@@ -42,7 +45,7 @@ class LosslessCleanDeviceTest {
         } finally { src.delete(); out.delete() }
     }
 
-    @Test fun heic() = check("gps_sample.heic", HeifCleaner::strip)
+    @Test fun heic() = check("gps_sample.heic", exifGps = true, HeifCleaner::isClean, HeifCleaner::strip)
 
-    @Test fun webp() = check("gps_sample.webp", WebpCleaner::strip)
+    @Test fun webp() = check("gps_sample.webp", exifGps = false, WebpCleaner::isClean, WebpCleaner::strip)
 }
