@@ -399,7 +399,7 @@
     <string name="dash_section_analytics">Статистика</string>
     <string name="dash_history_limit">Лимит сохранённой истории</string>
     <string name="dash_history_limit_pro">Pro: до 50 локальных отчётов</string>
-    <string name="dash_history_limit_free">Free: до 10 отчётов · Pro: до 50</string>
+    <string name="dash_history_limit_free">Проверки без ограничений. В истории хранятся последние 10 отчётов, в Pro — 50.</string>
     <string name="dash_upgrade_limit">Увеличить лимит с Pro</string>
     <string name="dash_stat_total">Отчётов</string>
     <string name="dash_stat_ai">С признаками ИИ</string>
@@ -597,7 +597,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">FREE  →  PRO</string>
-    <string name="pro_free_features">Free: анализ фото и видео и GPS Privacy Shield, просмотр EXIF, правка и очистка до %1$d фото в сутки (UTC), 10 отчётов в истории.</string>
+    <string name="pro_free_features">Free: проверки фото, видео и целых папок без ограничений, GPS Privacy Shield, просмотр EXIF, правка и очистка до %1$d фото в сутки (UTC), пакетно — по 5 за раз, последние 10 отчётов в истории.</string>
     <string name="pro_pro_features">Pro: безлимитная очистка и правка, очистка видео (MP4, MOV) без пережатия, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API.</string>
     <string name="pro_one_time">Разовая покупка через Google Play, без подписки.</string>
     <string name="pro_key_label">Ключ Pro, если он у вас есть</string>

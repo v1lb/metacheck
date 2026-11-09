@@ -393,7 +393,7 @@
     <string name="dash_section_analytics">통계</string>
     <string name="dash_history_limit">저장 기록 한도</string>
     <string name="dash_history_limit_pro">Pro: 로컬 보고서 최대 50개</string>
-    <string name="dash_history_limit_free">무료: 최대 10개 · Pro: 최대 50개</string>
+    <string name="dash_history_limit_free">검사는 무제한입니다. 기록에는 최근 보고서 10개가 저장되며 Pro는 50개입니다.</string>
     <string name="dash_upgrade_limit">Pro로 한도 늘리기</string>
     <string name="dash_stat_total">보고서</string>
     <string name="dash_stat_ai">AI 징후 있음</string>
@@ -591,7 +591,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">무료  →  PRO</string>
-    <string name="pro_free_features">무료: 사진·동영상 스캔 및 GPS Privacy Shield, EXIF 뷰어, 하루 최대 %1$d장 사진 편집·정리(UTC), 기록 10개.</string>
+    <string name="pro_free_features">무료: 사진·동영상·폴더 전체 무제한 검사, GPS Privacy Shield, EXIF 뷰어, 하루 최대 %1$d장 편집 및 정리(UTC), 일괄은 한 번에 5장, 기록에는 최근 보고서 10개.</string>
     <string name="pro_pro_features">Pro: 무제한 정리 및 편집, 재인코딩 없는 동영상 정리(MP4, MOV), 최대 50장 일괄 처리, PDF/JSON, 보고서 50개, API.</string>
     <string name="pro_one_time">Google Play를 통한 1회 구매, 구독 없음.</string>
     <string name="pro_key_label">Pro 키(있는 경우)</string>

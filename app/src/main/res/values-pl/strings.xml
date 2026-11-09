@@ -399,7 +399,7 @@
     <string name="dash_section_analytics">Statystyki</string>
     <string name="dash_history_limit">Limit zapisanej historii</string>
     <string name="dash_history_limit_pro">Pro: do 50 lokalnych raportów</string>
-    <string name="dash_history_limit_free">Za darmo: do 10 raportów · Pro: do 50</string>
+    <string name="dash_history_limit_free">Sprawdzanie jest bez limitu. Historia przechowuje 10 ostatnich raportów, Pro — 50.</string>
     <string name="dash_upgrade_limit">Zwiększ limit z Pro</string>
     <string name="dash_stat_total">Raporty</string>
     <string name="dash_stat_ai">Z oznakami AI</string>
@@ -597,7 +597,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">ZA DARMO  →  PRO</string>
-    <string name="pro_free_features">Za darmo: skanowanie zdjęć i filmów oraz GPS Privacy Shield, podgląd EXIF, edycja i czyszczenie do %1$d zdjęć dziennie (UTC), 10 raportów w historii.</string>
+    <string name="pro_free_features">Za darmo: nielimitowane sprawdzanie zdjęć, filmów i całych folderów, GPS Privacy Shield, przeglądarka EXIF, edycja i czyszczenie do %1$d zdjęć dziennie (UTC), wsadowo po 5 naraz, 10 ostatnich raportów w historii.</string>
     <string name="pro_pro_features">Pro: nieograniczone czyszczenie i edycja, czyszczenie filmów (MP4, MOV) bez ponownego kodowania, przetwarzanie wsadowe do 50 zdjęć, PDF/JSON, 50 raportów, API.</string>
     <string name="pro_one_time">Jednorazowy zakup w Google Play, bez subskrypcji.</string>
     <string name="pro_key_label">Klucz Pro, jeśli go masz</string>

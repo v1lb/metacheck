@@ -393,7 +393,7 @@
     <string name="dash_section_analytics">統計</string>
     <string name="dash_history_limit">保存履歴の上限</string>
     <string name="dash_history_limit_pro">Pro：最大50件のローカルレポート</string>
-    <string name="dash_history_limit_free">無料：最大10件 · Pro：最大50件</string>
+    <string name="dash_history_limit_free">チェックは無制限です。履歴には最新 10 件のレポートが保存されます（Pro は 50 件）。</string>
     <string name="dash_upgrade_limit">Proで上限を増やす</string>
     <string name="dash_stat_total">レポート</string>
     <string name="dash_stat_ai">AIの兆候あり</string>
@@ -591,7 +591,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">無料  →  PRO</string>
-    <string name="pro_free_features">無料：写真・動画のスキャンとGPS Privacy Shield、EXIFビューアー、1日 %1$d 枚までの写真の編集とクリーニング（UTC）、履歴10件。</string>
+    <string name="pro_free_features">無料：写真・動画・フォルダ全体のチェックが無制限、GPS Privacy Shield、EXIF ビューア、1日 %1$d 枚までの編集とクリーニング（UTC）、一括は 1 回 5 枚、履歴は最新 10 件。</string>
     <string name="pro_pro_features">Pro：無制限のクリーニングと編集、再エンコードなしの動画クリーニング（MP4、MOV）、最大50枚の一括処理、PDF/JSON、50件のレポート、API。</string>
     <string name="pro_one_time">Google Playでの買い切り。サブスクリプションではありません。</string>
     <string name="pro_key_label">Proキー（お持ちの場合）</string>

@@ -393,7 +393,7 @@
     <string name="dash_section_analytics">统计</string>
     <string name="dash_history_limit">已保存历史记录上限</string>
     <string name="dash_history_limit_pro">Pro：最多 50 份本地报告</string>
-    <string name="dash_history_limit_free">免费：最多 10 份 · Pro：最多 50 份</string>
+    <string name="dash_history_limit_free">检查次数不限。历史记录保留最近 10 份报告，Pro 保留 50 份。</string>
     <string name="dash_upgrade_limit">升级 Pro 提高上限</string>
     <string name="dash_stat_total">报告</string>
     <string name="dash_stat_ai">有 AI 迹象</string>
@@ -591,7 +591,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">免费  →  PRO</string>
-    <string name="pro_free_features">免费：扫描照片和视频及 GPS Privacy Shield、EXIF 查看器，每天最多编辑和清理 %1$d 张照片（UTC），历史记录 10 份。</string>
+    <string name="pro_free_features">免费：不限次数检查照片、视频和整个文件夹，GPS Privacy Shield，EXIF 查看器，每天最多编辑和清理 %1$d 张照片（UTC），批量每次 5 张，历史记录保留最近 10 份报告。</string>
     <string name="pro_pro_features">Pro：无限清理和编辑，不重新编码清理视频（MP4、MOV），批量处理最多 50 张照片，PDF/JSON，50 份报告，API。</string>
     <string name="pro_one_time">通过 Google Play 一次性购买，无需订阅。</string>
     <string name="pro_key_label">Pro 密钥（如有）</string>

@@ -395,7 +395,7 @@
     <string name="dash_section_analytics">İstatistikler</string>
     <string name="dash_history_limit">Kayıtlı geçmiş sınırı</string>
     <string name="dash_history_limit_pro">Pro: en fazla 50 yerel rapor</string>
-    <string name="dash_history_limit_free">Ücretsiz: en fazla 10 rapor · Pro: en fazla 50</string>
+    <string name="dash_history_limit_free">Kontroller sınırsızdır. Geçmişte son 10 rapor saklanır, Pro’da 50.</string>
     <string name="dash_upgrade_limit">Pro ile sınırı artırın</string>
     <string name="dash_stat_total">Raporlar</string>
     <string name="dash_stat_ai">Yapay zekâ belirtili</string>
@@ -593,7 +593,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">ÜCRETSİZ  →  PRO</string>
-    <string name="pro_free_features">Ücretsiz: fotoğraf ve video tarama ve GPS Privacy Shield, EXIF görüntüleyici, günde en fazla %1$d fotoğrafı düzenleme ve temizleme (UTC), geçmişte 10 rapor.</string>
+    <string name="pro_free_features">Ücretsiz: fotoğraf, video ve tüm klasörler için sınırsız kontrol, GPS Privacy Shield, EXIF görüntüleyici, günde %1$d fotoğrafa kadar düzenleme ve temizleme (UTC), toplu olarak seferde 5, geçmişte son 10 rapor.</string>
     <string name="pro_pro_features">Pro: sınırsız temizleme ve düzenleme, yeniden kodlamadan video temizleme (MP4, MOV), en fazla 50 fotoğrafı toplu işleme, PDF/JSON, 50 rapor, API.</string>
     <string name="pro_one_time">Google Play üzerinden tek seferlik satın alma, abonelik yok.</string>
     <string name="pro_key_label">Varsa Pro anahtarı</string>

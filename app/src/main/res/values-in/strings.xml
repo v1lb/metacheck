@@ -393,7 +393,7 @@
     <string name="dash_section_analytics">Statistik</string>
     <string name="dash_history_limit">Batas riwayat tersimpan</string>
     <string name="dash_history_limit_pro">Pro: hingga 50 laporan lokal</string>
-    <string name="dash_history_limit_free">Gratis: hingga 10 laporan · Pro: hingga 50</string>
+    <string name="dash_history_limit_free">Pemeriksaan tidak terbatas. Riwayat menyimpan 10 laporan terakhir, Pro menyimpan 50.</string>
     <string name="dash_upgrade_limit">Tingkatkan batas dengan Pro</string>
     <string name="dash_stat_total">Laporan</string>
     <string name="dash_stat_ai">Dengan tanda AI</string>
@@ -591,7 +591,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">GRATIS  →  PRO</string>
-    <string name="pro_free_features">Gratis: pemindaian foto dan video serta GPS Privacy Shield, penampil EXIF, edit dan pembersihan hingga %1$d foto per hari (UTC), 10 laporan di riwayat.</string>
+    <string name="pro_free_features">Gratis: pemeriksaan foto, video, dan seluruh folder tanpa batas, GPS Privacy Shield, penampil EXIF, edit dan pembersihan hingga %1$d foto per hari (UTC), massal 5 sekaligus, 10 laporan terakhir di riwayat.</string>
     <string name="pro_pro_features">Pro: pembersihan dan edit tanpa batas, pembersihan video (MP4, MOV) tanpa encode ulang, pemrosesan massal hingga 50 foto, PDF/JSON, 50 laporan, API.</string>
     <string name="pro_one_time">Pembelian sekali melalui Google Play, tanpa langganan.</string>
     <string name="pro_key_label">Kunci Pro, jika Anda punya</string>

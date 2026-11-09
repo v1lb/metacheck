@@ -397,7 +397,7 @@
     <string name="dash_section_analytics">Estadísticas</string>
     <string name="dash_history_limit">Límite del historial guardado</string>
     <string name="dash_history_limit_pro">Pro: hasta 50 informes locales</string>
-    <string name="dash_history_limit_free">Gratis: hasta 10 informes · Pro: hasta 50</string>
+    <string name="dash_history_limit_free">Las revisiones son ilimitadas. El historial guarda los últimos 10 informes; Pro, 50.</string>
     <string name="dash_upgrade_limit">Amplía el límite con Pro</string>
     <string name="dash_stat_total">Informes</string>
     <string name="dash_stat_ai">Con indicios de IA</string>
@@ -595,7 +595,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">GRATIS  →  PRO</string>
-    <string name="pro_free_features">Gratis: análisis de fotos y vídeos y GPS Privacy Shield, visor EXIF, edición y limpieza de hasta %1$d fotos al día (UTC), 10 informes en el historial.</string>
+    <string name="pro_free_features">Gratis: revisiones ilimitadas de fotos, vídeos y carpetas enteras, GPS Privacy Shield, visor EXIF, edición y limpieza de hasta %1$d fotos al día (UTC), por lotes de 5, los últimos 10 informes en el historial.</string>
     <string name="pro_pro_features">Pro: limpieza y edición ilimitadas, limpieza de vídeos (MP4, MOV) sin recodificar, procesamiento por lotes de hasta 50 fotos, PDF/JSON, 50 informes, API.</string>
     <string name="pro_one_time">Compra única a través de Google Play, sin suscripción.</string>
     <string name="pro_key_label">Clave Pro, si tienes una</string>
