@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">Долгота GPS (XMP)</string>
     <string name="xmp_gps_altitude">Высота GPS (XMP)</string>
     <string name="xmp_digital_source_type">Тип источника (IPTC)</string>
+    <string name="meta_keywords">Ключевые слова</string>
+    <string name="meta_headline">Заголовок</string>
+    <string name="meta_credit">Указание авторства</string>
+    <string name="meta_source">Источник</string>
+    <string name="meta_sublocation">Место</string>
+    <string name="meta_city">Город</string>
+    <string name="meta_state">Регион</string>
+    <string name="meta_country">Страна</string>
     <string name="xmp_history_agents">Программы в истории правок</string>
     <string name="value_exposure_fraction">1/%1$d с</string>
     <string name="value_exposure_seconds">%1$s с</string>
@@ -201,6 +209,7 @@
     <string name="failure_format_unconfirmed">Сигнатура файла не подтверждает изображение JPEG или PNG</string>
     <string name="failure_format_unconfirmed_type">Сигнатура файла не подтверждает изображение JPEG или PNG (тип провайдера: %1$s)</string>
     <string name="failure_unsupported_image">Неподдерживаемый формат изображения</string>
+    <string name="failure_no_date_to_shift">В фото нет даты съёмки, которую можно сдвинуть</string>
     <string name="failure_edit_jpeg_only">Редактор EXIF работает с JPEG; PNG/HEIC/AVIF пока можно полностью очистить как новую копию</string>
     <string name="failure_overwrite_edit_jpeg_only">Редактирование EXIF с перезаписью поддерживается для JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Перезапись при очистке поддерживает только JPEG и PNG: другие форматы сохраняйте как новую копию</string>
@@ -345,7 +354,7 @@
     <string name="common_cancel">Отмена</string>
     <string name="common_close">Закрыть</string>
     <string name="common_delete">Удалить</string>
-    <string name="studio_name">Metadata Studio</string>
+    <string name="studio_name">Студия метаданных</string>
     <string name="main_title_settings">Настройки</string>
     <string name="main_msg_history_load_failed">Не удалось загрузить историю</string>
     <string name="main_msg_history_save_failed">Проверка завершена, но историю сохранить не удалось</string>
@@ -379,6 +388,7 @@
     <string name="main_api_empty_response">Ответ пуст</string>
     <string name="dash_title">Что выдаёт ваше фото?</string>
     <string name="dash_subtitle">Место съёмки, камера, автор и метки ИИ внутри файла. Проверьте и удалите их до отправки.</string>
+    <string name="dash_audit_text">Узнайте, сколько фото в папке выдают, где они сняты.</string>
     <string name="dash_scan_hint">Выбирайте исходный JPEG, PNG, HEIC или видео MP4/MOV: в скриншоте часть данных уже потеряна.</string>
     <string name="dash_choose_photo">Проверить фото или видео</string>
     <string name="dash_camera">Камера</string>
@@ -389,7 +399,7 @@
     <string name="dash_section_analytics">Статистика</string>
     <string name="dash_history_limit">Лимит сохранённой истории</string>
     <string name="dash_history_limit_pro">Pro: до 50 локальных отчётов</string>
-    <string name="dash_history_limit_free">Free: до 10 отчётов · Pro: до 50</string>
+    <string name="dash_history_limit_free">Проверки без ограничений. В истории хранятся последние 10 отчётов, в Pro — 50.</string>
     <string name="dash_upgrade_limit">Увеличить лимит с Pro</string>
     <string name="dash_stat_total">Отчётов</string>
     <string name="dash_stat_ai">С признаками ИИ</string>
@@ -419,15 +429,17 @@
     <string name="error_home">На главную</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">На этом устройстве</string>
     <string name="studio_title">Управление метаданными</string>
     <string name="studio_quota_pro">PRO · Без ограничений на очистку</string>
     <string name="studio_quota_free">FREE · Очищено сегодня: %1$d из %2$d · Сброс в 00:00 UTC</string>
     <string name="studio_subtitle">Реальное сохранение изменений в файл. Без отправки изображения в сеть.</string>
     <string name="studio_back_to_report">← К отчёту</string>
+    <string name="studio_copy_from_photo">Взять данные из другого фото</string>
+    <string name="studio_copy_done">Заполнено полей из другого фото: %1$d. Проверьте и сохраните.</string>
+    <string name="studio_copy_none">В этом фото нет данных EXIF, которые можно взять.</string>
     <string name="studio_tab_strip">Очистка</string>
     <string name="studio_tab_edit">EXIF-редактор</string>
-    <string name="studio_tab_batch">Пакетно PRO</string>
+    <string name="studio_tab_batch">Пакетно</string>
     <string name="studio_check_numbers">Проверьте числа: GPS, ISO, диафрагму и выдержку</string>
     <string name="studio_source_eyebrow">1 · Исходное фото</string>
     <string name="studio_source_none">Файл не выбран</string>
@@ -439,7 +451,6 @@
     <string name="studio_strip_save_copy">Сохранить очищенный дубликат</string>
     <string name="studio_strip_overwrite">Перезаписать оригинал с резервной копией</string>
     <string name="studio_strip_overwrite_note">Для перезаписи доступны только JPEG/PNG и только документы с правом записи. Сначала вы выберете место для полноценной резервной копии.</string>
-    <string name="studio_edit_eyebrow">2 · Редактор EXIF</string>
     <string name="studio_edit_gps_title">Координаты и GPS</string>
     <string name="studio_edit_remove_gps">Удалить GPS целиком</string>
     <string name="studio_field_latitude">Широта (−90…90)</string>
@@ -448,6 +459,7 @@
     <string name="studio_edit_dates_title">Дата съёмки</string>
     <string name="studio_field_date_taken">Дата оригинала</string>
     <string name="studio_field_date_digitized">Дата оцифровки</string>
+    <string name="studio_dates_hint">По дате оригинала галереи сортируют фото. После сохранения MetaCheck просит Android перечитать файл; Google Фото может показывать старую дату, пока не обновит свою библиотеку.</string>
     <string name="studio_date_value">%1$s: %2$s</string>
     <string name="studio_date_unchanged">не изменять</string>
     <string name="studio_edit_camera_title">Камера и авторство</string>
@@ -456,13 +468,27 @@
     <string name="studio_field_aperture">Диафрагма (например, 1.8)</string>
     <string name="studio_field_shutter">Выдержка в секундах (например, 0.02)</string>
     <string name="studio_field_keep">Оставить без изменений</string>
-    <string name="studio_edit_note">Пустые поля остаются без изменений. Редактор работает с JPEG; противоречащие EXIF блоки XMP/IPTC в JPEG удаляются. Изменения не применяются к исходному файлу до сохранения. Любая правка может сделать C2PA-подписи недействительными.</string>
+    <string name="studio_edit_note">Пустые поля остаются без изменений. Редактор работает с JPEG. Ключевые слова, подписи и другие описательные поля сохраняются; старые даты, координаты и история правок в XMP/IPTC удаляются. Исходный файл не меняется до сохранения. Любая правка может сделать C2PA-подписи недействительными.</string>
     <string name="studio_edit_save_copy">Сохранить изменённую копию JPEG</string>
     <string name="studio_edit_overwrite">Перезаписать JPEG с резервной копией</string>
-    <string name="studio_batch_eyebrow">Пакетная очистка · Pro</string>
     <string name="studio_batch_title">Массовая очистка</string>
-    <string name="studio_batch_text">До 50 файлов за один запуск. Новые копии будут сохранены в выбранную папку. Оригиналы останутся неизменными.</string>
+    <string name="studio_batch_text">Очищенные копии сохраняются в выбранную папку. Оригиналы остаются без изменений.</string>
     <string name="studio_batch_selected">Выбрано: %1$d</string>
+    <string name="studio_batch_run_size">ЭТОТ ЗАПУСК · %1$d</string>
+    <string name="studio_batch_free_note">Бесплатно — %1$d фото за запуск, в пределах дневного лимита. Pro — %2$d за запуск, без лимита.</string>
+    <string name="studio_batch_upgrade">Очистить всё сразу с Pro</string>
+    <string name="studio_audit_button">Проверить всю папку</string>
+    <string name="studio_audit_hint">Каждое фото в папке читается на этом устройстве. Те, что выдают больше всего, отбираются для очистки.</string>
+    <string name="studio_audit_running">Проверка… %1$d фото</string>
+    <string name="studio_audit_summary">Проверено фото: %1$d</string>
+    <string name="studio_audit_clean_none">В этой папке метаданных не найдено.</string>
+    <string name="studio_audit_location">Точное место: %1$d</string>
+    <string name="studio_audit_serial">Серийный номер: %1$d</string>
+    <string name="studio_audit_person">Имя владельца или автора: %1$d</string>
+    <string name="studio_audit_other">Только прочие метаданные: %1$d</string>
+    <string name="studio_audit_selected">Отобраны для очистки, самые рискованные первыми.</string>
+    <string name="studio_audit_limited">Проверены только первые %1$d фото. Чтобы проверить остальные, выберите папку поменьше.</string>
+    <string name="studio_audit_failed">Не удалось прочитать эту папку. Выберите другую.</string>
     <string name="studio_batch_choose_photos">Выбрать фотографии</string>
     <string name="studio_batch_choose_folder_start">Выбрать папку и запустить</string>
     <string name="studio_batch_choose_files_first">Сначала выберите файлы</string>
@@ -484,6 +510,14 @@
     <string name="studio_msg_verified">Запись проверена.</string>
     <string name="studio_msg_not_verified">Не удалось перепроверить запись: откройте файл вручную.</string>
     <string name="studio_msg_downscaled">Разрешение уменьшено для безопасной обработки.</string>
+    <string name="studio_msg_shift_done">Даты сдвинуты: сохранено %1$d, ошибок %2$d.</string>
+    <string name="studio_shift_title">Сдвинуть дату съёмки</string>
+    <string name="studio_shift_text">Для выбранных фото JPEG, если в камере было неверное время или часовой пояс. Копии с новой датой сохраняются в выбранную папку под теми же именами.</string>
+    <string name="studio_shift_hours">Часы</string>
+    <string name="studio_shift_minutes">Минуты</string>
+    <string name="studio_shift_run">Выбрать папку и сдвинуть</string>
+    <string name="studio_shift_invalid">Укажите часы и минуты (0–59), не больше года.</string>
+    <string name="studio_shift_pro">Доступно в Pro.</string>
     <string name="studio_msg_batch_done">Пакетная очистка завершена: сохранено %1$d, ошибок %2$d.</string>
     <string name="studio_msg_interrupted">Операция прервана: приложение было перезапущено системой. Повторите действие; созданный пустой файл можно удалить</string>
 
@@ -563,7 +597,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">FREE  →  PRO</string>
-    <string name="pro_free_features">Free: анализ фото и видео и GPS Privacy Shield, просмотр EXIF, правка и очистка до %1$d фото в сутки (UTC), 10 отчётов в истории.</string>
+    <string name="pro_free_features">Free: проверки фото, видео и целых папок без ограничений, GPS Privacy Shield, просмотр EXIF, правка и очистка до %1$d фото в сутки (UTC), пакетно — по 5 за раз, последние 10 отчётов в истории.</string>
     <string name="pro_pro_features">Pro: безлимитная очистка и правка, очистка видео (MP4, MOV) без пережатия, пакетная обработка до 50 фото, PDF/JSON, 50 отчётов, API.</string>
     <string name="pro_one_time">Разовая покупка через Google Play, без подписки.</string>
     <string name="pro_key_label">Ключ Pro, если он у вас есть</string>
@@ -658,6 +692,7 @@
     <string name="privacy_kind_location_tags">Метки местоположения</string>
     <string name="privacy_kind_owner">Владелец камеры</string>
     <string name="privacy_kind_device_serial">Серийный номер устройства</string>
+    <string name="privacy_kind_place_name">Название места</string>
     <string name="privacy_kind_author">Автор и права</string>
     <string name="privacy_kind_ai_prompt">Промпт и настройки ИИ</string>
     <string name="privacy_kind_capture_time">Когда снято</string>

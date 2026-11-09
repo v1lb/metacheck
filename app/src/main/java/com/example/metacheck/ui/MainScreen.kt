@@ -56,6 +56,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material.icons.filled.Settings
@@ -142,6 +143,8 @@ fun MainScreen(
     val texts = rememberMetaTexts()
     var showSettings by rememberSaveable { mutableStateOf(false) }
     var showStudio by rememberSaveable { mutableStateOf(false) }
+    /** Студию открыли кнопкой «Проверить всю папку»: сразу вкладка «Пакетно» и выбор папки. */
+    var studioAudit by rememberSaveable { mutableStateOf(false) }
     var confirmApi by rememberSaveable { mutableStateOf(false) }
 
     // Сообщения ViewModel приходят как UiText и превращаются в строку здесь, на языке экрана.
@@ -242,6 +245,16 @@ fun MainScreen(
         if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
     }
     val savePng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
+        val original = pendingStripSource
+        pendingStripSource = null
+        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
+    }
+    val saveWebp = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/webp")) { uri ->
+        val original = pendingStripSource
+        pendingStripSource = null
+        if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
+    }
+    val saveHeic = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/heic")) { uri ->
         val original = pendingStripSource
         pendingStripSource = null
         if (uri != null && original != null) studioVm.stripCopy(original, uri) { viewModel.onImagePicked(uri, saveToHistory = false) }
@@ -356,6 +369,8 @@ fun MainScreen(
                     isPro = entitlement.isPro,
                     onUpgrade = proVm::openPaywall,
                     onBack = { showStudio = false },
+                    startAudit = studioAudit,
+                    onAuditStarted = { studioAudit = false },
                 )
                 else if (current.kind == ScreenKind.SETTINGS) SettingsScreen(onMessage = viewModel::showMessage, uiPreferences = uiPreferences)
                 else when (val s = current.ui) {
@@ -366,6 +381,7 @@ fun MainScreen(
                         onOpen = viewModel::openFromHistory, onDelete = viewModel::deleteFromHistory,
                         onCsv = { saveCsv.launch("metacheck-history.csv") },
                         onUpgrade = proVm::openPaywall, onStudio = { showStudio = true },
+                        onAudit = { studioAudit = true; showStudio = true },
                     )
                     UiState.Loading -> LoadingScreen()
                     is UiState.Failed -> ErrorScreen(s.message, { pick.launch(PICK_TYPES) }, viewModel::close)
@@ -411,8 +427,12 @@ fun MainScreen(
                                     clean@{
                                         if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@clean }
                                         pendingStripSource = s.source
-                                        if (format.extension == "jpg") saveJpeg.launch("$name-clean.jpg")
-                                        else savePng.launch("$name-clean.png")
+                                        when (format.extension) {
+                                            "jpg" -> saveJpeg.launch("$name-clean.jpg")
+                                            "webp" -> saveWebp.launch("$name-clean.webp")
+                                            "heic" -> saveHeic.launch("$name-clean.heic")
+                                            else -> savePng.launch("$name-clean.png")
+                                        }
                                     }
                                 },
                                 onCleanShare = if (s.source == null) null else {
@@ -500,6 +520,7 @@ internal fun Dashboard(
     onPick: () -> Unit, onCamera: () -> Unit, onClipboard: () -> Unit,
     onOpen: (String) -> Unit, onDelete: (String) -> Unit,
     onCsv: () -> Unit, onUpgrade: () -> Unit, onStudio: () -> Unit,
+    onAudit: () -> Unit = {},
 ) {
     val insight = remember(history) { HistoryInsights.from(history) }
     // Те же числа, что в AppContainer: раньше здесь были отдельно записанные 10 и 50.
@@ -559,6 +580,23 @@ internal fun Dashboard(
             }
             Text(stringResource(R.string.dash_scan_hint), Modifier.padding(top = 8.dp, start = 2.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+        }
+        item {
+            // Проверка всей папки: бесплатно, сразу показывает масштаб утечки и ведёт к пакетной очистке.
+            GlassPanel(Modifier.fillMaxWidth()) {
+                Row(Modifier.fillMaxWidth().clickable(onClick = onAudit).padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Icon(Icons.Filled.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Text(stringResource(R.string.studio_audit_button), style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(R.string.dash_audit_text),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    }
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
         }
         item {
             Column(Modifier.fillMaxWidth().padding(top = 10.dp)) {

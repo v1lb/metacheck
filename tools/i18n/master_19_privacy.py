@@ -22,6 +22,7 @@ S = [
     ("privacy_kind_location_tags", "Location tags", "Метки местоположения"),
     ("privacy_kind_owner", "Camera owner", "Владелец камеры"),
     ("privacy_kind_device_serial", "Device serial number", "Серийный номер устройства"),
+    ("privacy_kind_place_name", "Place name", "Название места"),
     ("privacy_kind_author", "Author and rights", "Автор и права"),
     ("privacy_kind_ai_prompt", "AI prompt and settings", "Промпт и настройки ИИ"),
     ("privacy_kind_capture_time", "When it was taken", "Когда снято"),

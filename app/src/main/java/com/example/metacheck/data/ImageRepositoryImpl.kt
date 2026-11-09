@@ -12,6 +12,7 @@ import com.example.metacheck.data.parser.ExifReader
 import com.example.metacheck.data.parser.ExifResult
 import com.example.metacheck.data.parser.ImageFormatDetector
 import com.example.metacheck.data.parser.PngTextParser
+import com.example.metacheck.data.parser.IptcReader
 import com.example.metacheck.data.parser.XmpExtractor
 import com.example.metacheck.data.parser.readBounded
 import com.example.metacheck.data.video.Mp4FormatException
@@ -89,7 +90,10 @@ class ImageRepositoryImpl(
             xmp?.fields?.get(XmpExtractor.KEY_CREATOR_TOOL)?.let { MetaItem("XMP CreatorTool", it) },
             xmp?.fields?.get(XmpExtractor.KEY_SOFTWARE_AGENT)?.let { MetaItem("XMP softwareAgent", it) },
         )
-        val xmpItems = xmp?.items.orEmpty()
+        // IPTC-IIM (APP13): то же, что в XMP, но в старом формате. Повторы значений из XMP не показываем.
+        val iptcItems = if (format == ImageFormat.JPEG) IptcReader.read(bytes) else emptyList()
+        val xmpValues = xmp?.items.orEmpty().map { it.value.trim() }.toSet()
+        val xmpItems = xmp?.items.orEmpty() + iptcItems.filter { it.value.trim() !in xmpValues }
         val pngItems = png
             .filter { it.keyword != "XML:com.adobe.xmp" }
             .map {

@@ -32,6 +32,7 @@ S = [
     ("failure_format_unconfirmed_type", "The file signature does not confirm a JPEG or PNG image (provider type: %1$s)",
      "Сигнатура файла не подтверждает изображение JPEG или PNG (тип провайдера: %1$s)"),
     ("failure_unsupported_image", "Unsupported image format", "Неподдерживаемый формат изображения"),
+    ("failure_no_date_to_shift", "The photo has no date taken to shift", "В фото нет даты съёмки, которую можно сдвинуть"),
     ("failure_edit_jpeg_only", "The EXIF editor works with JPEG; PNG/HEIC/AVIF can be fully cleaned as a new copy for now",
      "Редактор EXIF работает с JPEG; PNG/HEIC/AVIF пока можно полностью очистить как новую копию"),
     ("failure_overwrite_edit_jpeg_only", "Editing EXIF with overwrite is supported for JPEG",

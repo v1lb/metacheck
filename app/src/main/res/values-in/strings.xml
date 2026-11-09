@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">Bujur GPS (XMP)</string>
     <string name="xmp_gps_altitude">Ketinggian GPS (XMP)</string>
     <string name="xmp_digital_source_type">Jenis sumber (IPTC)</string>
+    <string name="meta_keywords">Kata kunci</string>
+    <string name="meta_headline">Judul utama</string>
+    <string name="meta_credit">Kredit</string>
+    <string name="meta_source">Sumber</string>
+    <string name="meta_sublocation">Tempat</string>
+    <string name="meta_city">Kota</string>
+    <string name="meta_state">Wilayah</string>
+    <string name="meta_country">Negara</string>
     <string name="xmp_history_agents">Perangkat lunak di riwayat edit</string>
     <string name="value_exposure_fraction">1/%1$d dtk</string>
     <string name="value_exposure_seconds">%1$s dtk</string>
@@ -201,6 +209,7 @@
     <string name="failure_format_unconfirmed">Tanda tangan file tidak mengonfirmasi gambar JPEG atau PNG</string>
     <string name="failure_format_unconfirmed_type">Tanda tangan file tidak mengonfirmasi gambar JPEG atau PNG (jenis penyedia: %1$s)</string>
     <string name="failure_unsupported_image">Format gambar tidak didukung</string>
+    <string name="failure_no_date_to_shift">Foto tidak memiliki tanggal pengambilan untuk digeser</string>
     <string name="failure_edit_jpeg_only">Editor EXIF berfungsi dengan JPEG; untuk saat ini PNG/HEIC/AVIF hanya dapat dibersihkan sepenuhnya sebagai salinan baru</string>
     <string name="failure_overwrite_edit_jpeg_only">Mengedit EXIF dengan penimpaan didukung untuk JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Penimpaan saat pembersihan hanya mendukung JPEG dan PNG: simpan format lain sebagai salinan baru</string>
@@ -373,6 +382,7 @@
     <string name="main_api_empty_response">Respons kosong</string>
     <string name="dash_title">Apa yang diungkap foto Anda?</string>
     <string name="dash_subtitle">Lokasi, kamera, pembuat, dan label AI tersembunyi di dalam file. Periksa dan hapus sebelum mengirim.</string>
+    <string name="dash_audit_text">Cari tahu berapa banyak foto di folder yang membuka lokasi pengambilannya.</string>
     <string name="dash_scan_hint">Pilih JPEG, PNG, HEIC asli, atau video MP4/MOV: tangkapan layar sudah kehilangan sebagian data.</string>
     <string name="dash_choose_photo">Periksa foto atau video</string>
     <string name="dash_camera">Kamera</string>
@@ -383,7 +393,7 @@
     <string name="dash_section_analytics">Statistik</string>
     <string name="dash_history_limit">Batas riwayat tersimpan</string>
     <string name="dash_history_limit_pro">Pro: hingga 50 laporan lokal</string>
-    <string name="dash_history_limit_free">Gratis: hingga 10 laporan · Pro: hingga 50</string>
+    <string name="dash_history_limit_free">Pemeriksaan tidak terbatas. Riwayat menyimpan 10 laporan terakhir, Pro menyimpan 50.</string>
     <string name="dash_upgrade_limit">Tingkatkan batas dengan Pro</string>
     <string name="dash_stat_total">Laporan</string>
     <string name="dash_stat_ai">Dengan tanda AI</string>
@@ -413,15 +423,17 @@
     <string name="error_home">Beranda</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">Di perangkat ini</string>
     <string name="studio_title">Pengelolaan metadata</string>
     <string name="studio_quota_pro">PRO · Pembersihan tanpa batas</string>
     <string name="studio_quota_free">GRATIS · Dibersihkan hari ini: %1$d dari %2$d · Diatur ulang pukul 00:00 UTC</string>
     <string name="studio_subtitle">Perubahan benar-benar disimpan ke file. Gambar tidak pernah diunggah.</string>
     <string name="studio_back_to_report">← Kembali ke laporan</string>
+    <string name="studio_copy_from_photo">Salin data dari foto lain</string>
+    <string name="studio_copy_done">Kolom yang diisi dari foto lain: %1$d. Periksa lalu simpan.</string>
+    <string name="studio_copy_none">Foto itu tidak memiliki data EXIF untuk disalin.</string>
     <string name="studio_tab_strip">Pembersihan</string>
     <string name="studio_tab_edit">Editor EXIF</string>
-    <string name="studio_tab_batch">Massal PRO</string>
+    <string name="studio_tab_batch">Massal</string>
     <string name="studio_check_numbers">Periksa angka: GPS, ISO, bukaan, dan kecepatan rana</string>
     <string name="studio_source_eyebrow">1 · Gambar sumber</string>
     <string name="studio_source_none">Belum ada file dipilih</string>
@@ -433,7 +445,6 @@
     <string name="studio_strip_save_copy">Simpan salinan bersih</string>
     <string name="studio_strip_overwrite">Ganti file asli, dengan cadangan</string>
     <string name="studio_strip_overwrite_note">Hanya dokumen JPEG/PNG yang dapat ditulisi yang bisa diganti. Pertama, Anda akan memilih tempat menyimpan cadangan lengkap.</string>
-    <string name="studio_edit_eyebrow">2 · Editor EXIF</string>
     <string name="studio_edit_gps_title">Koordinat dan GPS</string>
     <string name="studio_edit_remove_gps">Hapus semua GPS</string>
     <string name="studio_field_latitude">Lintang (−90…90)</string>
@@ -442,6 +453,7 @@
     <string name="studio_edit_dates_title">Tanggal pengambilan</string>
     <string name="studio_field_date_taken">Tanggal diambil</string>
     <string name="studio_field_date_digitized">Tanggal digitalisasi</string>
+    <string name="studio_dates_hint">Galeri mengurutkan foto berdasarkan tanggal pengambilan. Setelah disimpan, MetaCheck meminta Android membaca ulang file; Google Foto mungkin menampilkan tanggal lama sampai memperbarui pustakanya sendiri.</string>
     <string name="studio_date_value">%1$s: %2$s</string>
     <string name="studio_date_unchanged">tidak diubah</string>
     <string name="studio_edit_camera_title">Kamera dan pembuat</string>
@@ -450,13 +462,27 @@
     <string name="studio_field_aperture">Bukaan (misalnya 1.8)</string>
     <string name="studio_field_shutter">Kecepatan rana dalam detik (misalnya 0.02)</string>
     <string name="studio_field_keep">Biarkan tidak diubah</string>
-    <string name="studio_edit_note">Kolom kosong tidak diubah. Editor berfungsi dengan JPEG; blok XMP/IPTC terpisah yang bertentangan dengan EXIF dihapus dari JPEG. Tidak ada yang diterapkan ke file sumber sampai Anda menyimpan. Setiap edit dapat membuat tanda tangan C2PA tidak valid.</string>
+    <string name="studio_edit_note">Kolom kosong tidak berubah. Editor bekerja dengan JPEG. Kata kunci, keterangan, dan kolom deskriptif lain dipertahankan; tanggal lama, koordinat, dan riwayat edit di XMP/IPTC dihapus. File sumber tidak berubah sampai Anda menyimpan. Setiap edit dapat membuat tanda tangan C2PA tidak valid.</string>
     <string name="studio_edit_save_copy">Simpan salinan JPEG yang diedit</string>
     <string name="studio_edit_overwrite">Ganti JPEG, dengan cadangan</string>
-    <string name="studio_batch_eyebrow">Pembersihan massal · Pro</string>
     <string name="studio_batch_title">Pembersihan massal</string>
-    <string name="studio_batch_text">Hingga 50 file per proses. Salinan baru disimpan ke folder yang dipilih. File asli tetap tidak berubah.</string>
+    <string name="studio_batch_text">Salinan bersih disimpan di folder yang Anda pilih. File asli tidak berubah.</string>
     <string name="studio_batch_selected">Dipilih: %1$d</string>
+    <string name="studio_batch_run_size">PROSES INI · %1$d</string>
+    <string name="studio_batch_free_note">Gratis: %1$d foto per proses, dalam batas harian. Pro: %2$d per proses, tanpa batas.</string>
+    <string name="studio_batch_upgrade">Bersihkan semuanya sekaligus dengan Pro</string>
+    <string name="studio_audit_button">Periksa seluruh folder</string>
+    <string name="studio_audit_hint">Setiap foto di folder dibaca di perangkat ini. Foto yang paling banyak membuka informasi dipilih untuk dibersihkan.</string>
+    <string name="studio_audit_running">Memeriksa… %1$d foto</string>
+    <string name="studio_audit_summary">Foto diperiksa: %1$d</string>
+    <string name="studio_audit_clean_none">Tidak ada metadata di folder ini.</string>
+    <string name="studio_audit_location">Lokasi persis: %1$d</string>
+    <string name="studio_audit_serial">Nomor seri: %1$d</string>
+    <string name="studio_audit_person">Nama pemilik atau pembuat: %1$d</string>
+    <string name="studio_audit_other">Hanya metadata lain: %1$d</string>
+    <string name="studio_audit_selected">Dipilih untuk dibersihkan, yang paling berisiko lebih dulu.</string>
+    <string name="studio_audit_limited">Hanya %1$d foto pertama yang diperiksa. Pilih folder yang lebih kecil untuk memeriksa sisanya.</string>
+    <string name="studio_audit_failed">Folder ini tidak dapat dibaca. Pilih folder lain.</string>
     <string name="studio_batch_choose_photos">Pilih foto</string>
     <string name="studio_batch_choose_folder_start">Pilih folder dan mulai</string>
     <string name="studio_batch_choose_files_first">Pilih file terlebih dahulu</string>
@@ -478,6 +504,14 @@
     <string name="studio_msg_verified">Penulisan terverifikasi.</string>
     <string name="studio_msg_not_verified">Tidak dapat memeriksa ulang penulisan: buka file secara manual.</string>
     <string name="studio_msg_downscaled">Resolusi dikurangi agar pemrosesan aman.</string>
+    <string name="studio_msg_shift_done">Tanggal digeser: %1$d disimpan, %2$d gagal.</string>
+    <string name="studio_shift_title">Geser tanggal pengambilan</string>
+    <string name="studio_shift_text">Untuk foto JPEG yang dipilih, jika jam atau zona waktu kamera salah. Salinan dengan tanggal baru disimpan di folder yang dipilih dengan nama yang sama.</string>
+    <string name="studio_shift_hours">Jam</string>
+    <string name="studio_shift_minutes">Menit</string>
+    <string name="studio_shift_run">Pilih folder dan geser</string>
+    <string name="studio_shift_invalid">Masukkan jam dan menit (0–59), maksimal satu tahun.</string>
+    <string name="studio_shift_pro">Tersedia di Pro.</string>
     <string name="studio_msg_batch_done">Pembersihan massal selesai: %1$d disimpan, %2$d gagal.</string>
     <string name="studio_msg_interrupted">Operasi terhenti: sistem memulai ulang aplikasi. Coba lagi; Anda dapat menghapus file kosong yang dibuat</string>
 
@@ -557,7 +591,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">GRATIS  →  PRO</string>
-    <string name="pro_free_features">Gratis: pemindaian foto dan video serta GPS Privacy Shield, penampil EXIF, edit dan pembersihan hingga %1$d foto per hari (UTC), 10 laporan di riwayat.</string>
+    <string name="pro_free_features">Gratis: pemeriksaan foto, video, dan seluruh folder tanpa batas, GPS Privacy Shield, penampil EXIF, edit dan pembersihan hingga %1$d foto per hari (UTC), massal 5 sekaligus, 10 laporan terakhir di riwayat.</string>
     <string name="pro_pro_features">Pro: pembersihan dan edit tanpa batas, pembersihan video (MP4, MOV) tanpa encode ulang, pemrosesan massal hingga 50 foto, PDF/JSON, 50 laporan, API.</string>
     <string name="pro_one_time">Pembelian sekali melalui Google Play, tanpa langganan.</string>
     <string name="pro_key_label">Kunci Pro, jika Anda punya</string>
@@ -649,6 +683,7 @@
     <string name="privacy_kind_location_tags">Tag lokasi</string>
     <string name="privacy_kind_owner">Pemilik kamera</string>
     <string name="privacy_kind_device_serial">Nomor seri perangkat</string>
+    <string name="privacy_kind_place_name">Nama tempat</string>
     <string name="privacy_kind_author">Pembuat dan hak</string>
     <string name="privacy_kind_ai_prompt">Prompt dan pengaturan AI</string>
     <string name="privacy_kind_capture_time">Kapan diambil</string>

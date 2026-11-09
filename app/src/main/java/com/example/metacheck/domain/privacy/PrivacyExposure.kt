@@ -15,6 +15,7 @@ enum class ExposureKind(val weight: Int) {
     LOCATION_TAGS(25),
     OWNER(20),
     DEVICE_SERIAL(15),
+    PLACE_NAME(15),
     AUTHOR(10),
     AI_PROMPT(10),
     CAPTURE_TIME(8),
@@ -76,12 +77,17 @@ object PrivacyExposures {
         if (report.gps == null && GpsPrivacy.hasLocationMarkers(report)) add(ExposureKind.LOCATION_TAGS, "")
         add(ExposureKind.OWNER, value("exif:CameraOwnerName"))
         add(ExposureKind.DEVICE_SERIAL, values("exif:BodySerialNumber", "exif:LensSerialNumber"))
-        add(ExposureKind.AUTHOR, values("exif:Artist", "exif:Copyright", "xmp:dc:creator", "xmp:dc:rights"))
+        add(ExposureKind.PLACE_NAME, values(
+            "xmp:Iptc4xmpCore:Location", "iptc:Sublocation", "xmp:photoshop:City", "iptc:City",
+            "xmp:photoshop:State", "iptc:State", "xmp:photoshop:Country", "iptc:Country",
+        ))
+        add(ExposureKind.AUTHOR, values("exif:Artist", "exif:Copyright", "xmp:dc:creator", "xmp:dc:rights", "iptc:Byline", "iptc:Copyright"))
         val hasPrompt = report.pngTextItems.any { it.label.lowercase(Locale.ROOT) in promptKeywords && it.value.isNotBlank() } ||
             report.signals.any { it.kind == SignalKind.SD_PARAMETERS || it.kind == SignalKind.GENERATION_PARAMS || it.kind == SignalKind.COMFYUI_GRAPH }
         if (hasPrompt) add(ExposureKind.AI_PROMPT, "")
         add(ExposureKind.CAPTURE_TIME, value("exif:DateTimeOriginal", "exif:DateTime", "xmp:xmp:CreateDate", "video:created"))
-        add(ExposureKind.DESCRIPTION, values("exif:ImageDescription", "exif:UserComment", "xmp:dc:description", "xmp:dc:title", "video:title"))
+        add(ExposureKind.DESCRIPTION, values("exif:ImageDescription", "exif:UserComment", "xmp:dc:description", "xmp:dc:title", "iptc:Caption", "iptc:ObjectName",
+            "xmp:photoshop:Headline", "iptc:Headline", "xmp:dc:subject", "iptc:Keywords", "video:title"))
         val device = listOfNotNull(value("exif:Make", "xmp:tiff:Make"), value("exif:Model", "xmp:tiff:Model"))
             .fold(emptyList<String>()) { acc, part ->
                 // «Apple iPhone 15» вместо «Apple Apple iPhone 15»: модель часто уже содержит производителя.

@@ -70,6 +70,41 @@ internal object JpegSegments {
             walk(input, null, sanitize = false, dropExifThumbnail = false)
         }
 
+    /**
+     * Вставляет сегменты (маркер → содержимое без длины) после APP0/EXIF в начале JPEG.
+     * Остальные байты копируются как есть.
+     */
+    fun insertAfterHeader(source: File, destination: File, segments: List<Pair<Int, ByteArray>>) {
+        BufferedInputStream(FileInputStream(source), BUF).use { input ->
+            BufferedOutputStream(FileOutputStream(destination), BUF).use { out ->
+                if (input.read() != 0xFF || input.read() != SOI) throw IOException("Invalid JPEG SOI")
+                out.write(0xFF); out.write(SOI)
+                while (true) {
+                    input.mark(16)
+                    val peek = ByteArray(10)
+                    var n = 0
+                    while (n < peek.size) { val r = input.read(peek, n, peek.size - n); if (r <= 0) break; n += r }
+                    input.reset()
+                    if (n < 4 || (peek[0].toInt() and 0xFF) != 0xFF) throw IOException("Invalid JPEG marker")
+                    val marker = peek[1].toInt() and 0xFF
+                    val length = ((peek[2].toInt() and 0xFF) shl 8) or (peek[3].toInt() and 0xFF)
+                    val isHeader = marker == 0xE0 ||
+                        (marker == APP1 && n == peek.size && peek.copyOfRange(4, 10).contentEquals(exifHeader))
+                    if (!isHeader) break
+                    if (length < 2) throw IOException("Invalid segment length")
+                    val segment = ByteArray(length + 2); readCompletely(input, segment)
+                    out.write(segment)
+                }
+                for ((marker, data) in segments) {
+                    val length = data.size + 2
+                    if (length > 0xFFFF) continue
+                    out.write(0xFF); out.write(marker); out.write(length shr 8); out.write(length and 0xFF); out.write(data)
+                }
+                input.copyTo(out, BUF)
+            }
+        }
+    }
+
     /** Свежий результат Bitmap.compress: никаких метаданных и ничего после EOI. */
     fun isStrippedJpeg(source: File): Boolean = try {
         val f = inspect(source)

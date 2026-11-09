@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">Longitudine GPS (XMP)</string>
     <string name="xmp_gps_altitude">Altitudine GPS (XMP)</string>
     <string name="xmp_digital_source_type">Tipo di origine (IPTC)</string>
+    <string name="meta_keywords">Parole chiave</string>
+    <string name="meta_headline">Titolo</string>
+    <string name="meta_credit">Credito</string>
+    <string name="meta_source">Fonte</string>
+    <string name="meta_sublocation">Luogo</string>
+    <string name="meta_city">Città</string>
+    <string name="meta_state">Regione</string>
+    <string name="meta_country">Paese</string>
     <string name="xmp_history_agents">Software nella cronologia delle modifiche</string>
     <string name="value_exposure_fraction">1/%1$d s</string>
     <string name="value_exposure_seconds">%1$s s</string>
@@ -201,6 +209,7 @@
     <string name="failure_format_unconfirmed">La firma del file non conferma un’immagine JPEG o PNG</string>
     <string name="failure_format_unconfirmed_type">La firma del file non conferma un’immagine JPEG o PNG (tipo del provider: %1$s)</string>
     <string name="failure_unsupported_image">Formato immagine non supportato</string>
+    <string name="failure_no_date_to_shift">La foto non ha una data di scatto da spostare</string>
     <string name="failure_edit_jpeg_only">L’editor EXIF funziona con JPEG; per ora PNG/HEIC/AVIF si possono solo pulire completamente come nuova copia</string>
     <string name="failure_overwrite_edit_jpeg_only">La modifica EXIF con sovrascrittura è supportata per JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">La sovrascrittura durante la pulizia supporta solo JPEG e PNG: salva gli altri formati come nuova copia</string>
@@ -377,6 +386,7 @@
     <string name="main_api_empty_response">Risposta vuota</string>
     <string name="dash_title">Cosa rivela la tua foto?</string>
     <string name="dash_subtitle">Posizione, fotocamera, autore ed etichette IA nascosti nel file. Controllali e rimuovili prima di inviare.</string>
+    <string name="dash_audit_text">Scopri quante foto di una cartella rivelano dove sono state scattate.</string>
     <string name="dash_scan_hint">Scegli il JPEG, PNG o HEIC originale o un video MP4/MOV: uno screenshot ha già perso parte dei dati.</string>
     <string name="dash_choose_photo">Controlla una foto o un video</string>
     <string name="dash_camera">Fotocamera</string>
@@ -387,7 +397,7 @@
     <string name="dash_section_analytics">Statistiche</string>
     <string name="dash_history_limit">Limite della cronologia salvata</string>
     <string name="dash_history_limit_pro">Pro: fino a 50 report locali</string>
-    <string name="dash_history_limit_free">Gratis: fino a 10 report · Pro: fino a 50</string>
+    <string name="dash_history_limit_free">I controlli sono illimitati. La cronologia conserva gli ultimi 10 report, Pro ne conserva 50.</string>
     <string name="dash_upgrade_limit">Aumenta il limite con Pro</string>
     <string name="dash_stat_total">Report</string>
     <string name="dash_stat_ai">Con indizi di IA</string>
@@ -417,15 +427,17 @@
     <string name="error_home">Home</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">Su questo dispositivo</string>
     <string name="studio_title">Gestione dei metadati</string>
     <string name="studio_quota_pro">PRO · Pulizia illimitata</string>
     <string name="studio_quota_free">GRATIS · Pulite oggi: %1$d di %2$d · Si azzera alle 00:00 UTC</string>
     <string name="studio_subtitle">Le modifiche vengono davvero salvate nel file. L’immagine non viene mai caricata.</string>
     <string name="studio_back_to_report">← Torna al report</string>
+    <string name="studio_copy_from_photo">Copia i dati da un’altra foto</string>
+    <string name="studio_copy_done">Campi compilati dall’altra foto: %1$d. Controllali e salva.</string>
+    <string name="studio_copy_none">Quella foto non ha dati EXIF da copiare.</string>
     <string name="studio_tab_strip">Pulizia</string>
     <string name="studio_tab_edit">Editor EXIF</string>
-    <string name="studio_tab_batch">Batch PRO</string>
+    <string name="studio_tab_batch">In blocco</string>
     <string name="studio_check_numbers">Controlla i numeri: GPS, ISO, apertura e tempo di scatto</string>
     <string name="studio_source_eyebrow">1 · Immagine di origine</string>
     <string name="studio_source_none">Nessun file selezionato</string>
@@ -437,7 +449,6 @@
     <string name="studio_strip_save_copy">Salva una copia pulita</string>
     <string name="studio_strip_overwrite">Sostituisci l’originale, con backup</string>
     <string name="studio_strip_overwrite_note">Solo i documenti JPEG/PNG scrivibili possono essere sostituiti. Prima sceglierai dove salvare un backup completo.</string>
-    <string name="studio_edit_eyebrow">2 · Editor EXIF</string>
     <string name="studio_edit_gps_title">Coordinate e GPS</string>
     <string name="studio_edit_remove_gps">Rimuovi tutto il GPS</string>
     <string name="studio_field_latitude">Latitudine (−90…90)</string>
@@ -446,6 +457,7 @@
     <string name="studio_edit_dates_title">Data di scatto</string>
     <string name="studio_field_date_taken">Data di scatto</string>
     <string name="studio_field_date_digitized">Data di digitalizzazione</string>
+    <string name="studio_dates_hint">Le gallerie ordinano le foto per data di scatto. Dopo il salvataggio, MetaCheck chiede ad Android di rileggere il file; Google Foto può mostrare la data vecchia finché non aggiorna la propria libreria.</string>
     <string name="studio_date_value">%1$s: %2$s</string>
     <string name="studio_date_unchanged">invariata</string>
     <string name="studio_edit_camera_title">Fotocamera e autore</string>
@@ -454,13 +466,27 @@
     <string name="studio_field_aperture">Apertura (ad esempio 1.8)</string>
     <string name="studio_field_shutter">Tempo di scatto in secondi (ad esempio 0.02)</string>
     <string name="studio_field_keep">Lascia invariato</string>
-    <string name="studio_edit_note">I campi vuoti restano invariati. L’editor funziona con JPEG; i blocchi XMP/IPTC separati che contraddicono l’EXIF vengono rimossi dal JPEG. Nulla viene applicato al file di origine finché non salvi. Qualsiasi modifica può invalidare le firme C2PA.</string>
+    <string name="studio_edit_note">I campi vuoti restano invariati. L’editor funziona con JPEG. Parole chiave, didascalie e altri campi descrittivi vengono mantenuti; date, coordinate e cronologia delle modifiche vecchie in XMP/IPTC vengono rimosse. Il file originale non cambia finché non salvi. Qualsiasi modifica può invalidare le firme C2PA.</string>
     <string name="studio_edit_save_copy">Salva una copia JPEG modificata</string>
     <string name="studio_edit_overwrite">Sostituisci il JPEG, con backup</string>
-    <string name="studio_batch_eyebrow">Pulizia in batch · Pro</string>
     <string name="studio_batch_title">Pulizia in batch</string>
-    <string name="studio_batch_text">Fino a 50 file per volta. Le nuove copie vengono salvate nella cartella scelta. Gli originali restano invariati.</string>
+    <string name="studio_batch_text">Le copie pulite vengono salvate nella cartella scelta. Gli originali restano invariati.</string>
     <string name="studio_batch_selected">Selezionate: %1$d</string>
+    <string name="studio_batch_run_size">QUESTO GIRO · %1$d</string>
+    <string name="studio_batch_free_note">Gratis: %1$d foto per giro, entro il limite giornaliero. Pro: %2$d per giro, senza limiti.</string>
+    <string name="studio_batch_upgrade">Pulisci tutto insieme con Pro</string>
+    <string name="studio_audit_button">Controlla un’intera cartella</string>
+    <string name="studio_audit_hint">Ogni foto della cartella viene letta su questo dispositivo. Quelle che rivelano di più vengono selezionate per la pulizia.</string>
+    <string name="studio_audit_running">Controllo… %1$d foto</string>
+    <string name="studio_audit_summary">Foto controllate: %1$d</string>
+    <string name="studio_audit_clean_none">Nessun metadato trovato in questa cartella.</string>
+    <string name="studio_audit_location">Posizione esatta: %1$d</string>
+    <string name="studio_audit_serial">Numero di serie: %1$d</string>
+    <string name="studio_audit_person">Nome del proprietario o dell’autore: %1$d</string>
+    <string name="studio_audit_other">Solo altri metadati: %1$d</string>
+    <string name="studio_audit_selected">Selezionate per la pulizia, le più rischiose per prime.</string>
+    <string name="studio_audit_limited">Sono state controllate solo le prime %1$d foto. Scegli una cartella più piccola per controllare il resto.</string>
+    <string name="studio_audit_failed">Impossibile leggere questa cartella. Scegline un’altra.</string>
     <string name="studio_batch_choose_photos">Scegli le foto</string>
     <string name="studio_batch_choose_folder_start">Scegli la cartella e avvia</string>
     <string name="studio_batch_choose_files_first">Scegli prima i file</string>
@@ -482,6 +508,14 @@
     <string name="studio_msg_verified">Scrittura verificata.</string>
     <string name="studio_msg_not_verified">Impossibile ricontrollare la scrittura: apri il file manualmente.</string>
     <string name="studio_msg_downscaled">La risoluzione è stata ridotta per un’elaborazione sicura.</string>
+    <string name="studio_msg_shift_done">Date spostate: %1$d salvate, %2$d con errori.</string>
+    <string name="studio_shift_title">Sposta la data di scatto</string>
+    <string name="studio_shift_text">Per le foto JPEG selezionate, se l’ora o il fuso orario della fotocamera erano sbagliati. Le copie con la nuova data vengono salvate nella cartella scelta con gli stessi nomi.</string>
+    <string name="studio_shift_hours">Ore</string>
+    <string name="studio_shift_minutes">Minuti</string>
+    <string name="studio_shift_run">Scegli la cartella e sposta</string>
+    <string name="studio_shift_invalid">Inserisci ore e minuti (0–59), al massimo un anno.</string>
+    <string name="studio_shift_pro">Disponibile in Pro.</string>
     <string name="studio_msg_batch_done">Pulizia in batch completata: %1$d salvate, %2$d non riuscite.</string>
     <string name="studio_msg_interrupted">Operazione interrotta: il sistema ha riavviato l’app. Riprova; puoi eliminare il file vuoto creato</string>
 
@@ -561,7 +595,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">GRATIS  →  PRO</string>
-    <string name="pro_free_features">Gratis: scansione di foto e video e GPS Privacy Shield, visualizzatore EXIF, modifica e pulizia fino a %1$d foto al giorno (UTC), 10 report in cronologia.</string>
+    <string name="pro_free_features">Gratis: controlli illimitati di foto, video e intere cartelle, GPS Privacy Shield, visualizzatore EXIF, modifica e pulizia fino a %1$d foto al giorno (UTC), in blocco 5 alla volta, gli ultimi 10 report nella cronologia.</string>
     <string name="pro_pro_features">Pro: pulizia e modifica illimitate, pulizia dei video (MP4, MOV) senza ricodifica, elaborazione in batch fino a 50 foto, PDF/JSON, 50 report, API.</string>
     <string name="pro_one_time">Acquisto una tantum tramite Google Play, nessun abbonamento.</string>
     <string name="pro_key_label">Chiave Pro, se ne hai una</string>
@@ -654,6 +688,7 @@
     <string name="privacy_kind_location_tags">Tag di posizione</string>
     <string name="privacy_kind_owner">Proprietario della fotocamera</string>
     <string name="privacy_kind_device_serial">Numero di serie del dispositivo</string>
+    <string name="privacy_kind_place_name">Nome del luogo</string>
     <string name="privacy_kind_author">Autore e diritti</string>
     <string name="privacy_kind_ai_prompt">Prompt e impostazioni IA</string>
     <string name="privacy_kind_capture_time">Quando è stata scattata</string>

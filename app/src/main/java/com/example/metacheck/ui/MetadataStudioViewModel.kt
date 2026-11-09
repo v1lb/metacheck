@@ -30,7 +30,36 @@ class MetadataStudioViewModel(
     private val savedState: SavedStateHandle = SavedStateHandle(),
     private val uriAccess: UriAccess? = null,
     private val sharedCopies: com.example.metacheck.data.share.SharedCopies? = null,
+    private val folderAudit: com.example.metacheck.domain.metadata.FolderAuditRepository? = null,
 ) : ViewModel() {
+    /** Проверка папки: сколько фото уже прочитано и итог. */
+    data class AuditState(
+        val running: Boolean = false,
+        val scanned: Int = 0,
+        val result: com.example.metacheck.domain.metadata.AuditResult? = null,
+    )
+    private val _audit = MutableStateFlow(AuditState())
+    val audit = _audit.asStateFlow()
+
+    /** Проверка всей папки. По готовности [onDone] получает фото для очистки, самые рискованные первыми. */
+    fun auditFolder(tree: Uri, onDone: (List<String>) -> Unit) {
+        val repo = folderAudit ?: return
+        if (_audit.value.running) return
+        _audit.value = AuditState(running = true)
+        viewModelScope.launch {
+            try {
+                val result = repo.scan(tree.toString()) { n -> _audit.value = _audit.value.copy(scanned = n) }
+                _audit.value = AuditState(running = false, scanned = result.scanned, result = result)
+                onDone(result.findings.map { it.uri })
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                _audit.value = AuditState()
+                _message.value = UiText.Res(R.string.studio_audit_failed)
+            }
+        }
+    }
+
     /** Файл выбран пользователем: сохраняем доступ, чтобы он пережил выгрузку процесса. */
     fun persistAccess(uri: Uri) {
         uriAccess?.persist(uri)
@@ -162,12 +191,29 @@ class MetadataStudioViewModel(
         usedToday.value = studio.usedToday()
     }
 
-    fun batchStrip(sources: List<String>, targetTree: Uri) = work {
+    fun batchStrip(sources: List<String>, targetTree: Uri, onDone: () -> Unit = {}) = work {
         _batch.value = BatchProgress(total = sources.size, running = true)
         studio.batch(sources, targetTree.toString()) { _batch.value = it }.fold(
             onSuccess = {
                 _message.value = UiText.Res(R.string.studio_msg_batch_done, it.succeeded, it.failed)
                 _batch.value = it
+                onDone()
+            },
+            onFailure = {
+                _batch.value = _batch.value.copy(running = false)
+                _message.value = failMessage(it)
+            },
+        )
+        usedToday.value = studio.usedToday()
+    }
+
+    fun shiftDates(sources: List<String>, targetTree: Uri, seconds: Long, onDone: () -> Unit = {}) = work {
+        _batch.value = BatchProgress(total = sources.size, running = true)
+        studio.shiftDates(sources, targetTree.toString(), seconds) { _batch.value = it }.fold(
+            onSuccess = {
+                _message.value = UiText.Res(R.string.studio_msg_shift_done, it.succeeded, it.failed)
+                _batch.value = it
+                onDone()
             },
             onFailure = {
                 _batch.value = _batch.value.copy(running = false)
@@ -229,7 +275,7 @@ class MetadataStudioViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val c = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MetaCheckApplication).container
-                MetadataStudioViewModel(c.metadataStudio, createSavedStateHandle(), c.uriAccess, c.sharedCopies)
+                MetadataStudioViewModel(c.metadataStudio, createSavedStateHandle(), c.uriAccess, c.sharedCopies, c.folderAudit)
             }
         }
     }

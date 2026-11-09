@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">Longitude GPS (XMP)</string>
     <string name="xmp_gps_altitude">Altitude GPS (XMP)</string>
     <string name="xmp_digital_source_type">Type de source (IPTC)</string>
+    <string name="meta_keywords">Mots-clés</string>
+    <string name="meta_headline">Titre</string>
+    <string name="meta_credit">Crédit</string>
+    <string name="meta_source">Source</string>
+    <string name="meta_sublocation">Lieu</string>
+    <string name="meta_city">Ville</string>
+    <string name="meta_state">Région</string>
+    <string name="meta_country">Pays</string>
     <string name="xmp_history_agents">Logiciels dans l’historique des modifications</string>
     <string name="value_exposure_fraction">1/%1$d s</string>
     <string name="value_exposure_seconds">%1$s s</string>
@@ -201,6 +209,7 @@
     <string name="failure_format_unconfirmed">La signature du fichier ne confirme pas une image JPEG ou PNG</string>
     <string name="failure_format_unconfirmed_type">La signature du fichier ne confirme pas une image JPEG ou PNG (type du fournisseur : %1$s)</string>
     <string name="failure_unsupported_image">Format d’image non pris en charge</string>
+    <string name="failure_no_date_to_shift">La photo n’a pas de date de prise de vue à décaler</string>
     <string name="failure_edit_jpeg_only">L’éditeur EXIF fonctionne avec JPEG ; pour l’instant, PNG/HEIC/AVIF peuvent seulement être entièrement nettoyés en nouvelle copie</string>
     <string name="failure_overwrite_edit_jpeg_only">La modification EXIF avec écrasement est prise en charge pour JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">L’écrasement lors du nettoyage ne prend en charge que JPEG et PNG : enregistrez les autres formats en nouvelle copie</string>
@@ -377,6 +386,7 @@
     <string name="main_api_empty_response">Réponse vide</string>
     <string name="dash_title">Que révèle votre photo ?</string>
     <string name="dash_subtitle">Position, appareil, auteur et étiquettes IA cachés dans le fichier. Vérifiez-les et supprimez-les avant d’envoyer.</string>
+    <string name="dash_audit_text">Découvrez combien de photos d’un dossier révèlent où elles ont été prises.</string>
     <string name="dash_scan_hint">Choisissez le JPEG, PNG ou HEIC d’origine ou une vidéo MP4/MOV : une capture d’écran a déjà perdu une partie des données.</string>
     <string name="dash_choose_photo">Vérifier une photo ou une vidéo</string>
     <string name="dash_camera">Appareil photo</string>
@@ -387,7 +397,7 @@
     <string name="dash_section_analytics">Statistiques</string>
     <string name="dash_history_limit">Limite de l’historique enregistré</string>
     <string name="dash_history_limit_pro">Pro : jusqu’à 50 rapports locaux</string>
-    <string name="dash_history_limit_free">Gratuit : jusqu’à 10 rapports · Pro : jusqu’à 50</string>
+    <string name="dash_history_limit_free">Les vérifications sont illimitées. L’historique garde les 10 derniers rapports, Pro en garde 50.</string>
     <string name="dash_upgrade_limit">Augmentez la limite avec Pro</string>
     <string name="dash_stat_total">Rapports</string>
     <string name="dash_stat_ai">Avec indices d’IA</string>
@@ -417,15 +427,17 @@
     <string name="error_home">Accueil</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">Sur cet appareil</string>
     <string name="studio_title">Gestion des métadonnées</string>
     <string name="studio_quota_pro">PRO · Nettoyage illimité</string>
     <string name="studio_quota_free">GRATUIT · Nettoyées aujourd’hui : %1$d sur %2$d · Réinitialisation à 00:00 UTC</string>
     <string name="studio_subtitle">Les modifications sont réellement enregistrées dans le fichier. L’image n’est jamais envoyée.</string>
     <string name="studio_back_to_report">← Retour au rapport</string>
+    <string name="studio_copy_from_photo">Copier les données d’une autre photo</string>
+    <string name="studio_copy_done">Champs remplis depuis l’autre photo : %1$d. Vérifiez-les puis enregistrez.</string>
+    <string name="studio_copy_none">Cette photo ne contient aucune donnée EXIF à copier.</string>
     <string name="studio_tab_strip">Nettoyage</string>
     <string name="studio_tab_edit">Éditeur EXIF</string>
-    <string name="studio_tab_batch">Lot PRO</string>
+    <string name="studio_tab_batch">Lot</string>
     <string name="studio_check_numbers">Vérifiez les valeurs : GPS, ISO, ouverture et vitesse d’obturation</string>
     <string name="studio_source_eyebrow">1 · Image source</string>
     <string name="studio_source_none">Aucun fichier sélectionné</string>
@@ -437,7 +449,6 @@
     <string name="studio_strip_save_copy">Enregistrer une copie nettoyée</string>
     <string name="studio_strip_overwrite">Remplacer l’original, avec sauvegarde</string>
     <string name="studio_strip_overwrite_note">Seuls les documents JPEG/PNG modifiables peuvent être remplacés. Vous choisirez d’abord où enregistrer une sauvegarde complète.</string>
-    <string name="studio_edit_eyebrow">2 · Éditeur EXIF</string>
     <string name="studio_edit_gps_title">Coordonnées et GPS</string>
     <string name="studio_edit_remove_gps">Supprimer tout le GPS</string>
     <string name="studio_field_latitude">Latitude (−90…90)</string>
@@ -446,6 +457,7 @@
     <string name="studio_edit_dates_title">Date de prise de vue</string>
     <string name="studio_field_date_taken">Date de prise de vue</string>
     <string name="studio_field_date_digitized">Date de numérisation</string>
+    <string name="studio_dates_hint">Les galeries trient les photos selon la date de prise de vue. Après l’enregistrement, MetaCheck demande à Android de relire le fichier ; Google Photos peut afficher l’ancienne date jusqu’à la mise à jour de sa propre bibliothèque.</string>
     <string name="studio_date_value">%1$s : %2$s</string>
     <string name="studio_date_unchanged">inchangée</string>
     <string name="studio_edit_camera_title">Appareil et auteur</string>
@@ -454,13 +466,27 @@
     <string name="studio_field_aperture">Ouverture (par exemple 1.8)</string>
     <string name="studio_field_shutter">Vitesse d’obturation en secondes (par exemple 0.02)</string>
     <string name="studio_field_keep">Laisser inchangé</string>
-    <string name="studio_edit_note">Les champs vides restent inchangés. L’éditeur fonctionne avec JPEG ; les blocs XMP/IPTC séparés qui contredisent l’EXIF sont retirés du JPEG. Rien n’est appliqué au fichier source avant l’enregistrement. Toute modification peut invalider les signatures C2PA.</string>
+    <string name="studio_edit_note">Les champs vides restent inchangés. L’éditeur fonctionne avec le JPEG. Les mots-clés, légendes et autres champs descriptifs sont conservés ; les anciennes dates, coordonnées et l’historique de modification dans XMP/IPTC sont supprimés. Le fichier source ne change pas avant l’enregistrement. Toute modification peut invalider les signatures C2PA.</string>
     <string name="studio_edit_save_copy">Enregistrer une copie JPEG modifiée</string>
     <string name="studio_edit_overwrite">Remplacer le JPEG, avec sauvegarde</string>
-    <string name="studio_batch_eyebrow">Nettoyage par lot · Pro</string>
     <string name="studio_batch_title">Nettoyage par lot</string>
-    <string name="studio_batch_text">Jusqu’à 50 fichiers par lot. Les nouvelles copies sont enregistrées dans le dossier choisi. Les originaux restent inchangés.</string>
+    <string name="studio_batch_text">Les copies nettoyées sont enregistrées dans le dossier choisi. Les originaux restent inchangés.</string>
     <string name="studio_batch_selected">Sélectionnées : %1$d</string>
+    <string name="studio_batch_run_size">CE LOT · %1$d</string>
+    <string name="studio_batch_free_note">Gratuit : %1$d photos par lot, dans la limite quotidienne. Pro : %2$d par lot, sans limite.</string>
+    <string name="studio_batch_upgrade">Tout nettoyer d’un coup avec Pro</string>
+    <string name="studio_audit_button">Vérifier un dossier entier</string>
+    <string name="studio_audit_hint">Chaque photo du dossier est lue sur cet appareil. Celles qui en révèlent le plus sont sélectionnées pour le nettoyage.</string>
+    <string name="studio_audit_running">Vérification… %1$d photos</string>
+    <string name="studio_audit_summary">Photos vérifiées : %1$d</string>
+    <string name="studio_audit_clean_none">Aucune métadonnée trouvée dans ce dossier.</string>
+    <string name="studio_audit_location">Lieu exact : %1$d</string>
+    <string name="studio_audit_serial">Numéro de série : %1$d</string>
+    <string name="studio_audit_person">Nom du propriétaire ou de l’auteur : %1$d</string>
+    <string name="studio_audit_other">Autres métadonnées uniquement : %1$d</string>
+    <string name="studio_audit_selected">Sélectionnées pour le nettoyage, les plus risquées d’abord.</string>
+    <string name="studio_audit_limited">Seules les %1$d premières photos ont été vérifiées. Choisissez un dossier plus petit pour vérifier le reste.</string>
+    <string name="studio_audit_failed">Impossible de lire ce dossier. Choisissez-en un autre.</string>
     <string name="studio_batch_choose_photos">Choisir des photos</string>
     <string name="studio_batch_choose_folder_start">Choisir un dossier et démarrer</string>
     <string name="studio_batch_choose_files_first">Choisissez d’abord les fichiers</string>
@@ -482,6 +508,14 @@
     <string name="studio_msg_verified">Écriture vérifiée.</string>
     <string name="studio_msg_not_verified">Impossible de revérifier l’écriture : ouvrez le fichier manuellement.</string>
     <string name="studio_msg_downscaled">La résolution a été réduite pour un traitement sûr.</string>
+    <string name="studio_msg_shift_done">Dates décalées : %1$d enregistrées, %2$d en échec.</string>
+    <string name="studio_shift_title">Décaler la date de prise de vue</string>
+    <string name="studio_shift_text">Pour les photos JPEG sélectionnées, si l’heure ou le fuseau de l’appareil étaient faux. Les copies avec la nouvelle date sont enregistrées dans le dossier choisi, sous les mêmes noms.</string>
+    <string name="studio_shift_hours">Heures</string>
+    <string name="studio_shift_minutes">Minutes</string>
+    <string name="studio_shift_run">Choisir un dossier et décaler</string>
+    <string name="studio_shift_invalid">Indiquez les heures et minutes (0–59), un an maximum.</string>
+    <string name="studio_shift_pro">Disponible dans Pro.</string>
     <string name="studio_msg_batch_done">Nettoyage par lot terminé : %1$d enregistrées, %2$d en échec.</string>
     <string name="studio_msg_interrupted">Opération interrompue : le système a redémarré l’application. Réessayez ; vous pouvez supprimer le fichier vide créé</string>
 
@@ -561,7 +595,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">GRATUIT  →  PRO</string>
-    <string name="pro_free_features">Gratuit : analyse des photos et vidéos et GPS Privacy Shield, visionneuse EXIF, modification et nettoyage de jusqu’à %1$d photos par jour (UTC), 10 rapports dans l’historique.</string>
+    <string name="pro_free_features">Gratuit : vérifications illimitées de photos, vidéos et dossiers entiers, GPS Privacy Shield, visionneuse EXIF, modification et nettoyage de %1$d photos par jour (UTC), par lots de 5, les 10 derniers rapports dans l’historique.</string>
     <string name="pro_pro_features">Pro : nettoyage et modification illimités, nettoyage des vidéos (MP4, MOV) sans réencodage, traitement par lot jusqu’à 50 photos, PDF/JSON, 50 rapports, API.</string>
     <string name="pro_one_time">Achat unique via Google Play, sans abonnement.</string>
     <string name="pro_key_label">Clé Pro, si vous en avez une</string>
@@ -654,6 +688,7 @@
     <string name="privacy_kind_location_tags">Balises de localisation</string>
     <string name="privacy_kind_owner">Propriétaire de l’appareil</string>
     <string name="privacy_kind_device_serial">Numéro de série de l’appareil</string>
+    <string name="privacy_kind_place_name">Nom du lieu</string>
     <string name="privacy_kind_author">Auteur et droits</string>
     <string name="privacy_kind_ai_prompt">Prompt et réglages IA</string>
     <string name="privacy_kind_capture_time">Date de prise de vue</string>

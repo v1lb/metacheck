@@ -206,6 +206,7 @@ class ResourceMetaTexts(private val context: Context) : MetaTexts {
 
         private fun exif(tag: String) = ExifReader.KEY_PREFIX + tag
         private fun xmp(property: String) = XmpExtractor.KEY_PREFIX + property
+        private fun iptc(name: String) = com.example.metacheck.data.parser.IptcReader.KEY_PREFIX + name
 
         /** Ключ поля → подпись. Поля без записи здесь показываются по [MetaItem.label]. */
         private val labelIds: Map<String, Int> = mapOf(
@@ -282,6 +283,26 @@ class ResourceMetaTexts(private val context: Context) : MetaTexts {
             xmp("exif:GPSAltitude") to R.string.xmp_gps_altitude,
             xmp(SignalEngine.KEY_DIGITAL_SOURCE_TYPE) to R.string.xmp_digital_source_type,
             XmpExtractor.KEY_HISTORY_AGENTS to R.string.xmp_history_agents,
+            xmp("dc:subject") to R.string.meta_keywords,
+            xmp("photoshop:Headline") to R.string.meta_headline,
+            xmp("photoshop:Credit") to R.string.meta_credit,
+            xmp("photoshop:Source") to R.string.meta_source,
+            xmp("Iptc4xmpCore:Location") to R.string.meta_sublocation,
+            xmp("photoshop:City") to R.string.meta_city,
+            xmp("photoshop:State") to R.string.meta_state,
+            xmp("photoshop:Country") to R.string.meta_country,
+            iptc("ObjectName") to R.string.xmp_title,
+            iptc("Headline") to R.string.meta_headline,
+            iptc("Caption") to R.string.xmp_description,
+            iptc("Keywords") to R.string.meta_keywords,
+            iptc("Byline") to R.string.xmp_creator,
+            iptc("Copyright") to R.string.xmp_rights,
+            iptc("Credit") to R.string.meta_credit,
+            iptc("Source") to R.string.meta_source,
+            iptc("Sublocation") to R.string.meta_sublocation,
+            iptc("City") to R.string.meta_city,
+            iptc("State") to R.string.meta_state,
+            iptc("Country") to R.string.meta_country,
 
             Mp4MetadataReader.KEY_DURATION to R.string.label_video_duration,
             Mp4MetadataReader.KEY_CODEC to R.string.label_video_codec,

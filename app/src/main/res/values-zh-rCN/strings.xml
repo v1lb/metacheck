@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">GPS 经度（XMP）</string>
     <string name="xmp_gps_altitude">GPS 海拔（XMP）</string>
     <string name="xmp_digital_source_type">来源类型（IPTC）</string>
+    <string name="meta_keywords">关键词</string>
+    <string name="meta_headline">标题</string>
+    <string name="meta_credit">署名</string>
+    <string name="meta_source">来源</string>
+    <string name="meta_sublocation">地点</string>
+    <string name="meta_city">城市</string>
+    <string name="meta_state">地区</string>
+    <string name="meta_country">国家</string>
     <string name="xmp_history_agents">编辑历史中的软件</string>
     <string name="value_exposure_fraction">1/%1$d 秒</string>
     <string name="value_exposure_seconds">%1$s 秒</string>
@@ -201,6 +209,7 @@
     <string name="failure_format_unconfirmed">文件签名无法确认是 JPEG 或 PNG 图像</string>
     <string name="failure_format_unconfirmed_type">文件签名无法确认是 JPEG 或 PNG 图像（提供方类型：%1$s）</string>
     <string name="failure_unsupported_image">不支持的图像格式</string>
+    <string name="failure_no_date_to_shift">这张照片没有可调整的拍摄日期</string>
     <string name="failure_edit_jpeg_only">EXIF 编辑器仅支持 JPEG；PNG/HEIC/AVIF 目前只能作为新副本完全清理</string>
     <string name="failure_overwrite_edit_jpeg_only">覆盖方式编辑 EXIF 仅支持 JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">清理时覆盖仅支持 JPEG 和 PNG：其他格式请另存为新副本</string>
@@ -373,6 +382,7 @@
     <string name="main_api_empty_response">空响应</string>
     <string name="dash_title">你的照片会泄露什么？</string>
     <string name="dash_subtitle">文件中隐藏着位置、相机、作者和 AI 标签。发送前检查并移除它们。</string>
+    <string name="dash_audit_text">看看文件夹中有多少照片泄露了拍摄地点。</string>
     <string name="dash_scan_hint">请选择原始 JPEG、PNG、HEIC 或 MP4/MOV 视频：屏幕截图已丢失部分数据。</string>
     <string name="dash_choose_photo">检查照片或视频</string>
     <string name="dash_camera">相机</string>
@@ -383,7 +393,7 @@
     <string name="dash_section_analytics">统计</string>
     <string name="dash_history_limit">已保存历史记录上限</string>
     <string name="dash_history_limit_pro">Pro：最多 50 份本地报告</string>
-    <string name="dash_history_limit_free">免费：最多 10 份 · Pro：最多 50 份</string>
+    <string name="dash_history_limit_free">检查次数不限。历史记录保留最近 10 份报告，Pro 保留 50 份。</string>
     <string name="dash_upgrade_limit">升级 Pro 提高上限</string>
     <string name="dash_stat_total">报告</string>
     <string name="dash_stat_ai">有 AI 迹象</string>
@@ -413,15 +423,17 @@
     <string name="error_home">首页</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">在此设备上</string>
     <string name="studio_title">元数据管理</string>
     <string name="studio_quota_pro">PRO · 无限清理</string>
     <string name="studio_quota_free">免费 · 今日已清理：%1$d / %2$d · 00:00 UTC 重置</string>
     <string name="studio_subtitle">更改会真正保存到文件中。图像永远不会上传。</string>
     <string name="studio_back_to_report">← 返回报告</string>
+    <string name="studio_copy_from_photo">从另一张照片复制数据</string>
+    <string name="studio_copy_done">已从另一张照片填入 %1$d 个字段。请检查后保存。</string>
+    <string name="studio_copy_none">该照片没有可复制的 EXIF 数据。</string>
     <string name="studio_tab_strip">清理</string>
     <string name="studio_tab_edit">EXIF 编辑器</string>
-    <string name="studio_tab_batch">批量 PRO</string>
+    <string name="studio_tab_batch">批量</string>
     <string name="studio_check_numbers">请检查数值：GPS、ISO、光圈和快门速度</string>
     <string name="studio_source_eyebrow">1 · 源图像</string>
     <string name="studio_source_none">未选择文件</string>
@@ -433,7 +445,6 @@
     <string name="studio_strip_save_copy">保存清理后的副本</string>
     <string name="studio_strip_overwrite">替换原文件（含备份）</string>
     <string name="studio_strip_overwrite_note">只能替换可写入的 JPEG/PNG 文档。您需要先选择完整备份的保存位置。</string>
-    <string name="studio_edit_eyebrow">2 · EXIF 编辑器</string>
     <string name="studio_edit_gps_title">坐标和 GPS</string>
     <string name="studio_edit_remove_gps">移除全部 GPS</string>
     <string name="studio_field_latitude">纬度（−90…90）</string>
@@ -442,6 +453,7 @@
     <string name="studio_edit_dates_title">拍摄日期</string>
     <string name="studio_field_date_taken">拍摄日期</string>
     <string name="studio_field_date_digitized">数字化日期</string>
+    <string name="studio_dates_hint">图库按拍摄日期排序照片。保存后，MetaCheck 会请求 Android 重新读取文件；在 Google 相册更新自己的图库前，可能仍显示旧日期。</string>
     <string name="studio_date_value">%1$s：%2$s</string>
     <string name="studio_date_unchanged">不变</string>
     <string name="studio_edit_camera_title">相机和作者</string>
@@ -450,13 +462,27 @@
     <string name="studio_field_aperture">光圈（例如 1.8）</string>
     <string name="studio_field_shutter">快门速度（秒，例如 0.02）</string>
     <string name="studio_field_keep">保持不变</string>
-    <string name="studio_edit_note">空字段保持不变。编辑器仅支持 JPEG；与 EXIF 冲突的独立 XMP/IPTC 块会从 JPEG 中移除。保存之前不会对源文件做任何更改。任何编辑都可能使 C2PA 签名失效。</string>
+    <string name="studio_edit_note">留空的字段保持不变。编辑器适用于 JPEG。关键词、说明等描述性字段会保留；XMP/IPTC 中旧的日期、坐标和编辑历史会被删除。保存之前不会更改原文件。任何编辑都可能使 C2PA 签名失效。</string>
     <string name="studio_edit_save_copy">保存编辑后的 JPEG 副本</string>
     <string name="studio_edit_overwrite">替换 JPEG（含备份）</string>
-    <string name="studio_batch_eyebrow">批量清理 · Pro</string>
     <string name="studio_batch_title">批量清理</string>
-    <string name="studio_batch_text">每次最多 50 个文件。新副本保存到所选文件夹，原文件保持不变。</string>
+    <string name="studio_batch_text">清理后的副本保存到你选择的文件夹，原文件保持不变。</string>
     <string name="studio_batch_selected">已选择：%1$d</string>
+    <string name="studio_batch_run_size">本次 · %1$d</string>
+    <string name="studio_batch_free_note">免费：每次 %1$d 张，计入每日限额。Pro：每次 %2$d 张，不限次数。</string>
+    <string name="studio_batch_upgrade">升级 Pro 一次清理全部</string>
+    <string name="studio_audit_button">检查整个文件夹</string>
+    <string name="studio_audit_hint">在本机读取文件夹中的每张照片，并挑出泄露信息最多的照片进行清理。</string>
+    <string name="studio_audit_running">正在检查… %1$d 张</string>
+    <string name="studio_audit_summary">已检查照片：%1$d</string>
+    <string name="studio_audit_clean_none">此文件夹中未发现元数据。</string>
+    <string name="studio_audit_location">精确位置：%1$d</string>
+    <string name="studio_audit_serial">序列号：%1$d</string>
+    <string name="studio_audit_person">所有者或作者姓名：%1$d</string>
+    <string name="studio_audit_other">仅其他元数据：%1$d</string>
+    <string name="studio_audit_selected">已按风险从高到低选出待清理照片。</string>
+    <string name="studio_audit_limited">仅检查了前 %1$d 张照片。请选择更小的文件夹来检查其余照片。</string>
+    <string name="studio_audit_failed">无法读取此文件夹，请选择其他文件夹。</string>
     <string name="studio_batch_choose_photos">选择照片</string>
     <string name="studio_batch_choose_folder_start">选择文件夹并开始</string>
     <string name="studio_batch_choose_files_first">请先选择文件</string>
@@ -478,6 +504,14 @@
     <string name="studio_msg_verified">写入已验证。</string>
     <string name="studio_msg_not_verified">无法重新检查写入：请手动打开文件。</string>
     <string name="studio_msg_downscaled">为安全处理已降低分辨率。</string>
+    <string name="studio_msg_shift_done">日期已调整：成功 %1$d 张，失败 %2$d 张。</string>
+    <string name="studio_shift_title">调整拍摄日期</string>
+    <string name="studio_shift_text">用于所选 JPEG 照片，适用于相机时钟或时区设置错误的情况。调整后的副本以相同文件名保存到你选择的文件夹。</string>
+    <string name="studio_shift_hours">小时</string>
+    <string name="studio_shift_minutes">分钟</string>
+    <string name="studio_shift_run">选择文件夹并调整</string>
+    <string name="studio_shift_invalid">请输入小时和分钟（0–59），最多一年。</string>
+    <string name="studio_shift_pro">Pro 版可用。</string>
     <string name="studio_msg_batch_done">批量清理完成：已保存 %1$d 个，失败 %2$d 个。</string>
     <string name="studio_msg_interrupted">操作已中断：系统重启了应用。请重试；可以删除已创建的空文件</string>
 
@@ -557,7 +591,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">免费  →  PRO</string>
-    <string name="pro_free_features">免费：扫描照片和视频及 GPS Privacy Shield、EXIF 查看器，每天最多编辑和清理 %1$d 张照片（UTC），历史记录 10 份。</string>
+    <string name="pro_free_features">免费：不限次数检查照片、视频和整个文件夹，GPS Privacy Shield，EXIF 查看器，每天最多编辑和清理 %1$d 张照片（UTC），批量每次 5 张，历史记录保留最近 10 份报告。</string>
     <string name="pro_pro_features">Pro：无限清理和编辑，不重新编码清理视频（MP4、MOV），批量处理最多 50 张照片，PDF/JSON，50 份报告，API。</string>
     <string name="pro_one_time">通过 Google Play 一次性购买，无需订阅。</string>
     <string name="pro_key_label">Pro 密钥（如有）</string>
@@ -649,6 +683,7 @@
     <string name="privacy_kind_location_tags">位置标签</string>
     <string name="privacy_kind_owner">相机所有者</string>
     <string name="privacy_kind_device_serial">设备序列号</string>
+    <string name="privacy_kind_place_name">地名</string>
     <string name="privacy_kind_author">作者和权利</string>
     <string name="privacy_kind_ai_prompt">AI 提示词和设置</string>
     <string name="privacy_kind_capture_time">拍摄时间</string>

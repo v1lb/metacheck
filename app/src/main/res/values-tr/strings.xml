@@ -81,6 +81,14 @@
     <string name="xmp_gps_longitude">GPS boylamı (XMP)</string>
     <string name="xmp_gps_altitude">GPS yüksekliği (XMP)</string>
     <string name="xmp_digital_source_type">Kaynak türü (IPTC)</string>
+    <string name="meta_keywords">Anahtar kelimeler</string>
+    <string name="meta_headline">Başlık</string>
+    <string name="meta_credit">Kaynak gösterimi</string>
+    <string name="meta_source">Kaynak</string>
+    <string name="meta_sublocation">Yer</string>
+    <string name="meta_city">Şehir</string>
+    <string name="meta_state">Bölge</string>
+    <string name="meta_country">Ülke</string>
     <string name="xmp_history_agents">Düzenleme geçmişindeki yazılımlar</string>
     <string name="value_exposure_fraction">1/%1$d sn</string>
     <string name="value_exposure_seconds">%1$s sn</string>
@@ -201,6 +209,7 @@
     <string name="failure_format_unconfirmed">Dosya imzası bir JPEG veya PNG görüntüsünü doğrulamıyor</string>
     <string name="failure_format_unconfirmed_type">Dosya imzası bir JPEG veya PNG görüntüsünü doğrulamıyor (sağlayıcı türü: %1$s)</string>
     <string name="failure_unsupported_image">Desteklenmeyen görüntü biçimi</string>
+    <string name="failure_no_date_to_shift">Fotoğrafta kaydırılacak çekim tarihi yok</string>
     <string name="failure_edit_jpeg_only">EXIF düzenleyici JPEG ile çalışır; PNG/HEIC/AVIF şimdilik yalnızca yeni kopya olarak tamamen temizlenebilir</string>
     <string name="failure_overwrite_edit_jpeg_only">Üzerine yazarak EXIF düzenleme JPEG için desteklenir</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Temizleme sırasında üzerine yazma yalnızca JPEG ve PNG’yi destekler: diğer biçimleri yeni kopya olarak kaydedin</string>
@@ -375,6 +384,7 @@
     <string name="main_api_empty_response">Boş yanıt</string>
     <string name="dash_title">Fotoğrafınız neyi ele veriyor?</string>
     <string name="dash_subtitle">Dosyada gizli konum, kamera, yazar ve yapay zekâ etiketleri. Göndermeden önce kontrol edip kaldırın.</string>
+    <string name="dash_audit_text">Bir klasördeki kaç fotoğrafın çekildiği yeri açığa çıkardığını öğrenin.</string>
     <string name="dash_scan_hint">Orijinal JPEG, PNG, HEIC veya MP4/MOV videoyu seçin: ekran görüntüsü verilerin bir kısmını zaten kaybetmiştir.</string>
     <string name="dash_choose_photo">Fotoğraf veya videoyu kontrol et</string>
     <string name="dash_camera">Kamera</string>
@@ -385,7 +395,7 @@
     <string name="dash_section_analytics">İstatistikler</string>
     <string name="dash_history_limit">Kayıtlı geçmiş sınırı</string>
     <string name="dash_history_limit_pro">Pro: en fazla 50 yerel rapor</string>
-    <string name="dash_history_limit_free">Ücretsiz: en fazla 10 rapor · Pro: en fazla 50</string>
+    <string name="dash_history_limit_free">Kontroller sınırsızdır. Geçmişte son 10 rapor saklanır, Pro’da 50.</string>
     <string name="dash_upgrade_limit">Pro ile sınırı artırın</string>
     <string name="dash_stat_total">Raporlar</string>
     <string name="dash_stat_ai">Yapay zekâ belirtili</string>
@@ -415,15 +425,17 @@
     <string name="error_home">Ana sayfa</string>
 
     <!-- master_13_studio.py -->
-    <string name="studio_eyebrow">Bu cihazda</string>
     <string name="studio_title">Meta veri yönetimi</string>
     <string name="studio_quota_pro">PRO · Sınırsız temizleme</string>
     <string name="studio_quota_free">ÜCRETSİZ · Bugün temizlenen: %1$d / %2$d · 00:00 UTC’de sıfırlanır</string>
     <string name="studio_subtitle">Değişiklikler gerçekten dosyaya kaydedilir. Görüntü asla yüklenmez.</string>
     <string name="studio_back_to_report">← Rapora dön</string>
+    <string name="studio_copy_from_photo">Başka bir fotoğraftan veri al</string>
+    <string name="studio_copy_done">Diğer fotoğraftan doldurulan alanlar: %1$d. Kontrol edip kaydedin.</string>
+    <string name="studio_copy_none">Bu fotoğrafta alınacak EXIF verisi yok.</string>
     <string name="studio_tab_strip">Temizleme</string>
     <string name="studio_tab_edit">EXIF düzenleyici</string>
-    <string name="studio_tab_batch">Toplu PRO</string>
+    <string name="studio_tab_batch">Toplu</string>
     <string name="studio_check_numbers">Sayıları kontrol edin: GPS, ISO, diyafram ve deklanşör hızı</string>
     <string name="studio_source_eyebrow">1 · Kaynak görüntü</string>
     <string name="studio_source_none">Dosya seçilmedi</string>
@@ -435,7 +447,6 @@
     <string name="studio_strip_save_copy">Temiz kopyayı kaydet</string>
     <string name="studio_strip_overwrite">Orijinali yedekle birlikte değiştir</string>
     <string name="studio_strip_overwrite_note">Yalnızca yazılabilir JPEG/PNG belgeleri değiştirilebilir. Önce tam yedeğin nereye kaydedileceğini seçersiniz.</string>
-    <string name="studio_edit_eyebrow">2 · EXIF düzenleyici</string>
     <string name="studio_edit_gps_title">Koordinatlar ve GPS</string>
     <string name="studio_edit_remove_gps">Tüm GPS’i kaldır</string>
     <string name="studio_field_latitude">Enlem (−90…90)</string>
@@ -444,6 +455,7 @@
     <string name="studio_edit_dates_title">Çekim tarihi</string>
     <string name="studio_field_date_taken">Çekim tarihi</string>
     <string name="studio_field_date_digitized">Dijitalleştirme tarihi</string>
+    <string name="studio_dates_hint">Galeriler fotoğrafları çekim tarihine göre sıralar. Kaydettikten sonra MetaCheck, Android’den dosyayı yeniden okumasını ister; Google Fotoğraflar kendi kitaplığını güncelleyene kadar eski tarihi gösterebilir.</string>
     <string name="studio_date_value">%1$s: %2$s</string>
     <string name="studio_date_unchanged">değişmedi</string>
     <string name="studio_edit_camera_title">Kamera ve yazar</string>
@@ -452,13 +464,27 @@
     <string name="studio_field_aperture">Diyafram (örneğin 1.8)</string>
     <string name="studio_field_shutter">Saniye cinsinden deklanşör hızı (örneğin 0.02)</string>
     <string name="studio_field_keep">Değiştirmeden bırak</string>
-    <string name="studio_edit_note">Boş alanlar değişmeden kalır. Düzenleyici JPEG ile çalışır; EXIF ile çelişen ayrı XMP/IPTC blokları JPEG’den kaldırılır. Kaydedene kadar kaynak dosyaya hiçbir şey uygulanmaz. Her düzenleme C2PA imzalarını geçersiz kılabilir.</string>
+    <string name="studio_edit_note">Boş alanlar değişmez. Düzenleyici JPEG ile çalışır. Anahtar kelimeler, açıklamalar ve diğer tanımlayıcı alanlar korunur; XMP/IPTC içindeki eski tarihler, koordinatlar ve düzenleme geçmişi silinir. Kaydedene kadar kaynak dosya değişmez. Her düzenleme C2PA imzalarını geçersiz kılabilir.</string>
     <string name="studio_edit_save_copy">Düzenlenmiş JPEG kopyasını kaydet</string>
     <string name="studio_edit_overwrite">JPEG’i yedekle birlikte değiştir</string>
-    <string name="studio_batch_eyebrow">Toplu temizleme · Pro</string>
     <string name="studio_batch_title">Toplu temizleme</string>
-    <string name="studio_batch_text">Tek seferde en fazla 50 dosya. Yeni kopyalar seçilen klasöre kaydedilir. Orijinaller değişmez.</string>
+    <string name="studio_batch_text">Temiz kopyalar seçtiğiniz klasöre kaydedilir. Orijinaller değişmez.</string>
     <string name="studio_batch_selected">Seçilen: %1$d</string>
+    <string name="studio_batch_run_size">BU ÇALIŞTIRMA · %1$d</string>
+    <string name="studio_batch_free_note">Ücretsiz: günlük sınır dahilinde çalıştırma başına %1$d fotoğraf. Pro: çalıştırma başına %2$d, sınırsız.</string>
+    <string name="studio_batch_upgrade">Pro ile hepsini tek seferde temizle</string>
+    <string name="studio_audit_button">Tüm klasörü kontrol et</string>
+    <string name="studio_audit_hint">Klasördeki her fotoğraf bu cihazda okunur. En çok bilgi açığa çıkaranlar temizleme için seçilir.</string>
+    <string name="studio_audit_running">Kontrol ediliyor… %1$d fotoğraf</string>
+    <string name="studio_audit_summary">Kontrol edilen fotoğraf: %1$d</string>
+    <string name="studio_audit_clean_none">Bu klasörde meta veri bulunamadı.</string>
+    <string name="studio_audit_location">Tam konum: %1$d</string>
+    <string name="studio_audit_serial">Seri numarası: %1$d</string>
+    <string name="studio_audit_person">Sahip veya yazar adı: %1$d</string>
+    <string name="studio_audit_other">Yalnızca diğer meta veriler: %1$d</string>
+    <string name="studio_audit_selected">Temizleme için seçildi, en riskliler önce.</string>
+    <string name="studio_audit_limited">Yalnızca ilk %1$d fotoğraf kontrol edildi. Kalanları kontrol etmek için daha küçük bir klasör seçin.</string>
+    <string name="studio_audit_failed">Bu klasör okunamadı. Başka bir klasör seçin.</string>
     <string name="studio_batch_choose_photos">Fotoğraf seç</string>
     <string name="studio_batch_choose_folder_start">Klasör seç ve başlat</string>
     <string name="studio_batch_choose_files_first">Önce dosyaları seçin</string>
@@ -480,6 +506,14 @@
     <string name="studio_msg_verified">Yazma doğrulandı.</string>
     <string name="studio_msg_not_verified">Yazma yeniden kontrol edilemedi: dosyayı elle açın.</string>
     <string name="studio_msg_downscaled">Güvenli işleme için çözünürlük düşürüldü.</string>
+    <string name="studio_msg_shift_done">Tarihler kaydırıldı: %1$d kaydedildi, %2$d başarısız.</string>
+    <string name="studio_shift_title">Çekim tarihini kaydır</string>
+    <string name="studio_shift_text">Kameranın saati veya saat dilimi yanlışsa seçili JPEG fotoğraflar için. Yeni tarihli kopyalar seçtiğiniz klasöre aynı adlarla kaydedilir.</string>
+    <string name="studio_shift_hours">Saat</string>
+    <string name="studio_shift_minutes">Dakika</string>
+    <string name="studio_shift_run">Klasör seç ve kaydır</string>
+    <string name="studio_shift_invalid">Saat ve dakika (0–59) girin, en fazla bir yıl.</string>
+    <string name="studio_shift_pro">Pro’da kullanılabilir.</string>
     <string name="studio_msg_batch_done">Toplu temizleme bitti: %1$d kaydedildi, %2$d başarısız.</string>
     <string name="studio_msg_interrupted">İşlem kesildi: sistem uygulamayı yeniden başlattı. Lütfen tekrar deneyin; oluşturulan boş dosyayı silebilirsiniz</string>
 
@@ -559,7 +593,7 @@
     <!-- master_16_pro.py -->
     <string name="pro_title">MetaCheck Pro</string>
     <string name="pro_eyebrow">ÜCRETSİZ  →  PRO</string>
-    <string name="pro_free_features">Ücretsiz: fotoğraf ve video tarama ve GPS Privacy Shield, EXIF görüntüleyici, günde en fazla %1$d fotoğrafı düzenleme ve temizleme (UTC), geçmişte 10 rapor.</string>
+    <string name="pro_free_features">Ücretsiz: fotoğraf, video ve tüm klasörler için sınırsız kontrol, GPS Privacy Shield, EXIF görüntüleyici, günde %1$d fotoğrafa kadar düzenleme ve temizleme (UTC), toplu olarak seferde 5, geçmişte son 10 rapor.</string>
     <string name="pro_pro_features">Pro: sınırsız temizleme ve düzenleme, yeniden kodlamadan video temizleme (MP4, MOV), en fazla 50 fotoğrafı toplu işleme, PDF/JSON, 50 rapor, API.</string>
     <string name="pro_one_time">Google Play üzerinden tek seferlik satın alma, abonelik yok.</string>
     <string name="pro_key_label">Varsa Pro anahtarı</string>
@@ -652,6 +686,7 @@
     <string name="privacy_kind_location_tags">Konum etiketleri</string>
     <string name="privacy_kind_owner">Kamera sahibi</string>
     <string name="privacy_kind_device_serial">Cihaz seri numarası</string>
+    <string name="privacy_kind_place_name">Yer adı</string>
     <string name="privacy_kind_author">Yazar ve haklar</string>
     <string name="privacy_kind_ai_prompt">Yapay zekâ istemi ve ayarları</string>
     <string name="privacy_kind_capture_time">Ne zaman çekildi</string>

@@ -10,7 +10,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -38,6 +36,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.Text
 import androidx.compose.ui.res.stringResource
+import com.example.metacheck.domain.model.ImageFormat
 import com.example.metacheck.R
 import com.example.metacheck.domain.metadata.DailyCleanQuota
 import com.example.metacheck.ui.text.ErrorTexts
@@ -63,6 +62,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.exifinterface.media.ExifInterface
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metacheck.domain.metadata.MetadataPatch
@@ -84,6 +86,9 @@ fun MetadataStudioScreen(
     isPro: Boolean,
     onUpgrade: () -> Unit,
     onBack: () -> Unit,
+    startAudit: Boolean = false,
+    onAuditStarted: () -> Unit = {},
+    startInBatch: Boolean = false,
     vm: MetadataStudioViewModel = viewModel(factory = MetadataStudioViewModel.Factory),
 ) {
     val context = LocalContext.current
@@ -91,7 +96,9 @@ fun MetadataStudioScreen(
     val message by vm.message.collectAsStateWithLifecycle()
     val batch by vm.batch.collectAsStateWithLifecycle()
     val usedToday by vm.usedToday.collectAsStateWithLifecycle()
-    var mode by rememberSaveable { mutableStateOf(StudioMode.STRIP) }
+    val audit by vm.audit.collectAsStateWithLifecycle()
+    val perRun = com.example.metacheck.domain.metadata.BatchLimits.perRun(isPro, usedToday)
+    var mode by rememberSaveable { mutableStateOf(if (startInBatch) StudioMode.BATCH else StudioMode.STRIP) }
     var source by rememberSaveable { mutableStateOf(initialUri.orEmpty()) }
     var batchSources by rememberSaveable { mutableStateOf(emptyList<String>()) }
     var worldPicker by remember { mutableStateOf(false) }
@@ -119,7 +126,7 @@ fun MetadataStudioScreen(
             if (source.isEmpty()) null else runCatching {
                 val uri = Uri.parse(source)
                 context.contentResolver.openInputStream(uri)?.use { stream ->
-                    val header = ByteArray(8)
+                    val header = ByteArray(16)
                     var count = 0
                     while (count < header.size) {
                         val n = stream.read(header, count, header.size - count)
@@ -127,9 +134,11 @@ fun MetadataStudioScreen(
                         if (n == 0) continue
                         count += n
                     }
-                    when {
-                        count >= 3 && header[0] == 0xFF.toByte() && header[1] == 0xD8.toByte() && header[2] == 0xFF.toByte() -> "image/jpeg"
-                        count == 8 && header.toList() == listOf(137, 80, 78, 71, 13, 10, 26, 10).map { it.toByte() } -> "image/png"
+                    when (com.example.metacheck.data.parser.ImageFormatDetector.detect(header, count)) {
+                        ImageFormat.JPEG -> "image/jpeg"
+                        ImageFormat.PNG -> "image/png"
+                        ImageFormat.WEBP -> "image/webp"
+                        ImageFormat.HEIC -> "image/heic"
                         else -> context.contentResolver.getType(uri)?.lowercase(Locale.ROOT)
                     }
                 }
@@ -181,6 +190,31 @@ fun MetadataStudioScreen(
     val chooseImage = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
     }
+    // «Взять данные из другого фото»: дата, камера, автор, параметры съёмки и место — в поля редактора.
+    val donorScope = rememberCoroutineScope()
+    var donorInfo by remember { mutableStateOf<UiText?>(null) }
+    val chooseDonor = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        donorScope.launch {
+            val donor = withContext(Dispatchers.IO) { readDonorExif(context, uri) }
+            if (donor == null || donor.filled == 0) { donorInfo = UiText.Res(R.string.studio_copy_none); return@launch }
+            donor.dateTaken?.let { dateTaken = it }
+            donor.dateDigitized?.let { dateDigitized = it }
+            donor.make?.let { manufacturer = it }
+            donor.model?.let { model = it }
+            donor.author?.let { author = it }
+            donor.copyright?.let { copyright = it }
+            donor.description?.let { description = it }
+            donor.iso?.let { iso = it }
+            donor.aperture?.let { aperture = it }
+            donor.shutter?.let { shutter = it }
+            if (donor.latitude != null && donor.longitude != null) {
+                gpsRemove = false
+                latitude = donor.latitude; longitude = donor.longitude
+            }
+            donorInfo = UiText.Res(R.string.studio_copy_done, donor.filled)
+        }
+    }
     // После выгрузки процесса rememberSaveable возвращает URI, но временное право на него уже отозвано.
     // Проверяем один раз при восстановлении и честно просим выбрать файл снова.
     LaunchedEffect(Unit) {
@@ -196,22 +230,68 @@ fun MetadataStudioScreen(
             }
         }
     }
+    // Выбрать можно сколько угодно: за один запуск очищается [perRun] фото, остальные ждут следующего запуска.
     val chooseMultiple = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { list ->
         if (list.isNotEmpty()) {
-            if (!isPro) onUpgrade()
-            else if (list.size > 50) actionError = UiText.Res(R.string.failure_batch_size)
-            else { batchSources = list.map(Uri::toString); actionError = null }
+            batchSources = list.map(Uri::toString).distinct().take(MAX_QUEUE); actionError = null
+        }
+    }
+    // Без разрешения «Местоположение в медиа» Android прячет GPS, и проверка показала бы, что места нет.
+    var pendingAuditTree by remember { mutableStateOf<Uri?>(null) }
+    val startAuditScan: (Uri) -> Unit = { tree -> vm.auditFolder(tree) { risky -> batchSources = risky.take(MAX_QUEUE) } }
+    val auditLocationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        pendingAuditTree?.let(startAuditScan)
+        pendingAuditTree = null
+    }
+    val chooseAuditTree = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { tree ->
+        if (tree != null) {
+            vm.persistAccess(tree)
+            actionError = null
+            if (android.os.Build.VERSION.SDK_INT >= 29 && androidx.core.content.ContextCompat.checkSelfPermission(
+                    context, android.Manifest.permission.ACCESS_MEDIA_LOCATION,
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                pendingAuditTree = tree
+                auditLocationPermission.launch(android.Manifest.permission.ACCESS_MEDIA_LOCATION)
+            } else startAuditScan(tree)
+        }
+    }
+    LaunchedEffect(startAudit) {
+        if (startAudit) {
+            mode = StudioMode.BATCH
+            onAuditStarted()
+            if (!vm.audit.value.running) chooseAuditTree.launch(null)
+        }
+    }
+    var shiftBack by rememberSaveable { mutableStateOf(false) }
+    var shiftHours by rememberSaveable { mutableStateOf("") }
+    var shiftMinutes by rememberSaveable { mutableStateOf("") }
+    var pendingShift by rememberSaveable { mutableStateOf<Long?>(null) }
+    val chooseShiftTree = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { folder ->
+        val seconds = pendingShift
+        pendingShift = null
+        val run = batchSources.take(com.example.metacheck.domain.metadata.BatchLimits.PRO_PER_RUN)
+        if (folder != null && seconds != null && run.isNotEmpty()) {
+            vm.shiftDates(run, folder, seconds) { batchSources = batchSources.filterNot { it in run } }
         }
     }
     val chooseTree = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { folder ->
-        if (folder != null && batchSources.isNotEmpty()) {
-            vm.batchStrip(batchSources, folder)
+        val run = batchSources.take(perRun)
+        if (folder != null && run.isNotEmpty()) {
+            vm.batchStrip(run, folder) { batchSources = batchSources.filterNot { it in run } }
         }
     }
     val saveCleanJpeg = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/jpeg")) { uri ->
         if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
     }
     val saveCleanPng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
+        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
+    }
+    // WebP и HEIC чистятся без пережатия и остаются в своём формате.
+    val saveCleanWebp = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/webp")) { uri ->
+        if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
+    }
+    val saveCleanHeic = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/heic")) { uri ->
         if (uri != null && source.isNotBlank()) vm.stripCopy(source, uri) { vm.persistAccess(uri); source = uri.toString(); actionError = null }
     }
     // Операция и её параметры берутся только из ViewModel (SavedStateHandle), а не из состояния Composable:
@@ -269,26 +349,24 @@ fun MetadataStudioScreen(
     ) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                CyberEyebrow(stringResource(R.string.studio_eyebrow))
-                Text(stringResource(R.string.studio_title), style = MaterialTheme.typography.headlineMedium,
+                Text(stringResource(R.string.studio_title), style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurface)
                 Text(if (isPro) stringResource(R.string.studio_quota_pro) else
                     stringResource(R.string.studio_quota_free, usedToday, DailyCleanQuota.FREE_DAILY_LIMIT),
-                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                    style = com.example.metacheck.ui.theme.MonoText.tag, color = MaterialTheme.colorScheme.onSurface)
                 Text(stringResource(R.string.studio_subtitle),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 CyberOutlineButton(stringResource(R.string.studio_back_to_report), onBack, Modifier.fillMaxWidth())
             }
         }
         item {
-            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth()) {
                 StudioTab(stringResource(R.string.studio_tab_strip), mode == StudioMode.STRIP) { mode = StudioMode.STRIP }
                 StudioTab(stringResource(R.string.studio_tab_edit), mode == StudioMode.EDIT) {
                     mode = StudioMode.EDIT
                 }
                 StudioTab(stringResource(R.string.studio_tab_batch), mode == StudioMode.BATCH) {
-                    if (isPro) mode = StudioMode.BATCH else onUpgrade()
+                    mode = StudioMode.BATCH
                 }
             }
         }
@@ -330,8 +408,12 @@ fun MetadataStudioScreen(
                             if (source.isNotBlank() && !busy) {
                                 val error = formatError(jpegOnly = false, overwrite = false)
                                 if (error != null) actionError = error
-                                else if (sourceIsJpeg) saveCleanJpeg.launch("metacheck-clean-${System.currentTimeMillis()}.jpg")
-                                else saveCleanPng.launch("metacheck-clean-${System.currentTimeMillis()}.png")
+                                else when (selectedMime) {
+                                    "image/jpeg" -> saveCleanJpeg.launch("metacheck-clean-${System.currentTimeMillis()}.jpg")
+                                    "image/webp" -> saveCleanWebp.launch("metacheck-clean-${System.currentTimeMillis()}.webp")
+                                    "image/heic" -> saveCleanHeic.launch("metacheck-clean-${System.currentTimeMillis()}.heic")
+                                    else -> saveCleanPng.launch("metacheck-clean-${System.currentTimeMillis()}.png")
+                                }
                             }
                         }, modifier = Modifier.fillMaxWidth())
                         CyberOutlineButton(stringResource(R.string.studio_strip_overwrite), {
@@ -347,9 +429,12 @@ fun MetadataStudioScreen(
             }
         } else if (mode == StudioMode.EDIT) {
             item {
-                GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
+                GlassPanel(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(13.dp)) {
-                        CyberEyebrow(stringResource(R.string.studio_edit_eyebrow))
+                        CyberOutlineButton(stringResource(R.string.studio_copy_from_photo), { chooseDonor.launch(arrayOf("image/*")) },
+                            Modifier.fillMaxWidth())
+                        donorInfo?.let { Text(it.asString(), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         Text(stringResource(R.string.studio_edit_gps_title), style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface)
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -365,6 +450,8 @@ fun MetadataStudioScreen(
                         Text(stringResource(R.string.studio_edit_dates_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         StudioDatePicker(stringResource(R.string.studio_field_date_taken), dateTaken) { dateTaken = it }
                         StudioDatePicker(stringResource(R.string.studio_field_date_digitized), dateDigitized) { dateDigitized = it }
+                        Text(stringResource(R.string.studio_dates_hint), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                         Text(stringResource(R.string.studio_edit_camera_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         StudioField(stringResource(R.string.patch_field_make), manufacturer) { manufacturer = it }
@@ -398,16 +485,37 @@ fun MetadataStudioScreen(
             item {
                 GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.secondary) {
                     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        CyberEyebrow(stringResource(R.string.studio_batch_eyebrow))
                         Text(stringResource(R.string.studio_batch_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
                         Text(stringResource(R.string.studio_batch_text),
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(stringResource(R.string.studio_batch_selected, batchSources.size), color = MaterialTheme.colorScheme.onSurface)
-                        CyberOutlineButton(stringResource(R.string.studio_batch_choose_photos), { chooseMultiple.launch(arrayOf("image/*")) }, Modifier.fillMaxWidth())
-                        NeonButton(stringResource(R.string.studio_batch_choose_folder_start), {
-                            if (!busy && batchSources.isNotEmpty()) chooseTree.launch(null)
-                            else actionError = UiText.Res(R.string.studio_batch_choose_files_first)
+                        CyberOutlineButton(stringResource(R.string.studio_audit_button), {
+                            if (!audit.running) chooseAuditTree.launch(null)
                         }, Modifier.fillMaxWidth())
+                        Text(stringResource(R.string.studio_audit_hint), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        CyberOutlineButton(stringResource(R.string.studio_batch_choose_photos), { chooseMultiple.launch(arrayOf("image/*")) }, Modifier.fillMaxWidth())
+                        if (audit.running) {
+                            LinearProgressIndicator(Modifier.fillMaxWidth())
+                            Text(stringResource(R.string.studio_audit_running, audit.scanned), color = MaterialTheme.colorScheme.onSurface)
+                        }
+                        audit.result?.let { result -> AuditSummary(result) }
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        Text(stringResource(R.string.studio_batch_selected, batchSources.size), color = MaterialTheme.colorScheme.onSurface)
+                        if (batchSources.isNotEmpty()) Text(
+                            stringResource(R.string.studio_batch_run_size, minOf(perRun, batchSources.size)),
+                            style = com.example.metacheck.ui.theme.MonoText.tag, color = MaterialTheme.colorScheme.onSurface)
+                        if (!isPro) Text(stringResource(R.string.studio_batch_free_note, com.example.metacheck.domain.metadata.BatchLimits.FREE_PER_RUN,
+                            com.example.metacheck.domain.metadata.BatchLimits.PRO_PER_RUN),
+                            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        NeonButton(stringResource(R.string.studio_batch_choose_folder_start), {
+                            when {
+                                busy || audit.running -> Unit
+                                batchSources.isEmpty() -> actionError = UiText.Res(R.string.studio_batch_choose_files_first)
+                                perRun == 0 -> onUpgrade()
+                                else -> chooseTree.launch(null)
+                            }
+                        }, Modifier.fillMaxWidth())
+                        if (!isPro && batchSources.size > perRun) CyberOutlineButton(stringResource(R.string.studio_batch_upgrade), onUpgrade, Modifier.fillMaxWidth())
                         if (batch.total > 0) {
                             LinearProgressIndicator(
                                 progress = { batch.completed.toFloat() / batch.total },
@@ -417,6 +525,44 @@ fun MetadataStudioScreen(
                                 color = MaterialTheme.colorScheme.onSurface)
                             if (batch.current.isNotBlank()) Text(batch.current, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
+                    }
+                }
+            }
+            item {
+                // Сдвиг даты у выбранных фото: камера была в другом часовом поясе или с неверным временем.
+                GlassPanel(Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text(stringResource(R.string.studio_shift_title), style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(R.string.studio_shift_text), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.weight(1.1f)) {
+                                StudioTab("+", !shiftBack) { shiftBack = false }
+                                StudioTab("−", shiftBack) { shiftBack = true }
+                            }
+                            OutlinedTextField(shiftHours, { shiftHours = it.filter(Char::isDigit).take(4) },
+                                Modifier.weight(1f), label = { Text(stringResource(R.string.studio_shift_hours)) }, singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(4.dp))
+                            OutlinedTextField(shiftMinutes, { shiftMinutes = it.filter(Char::isDigit).take(2) },
+                                Modifier.weight(1f), label = { Text(stringResource(R.string.studio_shift_minutes)) }, singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(4.dp))
+                        }
+                        val shiftRun = minOf(batchSources.size, com.example.metacheck.domain.metadata.BatchLimits.PRO_PER_RUN)
+                        if (batchSources.isNotEmpty()) Text(stringResource(R.string.studio_batch_run_size, shiftRun),
+                            style = com.example.metacheck.ui.theme.MonoText.tag, color = MaterialTheme.colorScheme.onSurface)
+                        NeonButton(stringResource(R.string.studio_shift_run), {
+                            val seconds = com.example.metacheck.domain.metadata.DateShift.seconds(shiftBack, shiftHours, shiftMinutes)
+                            when {
+                                busy || audit.running -> Unit
+                                !isPro -> onUpgrade()
+                                batchSources.isEmpty() -> actionError = UiText.Res(R.string.studio_batch_choose_files_first)
+                                seconds == null -> actionError = UiText.Res(R.string.studio_shift_invalid)
+                                else -> { pendingShift = seconds; chooseShiftTree.launch(null) }
+                            }
+                        }, Modifier.fillMaxWidth())
+                        if (!isPro) Text(stringResource(R.string.studio_shift_pro), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -465,14 +611,86 @@ fun MetadataStudioScreen(
     }
 }
 
+/** Не больше стольких фото в очереди пакета: выбор и проверка папки могут дать сотни. */
+private const val MAX_QUEUE = 200
+
 @Composable
-private fun StudioTab(label: String, selected: Boolean, onClick: () -> Unit) {
-    Box(Modifier.background(
-        if (selected) MaterialTheme.colorScheme.primary.copy(alpha = .19f) else MaterialTheme.colorScheme.surface,
-        RoundedCornerShape(4.dp),
-    ).clickable(onClick = onClick).padding(horizontal = 15.dp, vertical = 12.dp)) {
-        Text(label, color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
+private fun AuditSummary(result: com.example.metacheck.domain.metadata.AuditResult) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(R.string.studio_audit_summary, result.scanned), style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface)
+        if (result.findings.isEmpty()) {
+            Text(stringResource(R.string.studio_audit_clean_none), color = MaterialTheme.colorScheme.tertiary)
+        } else {
+            val mono = com.example.metacheck.ui.theme.MonoText.value
+            if (result.withLocation > 0) Text(stringResource(R.string.studio_audit_location, result.withLocation), style = mono,
+                color = MaterialTheme.colorScheme.error)
+            if (result.withSerial > 0) Text(stringResource(R.string.studio_audit_serial, result.withSerial), style = mono,
+                color = MaterialTheme.colorScheme.onSurface)
+            if (result.withPerson > 0) Text(stringResource(R.string.studio_audit_person, result.withPerson), style = mono,
+                color = MaterialTheme.colorScheme.onSurface)
+            if (result.otherOnly > 0) Text(stringResource(R.string.studio_audit_other, result.otherOnly), style = mono,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.studio_audit_selected), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (result.limited) Text(stringResource(R.string.studio_audit_limited, com.example.metacheck.domain.metadata.FolderAuditRepository.MAX_FILES),
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
+}
+
+@Composable
+private fun androidx.compose.foundation.layout.RowScope.StudioTab(label: String, selected: Boolean, onClick: () -> Unit) {
+    val ink = MaterialTheme.colorScheme.onSurface
+    Column(Modifier.weight(1f)) {
+        Box(Modifier.fillMaxWidth().defaultMinSize(minHeight = 48.dp).clickable(onClick = onClick).padding(horizontal = 6.dp, vertical = 10.dp),
+            contentAlignment = Alignment.Center) {
+            Text(label, color = if (selected) ink else MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = if (selected) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2)
+        }
+        Box(Modifier.fillMaxWidth().height(if (selected) 3.dp else 1.dp)
+            .background(if (selected) ink else MaterialTheme.colorScheme.outlineVariant))
+    }
+}
+
+/** Поля EXIF другого фото для подстановки в редактор; [filled] — сколько полей найдено. */
+private data class DonorExif(
+    val dateTaken: String?, val dateDigitized: String?, val make: String?, val model: String?,
+    val author: String?, val copyright: String?, val description: String?,
+    val iso: String?, val aperture: String?, val shutter: String?,
+    val latitude: String?, val longitude: String?,
+) {
+    val filled: Int get() = listOf(dateTaken, dateDigitized, make, model, author, copyright, description, iso, aperture, shutter)
+        .count { it != null } + if (latitude != null && longitude != null) 1 else 0
+}
+
+/** Читает EXIF выбранного фото; координаты — через «оригинальный» URI, если Android это позволяет. */
+private fun readDonorExif(context: android.content.Context, uri: Uri): DonorExif? {
+    fun open(u: Uri) = runCatching { context.contentResolver.openInputStream(u)?.use { ExifInterface(it) } }.getOrNull()
+    val exif = open(uri) ?: return null
+    val gps = (if (android.os.Build.VERSION.SDK_INT >= 29) runCatching {
+        open(android.provider.MediaStore.setRequireOriginal(uri))?.latLong
+    }.getOrNull() else null) ?: exif.latLong
+    fun text(tag: String) = exif.getAttribute(tag)?.trim()?.takeIf { it.isNotEmpty() }
+    val fNumber = exif.getAttributeDouble(ExifInterface.TAG_F_NUMBER, 0.0).takeIf { it > 0 }
+    val exposure = exif.getAttributeDouble(ExifInterface.TAG_EXPOSURE_TIME, 0.0).takeIf { it > 0 }
+    return DonorExif(
+        dateTaken = text(ExifInterface.TAG_DATETIME_ORIGINAL),
+        dateDigitized = text(ExifInterface.TAG_DATETIME_DIGITIZED),
+        make = text(ExifInterface.TAG_MAKE),
+        model = text(ExifInterface.TAG_MODEL),
+        author = text(ExifInterface.TAG_ARTIST),
+        copyright = text(ExifInterface.TAG_COPYRIGHT),
+        description = text(ExifInterface.TAG_IMAGE_DESCRIPTION),
+        iso = (text(ExifInterface.TAG_PHOTOGRAPHIC_SENSITIVITY))?.substringBefore(',')?.trim(),
+        aperture = fNumber?.let { String.format(Locale.US, "%.1f", it) },
+        // Поле выдержки принимает секунды десятичной дробью: 1/50 → 0.02.
+        shutter = exposure?.let { java.math.BigDecimal(it).round(java.math.MathContext(4)).stripTrailingZeros().toPlainString() },
+        latitude = gps?.let { String.format(Locale.US, "%.6f", it[0]) },
+        longitude = gps?.let { String.format(Locale.US, "%.6f", it[1]) },
+    )
 }
 
 @Composable

@@ -6,7 +6,7 @@ S = [
     ("common_cancel", "Cancel", "Отмена"),
     ("common_close", "Close", "Закрыть"),
     ("common_delete", "Delete", "Удалить"),
-    ("studio_name", "Metadata Studio", "Metadata Studio"),
+    ("studio_name", "Metadata studio", "Студия метаданных"),
     ("main_title_settings", "Settings", "Настройки"),
 
     # --- Сообщения (snackbar) ---
@@ -51,6 +51,8 @@ S = [
     # --- Главная (Dashboard) ---
     ("dash_title", "What does your photo reveal?", "Что выдаёт ваше фото?"),
     ("dash_subtitle", "Location, camera, author and AI labels hidden in the file. Check them and remove them before you send.", "Место съёмки, камера, автор и метки ИИ внутри файла. Проверьте и удалите их до отправки."),
+    ("dash_audit_text", "Find out how many photos in a folder give away where they were taken.",
+     "Узнайте, сколько фото в папке выдают, где они сняты."),
     ("dash_scan_hint", "Choose the original JPEG, PNG, HEIC or MP4/MOV video: a screenshot has already lost part of the data.",
      "Выбирайте исходный JPEG, PNG, HEIC или видео MP4/MOV: в скриншоте часть данных уже потеряна."),
     ("dash_choose_photo", "Check a photo or video", "Проверить фото или видео"),
@@ -62,7 +64,8 @@ S = [
     ("dash_section_analytics", "Statistics", "Статистика"),
     ("dash_history_limit", "Saved history limit", "Лимит сохранённой истории"),
     ("dash_history_limit_pro", "Pro: up to 50 local reports", "Pro: до 50 локальных отчётов"),
-    ("dash_history_limit_free", "Free: up to 10 reports · Pro: up to 50", "Free: до 10 отчётов · Pro: до 50"),
+    ("dash_history_limit_free", "Checks are unlimited. History keeps the last 10 reports, Pro keeps 50.",
+     "Проверки без ограничений. В истории хранятся последние 10 отчётов, в Pro — 50."),
     ("dash_upgrade_limit", "Increase the limit with Pro", "Увеличить лимит с Pro"),
     ("dash_stat_total", "Reports", "Отчётов"),
     ("dash_stat_ai", "With AI signs", "С признаками ИИ"),
