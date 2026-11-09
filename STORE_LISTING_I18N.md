@@ -25,9 +25,10 @@ CUÁNDO AYUDA
 • Fotógrafos: consulta los ajustes de la cámara, el objetivo y el EXIF, o edita el autor y la fecha en una copia.
 
 PRIVACIDAD DE LAS FOTOS
+• Revisa una carpeta entera: descubre cuántas fotos revelan la ubicación, el número de serie o un nombre, y limpia primero las más arriesgadas, gratis de 5 en 5.
 • Índice de privacidad de 0 a 100 y lista de lo que verá quien reciba la foto: coordenadas, número de serie, autor, hora de captura.
 • «Enviar sin metadatos» en el menú Compartir: elígelo en la galería o en cualquier app y la foto sale ya limpia.
-• Limpieza de metadatos: una copia sin EXIF, GPS ni XMP. El archivo original no cambia. El GPS se elimina del JPEG sin recompresión.
+• Limpieza de metadatos: una copia sin EXIF, GPS, XMP ni IPTC. El archivo original no cambia. HEIC y WebP se limpian sin recomprimir, con el mismo formato y calidad.
 • Muestra dónde se tomó la foto y, al tocar el botón, el punto en un mapa.
 
 PRIVACIDAD DE LOS VÍDEOS (MP4, MOV)
@@ -38,7 +39,8 @@ PRIVACIDAD DE LOS VÍDEOS (MP4, MOV)
 TODOS LOS METADATOS
 • EXIF: cámara, objetivo, velocidad, apertura, ISO, fechas y más, con búsqueda por campos.
 • XMP, IPTC y bloques de texto PNG. Exporta el informe en PDF, JSON o CSV.
-• Edita el EXIF (fecha, cámara, autor, coordenadas) en una copia JPEG.
+• Edita el EXIF (fecha, cámara, autor, coordenadas) en una copia JPEG o cópialo de otra foto. Se conservan las palabras clave y los pies de foto.
+• Desplaza la fecha de captura de muchas fotos a la vez si el reloj o la zona horaria de la cámara estaban mal (Pro).
 
 ETIQUETAS DE IA EN EL ARCHIVO
 • Content Credentials (C2PA): etiquetas «creado con IA» y «editado con IA» de ChatGPT, Gemini, Adobe Firefly, Sora y otros.
@@ -46,19 +48,14 @@ ETIQUETAS DE IA EN EL ARCHIVO
 • Solo se revisan las etiquetas dentro del archivo; la imagen en sí no se analiza. Las redes sociales y las apps de mensajería eliminan las etiquetas, así que en esas imágenes la app indica con honestidad que no hay datos. La ausencia de etiquetas no prueba que una foto sea real.
 
 GRATIS Y PRO
-Gratis: análisis, visor de metadatos, índice de privacidad, GPS Privacy Shield, limpieza y edición de hasta 10 fotos al día, historial de hasta 10 informes.
-Pro (compra única, sin suscripción): sin límite diario, limpieza de vídeos (MP4, MOV) sin recodificar, limpieza por lotes de hasta 50 fotos, exportación PDF y JSON, historial de hasta 50 informes, envío del informe a tu propia API.
+Gratis: revisiones ilimitadas de fotos, vídeos y carpetas enteras, visor de metadatos, índice de privacidad, GPS Privacy Shield, limpieza y edición de hasta 10 fotos al día, limpieza por lotes de 5 fotos, los últimos 10 informes en el historial.
+Pro (compra única, sin suscripción): sin límite diario, limpieza de vídeos (MP4, MOV) sin recodificar, limpieza por lotes de hasta 50 fotos a la vez, cambio de fecha en muchas fotos, exportación PDF y JSON, historial de hasta 50 informes, envío del informe a tu propia API.
 
 PRIVADO POR DISEÑO
 • El análisis se hace en tu dispositivo. Las imágenes nunca se suben.
 • El mapa (MapTiler, datos de OpenStreetMap) solo se carga al tocar su botón. Una vez activado, el proveedor del mapa ve tu dirección IP y dónde está el punto en el mapa.
 • Sin cuentas, sin anuncios, sin analítica.
 • El envío del informe JSON a tu propio servidor está desactivado por defecto y solo funciona cuando tú lo ordenas.
-
-CÓMO SE USA
-1. Toca «Comprobar foto o vídeo» y elige una imagen, o usa la cámara o el portapapeles.
-2. Mira el índice de privacidad y lo que revela el archivo.
-3. Toca «Limpiar y compartir» o «Eliminar GPS» y envía la copia limpia.
 
 Elige el archivo original: las capturas de pantalla y las fotos enviadas por apps de mensajería suelen perder sus metadatos.
 ```
@@ -85,9 +82,10 @@ QUANDO AJUDA
 • Fotógrafos: veja as configurações da câmera, a lente e os dados EXIF, ou edite o autor e a data em uma cópia.
 
 PRIVACIDADE DAS FOTOS
+• Verifique uma pasta inteira: descubra quantas fotos revelam o local, o número de série ou um nome e limpe primeiro as mais arriscadas, grátis de 5 em 5.
 • Índice de privacidade de 0 a 100 e lista do que o destinatário verá: coordenadas, número de série, autor, horário da captura.
 • "Enviar sem metadados" no menu Compartilhar: escolha na galeria ou em qualquer app e a foto sai já limpa.
-• Limpeza de metadados: uma cópia sem EXIF, GPS e XMP. O arquivo original não muda. O GPS é removido do JPEG sem recompressão.
+• Limpeza de metadados: uma cópia sem EXIF, GPS, XMP e IPTC. O arquivo original não muda. HEIC e WebP são limpos sem recompressão, com o mesmo formato e qualidade.
 • Mostra onde a foto foi tirada e, ao tocar no botão, o ponto no mapa.
 
 PRIVACIDADE DOS VÍDEOS (MP4, MOV)
@@ -98,7 +96,8 @@ PRIVACIDADE DOS VÍDEOS (MP4, MOV)
 TODOS OS METADADOS
 • EXIF: câmera, lente, velocidade do obturador, abertura, ISO, datas e mais, com busca por campo.
 • XMP, IPTC e blocos de texto PNG. Exporte o relatório em PDF, JSON ou CSV.
-• Edite o EXIF (data, câmera, autor, coordenadas) em uma cópia JPEG.
+• Edite o EXIF (data, câmera, autor, coordenadas) em uma cópia JPEG ou copie de outra foto. Palavras-chave e legendas são mantidas.
+• Ajuste a data de captura de muitas fotos de uma vez quando o relógio ou o fuso horário da câmera estavam errados (Pro).
 
 RÓTULOS DE IA NO ARQUIVO
 • Content Credentials (C2PA): rótulos "criado por IA" e "editado com IA" do ChatGPT, Gemini, Adobe Firefly, Sora e outros.
@@ -106,19 +105,14 @@ RÓTULOS DE IA NO ARQUIVO
 • Apenas os rótulos dentro do arquivo são verificados; a imagem em si não é analisada. Redes sociais e mensageiros removem os rótulos, então nessas imagens o app informa honestamente que não há dados. A ausência de rótulos não prova que uma foto é real.
 
 GRÁTIS E PRO
-Grátis: análise, visualizador de metadados, índice de privacidade, GPS Privacy Shield, limpeza e edição de até 10 fotos por dia, histórico de até 10 relatórios.
-Pro (compra única, sem assinatura): sem limite diário, limpeza de vídeos (MP4, MOV) sem recodificação, limpeza em lote de até 50 fotos, exportação em PDF e JSON, histórico de até 50 relatórios, envio do relatório para sua própria API.
+Grátis: verificações ilimitadas de fotos, vídeos e pastas inteiras, visualizador de metadados, índice de privacidade, GPS Privacy Shield, limpeza e edição de até 10 fotos por dia, limpeza em lote de 5 fotos por vez, os últimos 10 relatórios no histórico.
+Pro (compra única, sem assinatura): sem limite diário, limpeza de vídeos (MP4, MOV) sem recodificar, limpeza em lote de até 50 fotos por vez, ajuste de datas em muitas fotos, exportação em PDF e JSON, histórico de até 50 relatórios, envio do relatório para sua própria API.
 
 PRIVADO DESDE A CONCEPÇÃO
 • A análise acontece no seu aparelho. As imagens nunca são enviadas.
 • O mapa (MapTiler, dados do OpenStreetMap) só carrega quando você toca no botão dele. Depois de ativado, o provedor do mapa vê seu endereço IP e onde fica o ponto no mapa.
 • Sem contas, sem anúncios, sem análises.
 • O envio do relatório JSON para seu próprio servidor fica desativado por padrão e só funciona quando você pede.
-
-COMO USAR
-1. Toque em "Verificar foto ou vídeo" e escolha uma imagem, ou use a câmera ou a área de transferência.
-2. Veja o índice de privacidade e o que o arquivo revela.
-3. Toque em "Limpar e compartilhar" ou "Remover GPS" e envie a cópia limpa.
 
 Escolha o arquivo original: capturas de tela e fotos enviadas por mensageiros costumam perder os metadados.
 ```
@@ -145,9 +139,10 @@ WANN ES HILFT
 • Fotografen: Kameraeinstellungen, Objektiv und EXIF-Daten ansehen oder Urheber und Datum in einer Kopie bearbeiten.
 
 FOTO-DATENSCHUTZ
+• Ganzen Ordner prüfen: Sehen Sie, wie viele Fotos Ort, Seriennummer oder einen Namen verraten, und bereinigen Sie die riskantesten zuerst – kostenlos 5 auf einmal.
 • Datenschutzwert von 0 bis 100 und eine Liste dessen, was der Empfänger sieht: Koordinaten, Seriennummer, Urheber, Aufnahmezeit.
 • „Ohne Metadaten senden“ im Teilen-Menü: In der Galerie oder einer beliebigen App auswählen, und das Foto geht bereits bereinigt raus.
-• Metadaten bereinigen: eine Kopie ohne EXIF, GPS und XMP. Die Originaldatei bleibt unverändert. GPS wird ohne Neukomprimierung aus JPEG entfernt.
+• Metadaten bereinigen: eine Kopie ohne EXIF, GPS, XMP und IPTC. Die Originaldatei bleibt unverändert. HEIC und WebP werden ohne Neukodierung bereinigt, Format und Qualität bleiben gleich.
 • Zeigt, wo das Foto aufgenommen wurde, und auf Tipp den Punkt auf einer Karte.
 
 VIDEO-PRIVATSPHÄRE (MP4, MOV)
@@ -158,7 +153,8 @@ VIDEO-PRIVATSPHÄRE (MP4, MOV)
 ALLE METADATEN
 • EXIF: Kamera, Objektiv, Belichtungszeit, Blende, ISO, Daten und mehr, mit Feldsuche.
 • XMP, IPTC und PNG-Textblöcke. Bericht als PDF, JSON oder CSV exportieren.
-• EXIF (Datum, Kamera, Urheber, Koordinaten) in einer JPEG-Kopie bearbeiten.
+• EXIF bearbeiten (Datum, Kamera, Autor, Koordinaten) in einer JPEG-Kopie oder aus einem anderen Foto übernehmen. Schlagwörter und Bildunterschriften bleiben erhalten.
+• Aufnahmedatum vieler Fotos auf einmal verschieben, wenn Uhrzeit oder Zeitzone der Kamera falsch waren (Pro).
 
 KI-KENNZEICHNUNGEN IN DER DATEI
 • Content Credentials (C2PA): Kennzeichnungen „von KI erstellt“ und „mit KI bearbeitet“ von ChatGPT, Gemini, Adobe Firefly, Sora und anderen.
@@ -166,19 +162,14 @@ KI-KENNZEICHNUNGEN IN DER DATEI
 • Geprüft werden nur Kennzeichnungen in der Datei; das Bild selbst wird nicht analysiert. Soziale Netzwerke und Messenger entfernen Kennzeichnungen, daher sagt die App bei solchen Bildern ehrlich, dass keine Daten vorliegen. Fehlende Kennzeichnungen beweisen nicht, dass ein Foto echt ist.
 
 KOSTENLOS UND PRO
-Kostenlos: Analyse, Metadaten-Anzeige, Datenschutzwert, GPS Privacy Shield, Bereinigen und Bearbeiten von bis zu 10 Fotos pro Tag, Verlauf mit bis zu 10 Berichten.
-Pro (Einmalkauf, kein Abo): kein Tageslimit, Videobereinigung (MP4, MOV) ohne Neukodierung, Stapelbereinigung von bis zu 50 Fotos, PDF- und JSON-Export, Verlauf mit bis zu 50 Berichten, Senden des Berichts an deine eigene API.
+Kostenlos: unbegrenzte Prüfung von Fotos, Videos und ganzen Ordnern, Metadaten-Ansicht, Datenschutz-Index, GPS Privacy Shield, Bereinigen und Bearbeiten von bis zu 10 Fotos pro Tag, Stapelbereinigung mit 5 Fotos auf einmal, die letzten 10 Berichte im Verlauf.
+Pro (Einmalkauf, kein Abo): kein Tageslimit, Bereinigung von Videos (MP4, MOV) ohne Neukodierung, Stapelbereinigung von bis zu 50 Fotos auf einmal, Datum vieler Fotos verschieben, PDF- und JSON-Export, Verlauf mit bis zu 50 Berichten, Senden des Berichts an Ihre eigene API.
 
 PRIVAT VON GRUND AUF
 • Die Analyse läuft auf deinem Gerät. Bilder werden nie hochgeladen.
 • Die Karte (MapTiler, OpenStreetMap-Daten) lädt nur, wenn du auf ihre Schaltfläche tippst. Danach sieht der Kartenanbieter deine IP-Adresse und wo der Punkt auf der Karte liegt.
 • Keine Konten, keine Werbung, keine Analysedienste.
 • Das Senden des JSON-Berichts an deinen eigenen Server ist standardmäßig aus und funktioniert nur auf deinen Befehl.
-
-SO GEHT’S
-1. Tippe auf „Foto oder Video prüfen“ und wähle ein Bild, oder nutze Kamera oder Zwischenablage.
-2. Sieh dir den Datenschutzwert an und was die Datei verrät.
-3. Tippe auf „Bereinigen und teilen“ oder „GPS entfernen“ und sende die bereinigte Kopie.
 
 Wähle die Originaldatei: Screenshots und über Messenger gesendete Fotos verlieren oft ihre Metadaten.
 ```
@@ -202,13 +193,12 @@ QUAND C’EST UTILE
 • Applications de rencontre et réseaux sociaux : vérifiez que vos photos ne révèlent pas où vous habitez ou travaillez.
 • Envoyer des photos à des inconnus, à un propriétaire ou à des clients : partagez une copie nettoyée et gardez l’original.
 • Journalistes, militants et toute personne attachée à sa vie privée : voyez exactement ce que révèle un fichier avant qu’il quitte votre téléphone.
-• Photographes : consultez les réglages de l’appareil, l’objectif et les données EXIF, ou modifiez l’auteur et la date dans une copie.
 
 CONFIDENTIALITÉ DES PHOTOS
+• Vérifiez un dossier entier : découvrez combien de photos révèlent le lieu, le numéro de série ou un nom, et nettoyez d’abord les plus risquées, gratuitement par 5.
 • Score de confidentialité de 0 à 100 et liste de ce que verra le destinataire : coordonnées, numéro de série, auteur, heure de prise de vue.
 • « Envoyer sans métadonnées » dans le menu Partager : choisissez-le dans la galerie ou n’importe quelle application et la photo part déjà nettoyée.
-• Nettoyage des métadonnées : une copie sans EXIF, GPS ni XMP. Le fichier d’origine n’est pas modifié. Le GPS est retiré du JPEG sans recompression.
-• Indique où la photo a été prise et, sur pression du bouton, le point sur une carte.
+• Nettoyage des métadonnées : une copie sans EXIF, GPS, XMP ni IPTC. Le fichier original ne change pas. Les HEIC et WebP sont nettoyés sans recompression, avec le même format et la même qualité.
 
 CONFIDENTIALITÉ DES VIDÉOS (MP4, MOV)
 • Lieu de tournage, modèle du téléphone, date et pistes cachées comme le timecode.
@@ -217,7 +207,8 @@ CONFIDENTIALITÉ DES VIDÉOS (MP4, MOV)
 TOUTES LES MÉTADONNÉES
 • EXIF : appareil, objectif, vitesse, ouverture, ISO, dates et plus, avec recherche par champ.
 • XMP, IPTC et blocs de texte PNG. Exportez le rapport en PDF, JSON ou CSV.
-• Modifiez l’EXIF (date, appareil, auteur, coordonnées) dans une copie JPEG.
+• Modifiez l’EXIF (date, appareil, auteur, coordonnées) dans une copie JPEG ou reprenez-le d’une autre photo. Les mots-clés et légendes sont conservés.
+• Décalez la date de prise de vue de nombreuses photos à la fois si l’heure ou le fuseau de l’appareil étaient faux (Pro).
 
 ÉTIQUETTES IA DANS LE FICHIER
 • Content Credentials (C2PA) : étiquettes « créé par IA » et « modifié avec IA » de ChatGPT, Gemini, Adobe Firefly, Sora et d’autres.
@@ -225,19 +216,14 @@ TOUTES LES MÉTADONNÉES
 • Seules les étiquettes contenues dans le fichier sont vérifiées ; l’image elle-même n’est pas analysée. Les réseaux sociaux et les messageries suppriment les étiquettes : pour ces images, l’application indique honnêtement qu’il n’y a pas de données. L’absence d’étiquette ne prouve pas qu’une photo est réelle.
 
 GRATUIT ET PRO
-Gratuit : analyse, visionneuse de métadonnées, score de confidentialité, GPS Privacy Shield, nettoyage et modification de jusqu’à 10 photos par jour, historique de jusqu’à 10 rapports.
-Pro (achat unique, sans abonnement) : sans limite quotidienne, nettoyage des vidéos (MP4, MOV) sans réencodage, nettoyage par lot de jusqu’à 50 photos, export PDF et JSON, historique de jusqu’à 50 rapports, envoi du rapport vers votre propre API.
+Gratuit : vérifications illimitées de photos, vidéos et dossiers entiers, visionneuse de métadonnées, indice de confidentialité, GPS Privacy Shield, nettoyage et modification de 10 photos par jour, nettoyage par lot de 5 photos, les 10 derniers rapports dans l’historique.
+Pro (achat unique, sans abonnement) : sans limite quotidienne, nettoyage des vidéos (MP4, MOV) sans réencodage, nettoyage par lot jusqu’à 50 photos à la fois, décalage des dates de nombreuses photos, export PDF et JSON, historique jusqu’à 50 rapports, envoi du rapport vers votre propre API.
 
 PRIVÉ PAR CONCEPTION
 • L’analyse se fait sur votre appareil. Les images ne sont jamais envoyées.
 • La carte (MapTiler, données OpenStreetMap) ne se charge que lorsque vous appuyez sur son bouton. Une fois activée, le fournisseur de la carte voit votre adresse IP et l’emplacement du point sur la carte.
 • Pas de compte, pas de publicité, pas de mesure d’audience.
 • L’envoi du rapport JSON vers votre propre serveur est désactivé par défaut et ne fonctionne que sur votre commande.
-
-MODE D’EMPLOI
-1. Appuyez sur « Vérifier une photo ou une vidéo » et choisissez une image, ou utilisez l’appareil photo ou le presse-papiers.
-2. Consultez le score de confidentialité et ce que révèle le fichier.
-3. Appuyez sur « Nettoyer et partager » ou « Supprimer le GPS », puis envoyez la copie nettoyée.
 
 Choisissez le fichier d’origine : les captures d’écran et les photos envoyées par messagerie perdent souvent leurs métadonnées.
 ```
@@ -264,9 +250,10 @@ QUANDO SERVE
 • Fotografi: consulta le impostazioni della fotocamera, l’obiettivo e i dati EXIF, oppure modifica autore e data in una copia.
 
 PRIVACY DELLE FOTO
+• Controlla un’intera cartella: scopri quante foto rivelano il luogo, il numero di serie o un nome e pulisci prima le più rischiose, gratis 5 alla volta.
 • Punteggio privacy da 0 a 100 e un elenco di ciò che vedrà il destinatario: coordinate, numero di serie, autore, ora dello scatto.
 • «Invia senza metadati» nel menu Condividi: sceglilo nella galleria o in qualsiasi app e la foto parte già pulita.
-• Pulizia dei metadati: una copia senza EXIF, GPS e XMP. Il file originale non cambia. Il GPS viene rimosso dal JPEG senza ricompressione.
+• Pulizia dei metadati: una copia senza EXIF, GPS, XMP e IPTC. Il file originale non cambia. HEIC e WebP vengono puliti senza ricompressione, con lo stesso formato e la stessa qualità.
 • Mostra dove è stata scattata la foto e, toccando il pulsante, il punto su una mappa.
 
 PRIVACY DEI VIDEO (MP4, MOV)
@@ -277,7 +264,8 @@ PRIVACY DEI VIDEO (MP4, MOV)
 TUTTI I METADATI
 • EXIF: fotocamera, obiettivo, tempo di scatto, apertura, ISO, date e altro, con ricerca per campo.
 • XMP, IPTC e blocchi di testo PNG. Esporta il report in PDF, JSON o CSV.
-• Modifica l’EXIF (data, fotocamera, autore, coordinate) in una copia JPEG.
+• Modifica l’EXIF (data, fotocamera, autore, coordinate) in una copia JPEG o prendilo da un’altra foto. Parole chiave e didascalie restano.
+• Sposta la data di scatto di molte foto insieme se l’ora o il fuso orario della fotocamera erano sbagliati (Pro).
 
 ETICHETTE IA NEL FILE
 • Content Credentials (C2PA): etichette «creato con IA» e «modificato con IA» di ChatGPT, Gemini, Adobe Firefly, Sora e altri.
@@ -285,19 +273,14 @@ ETICHETTE IA NEL FILE
 • Vengono controllate solo le etichette nel file; l’immagine in sé non viene analizzata. Social network e app di messaggistica rimuovono le etichette, quindi per queste immagini l’app dice onestamente che non ci sono dati. L’assenza di etichette non prova che una foto sia reale.
 
 GRATIS E PRO
-Gratis: analisi, visualizzatore di metadati, punteggio privacy, GPS Privacy Shield, pulizia e modifica fino a 10 foto al giorno, cronologia fino a 10 report.
-Pro (acquisto una tantum, nessun abbonamento): nessun limite giornaliero, pulizia dei video (MP4, MOV) senza ricodifica, pulizia in batch fino a 50 foto, esportazione PDF e JSON, cronologia fino a 50 report, invio del report alla tua API.
+Gratis: controlli illimitati di foto, video e intere cartelle, visualizzatore dei metadati, indice di privacy, GPS Privacy Shield, pulizia e modifica fino a 10 foto al giorno, pulizia in blocco di 5 foto alla volta, gli ultimi 10 report nella cronologia.
+Pro (acquisto unico, senza abbonamento): nessun limite giornaliero, pulizia dei video (MP4, MOV) senza ricodifica, pulizia in blocco fino a 50 foto alla volta, spostamento delle date di molte foto, esportazione PDF e JSON, cronologia fino a 50 report, invio del report alla tua API.
 
 PRIVATO PER DESIGN
 • L’analisi avviene sul tuo dispositivo. Le immagini non vengono mai caricate.
 • La mappa (MapTiler, dati OpenStreetMap) si carica solo quando tocchi il suo pulsante. Una volta attiva, il fornitore della mappa vede il tuo indirizzo IP e dove si trova il punto sulla mappa.
 • Nessun account, nessuna pubblicità, nessuna analisi statistica.
 • L’invio del report JSON al tuo server è disattivato per impostazione predefinita e funziona solo su tuo comando.
-
-COME SI USA
-1. Tocca «Controlla una foto o un video» e scegli un’immagine, oppure usa la fotocamera o gli appunti.
-2. Guarda il punteggio privacy e cosa rivela il file.
-3. Tocca «Pulisci e condividi» o «Rimuovi il GPS» e invia la copia pulita.
 
 Scegli il file originale: gli screenshot e le foto inviate tramite app di messaggistica spesso perdono i metadati.
 ```
@@ -324,9 +307,10 @@ MetaCheck: видалення EXIF, GPS
 • Фотографи: переглядайте налаштування камери, об’єктив і EXIF або змінюйте автора й дату в копії.
 
 ПРИВАТНІСТЬ ФОТО
+• Перевірка всієї папки: дізнайтеся, скільки фото видають місце, серійний номер чи ім’я, і очистіть найризикованіші першими — безкоштовно по 5 за раз.
 • Індекс приватності від 0 до 100 і список того, що побачить одержувач: координати, серійний номер, автор, час зйомки.
 • «Надіслати без метаданих» у меню «Поділитися»: виберіть його в галереї чи будь-якому застосунку, і фото піде вже очищеним.
-• Очищення метаданих: копія без EXIF, GPS і XMP. Оригінальний файл не змінюється. GPS видаляється з JPEG без повторного стиснення.
+• Очищення метаданих: копія без EXIF, GPS, XMP та IPTC. Вихідний файл не змінюється. HEIC і WebP очищаються без перестиснення — формат і якість ті самі.
 • Показує, де зроблено фото, а після натискання кнопки — точку на карті.
 
 ПРИВАТНІСТЬ ВІДЕО (MP4, MOV)
@@ -337,7 +321,8 @@ MetaCheck: видалення EXIF, GPS
 УСІ МЕТАДАНІ
 • EXIF: камера, об’єктив, витримка, діафрагма, ISO, дати та інше, з пошуком за полями.
 • XMP, IPTC і текстові блоки PNG. Експорт звіту в PDF, JSON або CSV.
-• Редагування EXIF (дата, камера, автор, координати) у копії JPEG.
+• Редагування EXIF (дата, камера, автор, координати) у копії JPEG, можна взяти дані з іншого фото. Ключові слова й підписи зберігаються.
+• Зсув дати зйомки одразу в багатьох фото, якщо в камері був неправильний час або часовий пояс (Pro).
 
 МІТКИ ШІ У ФАЙЛІ
 • Content Credentials (C2PA): мітки «створено ШІ» та «змінено ШІ» від ChatGPT, Gemini, Adobe Firefly, Sora та інших.
@@ -345,8 +330,8 @@ MetaCheck: видалення EXIF, GPS
 • Перевіряються лише мітки всередині файлу; саме зображення не аналізується. Соцмережі й месенджери видаляють мітки, тож для таких зображень застосунок чесно повідомляє, що даних немає. Відсутність міток не доводить, що фото справжнє.
 
 БЕЗКОШТОВНО І PRO
-Безкоштовно: аналіз, перегляд метаданих, індекс приватності, GPS Privacy Shield, очищення й редагування до 10 фото на день, історія до 10 звітів.
-Pro (одноразова покупка, без підписки): без денного ліміту, очищення відео (MP4, MOV) без перекодування, пакетне очищення до 50 фото, експорт PDF і JSON, історія до 50 звітів, надсилання звіту у ваш власний API.
+Безкоштовно: перевірки фото, відео й цілих папок без обмежень, перегляд метаданих, індекс приватності, GPS Privacy Shield, очищення й редагування до 10 фото на добу, пакетне очищення по 5 фото за раз, останні 10 звітів в історії.
+Pro (разова покупка, без підписки): без денного ліміту, очищення відео (MP4, MOV) без перекодування, пакетне очищення до 50 фото за раз, зсув дат у багатьох фото, експорт PDF і JSON, історія до 50 звітів, надсилання звіту у ваш API.
 
 ПРИВАТНІСТЬ ЗА ЗАДУМОМ
 • Аналіз виконується на вашому пристрої. Зображення ніколи не завантажуються в мережу.
@@ -384,9 +369,10 @@ KIEDY TO POMAGA
 • Fotografowie: sprawdzaj ustawienia aparatu, obiektyw i dane EXIF albo edytuj autora i datę w kopii.
 
 PRYWATNOŚĆ ZDJĘĆ
+• Sprawdź cały folder: zobacz, ile zdjęć zdradza miejsce, numer seryjny lub imię, i wyczyść najpierw te najbardziej ryzykowne — za darmo po 5 naraz.
 • Wskaźnik prywatności od 0 do 100 i lista tego, co zobaczy odbiorca: współrzędne, numer seryjny, autor, czas wykonania.
 • „Wyślij bez metadanych” w menu Udostępnij: wybierz tę opcję w galerii lub dowolnej aplikacji, a zdjęcie zostanie wysłane już wyczyszczone.
-• Czyszczenie metadanych: kopia bez EXIF, GPS i XMP. Oryginalny plik się nie zmienia. GPS jest usuwany z JPEG bez ponownej kompresji.
+• Czyszczenie metadanych: kopia bez EXIF, GPS, XMP i IPTC. Oryginalny plik się nie zmienia. HEIC i WebP są czyszczone bez ponownej kompresji, z tym samym formatem i jakością.
 • Pokazuje, gdzie zrobiono zdjęcie, a po naciśnięciu przycisku — punkt na mapie.
 
 PRYWATNOŚĆ FILMÓW (MP4, MOV)
@@ -397,7 +383,8 @@ PRYWATNOŚĆ FILMÓW (MP4, MOV)
 WSZYSTKIE METADANE
 • EXIF: aparat, obiektyw, czas naświetlania, przysłona, ISO, daty i więcej, z wyszukiwaniem pól.
 • XMP, IPTC i bloki tekstowe PNG. Eksport raportu do PDF, JSON lub CSV.
-• Edycja EXIF (data, aparat, autor, współrzędne) w kopii JPEG.
+• Edycja EXIF (data, aparat, autor, współrzędne) w kopii JPEG lub pobranie danych z innego zdjęcia. Słowa kluczowe i podpisy zostają.
+• Przesunięcie daty wykonania wielu zdjęć naraz, gdy zegar lub strefa czasowa aparatu były błędne (Pro).
 
 ETYKIETY AI W PLIKU
 • Content Credentials (C2PA): etykiety „utworzone przez AI” i „edytowane przez AI” od ChatGPT, Gemini, Adobe Firefly, Sora i innych.
@@ -405,8 +392,8 @@ ETYKIETY AI W PLIKU
 • Sprawdzane są tylko etykiety w pliku; sam obraz nie jest analizowany. Serwisy społecznościowe i komunikatory usuwają etykiety, więc w takich przypadkach aplikacja uczciwie informuje, że brak danych. Brak etykiet nie dowodzi, że zdjęcie jest prawdziwe.
 
 ZA DARMO I PRO
-Za darmo: analiza, podgląd metadanych, wskaźnik prywatności, GPS Privacy Shield, czyszczenie i edycja do 10 zdjęć dziennie, historia do 10 raportów.
-Pro (jednorazowy zakup, bez subskrypcji): bez dziennego limitu, czyszczenie filmów (MP4, MOV) bez ponownego kodowania, czyszczenie wsadowe do 50 zdjęć, eksport PDF i JSON, historia do 50 raportów, wysyłanie raportu do własnego API.
+Za darmo: nielimitowane sprawdzanie zdjęć, filmów i całych folderów, przeglądarka metadanych, indeks prywatności, GPS Privacy Shield, czyszczenie i edycja do 10 zdjęć dziennie, czyszczenie wsadowe po 5 zdjęć, 10 ostatnich raportów w historii.
+Pro (jednorazowy zakup, bez subskrypcji): bez dziennego limitu, czyszczenie filmów (MP4, MOV) bez ponownego kodowania, czyszczenie wsadowe do 50 zdjęć naraz, przesuwanie dat wielu zdjęć, eksport PDF i JSON, historia do 50 raportów, wysyłanie raportu do własnego API.
 
 PRYWATNOŚĆ OD PODSTAW
 • Analiza odbywa się na Twoim urządzeniu. Obrazy nigdy nie są przesyłane.
@@ -444,9 +431,10 @@ NE ZAMAN İŞE YARAR
 • Fotoğrafçılar: Kamera ayarlarını, lensi ve EXIF verilerini görüntüleyin ya da bir kopyada yazarı ve tarihi düzenleyin.
 
 FOTOĞRAF GİZLİLİĞİ
+• Tüm klasörü kontrol edin: kaç fotoğrafın konumu, seri numarasını veya bir adı açığa çıkardığını görün ve en risklileri önce temizleyin; ücretsiz olarak seferde 5.
 • 0–100 arası gizlilik puanı ve alıcının göreceklerinin listesi: koordinatlar, seri numarası, yazar, çekim zamanı.
 • Paylaş menüsünde “Meta veri olmadan gönder”: Galeride veya herhangi bir uygulamada seçin, fotoğraf temizlenmiş olarak gitsin.
-• Meta veri temizleme: EXIF, GPS ve XMP içermeyen bir kopya. Orijinal dosya değişmez. GPS, JPEG’den yeniden sıkıştırma olmadan kaldırılır.
+• Meta veri temizleme: EXIF, GPS, XMP ve IPTC içermeyen bir kopya. Orijinal dosya değişmez. HEIC ve WebP yeniden sıkıştırılmadan temizlenir; biçim ve kalite aynı kalır.
 • Fotoğrafın nerede çekildiğini ve düğmeye dokunduğunuzda noktayı haritada gösterir.
 
 VİDEO GİZLİLİĞİ (MP4, MOV)
@@ -457,7 +445,8 @@ VİDEO GİZLİLİĞİ (MP4, MOV)
 TÜM META VERİLER
 • EXIF: kamera, lens, deklanşör hızı, diyafram, ISO, tarihler ve daha fazlası; alan aramasıyla.
 • XMP, IPTC ve PNG metin blokları. Raporu PDF, JSON veya CSV olarak dışa aktarın.
-• Bir JPEG kopyasında EXIF’i (tarih, kamera, yazar, koordinatlar) düzenleyin.
+• EXIF düzenleme (tarih, kamera, yazar, koordinatlar) JPEG kopyasında veya başka bir fotoğraftan alarak. Anahtar kelimeler ve açıklamalar korunur.
+• Kameranın saati veya saat dilimi yanlışsa birçok fotoğrafın çekim tarihini aynı anda kaydırın (Pro).
 
 DOSYADAKİ YAPAY ZEKÂ ETİKETLERİ
 • Content Credentials (C2PA): ChatGPT, Gemini, Adobe Firefly, Sora ve diğerlerinin “yapay zekâ ile oluşturuldu” ve “yapay zekâ ile düzenlendi” etiketleri.
@@ -465,19 +454,14 @@ DOSYADAKİ YAPAY ZEKÂ ETİKETLERİ
 • Yalnızca dosyanın içindeki etiketler kontrol edilir; görüntünün kendisi analiz edilmez. Sosyal ağlar ve mesajlaşma uygulamaları etiketleri siler; bu tür görüntülerde uygulama dürüstçe veri olmadığını söyler. Etiketlerin olmaması fotoğrafın gerçek olduğunu kanıtlamaz.
 
 ÜCRETSİZ VE PRO
-Ücretsiz: analiz, meta veri görüntüleyici, gizlilik puanı, GPS Privacy Shield, günde en fazla 10 fotoğrafı temizleme ve düzenleme, en fazla 10 raporluk geçmiş.
-Pro (tek seferlik satın alma, abonelik yok): günlük sınır yok, yeniden kodlamadan video temizleme (MP4, MOV), en fazla 50 fotoğrafı toplu temizleme, PDF ve JSON dışa aktarma, en fazla 50 raporluk geçmiş, raporu kendi API’nize gönderme.
+Ücretsiz: fotoğraf, video ve tüm klasörler için sınırsız kontrol, meta veri görüntüleyici, gizlilik puanı, GPS Privacy Shield, günde 10 fotoğrafa kadar temizleme ve düzenleme, seferde 5 fotoğraf toplu temizleme, geçmişte son 10 rapor.
+Pro (tek seferlik satın alma, abonelik yok): günlük sınır yok, videoları (MP4, MOV) yeniden kodlamadan temizleme, seferde 50 fotoğrafa kadar toplu temizleme, birçok fotoğrafta tarih kaydırma, PDF ve JSON dışa aktarma, 50 rapora kadar geçmiş, raporu kendi API’nize gönderme.
 
 TASARIMI GEREĞİ GİZLİ
 • Analiz cihazınızda yapılır. Görüntüler asla yüklenmez.
 • Harita (MapTiler, OpenStreetMap verileri) yalnızca düğmesine dokunduğunuzda yüklenir. Açıldıktan sonra harita sağlayıcısı IP adresinizi ve noktanın haritadaki yerini görür.
 • Hesap yok, reklam yok, analiz yok.
 • JSON raporunu kendi sunucunuza gönderme varsayılan olarak kapalıdır ve yalnızca sizin komutunuzla çalışır.
-
-NASIL KULLANILIR
-1. “Fotoğraf veya videoyu kontrol et”e dokunun ve bir görüntü seçin ya da kamerayı veya panoyu kullanın.
-2. Gizlilik puanını ve dosyanın neyi ele verdiğini görün.
-3. “Temizle ve paylaş” veya “GPS’i kaldır”a dokunun ve temiz kopyayı gönderin.
 
 Orijinal dosyayı seçin: ekran görüntüleri ve mesajlaşma uygulamalarıyla gönderilen fotoğraflar çoğu zaman meta verilerini kaybeder.
 ```
@@ -504,9 +488,10 @@ KAPAN BERGUNA
 • Fotografer: lihat pengaturan kamera, lensa, dan data EXIF, atau edit pembuat dan tanggal di salinan.
 
 PRIVASI FOTO
+• Periksa seluruh folder: lihat berapa banyak foto yang membuka lokasi, nomor seri, atau nama, lalu bersihkan yang paling berisiko lebih dulu, gratis 5 sekaligus.
 • Skor privasi 0–100 dan daftar hal yang akan dilihat penerima: koordinat, nomor seri, pembuat, waktu pengambilan.
 • “Kirim tanpa metadata” di menu Bagikan: pilih di galeri atau aplikasi apa pun, dan foto terkirim dalam keadaan bersih.
-• Pembersihan metadata: salinan tanpa EXIF, GPS, dan XMP. File asli tidak berubah. GPS dihapus dari JPEG tanpa kompresi ulang.
+• Pembersihan metadata: salinan tanpa EXIF, GPS, XMP, dan IPTC. File asli tidak berubah. HEIC dan WebP dibersihkan tanpa kompresi ulang, format dan kualitasnya tetap.
 • Menampilkan lokasi pengambilan foto dan, saat tombol diketuk, titiknya di peta.
 
 PRIVASI VIDEO (MP4, MOV)
@@ -517,7 +502,8 @@ PRIVASI VIDEO (MP4, MOV)
 SEMUA METADATA
 • EXIF: kamera, lensa, kecepatan rana, bukaan, ISO, tanggal, dan lainnya, dengan pencarian kolom.
 • XMP, IPTC, dan blok teks PNG. Ekspor laporan sebagai PDF, JSON, atau CSV.
-• Edit EXIF (tanggal, kamera, pembuat, koordinat) di salinan JPEG.
+• Edit EXIF (tanggal, kamera, pembuat, koordinat) di salinan JPEG atau ambil dari foto lain. Kata kunci dan keterangan tetap ada.
+• Geser tanggal pengambilan banyak foto sekaligus jika jam atau zona waktu kamera salah (Pro).
 
 LABEL AI DI DALAM FILE
 • Content Credentials (C2PA): label “dibuat oleh AI” dan “diedit dengan AI” dari ChatGPT, Gemini, Adobe Firefly, Sora, dan lainnya.
@@ -525,8 +511,8 @@ LABEL AI DI DALAM FILE
 • Hanya label di dalam file yang diperiksa; gambarnya sendiri tidak dianalisis. Media sosial dan aplikasi pesan menghapus label, jadi untuk gambar seperti itu aplikasi dengan jujur menyatakan tidak ada data. Tidak adanya label tidak membuktikan foto itu asli.
 
 GRATIS DAN PRO
-Gratis: analisis, penampil metadata, skor privasi, GPS Privacy Shield, pembersihan dan edit hingga 10 foto per hari, riwayat hingga 10 laporan.
-Pro (pembelian sekali, tanpa langganan): tanpa batas harian, pembersihan video (MP4, MOV) tanpa encode ulang, pembersihan massal hingga 50 foto, ekspor PDF dan JSON, riwayat hingga 50 laporan, kirim laporan ke API Anda sendiri.
+Gratis: pemeriksaan foto, video, dan seluruh folder tanpa batas, penampil metadata, skor privasi, GPS Privacy Shield, pembersihan dan edit hingga 10 foto per hari, pembersihan massal 5 foto sekaligus, 10 laporan terakhir di riwayat.
+Pro (beli sekali, tanpa langganan): tanpa batas harian, pembersihan video (MP4, MOV) tanpa encode ulang, pembersihan massal hingga 50 foto sekaligus, geser tanggal banyak foto, ekspor PDF dan JSON, riwayat hingga 50 laporan, kirim laporan ke API Anda sendiri.
 
 PRIVAT SEJAK AWAL
 • Analisis berjalan di perangkat Anda. Gambar tidak pernah diunggah.
@@ -564,9 +550,10 @@ MetaCheck：EXIF・GPSを削除
 • 写真家：カメラ設定、レンズ、EXIFを確認したり、コピーで作成者や日付を編集したりできます。
 
 写真のプライバシー
+• フォルダ全体をチェック：撮影場所、シリアル番号、名前を明かしている写真が何枚あるかを確認し、リスクの高いものからクリーニング。無料で 1 回 5 枚まで。
 • 0〜100のプライバシースコアと、受信者に見える情報の一覧：座標、シリアル番号、作成者、撮影時刻。
 • 共有メニューの「メタデータなしで送信」：ギャラリーや任意のアプリで選ぶと、写真はクリーニング済みで送信されます。
-• メタデータのクリーニング：EXIF、GPS、XMPを含まないコピーを作成します。元のファイルは変更されません。JPEGのGPSは再圧縮せずに削除します。
+• メタデータのクリーニング：EXIF、GPS、XMP、IPTC を含まないコピーを作成。元のファイルは変更されません。HEIC と WebP は再圧縮せずにクリーニングするので、形式も画質もそのままです。
 • 撮影場所を表示し、ボタンをタップすると地図上に地点を表示します。
 
 動画のプライバシー（MP4、MOV）
@@ -577,7 +564,8 @@ MetaCheck：EXIF・GPSを削除
 すべてのメタデータ
 • EXIF：カメラ、レンズ、シャッター速度、絞り、ISO、日時など。フィールド検索付き。
 • XMP、IPTC、PNGテキストチャンク。レポートをPDF、JSON、CSVで書き出せます。
-• JPEGのコピーでEXIF（日付、カメラ、作成者、座標）を編集できます。
+• JPEG のコピーで EXIF（日時、カメラ、作成者、座標）を編集、または別の写真から取り込めます。キーワードとキャプションは保持されます。
+• カメラの時計やタイムゾーンが間違っていたとき、多数の写真の撮影日時をまとめてずらせます（Pro）。
 
 ファイル内のAIラベル
 • Content Credentials（C2PA）：ChatGPT、Gemini、Adobe Firefly, Soraなどによる「AIで作成」「AIで編集」のラベル。
@@ -585,8 +573,8 @@ MetaCheck：EXIF・GPSを削除
 • 確認するのはファイル内のラベルのみで、画像そのものは分析しません。SNSやメッセージアプリはラベルを削除するため、そうした画像ではデータがないことを正直に表示します。ラベルがないことは、写真が本物である証明にはなりません。
 
 無料版とPro
-無料：分析、メタデータビューアー、プライバシースコア、GPS Privacy Shield、1日10枚までのクリーニングと編集、最大10件の履歴。
-Pro（買い切り、サブスクリプションなし）：1日の上限なし、再エンコードなしの動画クリーニング（MP4、MOV）、最大50枚の一括クリーニング、PDF・JSONの書き出し、最大50件の履歴、独自APIへのレポート送信。
+無料：写真・動画・フォルダ全体のチェックが無制限、メタデータビューア、プライバシースコア、GPS Privacy Shield、1日 10 枚までのクリーニングと編集、1 回 5 枚の一括クリーニング、履歴は最新 10 件。
+Pro（買い切り、サブスクなし）：1日の上限なし、動画（MP4、MOV）の再エンコードなしのクリーニング、1 回最大 50 枚の一括クリーニング、多数の写真の日時変更、PDF と JSON の書き出し、最大 50 件の履歴、独自 API へのレポート送信。
 
 プライバシー重視の設計
 • 分析は端末上で行われます。画像がアップロードされることはありません。
@@ -624,9 +612,10 @@ MetaCheck: EXIF·GPS 제거
 • 사진가: 카메라 설정, 렌즈, EXIF를 확인하거나 사본에서 작성자와 날짜를 편집하세요.
 
 사진 개인정보 보호
+• 폴더 전체 검사: 위치, 일련번호, 이름을 드러내는 사진이 몇 장인지 확인하고 위험한 사진부터 정리하세요. 무료로 한 번에 5장.
 • 0~100 개인정보 점수와 받는 사람이 보게 될 정보 목록: 좌표, 일련번호, 작성자, 촬영 시각.
 • 공유 메뉴의 “메타데이터 없이 보내기”: 갤러리나 어떤 앱에서든 선택하면 정리된 사진이 전송됩니다.
-• 메타데이터 정리: EXIF, GPS, XMP가 없는 사본을 만듭니다. 원본 파일은 바뀌지 않습니다. JPEG의 GPS는 다시 압축하지 않고 제거합니다.
+• 메타데이터 정리: EXIF, GPS, XMP, IPTC가 없는 사본을 만듭니다. 원본 파일은 바뀌지 않습니다. HEIC와 WebP는 재압축 없이 정리되어 형식과 화질이 그대로입니다.
 • 사진을 찍은 위치를 보여주고, 버튼을 누르면 지도에 지점을 표시합니다.
 
 동영상 개인정보 보호(MP4, MOV)
@@ -637,7 +626,8 @@ MetaCheck: EXIF·GPS 제거
 모든 메타데이터
 • EXIF: 카메라, 렌즈, 셔터 속도, 조리개, ISO, 날짜 등을 필드 검색과 함께 제공합니다.
 • XMP, IPTC, PNG 텍스트 청크. 보고서를 PDF, JSON, CSV로 내보낼 수 있습니다.
-• JPEG 사본에서 EXIF(날짜, 카메라, 작성자, 좌표)를 편집할 수 있습니다.
+• JPEG 사본에서 EXIF(날짜, 카메라, 작성자, 좌표)를 편집하거나 다른 사진에서 가져올 수 있습니다. 키워드와 캡션은 유지됩니다.
+• 카메라 시계나 시간대가 잘못되었을 때 여러 사진의 촬영 날짜를 한 번에 이동(Pro).
 
 파일 속 AI 라벨
 • Content Credentials(C2PA): ChatGPT, Gemini, Adobe Firefly, Sora 등이 붙이는 “AI로 생성”, “AI로 편집” 라벨.
@@ -645,8 +635,8 @@ MetaCheck: EXIF·GPS 제거
 • 파일 안의 라벨만 확인하며 이미지 자체는 분석하지 않습니다. SNS와 메신저는 라벨을 제거하므로 이런 이미지에서는 데이터가 없다고 솔직하게 알려줍니다. 라벨이 없다고 사진이 진짜라는 뜻은 아닙니다.
 
 무료와 Pro
-무료: 분석, 메타데이터 뷰어, 개인정보 점수, GPS Privacy Shield, 하루 최대 10장 정리·편집, 최대 10개 보고서 기록.
-Pro(1회 구매, 구독 없음): 하루 제한 없음, 재인코딩 없는 동영상 정리(MP4, MOV), 최대 50장 일괄 정리, PDF·JSON 내보내기, 최대 50개 보고서 기록, 나만의 API로 보고서 전송.
+무료: 사진·동영상·폴더 전체 무제한 검사, 메타데이터 뷰어, 개인정보 점수, GPS Privacy Shield, 하루 최대 10장 정리 및 편집, 한 번에 5장 일괄 정리, 기록에는 최근 보고서 10개.
+Pro(일회성 구매, 구독 없음): 일일 한도 없음, 동영상(MP4, MOV) 재인코딩 없는 정리, 한 번에 최대 50장 일괄 정리, 여러 사진의 날짜 이동, PDF 및 JSON 내보내기, 최대 50개 보고서 기록, 내 API로 보고서 전송.
 
 설계부터 개인정보 보호
 • 분석은 기기에서 이루어집니다. 이미지는 업로드되지 않습니다.
@@ -684,9 +674,10 @@ MetaCheck：清除 EXIF 和 GPS
 • 摄影师：查看相机设置、镜头和 EXIF 数据，或在副本中编辑作者和日期。
 
 照片隐私
+• 检查整个文件夹：看看有多少照片泄露了位置、序列号或姓名，并优先清理风险最高的照片，免费每次 5 张。
 • 0–100 的隐私评分，以及接收者能看到的信息列表：坐标、序列号、作者、拍摄时间。
 • 分享菜单中的“无元数据发送”：在相册或任意应用中选择，照片发出时就已清理干净。
-• 清理元数据：生成不含 EXIF、GPS 和 XMP 的副本，原文件保持不变。JPEG 中的 GPS 会在不重新压缩的情况下移除。
+• 清理元数据：生成不含 EXIF、GPS、XMP 和 IPTC 的副本，原文件保持不变。HEIC 和 WebP 无需重新压缩即可清理，格式和画质保持不变。
 • 显示照片的拍摄地点，点按按钮即可在地图上查看位置。
 
 视频隐私（MP4、MOV）
@@ -697,7 +688,8 @@ MetaCheck：清除 EXIF 和 GPS
 全部元数据
 • EXIF：相机、镜头、快门速度、光圈、ISO、日期等，支持字段搜索。
 • XMP、IPTC 和 PNG 文本块。可将报告导出为 PDF、JSON 或 CSV。
-• 在 JPEG 副本中编辑 EXIF（日期、相机、作者、坐标）。
+• 在 JPEG 副本中编辑 EXIF（日期、相机、作者、坐标），或从另一张照片复制。关键词和说明会保留。
+• 相机时钟或时区设置错误时，可一次调整多张照片的拍摄日期（Pro）。
 
 文件中的 AI 标签
 • Content Credentials（C2PA）：ChatGPT、Gemini、Adobe Firefly, Sora 等添加的“AI 创建”和“AI 编辑”标签。
@@ -705,8 +697,8 @@ MetaCheck：清除 EXIF 和 GPS
 • 只检查文件中的标签，不分析图像本身。社交网络和即时通讯应用会删除标签，因此对这类图像，应用会如实说明没有数据。没有标签并不能证明照片是真实的。
 
 免费版和 Pro
-免费：分析、元数据查看器、隐私评分、GPS Privacy Shield，每天最多清理和编辑 10 张照片，最多保留 10 份报告记录。
-Pro（一次性购买，无需订阅）：无每日上限，不重新编码清理视频（MP4、MOV），批量清理最多 50 张照片，导出 PDF 和 JSON，最多保留 50 份报告记录，可将报告发送到自有 API。
+免费：不限次数检查照片、视频和整个文件夹，元数据查看器，隐私评分，GPS Privacy Shield，每天最多清理和编辑 10 张照片，批量清理每次 5 张，历史记录保留最近 10 份报告。
+Pro（一次性购买，无订阅）：无每日限制，无需重新编码清理视频（MP4、MOV），每次最多批量清理 50 张照片，批量调整照片日期，导出 PDF 和 JSON，最多 50 份报告的历史记录，将报告发送到你自己的 API。
 
 隐私优先的设计
 • 分析在你的设备上完成，图像绝不会上传。
