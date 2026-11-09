@@ -236,11 +236,24 @@ fun MetadataStudioScreen(
             batchSources = list.map(Uri::toString).distinct().take(MAX_QUEUE); actionError = null
         }
     }
+    // Без разрешения «Местоположение в медиа» Android прячет GPS, и проверка показала бы, что места нет.
+    var pendingAuditTree by remember { mutableStateOf<Uri?>(null) }
+    val startAuditScan: (Uri) -> Unit = { tree -> vm.auditFolder(tree) { risky -> batchSources = risky.take(MAX_QUEUE) } }
+    val auditLocationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        pendingAuditTree?.let(startAuditScan)
+        pendingAuditTree = null
+    }
     val chooseAuditTree = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { tree ->
         if (tree != null) {
             vm.persistAccess(tree)
             actionError = null
-            vm.auditFolder(tree) { risky -> batchSources = risky.take(MAX_QUEUE) }
+            if (android.os.Build.VERSION.SDK_INT >= 29 && androidx.core.content.ContextCompat.checkSelfPermission(
+                    context, android.Manifest.permission.ACCESS_MEDIA_LOCATION,
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                pendingAuditTree = tree
+                auditLocationPermission.launch(android.Manifest.permission.ACCESS_MEDIA_LOCATION)
+            } else startAuditScan(tree)
         }
     }
     LaunchedEffect(startAudit) {
