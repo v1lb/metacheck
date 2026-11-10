@@ -16,12 +16,12 @@ class SharedCopies(context: Context) {
     private val app = context.applicationContext
     private val dir get() = File(app.cacheDir, DIR).apply { mkdirs() }
 
-    /** Файл назначения: JPEG остаётся JPEG, видео — MP4/MOV, остальное очистка сохраняет в PNG (как CleanFormat). */
+    /** Файл назначения: JPEG, WebP и HEIC остаются в своём формате, видео — MP4/MOV, остальное сохраняется в PNG (как CleanFormat). */
     fun newTarget(source: String): Target {
         val format = runCatching {
             app.contentResolver.openInputStream(Uri.parse(source))?.use { stream ->
                 // read() может вернуть меньше байт, чем просили: дочитываем, иначе JPEG ушёл бы как «.png».
-                val head = ByteArray(16)
+                val head = ByteArray(32)
                 var n = 0
                 while (n < head.size) { val r = stream.read(head, n, head.size - n); if (r < 0) break; n += r }
                 ImageFormatDetector.detect(head, n)

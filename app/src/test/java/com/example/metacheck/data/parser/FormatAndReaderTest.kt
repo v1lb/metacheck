@@ -18,6 +18,13 @@ class FormatAndReaderTest {
     fun detectsPng() = assertEquals(ImageFormat.PNG, ImageFormatDetector.detect(PNG_SIGNATURE + ByteArray(8)))
 
     @Test
+    fun genericHeifBrandIsAvifOnlyWithAvifCompatibleBrand() {
+        fun ftyp(vararg brands: String) = ("\u0000\u0000\u0000\u0020ftyp" + brands.first() + "\u0000\u0000\u0000\u0000" + brands.drop(1).joinToString("")).toByteArray(Charsets.ISO_8859_1)
+        assertEquals(ImageFormat.HEIC, ImageFormatDetector.detect(ftyp("mif1", "mif1", "heic")))
+        assertEquals(ImageFormat.AVIF, ImageFormatDetector.detect(ftyp("mif1", "mif1", "avif", "miaf")))
+    }
+
+    @Test
     fun detectsGif() = assertEquals(ImageFormat.GIF, ImageFormatDetector.detect("GIF89a....".toByteArray()))
 
     @Test

@@ -17,8 +17,11 @@ object ImageFormatDetector {
             at(0, "RIFF") && at(8, "WEBP") -> ImageFormat.WEBP
             at(4, "ftyp") -> when {
                 at(8, "avif") || at(8, "avis") -> ImageFormat.AVIF
-                at(8, "heic") || at(8, "heix") || at(8, "heim") || at(8, "heis") ||
-                    at(8, "hevc") || at(8, "mif1") || at(8, "msf1") -> ImageFormat.HEIC
+                at(8, "heic") || at(8, "heix") || at(8, "heim") || at(8, "heis") || at(8, "hevc") -> ImageFormat.HEIC
+                // mif1/msf1 — общий бренд HEIF: что внутри (HEVC или AV1), видно по совместимым брендам.
+                // Смотрим только первые 32 байта: все вызывающие читают не меньше, и ответ у них одинаковый.
+                at(8, "mif1") || at(8, "msf1") ->
+                    if ((16..28 step 4).any { at(it, "avif") || at(it, "avis") }) ImageFormat.AVIF else ImageFormat.HEIC
                 at(8, "qt  ") -> ImageFormat.MOV
                 VIDEO_BRANDS.any { at(8, it) } -> ImageFormat.MP4
                 else -> ImageFormat.UNKNOWN

@@ -49,7 +49,7 @@ object WebpCleaner {
         while (p + 8 <= d.size) {
             val type = String(d, p, 4, Charsets.ISO_8859_1)
             val size = le32(d, p + 4)
-            if (type !in imageChunks) return false
+            if (size < 0 || type !in imageChunks) return false
             if (type == "VP8X" && (d[p + 8].toInt() and (FLAG_EXIF or FLAG_XMP)) != 0) return false
             p += 8 + size + (size and 1)
         }
@@ -70,8 +70,9 @@ object WebpCleaner {
 /**
  * Очистка HEIC/HEIF без пережатия. Удалять элементы из контейнера нельзя без пересчёта всех смещений,
  * поэтому содержимое метаданных затирается на месте, размер файла не меняется:
- * элемент Exif — пустым TIFF без тегов, элемент XMP — пустым пакетом и пробелами,
- * верхнеуровневые блоки uuid (там C2PA и метки производителей) — превращаются в free с нулями.
+ * элемент Exif — пустым TIFF без тегов, элемент XMP — пустым пакетом и пробелами, прочие служебные
+ * элементы (mime, uri) — нулями. Верхнеуровневые блоки, не нужные для показа фото (uuid с C2PA и метками
+ * производителей, mpvd — видео «живого фото» Samsung), превращаются в free с нулями.
  * Фото, миниатюры, карты глубины и HDR остаются как были.
  */
 object HeifCleaner {
@@ -80,34 +81,50 @@ object HeifCleaner {
     private val emptyXmp = "<?xpacket begin=\"\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?><x:xmpmeta xmlns:x=\"adobe:ns:meta/\"/><?xpacket end=\"w\"?>"
         .toByteArray(Charsets.US_ASCII)
 
+    /** Блоки верхнего уровня, которые остаются как есть. */
+    private val keptBoxes = setOf("ftyp", "meta", "mdat", "free", "skip", "wide")
+    /** Последовательности кадров (как видео): их структуру этот код не разбирает. */
+    private val sequenceBoxes = setOf("moov", "moof", "mfra")
+    private const val MAX_METADATA_BYTES = 16L * 1024 * 1024
+
     private data class Box(val type: String, val start: Long, val header: Int, val end: Long) {
         val dataStart get() = start + header
     }
 
     private data class Extent(val offset: Long, val length: Long)
-    private data class Item(val id: Long, val type: String, val contentType: String?)
+    private data class Item(val id: Long, val type: String, val contentType: String?) {
+        val isExif get() = type == "Exif"
+        val isXmp get() = type == "mime" && contentType?.lowercase()?.contains("rdf+xml") == true
+        /** Всё, что не изображение: Exif, XMP и любые вложенные данные (кроме картинок) и ссылки. */
+        val isMetadata get() = isExif || type == "uri " ||
+            (type == "mime" && contentType?.lowercase()?.startsWith("image/") != true)
+    }
+
+    private class Target(val extent: Extent, val bytes: ByteArray)
+    private class Plan(val targets: List<Target>, val removable: List<Box>)
 
     /** Копирует [source] в [output] и затирает метаданные. Бросает IOException, если структура непонятна. */
     fun strip(source: File, output: File) {
         source.copyTo(output, overwrite = true)
         RandomAccessFile(output, "rw").use { f ->
-            for (target in metadataTargets(f)) {
+            val plan = plan(f)
+            for (target in plan.targets) {
                 f.seek(target.extent.offset)
                 f.write(target.bytes)
             }
-            for (box in topLevel(f)) if (box.type == "uuid") {
+            for (box in plan.removable) {
                 f.seek(box.start + 4); f.write("free".toByteArray(Charsets.US_ASCII))
-                zero(f, box.start + 8, box.end)
+                zero(f, box.dataStart, box.end)
             }
         }
         if (!isClean(output)) throw IOException("HEIF metadata still present")
     }
 
-    /** true, если все элементы Exif/XMP пустые и блоков uuid нет. */
+    /** true, если все служебные элементы пустые и лишних блоков верхнего уровня нет. */
     fun isClean(file: File): Boolean = runCatching {
         RandomAccessFile(file, "r").use { f ->
-            if (topLevel(f).any { it.type == "uuid" }) return false
-            metadataTargets(f).all { t ->
+            val plan = plan(f)
+            plan.removable.isEmpty() && plan.targets.all { t ->
                 val now = ByteArray(t.bytes.size)
                 f.seek(t.extent.offset); f.readFully(now)
                 now.contentEquals(t.bytes)
@@ -115,14 +132,20 @@ object HeifCleaner {
         }
     }.getOrDefault(false)
 
-    private class Target(val extent: Extent, val bytes: ByteArray)
+    private fun plan(f: RandomAccessFile): Plan = try {
+        buildPlan(f)
+    } catch (e: RuntimeException) {
+        // Битый файл: выход за границы массива и т. п. Для вызывающего это «формат не разобран».
+        throw IOException("Malformed HEIF", e)
+    }
 
-    /** Какие байты и чем перезаписать. Payload элемента может состоять из нескольких частей. */
-    private fun metadataTargets(f: RandomAccessFile): List<Target> {
+    private fun buildPlan(f: RandomAccessFile): Plan {
+        val length = f.length()
         val top = topLevel(f)
         if (top.firstOrNull()?.type != "ftyp") throw IOException("Not an ISO BMFF file")
+        if (top.any { it.type in sequenceBoxes }) throw IOException("HEIF image sequence")
         val meta = top.firstOrNull { it.type == "meta" } ?: throw IOException("No meta box")
-        if (meta.end - meta.start > 16L * 1024 * 1024) throw IOException("meta box too large")
+        if (meta.end - meta.start > MAX_METADATA_BYTES) throw IOException("meta box too large")
         val metaBytes = ByteArray((meta.end - meta.dataStart).toInt())
         f.seek(meta.dataStart); f.readFully(metaBytes)
         val children = boxes(metaBytes, 4, metaBytes.size) // FullBox: 4 байта версии и флагов
@@ -130,53 +153,64 @@ object HeifCleaner {
         val iloc = children.firstOrNull { it.type == "iloc" } ?: throw IOException("No iloc")
         val idatStart = children.firstOrNull { it.type == "idat" }?.let { meta.dataStart + it.dataStart }
         val locations = locations(metaBytes, iloc, idatStart)
-        val out = ArrayList<Target>()
+
+        val metadataIds = items.filter { it.isMetadata }.map { it.id }.toSet()
+        // Данные изображений: их нельзя ни затирать, ни прятать в free. Длина 0 значит «до конца файла».
+        val imageRanges = locations.filterKeys { it !in metadataIds }.values.flatten()
+            .map { it.offset to if (it.length <= 0) length else it.offset + it.length }
+        fun touchesImage(from: Long, to: Long) = imageRanges.any { (a, b) -> from < b && a < to }
+
+        val targets = ArrayList<Target>()
         for (item in items) {
-            val isExif = item.type == "Exif"
-            val isXmp = item.type == "mime" && item.contentType?.lowercase()?.contains("rdf+xml") == true
-            if (!isExif && !isXmp) continue
-            val extents = locations[item.id] ?: throw IOException("Metadata item without location")
+            if (!item.isMetadata) continue
+            val extents = locations[item.id] ?: continue // элемент без данных
+            if (extents.any { it.length <= 0 }) throw IOException("Metadata extent length unknown")
+            if (extents.any { it.offset < 0 || it.offset + it.length > length }) throw IOException("Metadata extent outside the file")
+            if (extents.any { touchesImage(it.offset, it.offset + it.length) }) throw IOException("Metadata shares bytes with image data")
             val total = extents.sumOf { it.length }
-            val fill = ByteArray(total.coerceAtMost(64L * 1024 * 1024).toInt()).also { buf ->
-                if (isExif) {
-                    if (buf.size >= emptyExif.size) emptyExif.copyInto(buf)
-                } else {
-                    buf.fill(0x20)
-                    if (buf.size >= emptyXmp.size) emptyXmp.copyInto(buf)
-                }
+            if (total > MAX_METADATA_BYTES) throw IOException("Metadata item too large")
+            val fill = ByteArray(total.toInt())
+            when {
+                item.isExif -> if (fill.size >= emptyExif.size) emptyExif.copyInto(fill)
+                item.isXmp -> { fill.fill(0x20); if (fill.size >= emptyXmp.size) emptyXmp.copyInto(fill) }
             }
             var pos = 0
             for (e in extents) {
                 val len = e.length.toInt()
-                out += Target(e, fill.copyOfRange(pos, pos + len))
+                targets += Target(e, fill.copyOfRange(pos, pos + len))
                 pos += len
             }
         }
-        return out
+        val removable = top.filter { it.type !in keptBoxes && !touchesImage(it.start, it.end) }
+        return Plan(targets, removable)
     }
 
     private fun items(d: ByteArray, iinf: Box): List<Item> {
         val s = iinf.dataStart.toInt()
         val version = d[s].toInt() and 0xFF
         val first = s + 4 + if (version == 0) 2 else 4
-        return boxes(d, first, iinf.end.toInt()).filter { it.type == "infe" }.mapNotNull { infe ->
+        return boxes(d, first, iinf.end.toInt()).filter { it.type == "infe" }.map { infe ->
             val p = infe.dataStart.toInt()
             val v = d[p].toInt() and 0xFF
-            if (v < 2) return@mapNotNull null
-            var q = p + 4
-            val id = if (v == 2) u16(d, q).toLong().also { q += 2 } else u32(d, q).also { q += 4 }
-            q += 2 // protection_index
-            val type = String(d, q, 4, Charsets.ISO_8859_1); q += 4
             val end = infe.end.toInt()
-            // item_name\0, затем для mime: content_type\0
-            while (q < end && d[q].toInt() != 0) q++
-            q++
-            val contentType = if (type == "mime" && q < end) {
+            var q = p + 4
+            fun cString(): String {
                 val start = q
                 while (q < end && d[q].toInt() != 0) q++
-                String(d, start, q - start, Charsets.UTF_8)
-            } else null
-            Item(id, type, contentType)
+                return String(d, start, q - start, Charsets.UTF_8).also { q++ }
+            }
+            if (v < 2) {
+                // Старый вид записи: типа нет, только имя и content_type.
+                val id = u16(d, q).toLong(); q += 4 // item_ID + protection_index
+                cString()
+                Item(id, "mime", if (q < end) cString() else null)
+            } else {
+                val id = if (v == 2) u16(d, q).toLong().also { q += 2 } else u32(d, q).also { q += 4 }
+                q += 2 // protection_index
+                val type = String(d, q, 4, Charsets.ISO_8859_1); q += 4
+                cString() // item_name
+                Item(id, type, if (type == "mime" && q < end) cString() else null)
+            }
         }
     }
 
@@ -209,7 +243,6 @@ object HeifCleaner {
                     else -> {} // ссылки на другие элементы: метаданных так не хранят
                 }
             }
-            if (list.any { it.length <= 0 }) throw IOException("Extent length unknown")
             result[id] = list
         }
         return result

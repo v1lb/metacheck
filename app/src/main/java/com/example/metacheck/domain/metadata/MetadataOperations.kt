@@ -143,7 +143,8 @@ class MetadataStudioUseCase(
             }
             ensure(sources.size in 1..BatchLimits.PRO_PER_RUN, FailureCode.BATCH_SIZE)
             val result = repository.stripBatch(sources, tree, progress)
-            if (free) withContext(io) { repeat(result.succeeded) { quota.recordSuccess() } }
+            // Файлы уже сохранены: сбой счётчика не должен выглядеть как неудачная очистка.
+            if (free) withContext(io) { runCatching { repeat(result.succeeded) { quota.recordSuccess() } } }
             result
         }
     }

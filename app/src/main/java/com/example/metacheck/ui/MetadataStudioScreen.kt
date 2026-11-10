@@ -126,7 +126,7 @@ fun MetadataStudioScreen(
             if (source.isEmpty()) null else runCatching {
                 val uri = Uri.parse(source)
                 context.contentResolver.openInputStream(uri)?.use { stream ->
-                    val header = ByteArray(16)
+                    val header = ByteArray(32)
                     var count = 0
                     while (count < header.size) {
                         val n = stream.read(header, count, header.size - count)
