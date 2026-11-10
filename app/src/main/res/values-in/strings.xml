@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">Editor EXIF berfungsi dengan JPEG; untuk saat ini PNG/HEIC/AVIF hanya dapat dibersihkan sepenuhnya sebagai salinan baru</string>
     <string name="failure_overwrite_edit_jpeg_only">Mengedit EXIF dengan penimpaan didukung untuk JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Penimpaan saat pembersihan hanya mendukung JPEG dan PNG: simpan format lain sebagai salinan baru</string>
-    <string name="failure_wipe_gps_jpeg_png_only">Penghapusan GPS mendukung JPEG dan PNG</string>
+    <string name="failure_wipe_gps_jpeg_png_only">Penghapusan GPS mendukung JPEG, PNG, dan HEIC</string>
     <string name="failure_video_unsupported">Video ini tidak dapat dibersihkan tanpa encode ulang: struktur file tidak didukung (file terfragmentasi, terenkripsi, atau rusak)</string>
     <string name="failure_not_enough_space">Ruang kosong di perangkat tidak cukup untuk salinan yang dibersihkan</string>
     <string name="failure_decode_failed">Tidak dapat membaca piksel. Coba gambar lain</string>
@@ -504,6 +504,18 @@
     <string name="studio_msg_verified">Penulisan terverifikasi.</string>
     <string name="studio_msg_not_verified">Tidak dapat memeriksa ulang penulisan: buka file secara manual.</string>
     <string name="studio_msg_downscaled">Resolusi dikurangi agar pemrosesan aman.</string>
+    <string name="studio_undo_title">File asli telah ditimpa</string>
+    <string name="studio_undo_text">File seperti semula ada di salinan cadangan yang Anda simpan. Satu tombol mengembalikannya.</string>
+    <string name="studio_undo_button">Kembalikan seperti semula</string>
+    <string name="studio_undo_dismiss">Pertahankan versi baru</string>
+    <string name="studio_msg_undo_done">File asli dipulihkan dari salinan cadangan dan telah diverifikasi.</string>
+    <string name="studio_audit_list_title">Foto dengan metadata</string>
+    <string name="studio_audit_list_hint">Ketuk foto untuk membuka laporannya.</string>
+    <string name="studio_audit_more">Dan %1$d lainnya.</string>
+    <string name="studio_audit_tag_location">LOKASI</string>
+    <string name="studio_audit_tag_serial">NO. SERI</string>
+    <string name="studio_audit_tag_person">NAMA</string>
+    <string name="studio_audit_tag_other">DATA LAIN</string>
     <string name="studio_msg_shift_done">Tanggal digeser: %1$d disimpan, %2$d gagal.</string>
     <string name="studio_shift_title">Geser tanggal pengambilan</string>
     <string name="studio_shift_text">Untuk foto JPEG yang dipilih, jika jam atau zona waktu kamera salah. Salinan dengan tanggal baru disimpan di folder yang dipilih dengan nama yang sama.</string>

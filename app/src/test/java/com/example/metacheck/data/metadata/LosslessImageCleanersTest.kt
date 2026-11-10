@@ -42,7 +42,10 @@ class LosslessImageCleanersTest {
     private fun box(type: String, payload: ByteArray) = be32(payload.size + 8) + type.toByteArray(Charsets.ISO_8859_1) + payload
 
     /** ftyp + meta(hdlr, iinf[Exif, XMP], iloc) + uuid + mdat[exif, xmp, pixels]. */
-    private fun heif(exif: ByteArray, xmp: ByteArray, pixels: ByteArray): Pair<ByteArray, Int> {
+    private fun heif(
+        exif: ByteArray, xmp: ByteArray, pixels: ByteArray,
+        extraBox: String = "uuid", pixelLength: Int = pixels.size, exifLength: Int = exif.size,
+    ): Pair<ByteArray, Int> {
         val ftyp = box("ftyp", "heic".toByteArray() + be32(0) + "mif1heic".toByteArray())
         val hdlr = box("hdlr", ByteArray(4) + ByteArray(4) + "pict".toByteArray() + ByteArray(12) + byteArrayOf(0))
         fun infe(id: Int, type: String, extra: ByteArray) = box("infe", byteArrayOf(2, 0, 0, 0) + be16(id) + be16(0) + type.toByteArray() + byteArrayOf(0) + extra)
@@ -51,13 +54,13 @@ class LosslessImageCleanersTest {
         fun iloc(base: Int): ByteArray {
             val entries = ByteArrayOutputStream()
             var off = base
-            for ((id, len) in listOf(1 to exif.size, 2 to xmp.size, 3 to pixels.size)) {
-                entries.write(be16(id)); entries.write(be16(0)); entries.write(be16(1)); entries.write(be32(off)); entries.write(be32(len))
-                off += len
+            for ((id, real, stated) in listOf(Triple(1, exif.size, exifLength), Triple(2, xmp.size, xmp.size), Triple(3, pixels.size, pixelLength))) {
+                entries.write(be16(id)); entries.write(be16(0)); entries.write(be16(1)); entries.write(be32(off)); entries.write(be32(stated))
+                off += real
             }
             return box("iloc", byteArrayOf(0, 0, 0, 0, 0x44, 0x00) + be16(3) + entries.toByteArray())
         }
-        val uuid = box("uuid", ByteArray(16) + "c2pa manifest".toByteArray())
+        val uuid = box(extraBox, ByteArray(16) + "c2pa manifest".toByteArray())
         // Длина meta от смещения не зависит, поэтому её можно посчитать заранее.
         val metaLen = box("meta", ByteArray(4) + hdlr + iinf + iloc(0)).size
         val mdatData = ftyp.size + metaLen + uuid.size + 8
@@ -87,6 +90,81 @@ class LosslessImageCleanersTest {
             assertArrayEquals(pixels, d.copyOfRange(px, px + pixels.size))
             assertEquals(0x4D, d[mdatData + 4].toInt())
         } finally { src.delete(); out.delete() }
+    }
+
+    @Test fun motionVideoBoxIsBlankedAndOpenEndedImageExtentIsFine() {
+        val exif = byteArrayOf(0, 0, 0, 0) + "MM\u0000*GPS here".toByteArray()
+        val pixels = ByteArray(24) { (it + 1).toByte() }
+        // Длина 0 у данных изображения по стандарту значит «до конца файла».
+        val (bytes, mdatData) = heif(exif, "<x/>".toByteArray(), pixels, extraBox = "mpvd", pixelLength = 0)
+        val src = temp(bytes)
+        val out = File.createTempFile("lossless_out_", ".heic")
+        try {
+            HeifCleaner.strip(src, out)
+            val text = String(out.readBytes(), Charsets.ISO_8859_1)
+            assertFalse(text.contains("mpvd")); assertFalse(text.contains("c2pa")); assertFalse(text.contains("GPS"))
+            val px = mdatData + exif.size + 4
+            assertArrayEquals(pixels, out.readBytes().copyOfRange(px, px + pixels.size))
+            assertTrue(HeifCleaner.isClean(out))
+        } finally { src.delete(); out.delete() }
+    }
+
+    @Test fun metadataPointingOutsideTheFileIsRejectedAndNothingIsWritten() {
+        val (bytes, _) = heif(ByteArray(20), "<x/>".toByteArray(), ByteArray(8), exifLength = 1_000_000)
+        val src = temp(bytes)
+        val out = File.createTempFile("lossless_out_", ".heic")
+        try {
+            assertTrue(runCatching { HeifCleaner.strip(src, out) }.exceptionOrNull() is java.io.IOException)
+            assertEquals(bytes.size.toLong(), out.length())
+        } finally { src.delete(); out.delete() }
+    }
+
+    /** Exif-элемент: IFD0 с Make и ссылкой на GPS, таблица GPS с широтой (3 дроби) и буквой N. */
+    private fun exifWithGps(): ByteArray {
+        val t = ByteArrayOutputStream()
+        fun e(tag: Int, type: Int, count: Int, value: ByteArray) { t.write(be16(tag)); t.write(be16(type)); t.write(be32(count)); t.write(value) }
+        t.write("MM".toByteArray()); t.write(be16(42)); t.write(be32(8))
+        t.write(be16(2)) // IFD0 @8: 2 записи, до 38
+        e(0x010F, 2, 6, be32(38)) // Make → "Apple\u0000" @38
+        e(0x8825, 4, 1, be32(44)) // GPS IFD @44
+        t.write(be32(0))
+        t.write("Apple\u0000".toByteArray())
+        t.write(be16(2)) // GPS IFD @44: 2 записи, до 74
+        e(1, 2, 2, byteArrayOf('N'.code.toByte(), 0, 0, 0))
+        e(2, 5, 3, be32(74)) // широта → 24 байта @74
+        t.write(be32(0))
+        t.write(be32(48) + be32(1) + be32(51) + be32(1) + be32(30) + be32(1))
+        return byteArrayOf(0, 0, 0, 6) + "Exif\u0000\u0000".toByteArray() + t.toByteArray()
+    }
+
+    @Test fun gpsOnlyKeepsCameraAndEmptiesGpsTable() {
+        val exif = exifWithGps()
+        val pixels = ByteArray(16) { (it + 3).toByte() }
+        val xmp = "<x:xmpmeta exif:GPSLatitude='48'/>".toByteArray()
+        val (bytes, mdatData) = heif(exif, xmp, pixels)
+        val src = temp(bytes)
+        val out = File.createTempFile("lossless_out_", ".heic")
+        try {
+            assertFalse(HeifCleaner.isGpsFree(src))
+            HeifCleaner.stripGps(src, out)
+            val d = out.readBytes()
+            assertEquals(bytes.size, d.size)
+            assertTrue(HeifCleaner.isGpsFree(out))
+            val tiff = mdatData + 10
+            assertEquals("Apple", String(d, tiff + 38, 5, Charsets.US_ASCII))
+            assertEquals(0, d[tiff + 44].toInt() or d[tiff + 45].toInt()) // в таблице GPS 0 записей
+            assertTrue(d.copyOfRange(tiff + 44, tiff + 98).all { it.toInt() == 0 })
+            assertFalse(String(d, Charsets.ISO_8859_1).contains("GPSLatitude"))
+            assertFalse(String(d, Charsets.ISO_8859_1).contains("c2pa"))
+            val px = mdatData + exif.size + xmp.size
+            assertArrayEquals(pixels, d.copyOfRange(px, px + pixels.size))
+        } finally { src.delete(); out.delete() }
+    }
+
+    @Test fun exifWithoutGpsNeedsNoPatches() {
+        val noGps = byteArrayOf(0, 0, 0, 0) + "MM".toByteArray() + be16(42) + be32(8) + be16(0) + be32(0)
+        assertTrue(HeifCleaner.gpsPatches(noGps).isEmpty())
+        assertTrue(runCatching { HeifCleaner.gpsPatches(ByteArray(40)) }.exceptionOrNull() is java.io.IOException)
     }
 
     @Test fun notHeifIsRejected() {

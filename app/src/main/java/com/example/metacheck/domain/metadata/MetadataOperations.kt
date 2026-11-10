@@ -27,6 +27,10 @@ interface MetadataRewriteRepository {
         progress: (BatchProgress) -> Unit,
     ): BatchProgress
 
+    /** Возвращает в [original] содержимое резервной копии [backup], сделанной перед перезаписью. */
+    suspend fun restoreFromBackup(original: String, backup: String): MetadataWriteResult =
+        throw UnsupportedOperationException("restore")
+
     /** Сдвиг дат съёмки у нескольких JPEG, копии — в папку [destinationTree]. */
     suspend fun shiftDatesBatch(
         sources: List<String>,
@@ -119,6 +123,11 @@ class MetadataStudioUseCase(
         repository.overwriteWithBackup(source, backup, patch)
     }
 
+    /** Отмена перезаписи оригинала. Без лимита и без Pro: вернуть свой файл можно всегда. */
+    suspend fun undoOverwrite(original: String, backup: String): Result<MetadataWriteResult> = runCatchingCancellable {
+        lock.withLock { repository.restoreFromBackup(original, backup) }
+    }
+
     /** Сдвиг даты съёмки у нескольких фото (Pro): часовой пояс камеры был выставлен неверно. */
     suspend fun shiftDates(sources: List<String>, tree: String, shiftSeconds: Long, progress: (BatchProgress) -> Unit): Result<BatchProgress> =
         runCatchingCancellable {
@@ -143,7 +152,8 @@ class MetadataStudioUseCase(
             }
             ensure(sources.size in 1..BatchLimits.PRO_PER_RUN, FailureCode.BATCH_SIZE)
             val result = repository.stripBatch(sources, tree, progress)
-            if (free) withContext(io) { repeat(result.succeeded) { quota.recordSuccess() } }
+            // Файлы уже сохранены: сбой счётчика не должен выглядеть как неудачная очистка.
+            if (free) withContext(io) { runCatching { repeat(result.succeeded) { quota.recordSuccess() } } }
             result
         }
     }

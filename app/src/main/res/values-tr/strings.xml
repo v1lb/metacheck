@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">EXIF düzenleyici JPEG ile çalışır; PNG/HEIC/AVIF şimdilik yalnızca yeni kopya olarak tamamen temizlenebilir</string>
     <string name="failure_overwrite_edit_jpeg_only">Üzerine yazarak EXIF düzenleme JPEG için desteklenir</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Temizleme sırasında üzerine yazma yalnızca JPEG ve PNG’yi destekler: diğer biçimleri yeni kopya olarak kaydedin</string>
-    <string name="failure_wipe_gps_jpeg_png_only">GPS kaldırma JPEG ve PNG’yi destekler</string>
+    <string name="failure_wipe_gps_jpeg_png_only">GPS kaldırma JPEG, PNG ve HEIC destekler</string>
     <string name="failure_video_unsupported">Bu video yeniden kodlanmadan temizlenemez: dosya yapısı desteklenmiyor (parçalı, şifreli veya bozuk dosya)</string>
     <string name="failure_not_enough_space">Temizlenmiş kopya için cihazda yeterli boş alan yok</string>
     <string name="failure_decode_failed">Pikseller okunamadı. Başka bir görüntü deneyin</string>
@@ -506,6 +506,18 @@
     <string name="studio_msg_verified">Yazma doğrulandı.</string>
     <string name="studio_msg_not_verified">Yazma yeniden kontrol edilemedi: dosyayı elle açın.</string>
     <string name="studio_msg_downscaled">Güvenli işleme için çözünürlük düşürüldü.</string>
+    <string name="studio_undo_title">Orijinalin üzerine yazıldı</string>
+    <string name="studio_undo_text">Dosyanın önceki hâli kaydettiğiniz yedek kopyada duruyor. Tek düğmeyle geri getirebilirsiniz.</string>
+    <string name="studio_undo_button">Eski hâline getir</string>
+    <string name="studio_undo_dismiss">Yeni sürümü koru</string>
+    <string name="studio_msg_undo_done">Orijinal, yedek kopyadan geri yüklendi ve doğrulandı.</string>
+    <string name="studio_audit_list_title">Meta verisi olan fotoğraflar</string>
+    <string name="studio_audit_list_hint">Raporunu açmak için bir fotoğrafa dokunun.</string>
+    <string name="studio_audit_more">Ve %1$d tane daha.</string>
+    <string name="studio_audit_tag_location">KONUM</string>
+    <string name="studio_audit_tag_serial">SERİ NO.</string>
+    <string name="studio_audit_tag_person">AD</string>
+    <string name="studio_audit_tag_other">DİĞER VERİLER</string>
     <string name="studio_msg_shift_done">Tarihler kaydırıldı: %1$d kaydedildi, %2$d başarısız.</string>
     <string name="studio_shift_title">Çekim tarihini kaydır</string>
     <string name="studio_shift_text">Kameranın saati veya saat dilimi yanlışsa seçili JPEG fotoğraflar için. Yeni tarihli kopyalar seçtiğiniz klasöre aynı adlarla kaydedilir.</string>

@@ -1,6 +1,12 @@
 # Google Play release notes (up to 500 characters per language)
 
 ## ru-RU
+Версия 2.11.0
+• «Удалить только GPS» теперь работает и для HEIC: дата и камера остаются
+• После проверки папки виден список фото с пометками, по нажатию открывается отчёт
+• «Вернуть как было»: отмена перезаписи оригинала одной кнопкой
+• Очистка HEIC убирает больше скрытых данных
+
 Версия 2.10.0
 • HEIC и WebP очищаются без пережатия: качество и размер прежние
 • «Проверить всю папку» прямо на главном экране
@@ -33,6 +39,12 @@
 • Раздел «О приложении»: политика, условия, лицензии
 
 ## en-US
+Version 2.11.0
+• "Remove GPS only" now works for HEIC too: date and camera stay
+• After a folder check you get a list of photos with labels; tap one to open its report
+• "Put it back as it was": undo overwriting the original with one button
+• HEIC cleaning removes more hidden data
+
 Version 2.10.0
 • HEIC and WebP are cleaned without re-encoding: same quality and size
 • "Check a whole folder" right on the home screen

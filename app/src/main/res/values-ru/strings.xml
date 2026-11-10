@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">Редактор EXIF работает с JPEG; PNG/HEIC/AVIF пока можно полностью очистить как новую копию</string>
     <string name="failure_overwrite_edit_jpeg_only">Редактирование EXIF с перезаписью поддерживается для JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Перезапись при очистке поддерживает только JPEG и PNG: другие форматы сохраняйте как новую копию</string>
-    <string name="failure_wipe_gps_jpeg_png_only">Удаление GPS поддерживает JPEG и PNG</string>
+    <string name="failure_wipe_gps_jpeg_png_only">Удаление GPS поддерживает JPEG, PNG и HEIC</string>
     <string name="failure_video_unsupported">Это видео нельзя очистить без пережатия: структура файла не поддерживается (фрагментированный, зашифрованный или повреждённый файл)</string>
     <string name="failure_not_enough_space">На устройстве недостаточно места для очищенной копии</string>
     <string name="failure_decode_failed">Не удалось прочитать пиксели. Попробуйте другое изображение</string>
@@ -510,6 +510,18 @@
     <string name="studio_msg_verified">Запись проверена.</string>
     <string name="studio_msg_not_verified">Не удалось перепроверить запись: откройте файл вручную.</string>
     <string name="studio_msg_downscaled">Разрешение уменьшено для безопасной обработки.</string>
+    <string name="studio_undo_title">Оригинал перезаписан</string>
+    <string name="studio_undo_text">Файл в прежнем виде лежит в сохранённой резервной копии. Его можно вернуть одной кнопкой.</string>
+    <string name="studio_undo_button">Вернуть как было</string>
+    <string name="studio_undo_dismiss">Оставить новую версию</string>
+    <string name="studio_msg_undo_done">Оригинал восстановлен из резервной копии и проверен.</string>
+    <string name="studio_audit_list_title">Фото с метаданными</string>
+    <string name="studio_audit_list_hint">Нажмите на фото, чтобы открыть его отчёт.</string>
+    <string name="studio_audit_more">И ещё %1$d.</string>
+    <string name="studio_audit_tag_location">МЕСТО</string>
+    <string name="studio_audit_tag_serial">СЕРИЙНЫЙ №</string>
+    <string name="studio_audit_tag_person">ИМЯ</string>
+    <string name="studio_audit_tag_other">ПРОЧЕЕ</string>
     <string name="studio_msg_shift_done">Даты сдвинуты: сохранено %1$d, ошибок %2$d.</string>
     <string name="studio_shift_title">Сдвинуть дату съёмки</string>
     <string name="studio_shift_text">Для выбранных фото JPEG, если в камере было неверное время или часовой пояс. Копии с новой датой сохраняются в выбранную папку под теми же именами.</string>

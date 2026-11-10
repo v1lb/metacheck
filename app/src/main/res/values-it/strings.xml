@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">L’editor EXIF funziona con JPEG; per ora PNG/HEIC/AVIF si possono solo pulire completamente come nuova copia</string>
     <string name="failure_overwrite_edit_jpeg_only">La modifica EXIF con sovrascrittura è supportata per JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">La sovrascrittura durante la pulizia supporta solo JPEG e PNG: salva gli altri formati come nuova copia</string>
-    <string name="failure_wipe_gps_jpeg_png_only">La rimozione del GPS supporta JPEG e PNG</string>
+    <string name="failure_wipe_gps_jpeg_png_only">La rimozione del GPS supporta JPEG, PNG e HEIC</string>
     <string name="failure_video_unsupported">Questo video non può essere pulito senza ricodifica: la struttura del file non è supportata (file frammentato, crittografato o danneggiato)</string>
     <string name="failure_not_enough_space">Spazio libero insufficiente sul dispositivo per la copia pulita</string>
     <string name="failure_decode_failed">Impossibile leggere i pixel. Prova un’altra immagine</string>
@@ -508,6 +508,18 @@
     <string name="studio_msg_verified">Scrittura verificata.</string>
     <string name="studio_msg_not_verified">Impossibile ricontrollare la scrittura: apri il file manualmente.</string>
     <string name="studio_msg_downscaled">La risoluzione è stata ridotta per un’elaborazione sicura.</string>
+    <string name="studio_undo_title">L’originale è stato sovrascritto</string>
+    <string name="studio_undo_text">Il file com’era prima si trova nella copia di backup che hai salvato. Un pulsante lo rimette a posto.</string>
+    <string name="studio_undo_button">Ripristina com’era</string>
+    <string name="studio_undo_dismiss">Mantieni la nuova versione</string>
+    <string name="studio_msg_undo_done">L’originale è stato ripristinato dalla copia di backup e verificato.</string>
+    <string name="studio_audit_list_title">Foto con metadati</string>
+    <string name="studio_audit_list_hint">Tocca una foto per aprire il suo report.</string>
+    <string name="studio_audit_more">E altre %1$d.</string>
+    <string name="studio_audit_tag_location">LUOGO</string>
+    <string name="studio_audit_tag_serial">N. DI SERIE</string>
+    <string name="studio_audit_tag_person">NOME</string>
+    <string name="studio_audit_tag_other">ALTRI DATI</string>
     <string name="studio_msg_shift_done">Date spostate: %1$d salvate, %2$d con errori.</string>
     <string name="studio_shift_title">Sposta la data di scatto</string>
     <string name="studio_shift_text">Per le foto JPEG selezionate, se l’ora o il fuso orario della fotocamera erano sbagliati. Le copie con la nuova data vengono salvate nella cartella scelta con gli stessi nomi.</string>

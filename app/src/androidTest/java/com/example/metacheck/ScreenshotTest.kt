@@ -11,6 +11,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -114,7 +115,20 @@ class ScreenshotTest {
     private fun studioBatch(dark: Boolean) {
         val target = InstrumentationRegistry.getInstrumentation().targetContext
         val c = (target.applicationContext as MetaCheckApplication).container
-        val vm = com.example.metacheck.ui.MetadataStudioViewModel(c.metadataStudio, folderAudit = c.folderAudit)
+        // Проверка папки подменена: три фото с разными пометками, чтобы снять сводку и список.
+        val audit = object : com.example.metacheck.domain.metadata.FolderAuditRepository {
+            override suspend fun scan(tree: String, progress: (Int) -> Unit) = com.example.metacheck.domain.metadata.AuditResult.of(
+                312,
+                listOf(
+                    com.example.metacheck.domain.metadata.AuditFinding("content://a/1", "IMG_20261102_184210.jpg", location = true, serial = true, person = false),
+                    com.example.metacheck.domain.metadata.AuditFinding("content://a/2", "IMG_4821.HEIC", location = true, serial = false, person = true),
+                    com.example.metacheck.domain.metadata.AuditFinding("content://a/3", "scan_passport.png", location = false, serial = false, person = false),
+                ),
+                limited = false,
+            )
+        }
+        val vm = com.example.metacheck.ui.MetadataStudioViewModel(c.metadataStudio, folderAudit = audit)
+        vm.auditFolder(android.net.Uri.parse("content://a")) {}
         compose.setContent {
             MetaCheckTheme(darkTheme = dark) {
                 Box(Modifier.size(412.dp, 1400.dp).background(androidx.compose.material3.MaterialTheme.colorScheme.background)) {
@@ -125,6 +139,10 @@ class ScreenshotTest {
         }
         compose.waitForIdle()
         save("studio_batch_" + if (dark) "dark" else "light")
+        compose.onNode(androidx.compose.ui.test.hasScrollAction())
+            .performScrollToNode(androidx.compose.ui.test.hasText("scan_passport.png"))
+        compose.waitForIdle()
+        save("studio_audit_list_" + if (dark) "dark" else "light")
     }
 
     @Test fun studioBatchLight() = studioBatch(dark = false)

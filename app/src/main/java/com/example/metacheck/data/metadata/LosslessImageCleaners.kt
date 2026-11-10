@@ -49,7 +49,7 @@ object WebpCleaner {
         while (p + 8 <= d.size) {
             val type = String(d, p, 4, Charsets.ISO_8859_1)
             val size = le32(d, p + 4)
-            if (type !in imageChunks) return false
+            if (size < 0 || type !in imageChunks) return false
             if (type == "VP8X" && (d[p + 8].toInt() and (FLAG_EXIF or FLAG_XMP)) != 0) return false
             p += 8 + size + (size and 1)
         }
@@ -70,8 +70,9 @@ object WebpCleaner {
 /**
  * Очистка HEIC/HEIF без пережатия. Удалять элементы из контейнера нельзя без пересчёта всех смещений,
  * поэтому содержимое метаданных затирается на месте, размер файла не меняется:
- * элемент Exif — пустым TIFF без тегов, элемент XMP — пустым пакетом и пробелами,
- * верхнеуровневые блоки uuid (там C2PA и метки производителей) — превращаются в free с нулями.
+ * элемент Exif — пустым TIFF без тегов, элемент XMP — пустым пакетом и пробелами, прочие служебные
+ * элементы (mime, uri) — нулями. Верхнеуровневые блоки, не нужные для показа фото (uuid с C2PA и метками
+ * производителей, mpvd — видео «живого фото» Samsung), превращаются в free с нулями.
  * Фото, миниатюры, карты глубины и HDR остаются как были.
  */
 object HeifCleaner {
@@ -80,34 +81,63 @@ object HeifCleaner {
     private val emptyXmp = "<?xpacket begin=\"\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?><x:xmpmeta xmlns:x=\"adobe:ns:meta/\"/><?xpacket end=\"w\"?>"
         .toByteArray(Charsets.US_ASCII)
 
+    /** Блоки верхнего уровня, которые остаются как есть. */
+    private val keptBoxes = setOf("ftyp", "meta", "mdat", "free", "skip", "wide")
+    /** Последовательности кадров (как видео): их структуру этот код не разбирает. */
+    private val sequenceBoxes = setOf("moov", "moof", "mfra")
+    private const val MAX_METADATA_BYTES = 16L * 1024 * 1024
+
     private data class Box(val type: String, val start: Long, val header: Int, val end: Long) {
         val dataStart get() = start + header
     }
 
     private data class Extent(val offset: Long, val length: Long)
-    private data class Item(val id: Long, val type: String, val contentType: String?)
+    private data class Item(val id: Long, val type: String, val contentType: String?) {
+        val isExif get() = type == "Exif"
+        val isXmp get() = type == "mime" && contentType?.lowercase()?.contains("rdf+xml") == true
+        /** Всё, что не изображение: Exif, XMP и любые вложенные данные (кроме картинок) и ссылки. */
+        val isMetadata get() = isExif || type == "uri " ||
+            (type == "mime" && contentType?.lowercase()?.startsWith("image/") != true)
+    }
+
+    private class Target(val extent: Extent, val bytes: ByteArray)
+    private class Plan(val targets: List<Target>, val removable: List<Box>)
 
     /** Копирует [source] в [output] и затирает метаданные. Бросает IOException, если структура непонятна. */
-    fun strip(source: File, output: File) {
+    fun strip(source: File, output: File) = rewrite(source, output, gpsOnly = false)
+
+    /**
+     * «Удалить только GPS»: в Exif обнуляется таблица GPS (дата, камера и настройки съёмки остаются),
+     * XMP и прочие вложенные данные затираются целиком — в них бывает копия координат.
+     */
+    fun stripGps(source: File, output: File) = rewrite(source, output, gpsOnly = true)
+
+    private fun rewrite(source: File, output: File, gpsOnly: Boolean) {
         source.copyTo(output, overwrite = true)
         RandomAccessFile(output, "rw").use { f ->
-            for (target in metadataTargets(f)) {
+            val plan = plan(f, gpsOnly)
+            for (target in plan.targets) {
                 f.seek(target.extent.offset)
                 f.write(target.bytes)
             }
-            for (box in topLevel(f)) if (box.type == "uuid") {
+            for (box in plan.removable) {
                 f.seek(box.start + 4); f.write("free".toByteArray(Charsets.US_ASCII))
-                zero(f, box.start + 8, box.end)
+                zero(f, box.dataStart, box.end)
             }
         }
-        if (!isClean(output)) throw IOException("HEIF metadata still present")
+        if (!(if (gpsOnly) isGpsFree(output) else isClean(output))) throw IOException("HEIF metadata still present")
     }
 
-    /** true, если все элементы Exif/XMP пустые и блоков uuid нет. */
-    fun isClean(file: File): Boolean = runCatching {
+    /** true, если все служебные элементы пустые и лишних блоков верхнего уровня нет. */
+    fun isClean(file: File): Boolean = matchesPlan(file, gpsOnly = false)
+
+    /** true, если таблица GPS в Exif пуста, а XMP и лишние блоки затёрты. */
+    fun isGpsFree(file: File): Boolean = matchesPlan(file, gpsOnly = true)
+
+    private fun matchesPlan(file: File, gpsOnly: Boolean): Boolean = runCatching {
         RandomAccessFile(file, "r").use { f ->
-            if (topLevel(f).any { it.type == "uuid" }) return false
-            metadataTargets(f).all { t ->
+            val plan = plan(f, gpsOnly)
+            plan.removable.isEmpty() && plan.targets.all { t ->
                 val now = ByteArray(t.bytes.size)
                 f.seek(t.extent.offset); f.readFully(now)
                 now.contentEquals(t.bytes)
@@ -115,14 +145,20 @@ object HeifCleaner {
         }
     }.getOrDefault(false)
 
-    private class Target(val extent: Extent, val bytes: ByteArray)
+    private fun plan(f: RandomAccessFile, gpsOnly: Boolean): Plan = try {
+        buildPlan(f, gpsOnly)
+    } catch (e: RuntimeException) {
+        // Битый файл: выход за границы массива и т. п. Для вызывающего это «формат не разобран».
+        throw IOException("Malformed HEIF", e)
+    }
 
-    /** Какие байты и чем перезаписать. Payload элемента может состоять из нескольких частей. */
-    private fun metadataTargets(f: RandomAccessFile): List<Target> {
+    private fun buildPlan(f: RandomAccessFile, gpsOnly: Boolean): Plan {
+        val length = f.length()
         val top = topLevel(f)
         if (top.firstOrNull()?.type != "ftyp") throw IOException("Not an ISO BMFF file")
+        if (top.any { it.type in sequenceBoxes }) throw IOException("HEIF image sequence")
         val meta = top.firstOrNull { it.type == "meta" } ?: throw IOException("No meta box")
-        if (meta.end - meta.start > 16L * 1024 * 1024) throw IOException("meta box too large")
+        if (meta.end - meta.start > MAX_METADATA_BYTES) throw IOException("meta box too large")
         val metaBytes = ByteArray((meta.end - meta.dataStart).toInt())
         f.seek(meta.dataStart); f.readFully(metaBytes)
         val children = boxes(metaBytes, 4, metaBytes.size) // FullBox: 4 байта версии и флагов
@@ -130,53 +166,125 @@ object HeifCleaner {
         val iloc = children.firstOrNull { it.type == "iloc" } ?: throw IOException("No iloc")
         val idatStart = children.firstOrNull { it.type == "idat" }?.let { meta.dataStart + it.dataStart }
         val locations = locations(metaBytes, iloc, idatStart)
-        val out = ArrayList<Target>()
+
+        val metadataIds = items.filter { it.isMetadata }.map { it.id }.toSet()
+        // Данные изображений: их нельзя ни затирать, ни прятать в free. Длина 0 значит «до конца файла».
+        val imageRanges = locations.filterKeys { it !in metadataIds }.values.flatten()
+            .map { it.offset to if (it.length <= 0) length else it.offset + it.length }
+        fun touchesImage(from: Long, to: Long) = imageRanges.any { (a, b) -> from < b && a < to }
+
+        val targets = ArrayList<Target>()
         for (item in items) {
-            val isExif = item.type == "Exif"
-            val isXmp = item.type == "mime" && item.contentType?.lowercase()?.contains("rdf+xml") == true
-            if (!isExif && !isXmp) continue
-            val extents = locations[item.id] ?: throw IOException("Metadata item without location")
+            if (!item.isMetadata) continue
+            val extents = locations[item.id] ?: continue // элемент без данных
+            if (extents.any { it.length <= 0 }) throw IOException("Metadata extent length unknown")
+            if (extents.any { it.offset < 0 || it.offset + it.length > length }) throw IOException("Metadata extent outside the file")
+            if (extents.any { touchesImage(it.offset, it.offset + it.length) }) throw IOException("Metadata shares bytes with image data")
             val total = extents.sumOf { it.length }
-            val fill = ByteArray(total.coerceAtMost(64L * 1024 * 1024).toInt()).also { buf ->
-                if (isExif) {
-                    if (buf.size >= emptyExif.size) emptyExif.copyInto(buf)
-                } else {
-                    buf.fill(0x20)
-                    if (buf.size >= emptyXmp.size) emptyXmp.copyInto(buf)
-                }
+            if (total > MAX_METADATA_BYTES) throw IOException("Metadata item too large")
+            if (gpsOnly && item.isExif) {
+                // Exif остаётся, меняются только байты таблицы GPS.
+                if (extents.size != 1) throw IOException("Exif split into parts")
+                val start = extents[0].offset
+                val payload = ByteArray(total.toInt())
+                f.seek(start); f.readFully(payload)
+                for ((at, bytes) in gpsPatches(payload)) targets += Target(Extent(start + at, bytes.size.toLong()), bytes)
+                continue
+            }
+            val fill = ByteArray(total.toInt())
+            when {
+                item.isExif -> if (fill.size >= emptyExif.size) emptyExif.copyInto(fill)
+                item.isXmp -> { fill.fill(0x20); if (fill.size >= emptyXmp.size) emptyXmp.copyInto(fill) }
             }
             var pos = 0
             for (e in extents) {
                 val len = e.length.toInt()
-                out += Target(e, fill.copyOfRange(pos, pos + len))
+                targets += Target(e, fill.copyOfRange(pos, pos + len))
                 pos += len
             }
         }
-        return out
+        val removable = top.filter { it.type !in keptBoxes && !touchesImage(it.start, it.end) }
+        return Plan(targets, removable)
+    }
+
+    /**
+     * Что перезаписать в данных элемента Exif, чтобы таблица GPS стала пустой: её значения и строки
+     * обнуляются, число записей становится 0. Ссылка на таблицу в IFD0 остаётся и ведёт на пустую таблицу —
+     * так не нужно ничего сдвигать. Пустой список: GPS в файле нет или он уже удалён.
+     */
+    internal fun gpsPatches(payload: ByteArray): List<Pair<Int, ByteArray>> {
+        if (payload.size < 12) throw IOException("Exif too short")
+        // Первые 4 байта — смещение заголовка TIFF от их конца (обычно 6: «Exif\0\0»).
+        val tiff = 4 + u32(payload, 0).toInt()
+        if (tiff < 4 || tiff + 8 > payload.size) throw IOException("Bad Exif header offset")
+        val little = when {
+            payload[tiff] == 'I'.code.toByte() && payload[tiff + 1] == 'I'.code.toByte() -> true
+            payload[tiff] == 'M'.code.toByte() && payload[tiff + 1] == 'M'.code.toByte() -> false
+            else -> throw IOException("Bad TIFF byte order")
+        }
+        fun b(i: Int) = payload[i].toInt() and 0xFF
+        fun r16(i: Int) = if (little) b(i) or (b(i + 1) shl 8) else (b(i) shl 8) or b(i + 1)
+        fun r32(i: Int): Long = if (little) (b(i).toLong() or (b(i + 1).toLong() shl 8) or (b(i + 2).toLong() shl 16) or (b(i + 3).toLong() shl 24))
+            else u32(payload, i)
+        fun inside(from: Long, len: Long) = from >= 0 && len >= 0 && tiff + from + len <= payload.size
+        if (r16(tiff + 2) != 42) throw IOException("Not a TIFF header")
+        val ifd0 = r32(tiff + 4)
+        if (!inside(ifd0, 2)) throw IOException("IFD0 outside Exif")
+        val count0 = r16(tiff + ifd0.toInt())
+        if (!inside(ifd0 + 2, count0 * 12L)) throw IOException("IFD0 entries outside Exif")
+        var gps = -1L
+        for (i in 0 until count0) {
+            val e = tiff + ifd0.toInt() + 2 + i * 12
+            if (r16(e) == 0x8825) gps = r32(e + 8)
+        }
+        if (gps < 0) return emptyList()
+        if (!inside(gps, 2)) throw IOException("GPS IFD outside Exif")
+        val g = tiff + gps.toInt()
+        val count = r16(g)
+        if (count == 0) return emptyList()
+        if (!inside(gps + 2, count * 12L + 4)) throw IOException("GPS entries outside Exif")
+        val typeSize = intArrayOf(0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8)
+        val patches = ArrayList<Pair<Int, ByteArray>>()
+        for (i in 0 until count) {
+            val e = g + 2 + i * 12
+            val size = typeSize.getOrElse(r16(e + 2)) { 0 }.toLong() * r32(e + 4)
+            if (size > 4) {
+                val at = r32(e + 8)
+                if (!inside(at, size)) throw IOException("GPS value outside Exif")
+                patches += (tiff + at.toInt()) to ByteArray(size.toInt())
+            }
+        }
+        // Число записей 0, сами записи и ссылка на следующую таблицу — нули.
+        patches += g to ByteArray(2 + count * 12 + 4)
+        return patches
     }
 
     private fun items(d: ByteArray, iinf: Box): List<Item> {
         val s = iinf.dataStart.toInt()
         val version = d[s].toInt() and 0xFF
         val first = s + 4 + if (version == 0) 2 else 4
-        return boxes(d, first, iinf.end.toInt()).filter { it.type == "infe" }.mapNotNull { infe ->
+        return boxes(d, first, iinf.end.toInt()).filter { it.type == "infe" }.map { infe ->
             val p = infe.dataStart.toInt()
             val v = d[p].toInt() and 0xFF
-            if (v < 2) return@mapNotNull null
-            var q = p + 4
-            val id = if (v == 2) u16(d, q).toLong().also { q += 2 } else u32(d, q).also { q += 4 }
-            q += 2 // protection_index
-            val type = String(d, q, 4, Charsets.ISO_8859_1); q += 4
             val end = infe.end.toInt()
-            // item_name\0, затем для mime: content_type\0
-            while (q < end && d[q].toInt() != 0) q++
-            q++
-            val contentType = if (type == "mime" && q < end) {
+            var q = p + 4
+            fun cString(): String {
                 val start = q
                 while (q < end && d[q].toInt() != 0) q++
-                String(d, start, q - start, Charsets.UTF_8)
-            } else null
-            Item(id, type, contentType)
+                return String(d, start, q - start, Charsets.UTF_8).also { q++ }
+            }
+            if (v < 2) {
+                // Старый вид записи: типа нет, только имя и content_type.
+                val id = u16(d, q).toLong(); q += 4 // item_ID + protection_index
+                cString()
+                Item(id, "mime", if (q < end) cString() else null)
+            } else {
+                val id = if (v == 2) u16(d, q).toLong().also { q += 2 } else u32(d, q).also { q += 4 }
+                q += 2 // protection_index
+                val type = String(d, q, 4, Charsets.ISO_8859_1); q += 4
+                cString() // item_name
+                Item(id, type, if (type == "mime" && q < end) cString() else null)
+            }
         }
     }
 
@@ -209,7 +317,6 @@ object HeifCleaner {
                     else -> {} // ссылки на другие элементы: метаданных так не хранят
                 }
             }
-            if (list.any { it.length <= 0 }) throw IOException("Extent length unknown")
             result[id] = list
         }
         return result

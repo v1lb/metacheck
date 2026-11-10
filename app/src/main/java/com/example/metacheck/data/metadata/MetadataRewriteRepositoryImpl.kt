@@ -75,7 +75,8 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         ensure(src != dst, FailureCode.SAME_AS_SOURCE)
         val stage = createTemp("gps_wipe", ".img")
         try {
-            val prepared = when (readMime(src)) {
+            val isHeic = ImageFormatDetector.detect(VideoFiles.head(resolver, src)) == ImageFormat.HEIC
+            val prepared = if (isHeic) wipeGpsHeic(src, stage) else when (readMime(src)) {
                 "image/jpeg" -> {
                     prepareEdited(src, stage, MetadataPatch(removeGps = true), keepDescriptive = false)
                     val exif = ExifInterface(stage.absolutePath)
@@ -95,6 +96,46 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             writeDocument(dst, stage, allowNewFileFallback = true)
             if (!verifySameFile(stage, dst)) throw AppFailure(FailureCode.SAVED_FILE_UNVERIFIED)
             prepared.asResult(stage.length(), true)
+        } finally { stage.delete() }
+    }
+
+    /** HEIC: таблица GPS в Exif обнуляется на месте, дата и камера остаются, картинка не пережимается. */
+    private fun wipeGpsHeic(src: Uri, stage: File): Prepared {
+        val raw = createTemp("gps_heic", ".bin")
+        try {
+            copyUriToFile(src, raw)
+            try { HeifCleaner.stripGps(raw, stage) } catch (e: AppFailure) { throw e } catch (e: IOException) {
+                throw AppFailure(FailureCode.GPS_NOT_REMOVED, cause = e)
+            }
+            ensure(HeifCleaner.isGpsFree(stage), FailureCode.GPS_NOT_REMOVED)
+            // Вторая, независимая проверка — стандартным читателем Android (HEIC он читает с Android 9).
+            if (Build.VERSION.SDK_INT >= 28) {
+                val exif = runCatching { ExifInterface(stage.absolutePath) }.getOrNull()
+                ensure(exif == null || (exif.latLong == null && exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE) == null), FailureCode.GPS_NOT_REMOVED)
+                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeFile(stage.absolutePath, bounds)
+                ensure(bounds.outWidth > 0 && bounds.outHeight > 0, FailureCode.DECODE_FAILED)
+            }
+            return Prepared("image/heic", false)
+        } finally { raw.delete() }
+    }
+
+    /**
+     * «Вернуть как было»: содержимое резервной копии, сделанной перед перезаписью, пишется обратно в оригинал.
+     * Резервная копия остаётся у пользователя.
+     */
+    override suspend fun restoreFromBackup(original: String, backup: String): MetadataWriteResult = withContext(Dispatchers.IO) {
+        val target = checkedUri(original); val source = checkedUri(backup)
+        ensure(target != source, FailureCode.SAME_AS_BACKUP)
+        val stage = createTemp("restore", ".bak")
+        try {
+            copyUriToFile(source, stage)
+            ensure(stage.length() > 0, FailureCode.EMPTY_RESULT)
+            val mime = readMime(source) // резервная копия должна быть настоящим JPEG или PNG
+            writeDocument(target, stage)
+            if (!verifySameFile(stage, target)) throw AppFailure(FailureCode.RESTORE_UNVERIFIED)
+            refreshGallery(target)
+            MetadataWriteResult(stage.length(), false, if (mime == "image/jpeg") "JPEG" else "PNG", verified = true)
         } finally { stage.delete() }
     }
 
@@ -183,13 +224,11 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
                 .associateWith { exif.getAttribute(it)?.let { v -> DateShift.shift(v, shiftSeconds) } }
         } ?: throw AppFailure(FailureCode.CANNOT_READ_SOURCE)
         ensure(dates.values.any { it != null }, FailureCode.NO_DATE_TO_SHIFT)
+        // «Дата изменения» (DateTime) пишется тем же сохранением EXIF, что и остальные даты.
         prepareEdited(src, stage, MetadataPatch(
             dateTaken = dates[ExifInterface.TAG_DATETIME_ORIGINAL],
             dateDigitized = dates[ExifInterface.TAG_DATETIME_DIGITIZED],
-        ))
-        dates[ExifInterface.TAG_DATETIME]?.let { shifted ->
-            ExifInterface(stage.absolutePath).apply { setAttribute(ExifInterface.TAG_DATETIME, shifted); saveAttributes() }
-        }
+        ), extraAttributes = listOfNotNull(dates[ExifInterface.TAG_DATETIME]?.let { ExifInterface.TAG_DATETIME to it }))
         val base = label.substringBeforeLast('.', label)
             .map { if (it.isLetterOrDigit() || it == '_' || it == '-') it else '_' }
             .joinToString("").take(80).ifBlank { "photo" }
@@ -354,7 +393,10 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
      * [keepDescriptive]: ключевые слова, подписи и прочие описательные поля переносятся в новые XMP/IPTC
      * (см. [DescriptiveMetadata]). Для «удалить только GPS» выключено: там нужен файл без XMP/IPTC вовсе.
      */
-    private fun prepareEdited(source: Uri, output: File, patch: MetadataPatch, keepDescriptive: Boolean = true) {
+    private fun prepareEdited(
+        source: Uri, output: File, patch: MetadataPatch, keepDescriptive: Boolean = true,
+        extraAttributes: List<Pair<String, String>> = emptyList(),
+    ) {
         val sourceMime = readMime(source)
         ensure(sourceMime == "image/jpeg", FailureCode.EDIT_JPEG_ONLY)
         val original = createTemp("editable_original", ".jpg")
@@ -388,6 +430,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             patch.iso?.let { exif.setAttribute(ExifInterface.TAG_PHOTOGRAPHIC_SENSITIVITY, it.toString()) }
             patch.aperture?.let { exif.setAttribute(ExifInterface.TAG_F_NUMBER, it.toString()) }
             patch.exposureSeconds?.let { exif.setAttribute(ExifInterface.TAG_EXPOSURE_TIME, it.toString()) }
+            extraAttributes.forEach { (tag, value) -> exif.setAttribute(tag, value) }
             exif.saveAttributes()
             val check = ExifInterface(output.absolutePath)
             if (patch.removeGps && check.latLong != null) throw AppFailure(FailureCode.GPS_NOT_REMOVED)
@@ -405,7 +448,7 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
                 ExifInterface.TAG_ARTIST to patch.author,
                 ExifInterface.TAG_COPYRIGHT to patch.copyright,
                 ExifInterface.TAG_IMAGE_DESCRIPTION to patch.description,
-            )) {
+            ) + extraAttributes) {
                 if (desired != null && check.getAttribute(tag) != desired) {
                     throw AppFailure(FailureCode.EXIF_FIELD_UNVERIFIED, listOf(tag))
                 }
@@ -462,8 +505,11 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             BitmapFactory.decodeFile(output.absolutePath, bounds)
             if (Build.VERSION.SDK_INT >= 28 && (bounds.outWidth <= 0 || bounds.outHeight <= 0)) throw AppFailure(FailureCode.DECODE_FAILED)
             return Prepared(mime, false)
-        } catch (e: java.io.IOException) {
-            if (!allowFallback) throw AppFailure(FailureCode.CLEAN_CHECK_FAILED, cause = e)
+        } catch (e: Exception) {
+            // Слишком большой файл пережатие тоже не возьмёт: сообщаем как есть.
+            if (e is AppFailure && e.code == FailureCode.SOURCE_TOO_LARGE) throw e
+            if (!allowFallback) throw (e as? AppFailure) ?: AppFailure(FailureCode.CLEAN_CHECK_FAILED, cause = e)
+            // Непонятная структура или файл не открылся после очистки: пережимаем из пикселей.
             return renderClean(source, output)
         } finally { raw.delete() }
     }

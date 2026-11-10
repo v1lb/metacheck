@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">Редактор EXIF працює з JPEG; PNG/HEIC/AVIF поки можна лише повністю очистити як нову копію</string>
     <string name="failure_overwrite_edit_jpeg_only">Редагування EXIF з перезаписом підтримується для JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Перезапис під час очищення підтримує лише JPEG і PNG: інші формати збережіть як нову копію</string>
-    <string name="failure_wipe_gps_jpeg_png_only">Видалення GPS підтримує JPEG і PNG</string>
+    <string name="failure_wipe_gps_jpeg_png_only">Видалення GPS підтримує JPEG, PNG і HEIC</string>
     <string name="failure_video_unsupported">Це відео не можна очистити без перекодування: структура файлу не підтримується (фрагментований, зашифрований або пошкоджений файл)</string>
     <string name="failure_not_enough_space">На пристрої недостатньо місця для очищеної копії</string>
     <string name="failure_decode_failed">Не вдалося прочитати пікселі. Спробуйте інше зображення</string>
@@ -510,6 +510,18 @@
     <string name="studio_msg_verified">Запис перевірено.</string>
     <string name="studio_msg_not_verified">Не вдалося повторно перевірити запис: відкрийте файл вручну.</string>
     <string name="studio_msg_downscaled">Роздільність зменшено для безпечної обробки.</string>
+    <string name="studio_undo_title">Оригінал перезаписано</string>
+    <string name="studio_undo_text">Файл у попередньому вигляді лежить у збереженій резервній копії. Його можна повернути однією кнопкою.</string>
+    <string name="studio_undo_button">Повернути як було</string>
+    <string name="studio_undo_dismiss">Залишити нову версію</string>
+    <string name="studio_msg_undo_done">Оригінал відновлено з резервної копії та перевірено.</string>
+    <string name="studio_audit_list_title">Фото з метаданими</string>
+    <string name="studio_audit_list_hint">Натисніть на фото, щоб відкрити його звіт.</string>
+    <string name="studio_audit_more">І ще %1$d.</string>
+    <string name="studio_audit_tag_location">МІСЦЕ</string>
+    <string name="studio_audit_tag_serial">СЕРІЙНИЙ №</string>
+    <string name="studio_audit_tag_person">ІМ’Я</string>
+    <string name="studio_audit_tag_other">ІНШЕ</string>
     <string name="studio_msg_shift_done">Дати зсунуто: збережено %1$d, помилок %2$d.</string>
     <string name="studio_shift_title">Зсунути дату зйомки</string>
     <string name="studio_shift_text">Для вибраних фото JPEG, якщо в камері був неправильний час або часовий пояс. Копії з новою датою зберігаються у вибрану папку під тими самими назвами.</string>

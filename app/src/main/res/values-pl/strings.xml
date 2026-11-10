@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">Edytor EXIF obsługuje JPEG; PNG/HEIC/AVIF można na razie tylko w pełni wyczyścić jako nową kopię</string>
     <string name="failure_overwrite_edit_jpeg_only">Edycja EXIF z nadpisaniem jest obsługiwana dla JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Nadpisywanie podczas czyszczenia obsługuje tylko JPEG i PNG: zapisz inne formaty jako nową kopię</string>
-    <string name="failure_wipe_gps_jpeg_png_only">Usuwanie GPS obsługuje JPEG i PNG</string>
+    <string name="failure_wipe_gps_jpeg_png_only">Usuwanie GPS obsługuje JPEG, PNG i HEIC</string>
     <string name="failure_video_unsupported">Tego filmu nie da się wyczyścić bez ponownego kodowania: struktura pliku nie jest obsługiwana (plik pofragmentowany, zaszyfrowany lub uszkodzony)</string>
     <string name="failure_not_enough_space">Za mało wolnego miejsca na urządzeniu na wyczyszczoną kopię</string>
     <string name="failure_decode_failed">Nie udało się odczytać pikseli. Spróbuj innego obrazu</string>
@@ -510,6 +510,18 @@
     <string name="studio_msg_verified">Zapis zweryfikowany.</string>
     <string name="studio_msg_not_verified">Nie udało się ponownie sprawdzić zapisu: otwórz plik ręcznie.</string>
     <string name="studio_msg_downscaled">Zmniejszono rozdzielczość dla bezpiecznego przetwarzania.</string>
+    <string name="studio_undo_title">Oryginał został nadpisany</string>
+    <string name="studio_undo_text">Plik w poprzedniej postaci znajduje się w zapisanej kopii zapasowej. Jeden przycisk go przywraca.</string>
+    <string name="studio_undo_button">Przywróć, jak było</string>
+    <string name="studio_undo_dismiss">Zostaw nową wersję</string>
+    <string name="studio_msg_undo_done">Oryginał został przywrócony z kopii zapasowej i sprawdzony.</string>
+    <string name="studio_audit_list_title">Zdjęcia z metadanymi</string>
+    <string name="studio_audit_list_hint">Dotknij zdjęcia, aby otworzyć jego raport.</string>
+    <string name="studio_audit_more">I jeszcze %1$d.</string>
+    <string name="studio_audit_tag_location">MIEJSCE</string>
+    <string name="studio_audit_tag_serial">NR SERYJNY</string>
+    <string name="studio_audit_tag_person">IMIĘ</string>
+    <string name="studio_audit_tag_other">INNE DANE</string>
     <string name="studio_msg_shift_done">Daty przesunięte: zapisano %1$d, błędów %2$d.</string>
     <string name="studio_shift_title">Przesuń datę wykonania</string>
     <string name="studio_shift_text">Dla wybranych zdjęć JPEG, jeśli zegar lub strefa czasowa aparatu były błędne. Kopie z nową datą są zapisywane w wybranym folderze pod tymi samymi nazwami.</string>
