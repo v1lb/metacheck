@@ -119,6 +119,54 @@ class LosslessImageCleanersTest {
         } finally { src.delete(); out.delete() }
     }
 
+    /** Exif-элемент: IFD0 с Make и ссылкой на GPS, таблица GPS с широтой (3 дроби) и буквой N. */
+    private fun exifWithGps(): ByteArray {
+        val t = ByteArrayOutputStream()
+        fun e(tag: Int, type: Int, count: Int, value: ByteArray) { t.write(be16(tag)); t.write(be16(type)); t.write(be32(count)); t.write(value) }
+        t.write("MM".toByteArray()); t.write(be16(42)); t.write(be32(8))
+        t.write(be16(2)) // IFD0 @8: 2 записи, до 38
+        e(0x010F, 2, 6, be32(38)) // Make → "Apple\u0000" @38
+        e(0x8825, 4, 1, be32(44)) // GPS IFD @44
+        t.write(be32(0))
+        t.write("Apple\u0000".toByteArray())
+        t.write(be16(2)) // GPS IFD @44: 2 записи, до 74
+        e(1, 2, 2, byteArrayOf('N'.code.toByte(), 0, 0, 0))
+        e(2, 5, 3, be32(74)) // широта → 24 байта @74
+        t.write(be32(0))
+        t.write(be32(48) + be32(1) + be32(51) + be32(1) + be32(30) + be32(1))
+        return byteArrayOf(0, 0, 0, 6) + "Exif\u0000\u0000".toByteArray() + t.toByteArray()
+    }
+
+    @Test fun gpsOnlyKeepsCameraAndEmptiesGpsTable() {
+        val exif = exifWithGps()
+        val pixels = ByteArray(16) { (it + 3).toByte() }
+        val xmp = "<x:xmpmeta exif:GPSLatitude='48'/>".toByteArray()
+        val (bytes, mdatData) = heif(exif, xmp, pixels)
+        val src = temp(bytes)
+        val out = File.createTempFile("lossless_out_", ".heic")
+        try {
+            assertFalse(HeifCleaner.isGpsFree(src))
+            HeifCleaner.stripGps(src, out)
+            val d = out.readBytes()
+            assertEquals(bytes.size, d.size)
+            assertTrue(HeifCleaner.isGpsFree(out))
+            val tiff = mdatData + 10
+            assertEquals("Apple", String(d, tiff + 38, 5, Charsets.US_ASCII))
+            assertEquals(0, d[tiff + 44].toInt() or d[tiff + 45].toInt()) // в таблице GPS 0 записей
+            assertTrue(d.copyOfRange(tiff + 44, tiff + 98).all { it.toInt() == 0 })
+            assertFalse(String(d, Charsets.ISO_8859_1).contains("GPSLatitude"))
+            assertFalse(String(d, Charsets.ISO_8859_1).contains("c2pa"))
+            val px = mdatData + exif.size + xmp.size
+            assertArrayEquals(pixels, d.copyOfRange(px, px + pixels.size))
+        } finally { src.delete(); out.delete() }
+    }
+
+    @Test fun exifWithoutGpsNeedsNoPatches() {
+        val noGps = byteArrayOf(0, 0, 0, 0) + "MM".toByteArray() + be16(42) + be32(8) + be16(0) + be32(0)
+        assertTrue(HeifCleaner.gpsPatches(noGps).isEmpty())
+        assertTrue(runCatching { HeifCleaner.gpsPatches(ByteArray(40)) }.exceptionOrNull() is java.io.IOException)
+    }
+
     @Test fun notHeifIsRejected() {
         val src = temp(ByteArray(64))
         val out = File.createTempFile("lossless_out_", ".heic")

@@ -45,6 +45,22 @@ class LosslessCleanDeviceTest {
         } finally { src.delete(); out.delete() }
     }
 
+    /** «Удалить только GPS» у HEIC: места нет, камера и картинка на месте. */
+    @Test fun heicGpsOnly() {
+        val src = asset("gps_sample.heic")
+        val out = File(target.cacheDir, "gpsfree.heic")
+        try {
+            HeifCleaner.stripGps(src, out)
+            val exif = ExifInterface(out.absolutePath)
+            assertNull(exif.latLong)
+            assertNull(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE))
+            assertEquals("Apple", exif.getAttribute(ExifInterface.TAG_MAKE))
+            val original = BitmapFactory.decodeFile(src.absolutePath)
+            val cleaned = BitmapFactory.decodeFile(out.absolutePath)
+            if (original != null) assertTrue(original.sameAs(cleaned))
+        } finally { src.delete(); out.delete() }
+    }
+
     @Test fun heic() = check("gps_sample.heic", exifGps = true, HeifCleaner::isClean, HeifCleaner::strip)
 
     @Test fun webp() = check("gps_sample.webp", exifGps = false, WebpCleaner::isClean, WebpCleaner::strip)

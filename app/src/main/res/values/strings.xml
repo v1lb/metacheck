@@ -214,7 +214,7 @@
     <string name="failure_edit_jpeg_only">The EXIF editor works with JPEG; PNG/HEIC/AVIF can be fully cleaned as a new copy for now</string>
     <string name="failure_overwrite_edit_jpeg_only">Editing EXIF with overwrite is supported for JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Overwrite during cleaning supports only JPEG and PNG: save other formats as a new copy</string>
-    <string name="failure_wipe_gps_jpeg_png_only">GPS removal supports JPEG and PNG</string>
+    <string name="failure_wipe_gps_jpeg_png_only">GPS removal supports JPEG, PNG and HEIC</string>
     <string name="failure_video_unsupported">This video can\'t be cleaned without re-encoding: the file structure is not supported (fragmented, encrypted or damaged file)</string>
     <string name="failure_not_enough_space">Not enough free space on the device for the cleaned copy</string>
     <string name="failure_decode_failed">Could not read the pixels. Try another image</string>
@@ -507,6 +507,18 @@
     <string name="studio_msg_verified">Write verified.</string>
     <string name="studio_msg_not_verified">Could not re-check the write: open the file manually.</string>
     <string name="studio_msg_downscaled">The resolution was reduced for safe processing.</string>
+    <string name="studio_undo_title">The original was overwritten</string>
+    <string name="studio_undo_text">The file as it was before is in the backup copy you saved. One button puts it back.</string>
+    <string name="studio_undo_button">Put it back as it was</string>
+    <string name="studio_undo_dismiss">Keep the new version</string>
+    <string name="studio_msg_undo_done">The original is restored from the backup copy and verified.</string>
+    <string name="studio_audit_list_title">Photos with metadata</string>
+    <string name="studio_audit_list_hint">Tap a photo to open its report.</string>
+    <string name="studio_audit_more">And %1$d more.</string>
+    <string name="studio_audit_tag_location">LOCATION</string>
+    <string name="studio_audit_tag_serial">SERIAL NO.</string>
+    <string name="studio_audit_tag_person">NAME</string>
+    <string name="studio_audit_tag_other">OTHER DATA</string>
     <string name="studio_msg_shift_done">Dates shifted: %1$d saved, %2$d failed.</string>
     <string name="studio_shift_title">Shift the date taken</string>
     <string name="studio_shift_text">For the selected JPEG photos, if the camera clock or time zone was wrong. Copies with the new date are saved to the folder you choose, under the same names.</string>

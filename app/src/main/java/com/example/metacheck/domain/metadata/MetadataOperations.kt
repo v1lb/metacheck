@@ -27,6 +27,10 @@ interface MetadataRewriteRepository {
         progress: (BatchProgress) -> Unit,
     ): BatchProgress
 
+    /** Возвращает в [original] содержимое резервной копии [backup], сделанной перед перезаписью. */
+    suspend fun restoreFromBackup(original: String, backup: String): MetadataWriteResult =
+        throw UnsupportedOperationException("restore")
+
     /** Сдвиг дат съёмки у нескольких JPEG, копии — в папку [destinationTree]. */
     suspend fun shiftDatesBatch(
         sources: List<String>,
@@ -117,6 +121,11 @@ class MetadataStudioUseCase(
             if (issues.isNotEmpty()) throw InvalidPatchException(issues)
         }
         repository.overwriteWithBackup(source, backup, patch)
+    }
+
+    /** Отмена перезаписи оригинала. Без лимита и без Pro: вернуть свой файл можно всегда. */
+    suspend fun undoOverwrite(original: String, backup: String): Result<MetadataWriteResult> = runCatchingCancellable {
+        lock.withLock { repository.restoreFromBackup(original, backup) }
     }
 
     /** Сдвиг даты съёмки у нескольких фото (Pro): часовой пояс камеры был выставлен неверно. */

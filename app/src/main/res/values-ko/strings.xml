@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">EXIF 편집기는 JPEG에서 작동합니다. PNG/HEIC/AVIF는 현재 새 사본으로 완전히 정리하는 것만 가능합니다</string>
     <string name="failure_overwrite_edit_jpeg_only">덮어쓰기로 EXIF 편집은 JPEG에서 지원됩니다</string>
     <string name="failure_overwrite_strip_jpeg_png_only">정리 중 덮어쓰기는 JPEG와 PNG만 지원합니다. 다른 형식은 새 사본으로 저장하세요</string>
-    <string name="failure_wipe_gps_jpeg_png_only">GPS 제거는 JPEG와 PNG를 지원합니다</string>
+    <string name="failure_wipe_gps_jpeg_png_only">GPS 삭제는 JPEG, PNG, HEIC를 지원합니다</string>
     <string name="failure_video_unsupported">이 동영상은 재인코딩 없이 정리할 수 없습니다. 파일 구조가 지원되지 않습니다(조각화, 암호화 또는 손상된 파일)</string>
     <string name="failure_not_enough_space">정리된 사본을 저장할 여유 공간이 기기에 부족합니다</string>
     <string name="failure_decode_failed">픽셀을 읽을 수 없습니다. 다른 이미지를 사용해 보세요</string>
@@ -504,6 +504,18 @@
     <string name="studio_msg_verified">기록이 확인되었습니다.</string>
     <string name="studio_msg_not_verified">기록을 다시 확인할 수 없습니다. 파일을 직접 열어 보세요.</string>
     <string name="studio_msg_downscaled">안전한 처리를 위해 해상도를 낮췄습니다.</string>
+    <string name="studio_undo_title">원본을 덮어썼습니다</string>
+    <string name="studio_undo_text">이전 상태의 파일은 저장한 백업 사본에 있습니다. 버튼 하나로 되돌릴 수 있습니다.</string>
+    <string name="studio_undo_button">이전 상태로 되돌리기</string>
+    <string name="studio_undo_dismiss">새 버전 유지</string>
+    <string name="studio_msg_undo_done">원본을 백업 사본에서 복원하고 확인했습니다.</string>
+    <string name="studio_audit_list_title">메타데이터가 있는 사진</string>
+    <string name="studio_audit_list_hint">사진을 탭하면 보고서가 열립니다.</string>
+    <string name="studio_audit_more">외 %1$d개.</string>
+    <string name="studio_audit_tag_location">위치</string>
+    <string name="studio_audit_tag_serial">일련번호</string>
+    <string name="studio_audit_tag_person">이름</string>
+    <string name="studio_audit_tag_other">기타 데이터</string>
     <string name="studio_msg_shift_done">날짜 이동 완료: 저장 %1$d개, 실패 %2$d개.</string>
     <string name="studio_shift_title">촬영 날짜 이동</string>
     <string name="studio_shift_text">카메라 시계나 시간대가 잘못되었을 때 선택한 JPEG 사진에 사용합니다. 새 날짜의 사본이 선택한 폴더에 같은 이름으로 저장됩니다.</string>

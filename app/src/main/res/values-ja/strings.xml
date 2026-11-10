@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">EXIFエディターはJPEGに対応しています。PNG/HEIC/AVIFは現在、新しいコピーとして完全にクリーニングすることのみ可能です</string>
     <string name="failure_overwrite_edit_jpeg_only">上書きによるEXIF編集はJPEGに対応しています</string>
     <string name="failure_overwrite_strip_jpeg_png_only">クリーニング時の上書きはJPEGとPNGのみ対応しています。その他の形式は新しいコピーとして保存してください</string>
-    <string name="failure_wipe_gps_jpeg_png_only">GPSの削除はJPEGとPNGに対応しています</string>
+    <string name="failure_wipe_gps_jpeg_png_only">GPS の削除は JPEG、PNG、HEIC に対応しています</string>
     <string name="failure_video_unsupported">この動画は再エンコードなしではクリーニングできません。ファイル構造に対応していません（断片化、暗号化、または破損したファイル）</string>
     <string name="failure_not_enough_space">クリーニングしたコピーを保存する空き容量が端末にありません</string>
     <string name="failure_decode_failed">ピクセルを読み取れませんでした。別の画像をお試しください</string>
@@ -504,6 +504,18 @@
     <string name="studio_msg_verified">書き込みを確認しました。</string>
     <string name="studio_msg_not_verified">書き込みを再確認できませんでした。ファイルを手動で開いてください。</string>
     <string name="studio_msg_downscaled">安全に処理するため解像度を下げました。</string>
+    <string name="studio_undo_title">元のファイルを上書きしました</string>
+    <string name="studio_undo_text">変更前のファイルは、保存したバックアップコピーに残っています。ボタン 1 つで元に戻せます。</string>
+    <string name="studio_undo_button">元に戻す</string>
+    <string name="studio_undo_dismiss">新しいバージョンのままにする</string>
+    <string name="studio_msg_undo_done">元のファイルをバックアップコピーから復元し、検証しました。</string>
+    <string name="studio_audit_list_title">メタデータのある写真</string>
+    <string name="studio_audit_list_hint">写真をタップするとレポートが開きます。</string>
+    <string name="studio_audit_more">ほか %1$d 件。</string>
+    <string name="studio_audit_tag_location">位置情報</string>
+    <string name="studio_audit_tag_serial">シリアル番号</string>
+    <string name="studio_audit_tag_person">名前</string>
+    <string name="studio_audit_tag_other">その他</string>
     <string name="studio_msg_shift_done">日付を変更しました：保存 %1$d 件、失敗 %2$d 件。</string>
     <string name="studio_shift_title">撮影日時をずらす</string>
     <string name="studio_shift_text">カメラの時計やタイムゾーンが間違っていた場合に、選んだ JPEG 写真に使います。新しい日時のコピーが、選んだフォルダに同じ名前で保存されます。</string>

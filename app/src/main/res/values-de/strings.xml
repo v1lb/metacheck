@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">Der EXIF-Editor funktioniert mit JPEG; PNG/HEIC/AVIF lassen sich vorerst nur vollständig als neue Kopie bereinigen</string>
     <string name="failure_overwrite_edit_jpeg_only">Das Bearbeiten von EXIF mit Überschreiben wird für JPEG unterstützt</string>
     <string name="failure_overwrite_strip_jpeg_png_only">Überschreiben beim Bereinigen unterstützt nur JPEG und PNG: Speichere andere Formate als neue Kopie</string>
-    <string name="failure_wipe_gps_jpeg_png_only">Das Entfernen von GPS unterstützt JPEG und PNG</string>
+    <string name="failure_wipe_gps_jpeg_png_only">GPS-Entfernung unterstützt JPEG, PNG und HEIC</string>
     <string name="failure_video_unsupported">Dieses Video kann nicht ohne Neukodierung bereinigt werden: Die Dateistruktur wird nicht unterstützt (fragmentierte, verschlüsselte oder beschädigte Datei)</string>
     <string name="failure_not_enough_space">Nicht genug freier Speicher auf dem Gerät für die bereinigte Kopie</string>
     <string name="failure_decode_failed">Die Pixel konnten nicht gelesen werden. Versuche ein anderes Bild</string>
@@ -506,6 +506,18 @@
     <string name="studio_msg_verified">Schreibvorgang geprüft.</string>
     <string name="studio_msg_not_verified">Der Schreibvorgang konnte nicht erneut geprüft werden: Öffne die Datei manuell.</string>
     <string name="studio_msg_downscaled">Die Auflösung wurde für eine sichere Verarbeitung verringert.</string>
+    <string name="studio_undo_title">Das Original wurde überschrieben</string>
+    <string name="studio_undo_text">Die Datei im früheren Zustand liegt in der gespeicherten Sicherungskopie. Mit einer Taste stellen Sie sie wieder her.</string>
+    <string name="studio_undo_button">Wiederherstellen wie zuvor</string>
+    <string name="studio_undo_dismiss">Neue Version behalten</string>
+    <string name="studio_msg_undo_done">Das Original wurde aus der Sicherungskopie wiederhergestellt und geprüft.</string>
+    <string name="studio_audit_list_title">Fotos mit Metadaten</string>
+    <string name="studio_audit_list_hint">Tippen Sie auf ein Foto, um seinen Bericht zu öffnen.</string>
+    <string name="studio_audit_more">Und %1$d weitere.</string>
+    <string name="studio_audit_tag_location">ORT</string>
+    <string name="studio_audit_tag_serial">SERIENNR.</string>
+    <string name="studio_audit_tag_person">NAME</string>
+    <string name="studio_audit_tag_other">SONSTIGES</string>
     <string name="studio_msg_shift_done">Datum verschoben: %1$d gespeichert, %2$d fehlgeschlagen.</string>
     <string name="studio_shift_title">Aufnahmedatum verschieben</string>
     <string name="studio_shift_text">Für die ausgewählten JPEG-Fotos, wenn Uhrzeit oder Zeitzone der Kamera falsch waren. Kopien mit neuem Datum werden unter denselben Namen im gewählten Ordner gespeichert.</string>

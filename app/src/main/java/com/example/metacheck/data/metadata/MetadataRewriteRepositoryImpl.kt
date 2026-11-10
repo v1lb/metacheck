@@ -75,7 +75,8 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
         ensure(src != dst, FailureCode.SAME_AS_SOURCE)
         val stage = createTemp("gps_wipe", ".img")
         try {
-            val prepared = when (readMime(src)) {
+            val isHeic = ImageFormatDetector.detect(VideoFiles.head(resolver, src)) == ImageFormat.HEIC
+            val prepared = if (isHeic) wipeGpsHeic(src, stage) else when (readMime(src)) {
                 "image/jpeg" -> {
                     prepareEdited(src, stage, MetadataPatch(removeGps = true), keepDescriptive = false)
                     val exif = ExifInterface(stage.absolutePath)
@@ -95,6 +96,46 @@ class MetadataRewriteRepositoryImpl(private val context: Context) : MetadataRewr
             writeDocument(dst, stage, allowNewFileFallback = true)
             if (!verifySameFile(stage, dst)) throw AppFailure(FailureCode.SAVED_FILE_UNVERIFIED)
             prepared.asResult(stage.length(), true)
+        } finally { stage.delete() }
+    }
+
+    /** HEIC: таблица GPS в Exif обнуляется на месте, дата и камера остаются, картинка не пережимается. */
+    private fun wipeGpsHeic(src: Uri, stage: File): Prepared {
+        val raw = createTemp("gps_heic", ".bin")
+        try {
+            copyUriToFile(src, raw)
+            try { HeifCleaner.stripGps(raw, stage) } catch (e: AppFailure) { throw e } catch (e: IOException) {
+                throw AppFailure(FailureCode.GPS_NOT_REMOVED, cause = e)
+            }
+            ensure(HeifCleaner.isGpsFree(stage), FailureCode.GPS_NOT_REMOVED)
+            // Вторая, независимая проверка — стандартным читателем Android (HEIC он читает с Android 9).
+            if (Build.VERSION.SDK_INT >= 28) {
+                val exif = runCatching { ExifInterface(stage.absolutePath) }.getOrNull()
+                ensure(exif == null || (exif.latLong == null && exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE) == null), FailureCode.GPS_NOT_REMOVED)
+                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeFile(stage.absolutePath, bounds)
+                ensure(bounds.outWidth > 0 && bounds.outHeight > 0, FailureCode.DECODE_FAILED)
+            }
+            return Prepared("image/heic", false)
+        } finally { raw.delete() }
+    }
+
+    /**
+     * «Вернуть как было»: содержимое резервной копии, сделанной перед перезаписью, пишется обратно в оригинал.
+     * Резервная копия остаётся у пользователя.
+     */
+    override suspend fun restoreFromBackup(original: String, backup: String): MetadataWriteResult = withContext(Dispatchers.IO) {
+        val target = checkedUri(original); val source = checkedUri(backup)
+        ensure(target != source, FailureCode.SAME_AS_BACKUP)
+        val stage = createTemp("restore", ".bak")
+        try {
+            copyUriToFile(source, stage)
+            ensure(stage.length() > 0, FailureCode.EMPTY_RESULT)
+            val mime = readMime(source) // резервная копия должна быть настоящим JPEG или PNG
+            writeDocument(target, stage)
+            if (!verifySameFile(stage, target)) throw AppFailure(FailureCode.RESTORE_UNVERIFIED)
+            refreshGallery(target)
+            MetadataWriteResult(stage.length(), false, if (mime == "image/jpeg") "JPEG" else "PNG", verified = true)
         } finally { stage.delete() }
     }
 

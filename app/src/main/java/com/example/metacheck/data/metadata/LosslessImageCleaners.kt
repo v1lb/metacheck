@@ -104,10 +104,18 @@ object HeifCleaner {
     private class Plan(val targets: List<Target>, val removable: List<Box>)
 
     /** Копирует [source] в [output] и затирает метаданные. Бросает IOException, если структура непонятна. */
-    fun strip(source: File, output: File) {
+    fun strip(source: File, output: File) = rewrite(source, output, gpsOnly = false)
+
+    /**
+     * «Удалить только GPS»: в Exif обнуляется таблица GPS (дата, камера и настройки съёмки остаются),
+     * XMP и прочие вложенные данные затираются целиком — в них бывает копия координат.
+     */
+    fun stripGps(source: File, output: File) = rewrite(source, output, gpsOnly = true)
+
+    private fun rewrite(source: File, output: File, gpsOnly: Boolean) {
         source.copyTo(output, overwrite = true)
         RandomAccessFile(output, "rw").use { f ->
-            val plan = plan(f)
+            val plan = plan(f, gpsOnly)
             for (target in plan.targets) {
                 f.seek(target.extent.offset)
                 f.write(target.bytes)
@@ -117,13 +125,18 @@ object HeifCleaner {
                 zero(f, box.dataStart, box.end)
             }
         }
-        if (!isClean(output)) throw IOException("HEIF metadata still present")
+        if (!(if (gpsOnly) isGpsFree(output) else isClean(output))) throw IOException("HEIF metadata still present")
     }
 
     /** true, если все служебные элементы пустые и лишних блоков верхнего уровня нет. */
-    fun isClean(file: File): Boolean = runCatching {
+    fun isClean(file: File): Boolean = matchesPlan(file, gpsOnly = false)
+
+    /** true, если таблица GPS в Exif пуста, а XMP и лишние блоки затёрты. */
+    fun isGpsFree(file: File): Boolean = matchesPlan(file, gpsOnly = true)
+
+    private fun matchesPlan(file: File, gpsOnly: Boolean): Boolean = runCatching {
         RandomAccessFile(file, "r").use { f ->
-            val plan = plan(f)
+            val plan = plan(f, gpsOnly)
             plan.removable.isEmpty() && plan.targets.all { t ->
                 val now = ByteArray(t.bytes.size)
                 f.seek(t.extent.offset); f.readFully(now)
@@ -132,14 +145,14 @@ object HeifCleaner {
         }
     }.getOrDefault(false)
 
-    private fun plan(f: RandomAccessFile): Plan = try {
-        buildPlan(f)
+    private fun plan(f: RandomAccessFile, gpsOnly: Boolean): Plan = try {
+        buildPlan(f, gpsOnly)
     } catch (e: RuntimeException) {
         // Битый файл: выход за границы массива и т. п. Для вызывающего это «формат не разобран».
         throw IOException("Malformed HEIF", e)
     }
 
-    private fun buildPlan(f: RandomAccessFile): Plan {
+    private fun buildPlan(f: RandomAccessFile, gpsOnly: Boolean): Plan {
         val length = f.length()
         val top = topLevel(f)
         if (top.firstOrNull()?.type != "ftyp") throw IOException("Not an ISO BMFF file")
@@ -169,6 +182,15 @@ object HeifCleaner {
             if (extents.any { touchesImage(it.offset, it.offset + it.length) }) throw IOException("Metadata shares bytes with image data")
             val total = extents.sumOf { it.length }
             if (total > MAX_METADATA_BYTES) throw IOException("Metadata item too large")
+            if (gpsOnly && item.isExif) {
+                // Exif остаётся, меняются только байты таблицы GPS.
+                if (extents.size != 1) throw IOException("Exif split into parts")
+                val start = extents[0].offset
+                val payload = ByteArray(total.toInt())
+                f.seek(start); f.readFully(payload)
+                for ((at, bytes) in gpsPatches(payload)) targets += Target(Extent(start + at, bytes.size.toLong()), bytes)
+                continue
+            }
             val fill = ByteArray(total.toInt())
             when {
                 item.isExif -> if (fill.size >= emptyExif.size) emptyExif.copyInto(fill)
@@ -183,6 +205,58 @@ object HeifCleaner {
         }
         val removable = top.filter { it.type !in keptBoxes && !touchesImage(it.start, it.end) }
         return Plan(targets, removable)
+    }
+
+    /**
+     * Что перезаписать в данных элемента Exif, чтобы таблица GPS стала пустой: её значения и строки
+     * обнуляются, число записей становится 0. Ссылка на таблицу в IFD0 остаётся и ведёт на пустую таблицу —
+     * так не нужно ничего сдвигать. Пустой список: GPS в файле нет или он уже удалён.
+     */
+    internal fun gpsPatches(payload: ByteArray): List<Pair<Int, ByteArray>> {
+        if (payload.size < 12) throw IOException("Exif too short")
+        // Первые 4 байта — смещение заголовка TIFF от их конца (обычно 6: «Exif\0\0»).
+        val tiff = 4 + u32(payload, 0).toInt()
+        if (tiff < 4 || tiff + 8 > payload.size) throw IOException("Bad Exif header offset")
+        val little = when {
+            payload[tiff] == 'I'.code.toByte() && payload[tiff + 1] == 'I'.code.toByte() -> true
+            payload[tiff] == 'M'.code.toByte() && payload[tiff + 1] == 'M'.code.toByte() -> false
+            else -> throw IOException("Bad TIFF byte order")
+        }
+        fun b(i: Int) = payload[i].toInt() and 0xFF
+        fun r16(i: Int) = if (little) b(i) or (b(i + 1) shl 8) else (b(i) shl 8) or b(i + 1)
+        fun r32(i: Int): Long = if (little) (b(i).toLong() or (b(i + 1).toLong() shl 8) or (b(i + 2).toLong() shl 16) or (b(i + 3).toLong() shl 24))
+            else u32(payload, i)
+        fun inside(from: Long, len: Long) = from >= 0 && len >= 0 && tiff + from + len <= payload.size
+        if (r16(tiff + 2) != 42) throw IOException("Not a TIFF header")
+        val ifd0 = r32(tiff + 4)
+        if (!inside(ifd0, 2)) throw IOException("IFD0 outside Exif")
+        val count0 = r16(tiff + ifd0.toInt())
+        if (!inside(ifd0 + 2, count0 * 12L)) throw IOException("IFD0 entries outside Exif")
+        var gps = -1L
+        for (i in 0 until count0) {
+            val e = tiff + ifd0.toInt() + 2 + i * 12
+            if (r16(e) == 0x8825) gps = r32(e + 8)
+        }
+        if (gps < 0) return emptyList()
+        if (!inside(gps, 2)) throw IOException("GPS IFD outside Exif")
+        val g = tiff + gps.toInt()
+        val count = r16(g)
+        if (count == 0) return emptyList()
+        if (!inside(gps + 2, count * 12L + 4)) throw IOException("GPS entries outside Exif")
+        val typeSize = intArrayOf(0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8)
+        val patches = ArrayList<Pair<Int, ByteArray>>()
+        for (i in 0 until count) {
+            val e = g + 2 + i * 12
+            val size = typeSize.getOrElse(r16(e + 2)) { 0 }.toLong() * r32(e + 4)
+            if (size > 4) {
+                val at = r32(e + 8)
+                if (!inside(at, size)) throw IOException("GPS value outside Exif")
+                patches += (tiff + at.toInt()) to ByteArray(size.toInt())
+            }
+        }
+        // Число записей 0, сами записи и ссылка на следующую таблицу — нули.
+        patches += g to ByteArray(2 + count * 12 + 4)
+        return patches
     }
 
     private fun items(d: ByteArray, iinf: Box): List<Item> {

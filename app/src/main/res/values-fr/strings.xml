@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">L’éditeur EXIF fonctionne avec JPEG ; pour l’instant, PNG/HEIC/AVIF peuvent seulement être entièrement nettoyés en nouvelle copie</string>
     <string name="failure_overwrite_edit_jpeg_only">La modification EXIF avec écrasement est prise en charge pour JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">L’écrasement lors du nettoyage ne prend en charge que JPEG et PNG : enregistrez les autres formats en nouvelle copie</string>
-    <string name="failure_wipe_gps_jpeg_png_only">La suppression du GPS prend en charge JPEG et PNG</string>
+    <string name="failure_wipe_gps_jpeg_png_only">La suppression du GPS prend en charge JPEG, PNG et HEIC</string>
     <string name="failure_video_unsupported">Impossible de nettoyer cette vidéo sans réencodage : la structure du fichier n’est pas prise en charge (fichier fragmenté, chiffré ou endommagé)</string>
     <string name="failure_not_enough_space">Espace libre insuffisant sur l’appareil pour la copie nettoyée</string>
     <string name="failure_decode_failed">Impossible de lire les pixels. Essayez une autre image</string>
@@ -508,6 +508,18 @@
     <string name="studio_msg_verified">Écriture vérifiée.</string>
     <string name="studio_msg_not_verified">Impossible de revérifier l’écriture : ouvrez le fichier manuellement.</string>
     <string name="studio_msg_downscaled">La résolution a été réduite pour un traitement sûr.</string>
+    <string name="studio_undo_title">L’original a été écrasé</string>
+    <string name="studio_undo_text">Le fichier tel qu’il était se trouve dans la copie de sauvegarde enregistrée. Un bouton le remet en place.</string>
+    <string name="studio_undo_button">Remettre comme avant</string>
+    <string name="studio_undo_dismiss">Garder la nouvelle version</string>
+    <string name="studio_msg_undo_done">L’original a été restauré depuis la copie de sauvegarde et vérifié.</string>
+    <string name="studio_audit_list_title">Photos avec métadonnées</string>
+    <string name="studio_audit_list_hint">Touchez une photo pour ouvrir son rapport.</string>
+    <string name="studio_audit_more">Et %1$d de plus.</string>
+    <string name="studio_audit_tag_location">LIEU</string>
+    <string name="studio_audit_tag_serial">N° DE SÉRIE</string>
+    <string name="studio_audit_tag_person">NOM</string>
+    <string name="studio_audit_tag_other">AUTRES DONNÉES</string>
     <string name="studio_msg_shift_done">Dates décalées : %1$d enregistrées, %2$d en échec.</string>
     <string name="studio_shift_title">Décaler la date de prise de vue</string>
     <string name="studio_shift_text">Pour les photos JPEG sélectionnées, si l’heure ou le fuseau de l’appareil étaient faux. Les copies avec la nouvelle date sont enregistrées dans le dossier choisi, sous les mêmes noms.</string>

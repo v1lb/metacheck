@@ -89,6 +89,8 @@ fun MetadataStudioScreen(
     startAudit: Boolean = false,
     onAuditStarted: () -> Unit = {},
     startInBatch: Boolean = false,
+    /** Открыть отчёт по фото из списка проверки папки. */
+    onOpenReport: (Uri) -> Unit = {},
     vm: MetadataStudioViewModel = viewModel(factory = MetadataStudioViewModel.Factory),
 ) {
     val context = LocalContext.current
@@ -97,6 +99,7 @@ fun MetadataStudioScreen(
     val batch by vm.batch.collectAsStateWithLifecycle()
     val usedToday by vm.usedToday.collectAsStateWithLifecycle()
     val audit by vm.audit.collectAsStateWithLifecycle()
+    val undoOriginal by vm.undoOriginal.collectAsStateWithLifecycle()
     val perRun = com.example.metacheck.domain.metadata.BatchLimits.perRun(isPro, usedToday)
     var mode by rememberSaveable { mutableStateOf(if (startInBatch) StudioMode.BATCH else StudioMode.STRIP) }
     var source by rememberSaveable { mutableStateOf(initialUri.orEmpty()) }
@@ -376,6 +379,20 @@ fun MetadataStudioScreen(
                 Text(actionError?.asString().orEmpty(), Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onSurface)
             }
         }
+        if (mode != StudioMode.BATCH && undoOriginal != null) item {
+            // Последняя перезапись оригинала: одной кнопкой вернуть файл из резервной копии.
+            GlassPanel(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(17.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(stringResource(R.string.studio_undo_title), style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface)
+                    Text(stringResource(R.string.studio_undo_text), color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall)
+                    CyberOutlineButton(stringResource(R.string.studio_undo_button), { if (!busy) vm.undoOverwrite() }, Modifier.fillMaxWidth())
+                    Text(stringResource(R.string.studio_undo_dismiss), Modifier.clickable { vm.dismissUndo() }.padding(vertical = 6.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
         if (mode != StudioMode.BATCH) {
             item {
                 GlassPanel(Modifier.fillMaxWidth(), MaterialTheme.colorScheme.primary) {
@@ -528,6 +545,23 @@ fun MetadataStudioScreen(
                     }
                 }
             }
+            // Список после проверки папки: что именно выдаёт каждое фото; нажатие открывает его отчёт.
+            audit.result?.takeIf { it.findings.isNotEmpty() }?.let { result ->
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        SectionLabel(stringResource(R.string.studio_audit_list_title), trailing = result.findings.size.toString())
+                        Text(stringResource(R.string.studio_audit_list_hint), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+                items(result.findings.take(AUDIT_LIST_LIMIT), key = { it.uri }) { finding ->
+                    AuditRow(finding) { if (!busy && !audit.running) onOpenReport(Uri.parse(finding.uri)) }
+                }
+                if (result.findings.size > AUDIT_LIST_LIMIT) item {
+                    Text(stringResource(R.string.studio_audit_more, result.findings.size - AUDIT_LIST_LIMIT),
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
             item {
                 // Сдвиг даты у выбранных фото: камера была в другом часовом поясе или с неверным временем.
                 GlassPanel(Modifier.fillMaxWidth()) {
@@ -608,6 +642,26 @@ fun MetadataStudioScreen(
                 worldPicker = false
             },
         )
+    }
+}
+
+/** Сколько строк списка проверки показывать: длинный список на телефоне всё равно не читают. */
+private const val AUDIT_LIST_LIMIT = 100
+
+/** Строка списка проверки: имя файла и пометки, что он выдаёт. */
+@Composable
+private fun AuditRow(finding: com.example.metacheck.domain.metadata.AuditFinding, onClick: () -> Unit) {
+    Column(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(finding.name, style = com.example.metacheck.ui.theme.MonoText.value, color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (finding.location) Stamp(listOf(stringResource(R.string.studio_audit_tag_location)), MaterialTheme.colorScheme.error, small = true)
+            if (finding.serial) Stamp(listOf(stringResource(R.string.studio_audit_tag_serial)), MaterialTheme.colorScheme.onSurface, small = true)
+            if (finding.person) Stamp(listOf(stringResource(R.string.studio_audit_tag_person)), MaterialTheme.colorScheme.onSurface, small = true)
+            if (finding.risk == 0) Stamp(listOf(stringResource(R.string.studio_audit_tag_other)), MaterialTheme.colorScheme.onSurfaceVariant, small = true)
+        }
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 }
 

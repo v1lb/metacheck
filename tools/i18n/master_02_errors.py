@@ -40,7 +40,7 @@ S = [
     ("failure_overwrite_strip_jpeg_png_only",
      "Overwrite during cleaning supports only JPEG and PNG: save other formats as a new copy",
      "Перезапись при очистке поддерживает только JPEG и PNG: другие форматы сохраняйте как новую копию"),
-    ("failure_wipe_gps_jpeg_png_only", "GPS removal supports JPEG and PNG", "Удаление GPS поддерживает JPEG и PNG"),
+    ("failure_wipe_gps_jpeg_png_only", "GPS removal supports JPEG, PNG and HEIC", "Удаление GPS поддерживает JPEG, PNG и HEIC"),
     ("failure_video_unsupported",
      "This video can't be cleaned without re-encoding: the file structure is not supported (fragmented, encrypted or damaged file)",
      "Это видео нельзя очистить без пережатия: структура файла не поддерживается (фрагментированный, зашифрованный или повреждённый файл)"),

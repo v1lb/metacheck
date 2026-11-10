@@ -145,6 +145,10 @@ fun MainScreen(
     var showStudio by rememberSaveable { mutableStateOf(false) }
     /** Студию открыли кнопкой «Проверить всю папку»: сразу вкладка «Пакетно» и выбор папки. */
     var studioAudit by rememberSaveable { mutableStateOf(false) }
+    /** Студию открыть сразу на вкладке «Пакетно» (возврат к списку проверки папки). */
+    var studioBatch by rememberSaveable { mutableStateOf(false) }
+    /** Отчёт открыт из списка проверки папки: «Назад» возвращает к этому списку, а не на главный экран. */
+    var returnToAudit by rememberSaveable { mutableStateOf(false) }
     var confirmApi by rememberSaveable { mutableStateOf(false) }
 
     // Сообщения ViewModel приходят как UiText и превращаются в строку здесь, на языке экрана.
@@ -274,6 +278,11 @@ fun MainScreen(
         pendingWipeSource = null
         if (uri != null && original != null) studioVm.wipeGpsCopy(original, uri)
     }
+    val saveGpsHeic = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/heic")) { uri ->
+        val original = pendingWipeSource
+        pendingWipeSource = null
+        if (uri != null && original != null) studioVm.wipeGpsCopy(original, uri)
+    }
     val saveGpsPng = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
         val original = pendingWipeSource
         pendingWipeSource = null
@@ -283,11 +292,15 @@ fun MainScreen(
     // «Назад» с экрана ошибки и во время анализа раньше закрывало приложение: возвращаемся на главный.
     val inFlow = inResult || state is UiState.Failed || state is UiState.Loading
 
-    BackHandler(enabled = showStudio || showSettings || inFlow) {
+    val goBack = {
         if (showStudio) showStudio = false
         else if (showSettings) { showSettings = false; viewModel.refreshHistory() }
-        else viewModel.close()
+        else {
+            viewModel.close()
+            if (returnToAudit) { returnToAudit = false; studioBatch = true; showStudio = true }
+        }
     }
+    BackHandler(enabled = showStudio || showSettings || inFlow) { goBack() }
 
     CyberBackdrop {
         Scaffold(
@@ -320,11 +333,7 @@ fun MainScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                     navigationIcon = {
-                        if (showStudio || showSettings || inFlow) IconButton(onClick = {
-                            if (showStudio) showStudio = false
-                            else if (showSettings) { showSettings = false; viewModel.refreshHistory() }
-                            else viewModel.close()
-                        }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.common_back)) }
+                        if (showStudio || showSettings || inFlow) IconButton(onClick = { goBack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.common_back)) }
                     },
                     actions = {
                         if (!showSettings && !showStudio && !inFlow) {
@@ -371,6 +380,8 @@ fun MainScreen(
                     onBack = { showStudio = false },
                     startAudit = studioAudit,
                     onAuditStarted = { studioAudit = false },
+                    startInBatch = studioBatch,
+                    onOpenReport = { uri -> returnToAudit = true; showStudio = false; viewModel.onImagePicked(uri) },
                 )
                 else if (current.kind == ScreenKind.SETTINGS) SettingsScreen(onMessage = viewModel::showMessage, uiPreferences = uiPreferences)
                 else when (val s = current.ui) {
@@ -380,7 +391,7 @@ fun MainScreen(
                         onCamera = ::launchCamera, onClipboard = ::pasteImage,
                         onOpen = viewModel::openFromHistory, onDelete = viewModel::deleteFromHistory,
                         onCsv = { saveCsv.launch("metacheck-history.csv") },
-                        onUpgrade = proVm::openPaywall, onStudio = { showStudio = true },
+                        onUpgrade = proVm::openPaywall, onStudio = { studioBatch = false; showStudio = true },
                         onAudit = { studioAudit = true; showStudio = true },
                     )
                     UiState.Loading -> LoadingScreen()
@@ -403,14 +414,17 @@ fun MainScreen(
                             sourceUri = s.source,
                             actions = ResultActions(
                                 onCsv = { saveMetadataCsv.launch("$name-metadata.csv") },
-                                onEdit = if (s.source == null || video) null else { { if (entitlement.isPro) showStudio = true else proVm.openPaywall() } },
+                                onEdit = if (s.source == null || video) null else { { if (entitlement.isPro) { studioBatch = false; showStudio = true } else proVm.openPaywall() } },
                                 onWipeGps = if (video) cleanVideo.takeIf { GpsPrivacy.hasLocationMarkers(s.report) } else if (s.source == null || !GpsPrivacy.hasLocationMarkers(s.report) ||
-                                    s.report.file.format !in setOf(ImageFormat.JPEG, ImageFormat.PNG)) null else {
+                                    s.report.file.format !in setOf(ImageFormat.JPEG, ImageFormat.PNG, ImageFormat.HEIC)) null else {
                                     wipe@{
                                         if (studioBusy) { viewModel.showMessage(UiText.Res(R.string.main_msg_busy)); return@wipe }
                                         pendingWipeSource = s.source
-                                        if (s.report.file.format == ImageFormat.JPEG) saveGpsJpeg.launch("${name}-gps-safe.jpg")
-                                        else saveGpsPng.launch("${name}-gps-safe.png")
+                                        when (s.report.file.format) {
+                                            ImageFormat.JPEG -> saveGpsJpeg.launch("${name}-gps-safe.jpg")
+                                            ImageFormat.HEIC -> saveGpsHeic.launch("${name}-gps-safe.heic")
+                                            else -> saveGpsPng.launch("${name}-gps-safe.png")
+                                        }
                                     }
                                 },
                                 onCopy = {

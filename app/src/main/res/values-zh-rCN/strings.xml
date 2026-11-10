@@ -213,7 +213,7 @@
     <string name="failure_edit_jpeg_only">EXIF 编辑器仅支持 JPEG；PNG/HEIC/AVIF 目前只能作为新副本完全清理</string>
     <string name="failure_overwrite_edit_jpeg_only">覆盖方式编辑 EXIF 仅支持 JPEG</string>
     <string name="failure_overwrite_strip_jpeg_png_only">清理时覆盖仅支持 JPEG 和 PNG：其他格式请另存为新副本</string>
-    <string name="failure_wipe_gps_jpeg_png_only">移除 GPS 支持 JPEG 和 PNG</string>
+    <string name="failure_wipe_gps_jpeg_png_only">GPS 移除支持 JPEG、PNG 和 HEIC</string>
     <string name="failure_video_unsupported">无法在不重新编码的情况下清理此视频：不支持该文件结构（分段、加密或损坏的文件）</string>
     <string name="failure_not_enough_space">设备可用空间不足，无法保存清理后的副本</string>
     <string name="failure_decode_failed">无法读取像素。请尝试其他图像</string>
@@ -504,6 +504,18 @@
     <string name="studio_msg_verified">写入已验证。</string>
     <string name="studio_msg_not_verified">无法重新检查写入：请手动打开文件。</string>
     <string name="studio_msg_downscaled">为安全处理已降低分辨率。</string>
+    <string name="studio_undo_title">原文件已被覆盖</string>
+    <string name="studio_undo_text">原来的文件保存在你存下的备份副本中，一键即可恢复。</string>
+    <string name="studio_undo_button">恢复原样</string>
+    <string name="studio_undo_dismiss">保留新版本</string>
+    <string name="studio_msg_undo_done">已从备份副本恢复原文件并完成验证。</string>
+    <string name="studio_audit_list_title">含元数据的照片</string>
+    <string name="studio_audit_list_hint">点按照片可打开它的报告。</string>
+    <string name="studio_audit_more">还有 %1$d 张。</string>
+    <string name="studio_audit_tag_location">位置</string>
+    <string name="studio_audit_tag_serial">序列号</string>
+    <string name="studio_audit_tag_person">姓名</string>
+    <string name="studio_audit_tag_other">其他数据</string>
     <string name="studio_msg_shift_done">日期已调整：成功 %1$d 张，失败 %2$d 张。</string>
     <string name="studio_shift_title">调整拍摄日期</string>
     <string name="studio_shift_text">用于所选 JPEG 照片，适用于相机时钟或时区设置错误的情况。调整后的副本以相同文件名保存到你选择的文件夹。</string>

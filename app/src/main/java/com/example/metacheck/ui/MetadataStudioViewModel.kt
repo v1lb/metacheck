@@ -184,11 +184,41 @@ class MetadataStudioViewModel(
     }
 
     private fun overwrite(source: String, backup: Uri, patch: MetadataPatch?) = work {
+        // Доступ к резервной копии должен пережить перезапуск: по ней работает «Вернуть как было».
+        persistAccess(backup)
         studio.overwrite(source, backup.toString(), patch).fold(
-            onSuccess = { _message.value = successMessage(R.string.studio_msg_original_replaced, it.verified, it.downscaled) },
+            onSuccess = {
+                _message.value = successMessage(R.string.studio_msg_original_replaced, it.verified, it.downscaled)
+                savedState[UNDO_BACKUP] = backup.toString()
+                savedState[UNDO_ORIGINAL] = source
+            },
             onFailure = { _message.value = failMessage(it) },
         )
         usedToday.value = studio.usedToday()
+    }
+
+    /** URI оригинала, который был перезаписан последним и ещё может быть возвращён из резервной копии. */
+    val undoOriginal: StateFlow<String?> = savedState.getStateFlow(UNDO_ORIGINAL, null)
+
+    /** «Вернуть как было»: в оригинал записывается содержимое резервной копии. */
+    fun undoOverwrite() = work {
+        val original = savedState.get<String>(UNDO_ORIGINAL)
+        val backup = savedState.get<String>(UNDO_BACKUP)
+        if (original == null || backup == null) { _message.value = INTERRUPTED; return@work }
+        studio.undoOverwrite(original, backup).fold(
+            onSuccess = {
+                savedState[UNDO_ORIGINAL] = null
+                savedState[UNDO_BACKUP] = null
+                _message.value = UiText.Res(R.string.studio_msg_undo_done)
+            },
+            onFailure = { _message.value = failMessage(it) },
+        )
+    }
+
+    /** Убрать предложение отмены (файл оставляем как есть). */
+    fun dismissUndo() {
+        savedState[UNDO_ORIGINAL] = null
+        savedState[UNDO_BACKUP] = null
     }
 
     fun batchStrip(sources: List<String>, targetTree: Uri, onDone: () -> Unit = {}) = work {
@@ -271,6 +301,9 @@ class MetadataStudioViewModel(
         private val INTERRUPTED = UiText.Res(R.string.studio_msg_interrupted)
 
         val LOST_ACCESS = UiText.Res(R.string.error_access_lost)
+
+        private const val UNDO_ORIGINAL = "undo_original"
+        private const val UNDO_BACKUP = "undo_backup"
 
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
