@@ -42,10 +42,13 @@ class MainActivity : AppCompatActivity() {
      * Без этого разрешения Android 10+ отдаёт файл без GPS, и отчёт ошибочно показывал бы, что координат нет.
      */
     private var pendingSharedUri: Uri? = null
+    /** true: ожидающее фото пришло через «Отправить без метаданных», после ответа его нужно очистить и переслать. */
+    private var pendingCleanShare = false
     private val mediaLocationPermission =
         registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) {
-            pendingSharedUri?.let(viewModel::onImagePicked)
+            pendingSharedUri?.let { if (pendingCleanShare) viewModel.requestCleanShare(it) else viewModel.onImagePicked(it) }
             pendingSharedUri = null
+            pendingCleanShare = false
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,15 +129,19 @@ class MainActivity : AppCompatActivity() {
         if (intent?.action != Intent.ACTION_SEND || !(type.startsWith("image/") || type.startsWith("video/"))) return
         val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java) ?: return
         // Второй пункт в меню «Поделиться» (activity-alias): сразу очистить и переслать дальше.
-        // Для него разрешение не нужно: всё равно удаляется всё, а лишний диалог сломал бы «одно касание».
-        if (intent.component?.className?.endsWith(CLEAN_SHARE_ALIAS) == true) viewModel.requestCleanShare(uri)
-        else if (android.os.Build.VERSION.SDK_INT >= 29 && androidx.core.content.ContextCompat.checkSelfPermission(
+        val cleanShare = intent.component?.className?.endsWith(CLEAN_SHARE_ALIAS) == true
+        // Разрешение нужно и для него: очистка работает и так, но отчёт и запись в истории без разрешения
+        // показывали бы «места съёмки нет» у фото, где оно есть. Диалог появляется только пока разрешение
+        // не выдано; после отказа Android его больше не показывает, и «одно касание» сохраняется.
+        if (android.os.Build.VERSION.SDK_INT >= 29 && androidx.core.content.ContextCompat.checkSelfPermission(
                 this, android.Manifest.permission.ACCESS_MEDIA_LOCATION,
             ) != android.content.pm.PackageManager.PERMISSION_GRANTED
         ) {
             pendingSharedUri = uri
+            pendingCleanShare = cleanShare
             mediaLocationPermission.launch(android.Manifest.permission.ACCESS_MEDIA_LOCATION)
-        } else viewModel.onImagePicked(uri)
+        } else if (cleanShare) viewModel.requestCleanShare(uri)
+        else viewModel.onImagePicked(uri)
     }
 
     private companion object {
