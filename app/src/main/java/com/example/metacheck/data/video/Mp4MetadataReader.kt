@@ -223,7 +223,9 @@ object Mp4MetadataReader {
 
     /** udta: теги QuickTime (©xxx), 3GPP (loci, auth…), вложенный meta/ilst, XMP_ от Adobe. */
     private fun readUdta(src: ByteSource, udta: BoxRef, tags: Collector, onXmp: (String) -> Unit) {
-        val children = try { IsoBmff.children(src, udta) } catch (_: Mp4FormatException) { return }
+        // QuickTime завершает udta четырьмя нулевыми байтами: это не бокс, поэтому разбор нестрогий.
+        // Строгий разбор на таком файле бросал исключение, и теги udta (в том числе ©xyz) не читались вовсе.
+        val children = IsoBmff.list(src, udta.payloadStart, udta.end, lenient = true).first
         for (child in children) {
             val size = child.payloadSize
             if (size > MAX_UUID_BYTES) { tags.raw("udta ${child.type}", child.size); continue }

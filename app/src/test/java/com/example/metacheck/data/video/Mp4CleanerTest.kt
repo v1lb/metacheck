@@ -137,6 +137,17 @@ class Mp4CleanerTest {
     }
 
     @Test
+    fun readsUdtaEndingWithQuickTimeTerminator() {
+        // QuickTime дописывает в конец udta 32-битный ноль. Теги перед ним должны читаться.
+        val xyzText = "+41.8902+012.4923/".toByteArray()
+        val xyz = box("©xyz", byteArrayOf(0, xyzText.size.toByte(), 0x15, 0xC7.toByte()) + xyzText)
+        val moov = box("moov", box("udta", xyz + ByteArray(4)))
+        val meta = Mp4MetadataReader.read(ArrayByteSource(ftyp("qt  ") + moov))
+        assertEquals(41.8902, meta.gps!!.latitude, 1e-6)
+        assertEquals(12.4923, meta.gps!!.longitude, 1e-6)
+    }
+
+    @Test
     fun parsesQuickTimeLocationAndKeysInMoov() {
         // Android пишет moov/udta/©xyz, iPhone — moov/meta с ключами mdta.
         val xyzText = "+59.9386+030.3141/".toByteArray()
