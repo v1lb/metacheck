@@ -13,3 +13,8 @@ keystore.properties
 *.keystore
 *.aab
 __pycache__/
+# Закрытые ключи (tools/license_tool.py keygen и любые другие)
+*.pem
+*.key
+*.p12
+secrets/
